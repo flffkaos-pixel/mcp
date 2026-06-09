@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html class="light" lang="ko">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -10,173 +10,181 @@ tailwind.config = {{
   darkMode: "class",
   theme: {{
     extend: {{
-      colors: {{
-        "background-surface": "#F8FAFC","surface-container-highest": "#d5e3fd","on-surface": "#0d1c2f",
-        "on-secondary": "#ffffff","secondary-fixed-dim": "#a2c9ff","tertiary": "#974700",
-        "on-primary-fixed": "#001c39","error-container": "#ffdad6","outline": "#717783",
-        "tertiary-fixed": "#ffdbc8","on-primary": "#ffffff","on-primary-fixed-variant": "#004883",
-        "on-tertiary-fixed": "#311300","on-tertiary-container": "#ffffff",
-        "glass-fill": "rgba(255, 255, 255, 0.7)","on-secondary-fixed": "#001c38",
-        "on-secondary-fixed-variant": "#004881","surface-container-lowest": "#ffffff",
-        "tertiary-fixed-dim": "#ffb689","surface-dim": "#ccdbf4","inverse-surface": "#233144",
-        "on-primary-container": "#ffffff","primary-container": "#0078d4","secondary-container": "#78b4fe",
-        "on-secondary-container": "#00457b","success-green": "#34D399","on-background": "#0d1c2f",
-        "surface-container-low": "#eff4ff","surface-bright": "#f8f9ff","surface-container-high": "#dde9ff",
-        "inverse-on-surface": "#ebf1ff","tertiary-container": "#bc5b00","secondary": "#1260a5",
-        "error": "#ba1a1a","primary-fixed": "#d3e3ff","primary-fixed-dim": "#a3c9ff",
-        "on-tertiary": "#ffffff","surface-tint": "#0060ab","background": "#f8f9ff","surface": "#f8f9ff",
-        "on-primary": "#ffffff","on-error": "#ffffff","outline-variant": "#c2c7cf",
-        "code-bg": "#0F172A","card": "#ffffff","accent": "#06b6d4","on-accent": "#ffffff"
-      }},
-      borderRadius: {{ DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" }},
-      spacing: {{ lg: "24px", base: "4px", md: "16px", xs: "8px", "section-gap": "80px", sm: "12px", "container-max": "1024px", xl: "40px" }},
-      fontFamily: {{ "label-sm": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "headline-xl-mobile": ["Inter"], "label-md": ["JetBrains Mono"], "headline-lg": ["Inter"], "headline-xl": ["Inter"] }},
-      fontSize: {{ "label-sm": ["12px", {{"lineHeight": "16px","letterSpacing": "0.05em","fontWeight": "600"}}], "body-lg": ["18px", {{"lineHeight": "30px","fontWeight": "400"}}], "headline-md": ["20px", {{"lineHeight": "28px","fontWeight": "700"}}], "body-md": ["16px", {{"lineHeight": "24px","fontWeight": "400"}}], "headline-xl-mobile": ["32px", {{"lineHeight": "40px","letterSpacing": "-0.02em","fontWeight": "800"}}], "label-md": ["14px", {{"lineHeight": "20px","fontWeight": "500"}}], "headline-lg": ["28px", {{"lineHeight": "36px","fontWeight": "700"}}], "headline-xl": ["42px", {{"lineHeight": "52px","letterSpacing": "-0.02em","fontWeight": "800"}}] }}
+      "colors": {
+  "background-surface": "#F8FAFC","surface-container-highest": "#d5e3fd","on-surface": "#0d1c2f",
+  "on-secondary": "#ffffff","secondary-fixed-dim": "#a2c9ff","tertiary": "#974700",
+  "on-primary-fixed": "#001c39","error-container": "#ffdad6","outline": "#717783",
+  "tertiary-fixed": "#ffdbc8","on-primary": "#ffffff","on-primary-fixed-variant": "#004883",
+  "on-tertiary-fixed": "#311300","on-tertiary-container": "#ffffff",
+  "glass-fill": "rgba(255, 255, 255, 0.7)","on-secondary-fixed": "#001c38",
+  "on-secondary-fixed-variant": "#004881","surface-container-lowest": "#ffffff",
+  "tertiary-fixed-dim": "#ffb689","surface-dim": "#ccdbf4","inverse-surface": "#233144",
+  "on-primary-container": "#ffffff","primary-container": "#0078d4","secondary-container": "#78b4fe",
+  "on-secondary-container": "#00457b","success-green": "#34D399","on-background": "#0d1c2f",
+  "surface-container-low": "#eff4ff","surface-bright": "#f8f9ff","surface-container-high": "#dde9ff",
+  "inverse-on-surface": "#ebf1ff","tertiary-container": "#bc5b00","secondary": "#1260a5",
+  "error": "#ba1a1a","primary-fixed": "#d3e3ff","primary-fixed-dim": "#a3c9ff",
+  "on-tertiary": "#ffffff","surface-tint": "#0060ab","background": "#f8f9ff","surface": "#f8f9ff",
+  "on-primary": "#ffffff","on-error": "#ffffff","outline-variant": "#c2c7cf",
+  "code-bg": "#0F172A","card": "#ffffff","accent": "#06b6d4","on-accent": "#ffffff",
+  "primary-container": "#0078d4","surface-container": "#e6eeff","surface-variant": "#d5e3fd",
+  "inverse-primary": "#a3c9ff","primary": "#005faa","on-error-container": "#93000a",
+  "on-surface-variant": "#404752","secondary-fixed": "#d3e4ff","on-tertiary-fixed-variant": "#743500"
+}
     }}
   }}
 }}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/style.css"/>
+<style>
+body {{ font-family: 'Inter', sans-serif; background-color: #f8f9ff; }}
+.glass {{ background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); }}
+.material-symbols-outlined {{ font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }}
+.scroll-mt-24 {{ scroll-margin-top: 6rem; }}
+.lang-content {{ display: none; }}
+.lang-content.active {{ display: block; }}
+</style>
 </head>
-<body class="bg-surface dark:bg-inverse-surface text-on-background dark:text-inverse-on-surface transition-colors duration-300">
-<header class="fixed top-0 w-full z-50 bg-glass-fill dark:bg-[#0d1c2f]/80 backdrop-blur-md border-b border-outline-variant dark:border-gray-700 shadow-sm h-16">
-  <div class="max-w-container-max mx-auto px-md flex justify-between items-center h-full">
-    <a href="../index.html" class="flex items-center gap-xs">
-      <span class="material-symbols-outlined text-primary text-3xl">extension</span>
-      <span class="font-headline-md font-headline-md font-bold text-on-surface dark:text-inverse-on-surface">MCP Curriculum</span>
-    </a>
-    <div class="flex items-center gap-md">
-      <div id="langToggleBtn" class="flex items-center gap-xs cursor-pointer text-on-surface-variant dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">translate</span>
-        <span class="font-label-sm text-label-sm" id="langLabel">KO / EN</span>
-      </div>
-      <button id="darkModeToggle" class="material-symbols-outlined text-on-surface-variant dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-transform active:scale-90">dark_mode</button>
-    </div>
-  </div>
+<body class="text-on-background">
+<header class="fixed top-0 w-full z-50 glass backdrop-blur-md border-b border-outline-variant shadow-sm h-16">
+<div class="max-w-container-max mx-auto px-md flex justify-between items-center h-full">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-3xl">extension</span>
+<span class="text-headline-md font-headline-md font-bold text-on-surface">MCP Curriculum</span>
+</div>
+<nav class="hidden md:flex gap-lg items-center">
+  <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="fundamentals.html">Fundamentals</a>
+          <a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1" href="getting-started.html">Getting Started</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="intermediate.html">Intermediate</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="ecosystem.html">Ecosystem</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="production.html">Production</a>
+</nav>
+<div class="flex items-center gap-md">
+<div id="langToggleBtn" class="flex items-center gap-xs cursor-pointer text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">translate</span>
+<span class="font-label-sm text-label-sm" id="langLabel">KO / EN</span>
+</div>
+</div>
+</div>
 </header>
 <main class="pt-16">
 <div id="content-en" class="lang-content">
 
 <section class="py-section-gap px-md scroll-mt-24">
   <div class="max-w-container-max mx-auto">
-    <div class="inline-flex items-center gap-xs px-sm py-base bg-surface-container-high text-primary dark:text-primary rounded-full mb-lg border border-primary/20">
+    <div class="inline-flex items-center gap-xs px-sm py-base bg-surface-container-high text-primary rounded-full mb-lg border border-primary/20">
       <span class="material-symbols-outlined text-sm">code</span>
       <span class="font-label-sm text-label-sm uppercase tracking-wider">Module 03</span>
     </div>
-    <h2 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mb-md">Getting Started</h2>
-    <div class="bg-white dark:bg-[#1a2a3e] rounded-2xl p-lg md:p-xl border border-outline-variant/30 dark:border-gray-700 shadow-sm">
-      <h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">Getting Started  </h3>
+    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">Getting Started</h2>
+    <div class="bg-white rounded-2xl p-lg md:p-xl border border-outline-variant/30 shadow-sm">
+      <h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Getting Started  </h3>
 
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">_(Click the image above to view video of this lesson)_</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">_(Click the image above to view video of this lesson)_</p>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">This section consists of several lessons:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This section consists of several lessons:</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">1 Your first server</strong>, in this first lesson, you will learn how to create your first server and inspect it with the inspector tool, a valuable way to test and debug your server, <a href="01-first-server/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>1 Your first server</strong>, in this first lesson, you will learn how to create your first server and inspect it with the inspector tool, a valuable way to test and debug your server, <a href="01-first-server/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">2 Client</strong>, in this lesson, you will learn how to write a client that can connect to your server, <a href="02-client/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>2 Client</strong>, in this lesson, you will learn how to write a client that can connect to your server, <a href="02-client/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">3 Client with LLM</strong>, an even better way of writing a client is by adding an LLM to it so it can "negotiate" with your server on what to do, <a href="03-llm-client/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>3 Client with LLM</strong>, an even better way of writing a client is by adding an LLM to it so it can "negotiate" with your server on what to do, <a href="03-llm-client/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">4 Consuming a server GitHub Copilot Agent mode in Visual Studio Code</strong>. Here, we're looking at running our MCP Server from within Visual Studio Code, <a href="04-vscode/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>4 Consuming a server GitHub Copilot Agent mode in Visual Studio Code</strong>. Here, we're looking at running our MCP Server from within Visual Studio Code, <a href="04-vscode/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">5 stdio Transport Server</strong> stdio transport is the recommended standard for local MCP server-to-client communication, providing secure subprocess-based communication with built-in process isolation <a href="05-stdio-server/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>5 stdio Transport Server</strong> stdio transport is the recommended standard for local MCP server-to-client communication, providing secure subprocess-based communication with built-in process isolation <a href="05-stdio-server/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">6 HTTP Streaming with MCP (Streamable HTTP)</strong>. Learn about modern HTTP streaming transport (the recommended approach for remote MCP servers per <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/basic/transports/#streamable-http" class="text-primary underline">MCP Specification 2025-11-25</a>), progress notifications, and how to implement scalable, real-time MCP servers and clients using Streamable HTTP. <a href="06-http-streaming/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>6 HTTP Streaming with MCP (Streamable HTTP)</strong>. Learn about modern HTTP streaming transport (the recommended approach for remote MCP servers per <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/basic/transports/#streamable-http" class="text-primary underline">MCP Specification 2025-11-25</a>), progress notifications, and how to implement scalable, real-time MCP servers and clients using Streamable HTTP. <a href="06-http-streaming/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">7 Utilising AI Toolkit for VSCode</strong> to consume and test your MCP Clients and Servers <a href="07-aitk/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>7 Utilising AI Toolkit for VSCode</strong> to consume and test your MCP Clients and Servers <a href="07-aitk/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">8 Testing</strong>. Here we will focus especially how we can test out our server and client in different ways, <a href="08-testing/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>8 Testing</strong>. Here we will focus especially how we can test out our server and client in different ways, <a href="08-testing/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">9 Deployment</strong>. This chapter will look at different ways of deploying your MCP solutions, <a href="09-deployment/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>9 Deployment</strong>. This chapter will look at different ways of deploying your MCP solutions, <a href="09-deployment/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">10 Advanced server usage</strong>. This chapter covers advanced server usage, <a href="./10-advanced/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>10 Advanced server usage</strong>. This chapter covers advanced server usage, <a href="./10-advanced/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">11 Auth</strong>. This chapter covers how to add simple auth, from Basic Auth to using JWT and RBAC. You're encouraged to start here and then look at Advanced Topics in Chapter 5 and perform additional security hardening via recommendations in Chapter 2, <a href="./11-simple-auth/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>11 Auth</strong>. This chapter covers how to add simple auth, from Basic Auth to using JWT and RBAC. You're encouraged to start here and then look at Advanced Topics in Chapter 5 and perform additional security hardening via recommendations in Chapter 2, <a href="./11-simple-auth/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">12 MCP Hosts</strong>. Configure and use popular MCP host clients including Claude Desktop, Cursor, Cline, and Windsurf. Learn transport types and troubleshooting, <a href="./12-mcp-hosts/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>12 MCP Hosts</strong>. Configure and use popular MCP host clients including Claude Desktop, Cursor, Cline, and Windsurf. Learn transport types and troubleshooting, <a href="./12-mcp-hosts/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">13 MCP Inspector</strong>. Debug and test your MCP servers interactively using the MCP Inspector tool. Learn to troubleshoot tools, resources, and protocol messages, <a href="./13-mcp-inspector/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>13 MCP Inspector</strong>. Debug and test your MCP servers interactively using the MCP Inspector tool. Learn to troubleshoot tools, resources, and protocol messages, <a href="./13-mcp-inspector/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">14 Sampling</strong>. Create MCP Servers that collaborate with MCP clients on LLM related tasks. <a href="./14-sampling/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>14 Sampling</strong>. Create MCP Servers that collaborate with MCP clients on LLM related tasks. <a href="./14-sampling/README.md" class="text-primary underline">to the lesson</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">15 MCP Apps</strong>. Build MCP Servers that also reply with UI instructions, <a href="./15-mcp-apps/README.md" class="text-primary underline">to the lesson</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>15 MCP Apps</strong>. Build MCP Servers that also reply with UI instructions, <a href="./15-mcp-apps/README.md" class="text-primary underline">to the lesson</a></li>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">The Model Context Protocol (MCP) is an open protocol that standardizes how applications provide context to LLMs.</p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">Think of MCP like a USB-C port for AI applications - it provides a standardized way to connect AI models to different data sources and tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) is an open protocol that standardizes how applications provide context to LLMs.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Think of MCP like a USB-C port for AI applications - it provides a standardized way to connect AI models to different data sources and tools.</p>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">Learning Objectives</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Set up development environments for MCP in C#, Java, Python, TypeScript, and JavaScript</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Build and deploy basic MCP servers with custom features (resources, prompts, and tools)</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Create host applications that connect to MCP servers</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Test and debug MCP implementations</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Understand common setup challenges and their solutions</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Connect your MCP implementations to popular LLM services</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set up development environments for MCP in C#, Java, Python, TypeScript, and JavaScript</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Build and deploy basic MCP servers with custom features (resources, prompts, and tools)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create host applications that connect to MCP servers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test and debug MCP implementations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand common setup challenges and their solutions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Connect your MCP implementations to popular LLM services</li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">Setting Up Your MCP Environment</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Setting Up Your MCP Environment</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">Before you begin working with MCP, it's important to prepare your development environment and understand the basic workflow. This section will guide you through the initial setup steps to ensure a smooth start with MCP.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before you begin working with MCP, it's important to prepare your development environment and understand the basic workflow. This section will guide you through the initial setup steps to ensure a smooth start with MCP.</p>
 
-<h4 class="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mt-8 mb-3">Prerequisites</h4>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Prerequisites</h4>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">Before diving into MCP development, ensure you have:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before diving into MCP development, ensure you have:</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">Development Environment</strong>: For your chosen language (C#, Java, Python, TypeScript, or JavaScript)</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">IDE/Editor</strong>: Visual Studio, Visual Studio Code, IntelliJ, Eclipse, PyCharm, or any modern code editor</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">Package Managers</strong>: NuGet, Maven/Gradle, pip, or npm/yarn</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">API Keys</strong>: For any AI services you plan to use in your host applications</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Development Environment</strong>: For your chosen language (C#, Java, Python, TypeScript, or JavaScript)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>IDE/Editor</strong>: Visual Studio, Visual Studio Code, IntelliJ, Eclipse, PyCharm, or any modern code editor</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Package Managers</strong>: NuGet, Maven/Gradle, pip, or npm/yarn</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>API Keys</strong>: For any AI services you plan to use in your host applications</li>
 
 
-<h4 class="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mt-8 mb-3">Official SDKs</h4>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Official SDKs</h4>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">In the upcoming chapters you will see solutions built using Python, TypeScript, Java and .NET. Here are all the officially supported SDKs.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the upcoming chapters you will see solutions built using Python, TypeScript, Java and .NET. Here are all the officially supported SDKs.</p>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">MCP provides official SDKs for multiple languages (aligned with <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/" class="text-primary underline">MCP Specification 2025-11-25</a>):</p>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/csharp-sdk" class="text-primary underline">C# SDK</a> - Maintained in collaboration with Microsoft</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/java-sdk" class="text-primary underline">Java SDK</a> - Maintained in collaboration with Spring AI</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/typescript-sdk" class="text-primary underline">TypeScript SDK</a> - The official TypeScript implementation</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/python-sdk" class="text-primary underline">Python SDK</a> - The official Python implementation (FastMCP)</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/kotlin-sdk" class="text-primary underline">Kotlin SDK</a> - The official Kotlin implementation</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/swift-sdk" class="text-primary underline">Swift SDK</a> - Maintained in collaboration with Loopwork AI</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/rust-sdk" class="text-primary underline">Rust SDK</a> - The official Rust implementation</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/go-sdk" class="text-primary underline">Go SDK</a> - The official Go implementation</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP provides official SDKs for multiple languages (aligned with <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/" class="text-primary underline">MCP Specification 2025-11-25</a>):</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/csharp-sdk" class="text-primary underline">C# SDK</a> - Maintained in collaboration with Microsoft</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/java-sdk" class="text-primary underline">Java SDK</a> - Maintained in collaboration with Spring AI</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/typescript-sdk" class="text-primary underline">TypeScript SDK</a> - The official TypeScript implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/python-sdk" class="text-primary underline">Python SDK</a> - The official Python implementation (FastMCP)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/kotlin-sdk" class="text-primary underline">Kotlin SDK</a> - The official Kotlin implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/swift-sdk" class="text-primary underline">Swift SDK</a> - Maintained in collaboration with Loopwork AI</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/rust-sdk" class="text-primary underline">Rust SDK</a> - The official Rust implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/go-sdk" class="text-primary underline">Go SDK</a> - The official Go implementation</li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">Key Takeaways</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Key Takeaways</h3>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Setting up an MCP development environment is straightforward with language-specific SDKs</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Building MCP servers involves creating and registering tools with clear schemas</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">MCP clients connect to servers and models to leverage extended capabilities</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Testing and debugging are essential for reliable MCP implementations</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">Deployment options range from local development to cloud-based solutions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Setting up an MCP development environment is straightforward with language-specific SDKs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Building MCP servers involves creating and registering tools with clear schemas</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP clients connect to servers and models to leverage extended capabilities</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Testing and debugging are essential for reliable MCP implementations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Deployment options range from local development to cloud-based solutions</li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">Practicing</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Practicing</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">We have a set of samples that complements the exercises you will see in all chapters in this section. Additionally each chapter also has their own exercises and assignments</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We have a set of samples that complements the exercises you will see in all chapters in this section. Additionally each chapter also has their own exercises and assignments</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/java/calculator/README.md" class="text-primary underline">Java Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/csharp/" class="text-primary underline">.Net Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/javascript/README.md" class="text-primary underline">JavaScript Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/typescript/README.md" class="text-primary underline">TypeScript Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/python/" class="text-primary underline">Python Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/java/calculator/README.md" class="text-primary underline">Java Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/csharp/" class="text-primary underline">.Net Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/javascript/README.md" class="text-primary underline">JavaScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/typescript/README.md" class="text-primary underline">TypeScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/python/" class="text-primary underline">Python Calculator</a></li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">Additional Resources</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://learn.microsoft.com/azure/developer/ai/intro-agents-mcp" class="text-primary underline">Build Agents using Model Context Protocol on Azure</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/mcp-container-ts/mcp-container-ts/" class="text-primary underline">Remote MCP with Azure Container Apps (Node.js/TypeScript/JavaScript)</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/openai-mcp-agent-dotnet/openai-mcp-agent-dotnet/" class="text-primary underline">.NET OpenAI MCP Agent</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://learn.microsoft.com/azure/developer/ai/intro-agents-mcp" class="text-primary underline">Build Agents using Model Context Protocol on Azure</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/mcp-container-ts/mcp-container-ts/" class="text-primary underline">Remote MCP with Azure Container Apps (Node.js/TypeScript/JavaScript)</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/openai-mcp-agent-dotnet/openai-mcp-agent-dotnet/" class="text-primary underline">.NET OpenAI MCP Agent</a></li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">What's next</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">Start with the first lesson: <a href="01-first-server/README.md" class="text-primary underline">Creating your first MCP Server</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Start with the first lesson: <a href="01-first-server/README.md" class="text-primary underline">Creating your first MCP Server</a></p>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">Once you've completed this module, continue to: <a href="../04-PracticalImplementation/README.md" class="text-primary underline">Module 4: Practical Implementation</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Once you've completed this module, continue to: <a href="../04-PracticalImplementation/README.md" class="text-primary underline">Module 4: Practical Implementation</a></p>
 
     </div>
   </div>
@@ -186,146 +194,170 @@ tailwind.config = {{
 
 <section class="py-section-gap px-md scroll-mt-24">
   <div class="max-w-container-max mx-auto">
-    <div class="inline-flex items-center gap-xs px-sm py-base bg-surface-container-high text-primary dark:text-primary rounded-full mb-lg border border-primary/20">
+    <div class="inline-flex items-center gap-xs px-sm py-base bg-surface-container-high text-primary rounded-full mb-lg border border-primary/20">
       <span class="material-symbols-outlined text-sm">code</span>
       <span class="font-label-sm text-label-sm uppercase tracking-wider">Module 03</span>
     </div>
-    <h2 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mb-md">Module 03 &mdash; 시작하기</h2>
-    <div class="bg-white dark:bg-[#1a2a3e] rounded-2xl p-lg md:p-xl border border-outline-variant/30 dark:border-gray-700 shadow-sm">
-      <h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">시작하기  </h3>
+    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">Module 03 &mdash; 시작하기</h2>
+    <div class="bg-white rounded-2xl p-lg md:p-xl border border-outline-variant/30 shadow-sm">
+      <h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">시작하기  </h3>
 
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">_(위 이미지를 클릭하면 이 강의의 영상을 볼 수 있습니다)_</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">_(위 이미지를 클릭하면 이 강의의 영상을 볼 수 있습니다)_</p>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">이 섹션은 여러 강의로 구성되어 있습니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 섹션은 여러 강의로 구성되어 있습니다:</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">1 Your first server</strong>, 첫 번째 강의에서는 첫 서버를 만드는 방법과 검사 도구를 사용해 서버를 확인하는 방법을 배웁니다. 검사 도구는 서버 테스트와 디버깅에 유용합니다, <a href="01-first-server/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>1 Your first server</strong>, 첫 번째 강의에서는 첫 서버를 만드는 방법과 검사 도구를 사용해 서버를 확인하는 방법을 배웁니다. 검사 도구는 서버 테스트와 디버깅에 유용합니다, <a href="01-first-server/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">2 Client</strong>, 이 강의에서는 서버에 연결할 수 있는 클라이언트 작성법을 배웁니다, <a href="02-client/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>2 Client</strong>, 이 강의에서는 서버에 연결할 수 있는 클라이언트 작성법을 배웁니다, <a href="02-client/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">3 Client with LLM</strong>, 더 나은 방법으로서 클라이언트에 LLM을 추가해 서버와 "협상"하며 동작하도록 작성하는 방법을 배웁니다, <a href="03-llm-client/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>3 Client with LLM</strong>, 더 나은 방법으로서 클라이언트에 LLM을 추가해 서버와 "협상"하며 동작하도록 작성하는 방법을 배웁니다, <a href="03-llm-client/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">4 Consuming a server GitHub Copilot Agent mode in Visual Studio Code</strong>. 여기서는 Visual Studio Code 내에서 MCP 서버를 실행하는 방법을 살펴봅니다, <a href="04-vscode/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>4 Consuming a server GitHub Copilot Agent mode in Visual Studio Code</strong>. 여기서는 Visual Studio Code 내에서 MCP 서버를 실행하는 방법을 살펴봅니다, <a href="04-vscode/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">5 stdio Transport Server</strong> stdio 전송은 로컬 MCP 서버-클라이언트 통신에 권장되는 표준으로, 프로세스 격리가 내장된 보안 서브프로세스 기반 통신을 제공합니다, <a href="05-stdio-server/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>5 stdio Transport Server</strong> stdio 전송은 로컬 MCP 서버-클라이언트 통신에 권장되는 표준으로, 프로세스 격리가 내장된 보안 서브프로세스 기반 통신을 제공합니다, <a href="05-stdio-server/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">6 HTTP Streaming with MCP (Streamable HTTP)</strong>. 현대적인 HTTP 스트리밍 전송 방식(원격 MCP 서버에 권장되는 방법, <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/basic/transports/#streamable-http" class="text-primary underline">MCP Specification 2025-11-25</a>참조), 진행 알림, Streamable HTTP를 사용해 확장 가능하고 실시간으로 동작하는 MCP 서버와 클라이언트 구현 방법을 배웁니다, <a href="06-http-streaming/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>6 HTTP Streaming with MCP (Streamable HTTP)</strong>. 현대적인 HTTP 스트리밍 전송 방식(원격 MCP 서버에 권장되는 방법, <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/basic/transports/#streamable-http" class="text-primary underline">MCP Specification 2025-11-25</a>참조), 진행 알림, Streamable HTTP를 사용해 확장 가능하고 실시간으로 동작하는 MCP 서버와 클라이언트 구현 방법을 배웁니다, <a href="06-http-streaming/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">7 Utilising AI Toolkit for VSCode</strong> MCP 클라이언트와 서버를 사용해 보고 테스트하는 방법, <a href="07-aitk/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>7 Utilising AI Toolkit for VSCode</strong> MCP 클라이언트와 서버를 사용해 보고 테스트하는 방법, <a href="07-aitk/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">8 Testing</strong> 다양한 방법으로 서버와 클라이언트를 테스트하는 방법에 중점을 둡니다, <a href="08-testing/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>8 Testing</strong> 다양한 방법으로 서버와 클라이언트를 테스트하는 방법에 중점을 둡니다, <a href="08-testing/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">9 Deployment</strong> MCP 솔루션을 배포하는 여러 방식을 알아봅니다, <a href="09-deployment/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>9 Deployment</strong> MCP 솔루션을 배포하는 여러 방식을 알아봅니다, <a href="09-deployment/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">10 Advanced server usage</strong> 고급 서버 사용법을 다룹니다, <a href="./10-advanced/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>10 Advanced server usage</strong> 고급 서버 사용법을 다룹니다, <a href="./10-advanced/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">11 Auth</strong> Basic Auth에서 JWT 및 RBAC 사용까지 간단한 인증 추가 방법을 배웁니다. 여기에서 시작한 후 고급 주제(5장)를 참고하고 2장 추천 사항을 통해 추가 보안 강화 작업을 수행하시기 바랍니다, <a href="./11-simple-auth/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>11 Auth</strong> Basic Auth에서 JWT 및 RBAC 사용까지 간단한 인증 추가 방법을 배웁니다. 여기에서 시작한 후 고급 주제(5장)를 참고하고 2장 추천 사항을 통해 추가 보안 강화 작업을 수행하시기 바랍니다, <a href="./11-simple-auth/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">12 MCP Hosts</strong> Claude Desktop, Cursor, Cline, Windsurf 등 인기 있는 MCP 호스트 클라이언트를 설정하고 사용하는 방법, 전송 유형 및 문제 해결 방법 학습, <a href="./12-mcp-hosts/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>12 MCP Hosts</strong> Claude Desktop, Cursor, Cline, Windsurf 등 인기 있는 MCP 호스트 클라이언트를 설정하고 사용하는 방법, 전송 유형 및 문제 해결 방법 학습, <a href="./12-mcp-hosts/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">13 MCP Inspector</strong> MCP Inspector 도구를 사용해 MCP 서버를 인터랙티브하게 디버그하고 테스트하는 방법, 도구와 리소스, 프로토콜 메시지 문제 해결법 학습, <a href="./13-mcp-inspector/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>13 MCP Inspector</strong> MCP Inspector 도구를 사용해 MCP 서버를 인터랙티브하게 디버그하고 테스트하는 방법, 도구와 리소스, 프로토콜 메시지 문제 해결법 학습, <a href="./13-mcp-inspector/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">14 Sampling</strong> MCP 서버가 MCP 클라이언트와 협력해 LLM 관련 작업 수행하는 서버 만들기, <a href="./14-sampling/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>14 Sampling</strong> MCP 서버가 MCP 클라이언트와 협력해 LLM 관련 작업 수행하는 서버 만들기, <a href="./14-sampling/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">15 MCP Apps</strong> UI 지침도 함께 응답하는 MCP 서버 구축, <a href="./15-mcp-apps/README.md" class="text-primary underline">강의로 가기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>15 MCP Apps</strong> UI 지침도 함께 응답하는 MCP 서버 구축, <a href="./15-mcp-apps/README.md" class="text-primary underline">강의로 가기</a></li>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">Model Context Protocol (MCP)은 애플리케이션이 LLM에 컨텍스트를 제공하는 방식을 표준화한 오픈 프로토콜입니다. MCP는 AI 애플리케이션을 위한 USB-C 포트와 같아서 다양한 데이터 소스와 도구를 AI 모델에 연결하는 표준화된 방식을 제공합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol (MCP)은 애플리케이션이 LLM에 컨텍스트를 제공하는 방식을 표준화한 오픈 프로토콜입니다. MCP는 AI 애플리케이션을 위한 USB-C 포트와 같아서 다양한 데이터 소스와 도구를 AI 모델에 연결하는 표준화된 방식을 제공합니다.</p>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">학습 목표</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">이 강의가 끝나면 다음을 할 수 있습니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 강의가 끝나면 다음을 할 수 있습니다:</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">C#, Java, Python, TypeScript, JavaScript를 위한 MCP 개발 환경 설정</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">맞춤 기능(리소스, 프롬프트, 도구)을 갖춘 기본 MCP 서버 구축 및 배포</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">MCP 서버에 연결하는 호스트 애플리케이션 작성</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">MCP 구현 테스트 및 디버깅</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">일반적인 설정 문제점과 해결 방법 이해</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">MCP 구현을 인기 LLM 서비스에 연결하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">C#, Java, Python, TypeScript, JavaScript를 위한 MCP 개발 환경 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">맞춤 기능(리소스, 프롬프트, 도구)을 갖춘 기본 MCP 서버 구축 및 배포</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버에 연결하는 호스트 애플리케이션 작성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 구현 테스트 및 디버깅</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">일반적인 설정 문제점과 해결 방법 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 구현을 인기 LLM 서비스에 연결하기</li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">MCP 환경 설정</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 환경 설정</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">MCP 작업을 시작하기 전 개발 환경을 준비하고 기본 워크플로우를 이해하는 것이 중요합니다. 이 섹션에서 원활하게 MCP를 시작할 수 있도록 초기 설정 단계를 안내합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 작업을 시작하기 전 개발 환경을 준비하고 기본 워크플로우를 이해하는 것이 중요합니다. 이 섹션에서 원활하게 MCP를 시작할 수 있도록 초기 설정 단계를 안내합니다.</p>
 
-<h4 class="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mt-8 mb-3">사전 준비 사항</h4>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">사전 준비 사항</h4>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">MCP 개발에 들어가기 전에 다음을 준비하세요:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 개발에 들어가기 전에 다음을 준비하세요:</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">개발 환경</strong>: 선택한 언어(C#, Java, Python, TypeScript, JavaScript)용</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">IDE/편집기</strong>: Visual Studio, Visual Studio Code, IntelliJ, Eclipse, PyCharm 또는 최신 코드 편집기</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">패키지 관리자</strong>: NuGet, Maven/Gradle, pip, npm/yarn</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">API 키</strong>: 호스트 애플리케이션에서 사용할 AI 서비스용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>개발 환경</strong>: 선택한 언어(C#, Java, Python, TypeScript, JavaScript)용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>IDE/편집기</strong>: Visual Studio, Visual Studio Code, IntelliJ, Eclipse, PyCharm 또는 최신 코드 편집기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>패키지 관리자</strong>: NuGet, Maven/Gradle, pip, npm/yarn</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>API 키</strong>: 호스트 애플리케이션에서 사용할 AI 서비스용</li>
 
-<h4 class="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mt-8 mb-3">공식 SDK</h4>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">공식 SDK</h4>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">앞선 장들에서 Python, TypeScript, Java, .NET을 사용한 솔루션 예시를 볼 수 있습니다. 아래는 공식 지원하는 SDK 목록입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">앞선 장들에서 Python, TypeScript, Java, .NET을 사용한 솔루션 예시를 볼 수 있습니다. 아래는 공식 지원하는 SDK 목록입니다.</p>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">MCP는 여러 언어용 공식 SDK를 제공합니다 (<a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/" class="text-primary underline">MCP Specification 2025-11-25</a> 에 맞춤):</p>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/csharp-sdk" class="text-primary underline">C# SDK</a> - Microsoft와 협력해 유지 관리</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/java-sdk" class="text-primary underline">Java SDK</a> - Spring AI와 협력해 유지 관리</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/typescript-sdk" class="text-primary underline">TypeScript SDK</a> - 공식 TypeScript 구현체</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/python-sdk" class="text-primary underline">Python SDK</a> - 공식 Python 구현체 (FastMCP)</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/kotlin-sdk" class="text-primary underline">Kotlin SDK</a> - 공식 Kotlin 구현체</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/swift-sdk" class="text-primary underline">Swift SDK</a> - Loopwork AI와 협력해 유지 관리</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/rust-sdk" class="text-primary underline">Rust SDK</a> - 공식 Rust 구현체</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/go-sdk" class="text-primary underline">Go SDK</a> - 공식 Go 구현체</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 여러 언어용 공식 SDK를 제공합니다 (<a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/" class="text-primary underline">MCP Specification 2025-11-25</a> 에 맞춤):</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/csharp-sdk" class="text-primary underline">C# SDK</a> - Microsoft와 협력해 유지 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/java-sdk" class="text-primary underline">Java SDK</a> - Spring AI와 협력해 유지 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/typescript-sdk" class="text-primary underline">TypeScript SDK</a> - 공식 TypeScript 구현체</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/python-sdk" class="text-primary underline">Python SDK</a> - 공식 Python 구현체 (FastMCP)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/kotlin-sdk" class="text-primary underline">Kotlin SDK</a> - 공식 Kotlin 구현체</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/swift-sdk" class="text-primary underline">Swift SDK</a> - Loopwork AI와 협력해 유지 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/rust-sdk" class="text-primary underline">Rust SDK</a> - 공식 Rust 구현체</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://github.com/modelcontextprotocol/go-sdk" class="text-primary underline">Go SDK</a> - 공식 Go 구현체</li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">주요 내용 정리</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">주요 내용 정리</h3>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">언어별 SDK로 MCP 개발 환경 설정은 간단합니다</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">MCP 서버 구축 시 명확한 스키마를 갖춘 도구를 생성하고 등록합니다</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">MCP 클라이언트는 서버 및 모델에 연결해 확장 기능을 활용합니다</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">테스트와 디버깅은 신뢰할 수 있는 MCP 구현에 필수적입니다</li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed">배포 방법은 로컬 개발부터 클라우드 기반 솔루션까지 다양합니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">언어별 SDK로 MCP 개발 환경 설정은 간단합니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버 구축 시 명확한 스키마를 갖춘 도구를 생성하고 등록합니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 클라이언트는 서버 및 모델에 연결해 확장 기능을 활용합니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">테스트와 디버깅은 신뢰할 수 있는 MCP 구현에 필수적입니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">배포 방법은 로컬 개발부터 클라우드 기반 솔루션까지 다양합니다</li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">연습하기</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">연습하기</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">이 섹션의 모든 장에서 볼 수 있는 연습 문제를 보완하는 샘플 세트를 제공합니다. 각 장마다 고유의 연습문제와 과제도 포함되어 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 섹션의 모든 장에서 볼 수 있는 연습 문제를 보완하는 샘플 세트를 제공합니다. 각 장마다 고유의 연습문제와 과제도 포함되어 있습니다.</p>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/java/calculator/README.md" class="text-primary underline">Java Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="../../../03-GettingStarted/samples/csharp" class="text-primary underline">.Net Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/javascript/README.md" class="text-primary underline">JavaScript Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="./samples/typescript/README.md" class="text-primary underline">TypeScript Calculator</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="../../../03-GettingStarted/samples/python" class="text-primary underline">Python Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/java/calculator/README.md" class="text-primary underline">Java Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="../../../03-GettingStarted/samples/csharp" class="text-primary underline">.Net Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/javascript/README.md" class="text-primary underline">JavaScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="./samples/typescript/README.md" class="text-primary underline">TypeScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="../../../03-GettingStarted/samples/python" class="text-primary underline">Python Calculator</a></li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">추가 자료</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
 
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://learn.microsoft.com/azure/developer/ai/intro-agents-mcp" class="text-primary underline">Build Agents using Model Context Protocol on Azure</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/mcp-container-ts/mcp-container-ts/" class="text-primary underline">Remote MCP with Azure Container Apps (Node.js/TypeScript/JavaScript)</a></li>
-<li class="ml-5 list-disc text-on-surface-variant dark:text-gray-400 mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/openai-mcp-agent-dotnet/openai-mcp-agent-dotnet/" class="text-primary underline">.NET OpenAI MCP Agent</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://learn.microsoft.com/azure/developer/ai/intro-agents-mcp" class="text-primary underline">Build Agents using Model Context Protocol on Azure</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/mcp-container-ts/mcp-container-ts/" class="text-primary underline">Remote MCP with Azure Container Apps (Node.js/TypeScript/JavaScript)</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a href="https://learn.microsoft.com/samples/azure-samples/openai-mcp-agent-dotnet/openai-mcp-agent-dotnet/" class="text-primary underline">.NET OpenAI MCP Agent</a></li>
 
-<h3 class="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mt-10 mb-4">다음 단계</h3>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">첫 번째 강의부터 시작하세요: <a href="01-first-server/README.md" class="text-primary underline">처음 MCP 서버 만들기</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">첫 번째 강의부터 시작하세요: <a href="01-first-server/README.md" class="text-primary underline">처음 MCP 서버 만들기</a></p>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">이 모듈을 완료한 후에는 계속해서: <a href="../04-PracticalImplementation/README.md" class="text-primary underline">모듈 4: 실전 구현</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈을 완료한 후에는 계속해서: <a href="../04-PracticalImplementation/README.md" class="text-primary underline">모듈 4: 실전 구현</a></p>
 
-<hr class="my-10 border-outline-variant dark:border-gray-700" />
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
 
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed"><strong class="text-on-surface dark:text-inverse-on-surface">면책 조항</strong>:  </p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a href="https://github.com/Azure/co-op-translator" class="text-primary underline">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">정확성을 위해 최선을 다했지만, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed">본 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
-<p class="text-body-md text-on-surface-variant dark:text-gray-400 mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a href="https://github.com/Azure/co-op-translator" class="text-primary underline">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다했지만, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p>
     </div>
   </div>
 </section>
 </div>
 </main>
-<footer class="bg-surface-container-lowest dark:bg-[#0a1628] border-t border-outline-variant dark:border-gray-700 w-full py-xl px-lg">
-  <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
-    <div class="flex flex-col gap-xs items-center md:items-start">
-      <span class="font-headline-md font-headline-md font-bold text-on-surface dark:text-inverse-on-surface">MCP Curriculum</span>
-      <p class="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">&copy; 2024 Microsoft Corporation</p>
-    </div>
-    <div class="flex flex-wrap gap-lg justify-center">
-      <a href="https://github.com/microsoft/mcp-for-beginners" class="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-all" target="_blank">GitHub</a>
-      <a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" class="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-all" target="_blank">License</a>
-    </div>
-  </div>
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full py-xl px-lg mt-section-gap">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
+<div class="flex flex-col gap-xs items-center md:items-start">
+<span class="text-headline-md font-headline-md font-bold text-on-surface">MCP Curriculum</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">&copy; 2024 Microsoft Corporation</p>
+</div>
+<div class="flex flex-wrap gap-lg justify-center">
+<a href="../index.html" class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all">Home</a>
+<a href="https://github.com/microsoft/mcp-for-beginners" class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all" target="_blank">GitHub</a>
+<a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all" target="_blank">License</a>
+</div>
+</div>
 </footer>
-<script src="../js/main.js"></script>
+<script>
+// Language toggle
+(function() {{
+  var btn = document.getElementById('langToggleBtn');
+  var label = document.getElementById('langLabel');
+  var en = document.getElementById('content-en');
+  var ko = document.getElementById('content-ko');
+  var lang = localStorage.getItem('mcp-lang') || 'ko';
+  function setLang(l) {{
+    document.querySelectorAll('.lang-content').forEach(function(e) {{ e.classList.remove('active'); }});
+    if (l === 'en' && en) {{ en.classList.add('active'); label.textContent = 'EN / KO'; }}
+    else {{ if (ko) ko.classList.add('active'); label.textContent = 'KO / EN'; }}
+    localStorage.setItem('mcp-lang', l);
+  }}
+  if (btn) btn.addEventListener('click', function() {{ setLang(lang === 'ko' ? 'en' : 'ko'); }});
+  setLang(lang);
+}})();
+// Header shadow
+window.addEventListener('scroll', function() {{
+  var h = document.querySelector('header');
+  if (window.scrollY > 20) {{ h.classList.add('shadow-md'); h.classList.remove('shadow-sm'); }}
+  else {{ h.classList.remove('shadow-md'); h.classList.add('shadow-sm'); }}
+}});
+</script>
 </body>
 </html>
