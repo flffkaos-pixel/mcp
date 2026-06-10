@@ -1,0 +1,7 @@
+-Server-and-PostgreSQL-Sample-Retail
+
+| Lab | Topic | Description | Link |
+|--------|-------|-------------|------|
+| **Lab 1-3: Foundations** | | | |
+| 00 | [Introduction to MCP Database Integration](./00-Introduction/README.md) | Overview of MCP with database integration and retail analytics use case | [Start Here](./00-Introduction/README.md) |
+| 01 | [Core Architecture Concepts](./01-Architecture/README.md) | Understanding MCP server architecture, database layers, and security patterns | [Lea
