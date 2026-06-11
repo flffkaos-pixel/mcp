@@ -1,400 +1,362 @@
 <!DOCTYPE html>
-<html class="dark" lang="ko">
+<html lang="ko">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Intermediate - MCP Academy</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script>
-tailwind.config = {{ darkMode: "class", theme: {{ extend: {{ colors: {{ "surface-deep":"#050B14","surface":"#051426","surface-bright":"#2c3a4e","surface-container":"#122033","surface-container-high":"#1c2b3e","surface-container-highest":"#27354a","surface-container-lowest":"#010e21","neon-cyan":"#00F0FF","primary":"#dbfcff","secondary":"#a3c9ff","on-surface":"#d5e3fe","on-surface-variant":"#b9cacb","outline":"#849495","outline-variant":"#3b494b","terminal-green":"#00FF41","warning-gold":"#FFD700","code-bg":"#0F172A" }}, borderRadius: {{ DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem" }}, spacing: {{ gutter:"24px",base:"8px","section-gap-desktop":"80px","container-max":"1280px","section-gap-mobile":"48px" }}, fontFamily: {{ "label-caps":["JetBrains Mono"],"body-md":["Inter"],"display-lg":["Hanken Grotesk"],"headline-md":["Hanken Grotesk"],"headline-lg":["Hanken Grotesk"],"headline-xl":["Hanken Grotesk"],"headline-sm":["Hanken Grotesk"],"body-lg":["Inter"],"code-sm":["JetBrains Mono"] }}, fontSize: {{ "label-caps":["12px",{{"lineHeight":"16px","letterSpacing":"0.1em","fontWeight":"700"}}],"body-md":["16px",{{"lineHeight":"24px","fontWeight":"400"}}],"display-lg":["48px",{{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}}],"headline-md":["24px",{{"lineHeight":"32px","fontWeight":"600"}}],"body-lg":["18px",{{"lineHeight":"28px","fontWeight":"400"}}],"headline-lg":["32px",{{"lineHeight":"40px","fontWeight":"700"}}],"headline-xl":["36px",{{"lineHeight":"44px","fontWeight":"700"}}],"headline-sm":["18px",{{"lineHeight":"24px","fontWeight":"600"}}],"code-sm":["14px",{{"lineHeight":"20px","fontWeight":"400"}}] }} }} }} }};
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-:root {{ --bg:#051426;--text:#d5e3fe;--muted:#b9cacb;--accent:#00F0FF;--accent-hover:#00dbe9;--border:#3b494b;--card:#122033;--card-hover:#1c2b3e;--radius:12px;--code-bg:#0F172A; }}
-* {{ margin:0;padding:0;box-sizing:border-box; }}
-body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
-.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
-.module-card {{ margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);transition:box-shadow .2s,transform .15s,border-color .15s; }}
-.module-card:hover {{ box-shadow:0 0 20px rgba(0,240,255,0.08);border-color:rgba(0,240,255,0.3); }}
-.module-header {{ display:flex;justify-content:space-between;align-items:center;padding:16px 20px;cursor:pointer;user-select:none;transition:background .15s; gap:12px; }}
-.module-header:hover {{ background:var(--card-hover); }}
-.module-header .chevron {{ flex-shrink:0;color:var(--accent);transition:transform .2s ease;display:flex;align-items:center;justify-content:center; }}
-.module-card.open .module-header .chevron {{ transform:rotate(180deg); }}
-.module-id {{ font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);min-width:36px; }}
-.module-name {{ font-weight:600;flex:1;font-size:0.95rem; }}
-.module-name .ko {{ color:var(--muted);font-weight:400;font-size:0.85rem;display:block;margin-top:2px; }}
-.module-meta {{ font-size:0.78rem;color:var(--muted); }}
-.module-lessons {{ display:none;padding:0 20px 16px;max-height:0;opacity:0;overflow:hidden;transition:max-height .3s ease,opacity .2s ease,padding .3s ease; }}
-.module-card.open .module-lessons {{ display:block;max-height:2000px;opacity:1;padding:0 20px 16px; }}
-.lesson-item {{ display:flex;align-items:center;padding:10px 12px;border-radius:8px;gap:10px;text-decoration:none;color:var(--text);transition:background .15s,transform .15s;margin-bottom:2px;background:transparent; }}
-.lesson-item:hover {{ background:var(--card-hover);transform:translateX(4px); }}
-.lesson-item .lang-badge {{ font-size:0.65rem;padding:2px 8px;border-radius:4px;font-weight:600;background:rgba(0,240,255,0.1);color:var(--accent);font-family:'JetBrains Mono',monospace;white-space:nowrap; }}
-.lesson-item .name {{ flex:1;font-size:0.88rem;font-weight:500; }}
-.lesson-item .meta {{ font-size:0.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace; }}
-.lang-content {{ display:none; }}
-.lang-content.active {{ display:block; }}
-.search-wrap {{ position:relative;margin-bottom:20px; }}
-.search-wrap input {{ width:100%;padding:10px 16px 10px 38px;border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-family:'Inter',sans-serif;background:var(--card);color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s; }}
-.search-wrap input:focus {{ border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,240,255,0.1); }}
-.search-wrap .icon {{ position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1.1rem;pointer-events:none; }}
-.search-wrap .clear-btn {{ position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1.2rem;pointer-events:auto;cursor:pointer;background:none;border:none;padding:4px;display:none;transition:color .15s; }}
-.search-wrap .clear-btn:hover {{ color:var(--accent); }}
-.search-wrap .clear-btn.visible {{ display:block; }}
-.no-lessons {{ display:none;text-align:center;padding:40px 20px;color:var(--muted);font-size:0.9rem; }}
-.hub-count {{ font-size:0.85rem;color:var(--muted); }}
-nav a {{ font-size:1rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s; }}
-nav a:hover,nav a.active {{ color:var(--accent); }}
-.mobile-menu-btn {{ display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:8px; }}
-@media (max-width:767px) { .mobile-menu-btn {{ display:flex; }} }
-.mobile-menu {{ position:fixed;top:64px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:16px;z-index:40;display:none;flex-direction:column;gap:8px;box-shadow:0 10px 20px rgba(0,0,0,0.3); }}
-.mobile-menu.open {{ display:flex; }}
-.mobile-menu a {{ padding:12px 16px;border-radius:8px;color:var(--text);text-decoration:none;transition:background .15s; }}
-.mobile-menu a:hover {{ background:var(--card-hover); }}
-.mobile-menu a.active {{ color:var(--accent);background:rgba(0,240,255,0.1); }}
-pre {{ position:relative; }}
-.code-copy-btn {{ position:absolute;top:8px;right:8px;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:var(--accent);padding:4px 8px;border-radius:4px;font-size:0.7rem;font-family:'JetBrains Mono',monospace;cursor:pointer;opacity:0;transition:opacity .2s,background .15s; }}
-pre:hover .code-copy-btn {{ opacity:1; }}
-.code-copy-btn:hover {{ background:rgba(0,240,255,0.2); }}
-.code-copy-btn.copied {{ background:var(--terminal-green);color:var(--surface-deep);border-color:var(--terminal-green); }}
-.module-chev {{ transition:transform .2s ease; }}
-.open > .module-chev,.open .module-chev {{ transform:rotate(180deg); }}
+:root{{--bg:#0a0f1a;--surface:#111827;--card:#1a2235;--hover:#222d42;--border:#2a3548;--text:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--green:#4ade80;--radius:12px}}
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}}
+header{{position:sticky;top:0;z-index:50;background:rgba(10,15,26,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}}
+.logo{{font-size:22px;font-weight:800;color:var(--accent);text-decoration:none}}
+nav a{{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;margin-left:28px;transition:color .15s}}
+nav a:hover,nav a.active{{color:var(--accent)}}
+main{{max-width:960px;margin:0 auto;padding:48px 24px 80px}}
+.hero{{margin-bottom:48px}}
+.badge{{display:inline-block;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);color:var(--accent);font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;letter-spacing:0.06em;margin-bottom:20px}}
+h1{{font-size:36px;font-weight:800;color:#fff;margin-bottom:8px}}
+.hero p{{color:var(--muted);font-size:16px;max-width:560px}}
+.search{{position:relative;margin-bottom:32px}}
+.search input{{width:100%;padding:12px 16px 12px 40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;outline:none;transition:border-color .15s}}
+.search input:focus{{border-color:var(--accent)}}
+.search svg{{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted)}}
+.module{{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden}}
+.module-top{{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;user-select:none;transition:background .15s}}
+.module-top:hover{{background:var(--hover)}}
+.module-top h2{{font-size:20px;font-weight:700;color:#fff}}
+.module-top .sub{{color:var(--muted);font-size:13px;margin-left:8px;font-weight:400}}
+.module-top .count{{font-size:12px;color:var(--muted);background:var(--hover);padding:4px 12px;border-radius:12px;font-weight:600}}
+.module-rows{{display:none;border-top:1px solid var(--border)}}
+.module.open .module-rows{{display:block}}
+.row{{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;text-decoration:none;color:var(--text);border-bottom:1px solid rgba(42,53,72,0.5);transition:background .15s;gap:16px}}
+.row:hover{{background:var(--hover)}}
+.row:last-child{{border-bottom:none}}
+.row h3{{font-size:15px;font-weight:600;color:#fff;flex:1;min-width:0}}
+.row .tags{{display:flex;align-items:center;gap:10px;flex-shrink:0}}
+.tag{{font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;text-transform:uppercase;letter-spacing:0.04em}}
+.tag.build{{background:rgba(56,189,248,0.12);color:var(--accent)}}
+.tag.learn{{background:rgba(74,222,128,0.12);color:var(--green)}}
+.tag.lang{{color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace}}
+.overview-body{{padding:24px;border-top:1px solid var(--border);display:none}}
+.module.open .overview-body{{display:block}}
+.overview-body h2,.overview-body h3,.overview-body h4,.overview-body h5{{color:#fff;margin:24px 0 10px;font-weight:700}}
+.overview-body h2{{font-size:24px}}
+.overview-body h3{{font-size:20px}}
+.overview-body h4{{font-size:17px}}
+.overview-body h5{{font-size:15px}}
+.overview-body p{{color:var(--muted);margin-bottom:14px;font-size:15px}}
+.overview-body ul,.overview-body ol{{color:var(--muted);padding-left:20px;margin-bottom:14px;font-size:15px}}
+.overview-body li{{margin-bottom:6px}}
+.overview-body a{{color:var(--accent)}}
+.overview-body code{{background:var(--hover);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:13px;font-family:'JetBrains Mono',monospace}}
+.overview-body pre{{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;overflow-x:auto;margin-bottom:16px}}
+.overview-body pre code{{background:none;color:var(--text);padding:0;font-size:13px;line-height:1.6;display:block}}
+.overview-body table{{width:100%;border-collapse:collapse;margin-bottom:16px}}
+.overview-body th,.overview-body td{{border:1px solid var(--border);padding:8px 12px;text-align:left;font-size:14px}}
+.overview-body th{{background:var(--hover);color:#fff;font-weight:600}}
+.overview-body td{{color:var(--muted)}}
+.overview-body strong{{color:#fff}}
+.overview-body hr{{border:none;border-top:1px solid var(--border);margin:24px 0}}
+.chevron{{font-size:20px;color:var(--accent);transition:transform .2s;flex-shrink:0;margin-left:12px}}
+.module.open .chevron{{transform:rotate(180deg)}}
+.lang-content{{display:none}}
+.lang-content.active{{display:block}}
+.no-results{{display:none;text-align:center;padding:40px;color:var(--muted);font-size:15px}}
+#totalCount{{font-size:13px;color:var(--muted);margin-top:12px;font-weight:500}}
+.toggle-btn{{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:600;background:none;border:1px solid var(--border);padding:6px 14px;border-radius:8px;transition:all .15s}}
+.toggle-btn:hover{{color:var(--accent);border-color:var(--accent)}}
+.mobile-btn{{display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer}}
+footer{{border-top:1px solid var(--border);padding:32px 24px;text-align:center;color:var(--muted);font-size:14px}}
+footer a{{color:var(--accent);text-decoration:none}}
+@media(max-width:768px){{
+.mobile-btn{{display:block}}
+nav{{display:none;position:fixed;top:56px;left:0;right:0;background:var(--surface);flex-direction:column;padding:16px;border-bottom:1px solid var(--border);gap:8px;z-index:40}}
+nav.open{{display:flex}}
+nav a{{margin:0;padding:12px 16px;border-radius:8px;font-size:15px}}
+nav a:hover{{background:var(--hover)}}
+h1{{font-size:28px}}
+}}
 </style>
 </head>
-<body class="bg-surface-deep text-on-surface font-body-md selection:bg-neon-cyan/30">
-<header class="bg-surface/80 docked top-0 sticky z-50 backdrop-blur-xl border-b border-primary/10 shadow-[0_0_20px_rgba(0,240,255,0.1)] flex justify-between items-center px-gutter py-4 w-full">
-<div class="flex items-center gap-4">
-<a href="../index.html" class="no-underline">
-<span class="font-display-lg text-display-lg text-neon-cyan tracking-tighter">MCP Academy</span>
-</a>
-</div>
-<nav class="hidden md:flex gap-8 items-center"><a class="" href="fundamentals.html">Fundamentals</a>
+<body>
+<header>
+<a href="../index.html" class="logo">MCP Academy</a>
+<button class="mobile-btn" onclick="document.querySelector('nav').classList.toggle('open')">&#9776;</button>
+<nav><a class="" href="fundamentals.html">Fundamentals</a>
           <a class="" href="getting-started.html">Getting Started</a>
           <a class="active" href="intermediate.html">Intermediate</a>
           <a class="" href="ecosystem.html">Ecosystem</a>
           <a class="" href="production.html">Production</a></nav>
-<div class="flex items-center gap-4">
-<button class="mobile-menu-btn material-symbols-outlined" id="mobileMenuBtn" aria-label="Menu">menu</button>
-<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-on-surface-variant hover:text-neon-cyan transition-colors">
-<span class="material-symbols-outlined">translate</span>
-<span class="font-label-caps text-label-caps" id="langLabel">KO / EN</span>
-</div>
+<div style="display:flex;align-items:center;gap:20px">
+<button class="toggle-btn" id="langToggle">
+<span id="langLabel">KO &#8644; EN</span>
+</button>
 </div>
 </header>
-<div class="mobile-menu" id="mobileMenu"><a class="" href="fundamentals.html">Fundamentals</a>
-          <a class="" href="getting-started.html">Getting Started</a>
-          <a class="active" href="intermediate.html">Intermediate</a>
-          <a class="" href="ecosystem.html">Ecosystem</a>
-          <a class="" href="production.html">Production</a></div>
 <main>
-<section class="relative overflow-hidden border-b border-primary/10 px-gutter py-section-gap-desktop">
-<div class="max-w-5xl mx-auto">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-neon-cyan/10 border border-neon-cyan/30 rounded-full mb-6">
-<span class="material-symbols-outlined text-neon-cyan text-sm">auto_awesome</span>
-<span class="font-label-caps text-label-caps text-neon-cyan">MCP CURRICULUM</span>
+<div class="hero">
+<div class="badge">MCP CURRICULUM</div>
+<h1>Intermediate</h1>
+<p>Explore modules and lessons. Click for details and code examples.</p>
+<div id="totalCount"></div>
 </div>
-<h1 class="font-display-lg text-display-lg text-white mb-4">Intermediate</h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">MCP 학습 과정을 모듈별로 탐색하세요. 레슨을 클릭하면 상세 내용과 코드 예제를 확인할 수 있습니다.</p>
-<div id="totalCount" class="hub-count mt-4 font-label-caps text-label-caps"></div>
+<div class="search">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+<input type="text" id="lessonSearch" placeholder="Search lessons..." oninput="filter(this.value)">
 </div>
-</section>
-<div class="max-w-5xl mx-auto px-gutter py-section-gap-mobile">
-<div class="search-wrap">
-<span class="icon material-symbols-outlined">search</span>
-<input type="text" id="lessonSearch" placeholder="Search lessons..." oninput="filterLessons(this.value)">
-<button type="button" class="clear-btn material-symbols-outlined" id="searchClear" aria-label="Clear search">close</button>
+<div class="no-results" id="noResults">No results found.</div>
+<div id="content-en" class="lang-content"><div class="module">
+<div class="module-top" onclick="this.parentElement.classList.toggle('open')">
+  <div><h2>M04: Practical Implementation <span class="sub">실용적인 구현</span></h2></div>
+  <div style="display:flex;align-items:center;gap:12px"><span class="count">9 lessons</span><span class="chevron">&#8250;</span></div>
 </div>
-<div class="no-lessons" id="noLessons">No lessons found matching your search.</div>
-<div id="content-en" class="lang-content"><div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
-<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
-  <div class="flex items-center gap-4">
-    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
-    <div class="text-left"><h2 class="text-3xl font-bold text-white mb-1" style="font-family:'Hanken Grotesk',sans-serif;">M04: Practical Implementation</h2><p class="text-on-surface-variant text-body-md">실용적인 구현</p></div>
-  </div>
-  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">9 lessons</span></div>
-</button>
-<div class="border-t border-outline-variant"><a href="../lessons/m04_01-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">C#</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">C#</span></div>
+<div class="module-rows"><a href="../lessons/m04_01-c.html" class="row">
+  <h3>C#</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">C#</span></div>
 </a>
-<a href="../lessons/m04_02-java-with-spring.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Java with Spring</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+<a href="../lessons/m04_02-java-with-spring.html" class="row">
+  <h3>Java with Spring</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Java</span></div>
 </a>
-<a href="../lessons/m04_03-typescript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">TypeScript</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">TypeScript</span></div>
+<a href="../lessons/m04_03-typescript.html" class="row">
+  <h3>TypeScript</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">TypeScript</span></div>
 </a>
-<a href="../lessons/m04_04-javascript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">JavaScript</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+<a href="../lessons/m04_04-javascript.html" class="row">
+  <h3>JavaScript</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">JavaScript</span></div>
 </a>
-<a href="../lessons/m04_05-python.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Python</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+<a href="../lessons/m04_05-python.html" class="row">
+  <h3>Python</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Python</span></div>
 </a>
-<a href="../lessons/m04_06-pagination-and-large-result-sets.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Pagination and Large Result Sets</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m04_06-pagination-and-large-result-sets.html" class="row">
+  <h3>Pagination and Large Result Sets</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m04_07-java-with-spring-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Java with Spring sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+<a href="../lessons/m04_07-java-with-spring-sample.html" class="row">
+  <h3>Java with Spring sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Java</span></div>
 </a>
-<a href="../lessons/m04_08-javascript-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">JavaScript sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+<a href="../lessons/m04_08-javascript-sample.html" class="row">
+  <h3>JavaScript sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">JavaScript</span></div>
 </a>
-<a href="../lessons/m04_09-python-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Python sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+<a href="../lessons/m04_09-python-sample.html" class="row">
+  <h3>Python sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Python</span></div>
 </a>
 </div>
 </div>
-<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
-<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
-  <div class="flex items-center gap-4">
-    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
-    <div class="text-left"><h2 class="text-3xl font-bold text-white mb-1" style="font-family:'Hanken Grotesk',sans-serif;">M05: Advanced Topics</h2><p class="text-on-surface-variant text-body-md">고급 주제</p></div>
-  </div>
-  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">16 lessons</span></div>
-</button>
-<div class="border-t border-outline-variant"><a href="../lessons/m05_01-51-integration-with-azure.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.1 Integration with Azure</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<div class="module">
+<div class="module-top" onclick="this.parentElement.classList.toggle('open')">
+  <div><h2>M05: Advanced Topics <span class="sub">고급 주제</span></h2></div>
+  <div style="display:flex;align-items:center;gap:12px"><span class="count">16 lessons</span><span class="chevron">&#8250;</span></div>
+</div>
+<div class="module-rows"><a href="../lessons/m05_01-51-integration-with-azure.html" class="row">
+  <h3>5.1 Integration with Azure</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_02-52-multi-modal-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.2 Multi modal sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_02-52-multi-modal-sample.html" class="row">
+  <h3>5.2 Multi modal sample</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_03-54-root-contexts.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.4 Root Contexts</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_03-54-root-contexts.html" class="row">
+  <h3>5.4 Root Contexts</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_04-55-routing.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.5 Routing</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_04-55-routing.html" class="row">
+  <h3>5.5 Routing</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_05-56-sampling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.6 Sampling</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_05-56-sampling.html" class="row">
+  <h3>5.6 Sampling</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_06-57-scaling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.7 Scaling</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_06-57-scaling.html" class="row">
+  <h3>5.7 Scaling</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_07-58-security.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.8 Security</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_07-58-security.html" class="row">
+  <h3>5.8 Security</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_08-59-web-search-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.9 Web Search sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+<a href="../lessons/m05_08-59-web-search-sample.html" class="row">
+  <h3>5.9 Web Search sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Python</span></div>
 </a>
-<a href="../lessons/m05_09-510-realtime-streaming.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.10 Realtime Streaming</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_09-510-realtime-streaming.html" class="row">
+  <h3>5.10 Realtime Streaming</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_10-511-realtime-web-search.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.11 Realtime Web Search</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_10-511-realtime-web-search.html" class="row">
+  <h3>5.11 Realtime Web Search</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.12  Entra ID Authentication for Model Context Protocol Servers</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html" class="row">
+  <h3>5.12  Entra ID Authentication for Model Context Protocol Servers</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.13 Azure AI Foundry Agent Integration</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html" class="row">
+  <h3>5.13 Azure AI Foundry Agent Integration</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_13-514-context-engineering.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.14 Context Engineering</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_13-514-context-engineering.html" class="row">
+  <h3>5.14 Context Engineering</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_14-515-mcp-custom-transport.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.15 MCP Custom Transport</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_14-515-mcp-custom-transport.html" class="row">
+  <h3>5.15 MCP Custom Transport</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_15-516-protocol-features-deep-dive.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.16 Protocol Features Deep Dive</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_15-516-protocol-features-deep-dive.html" class="row">
+  <h3>5.16 Protocol Features Deep Dive</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.17 Adversarial Multi-Agent Reasoning</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html" class="row">
+  <h3>5.17 Adversarial Multi-Agent Reasoning</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
 </div>
 </div></div>
-<div id="content-ko" class="lang-content"><div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
-<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
-  <div class="flex items-center gap-4">
-    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
-    <div class="text-left"><h2 class="text-3xl font-bold text-white mb-1" style="font-family:'Hanken Grotesk',sans-serif;">M04: 실용적인 구현</h2><p class="text-on-surface-variant text-body-md">Practical Implementation</p></div>
-  </div>
-  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">9 lessons</span></div>
-</button>
-<div class="border-t border-outline-variant"><a href="../lessons/m04_01-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">C#</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">C#</span></div>
+<div id="content-ko" class="lang-content"><div class="module">
+<div class="module-top" onclick="this.parentElement.classList.toggle('open')">
+  <div><h2>M04: 실용적인 구현 <span class="sub">Practical Implementation</span></h2></div>
+  <div style="display:flex;align-items:center;gap:12px"><span class="count">9 lessons</span><span class="chevron">&#8250;</span></div>
+</div>
+<div class="module-rows"><a href="../lessons/m04_01-c.html" class="row">
+  <h3>C#</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">C#</span></div>
 </a>
-<a href="../lessons/m04_02-java-with-spring.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Java with Spring</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+<a href="../lessons/m04_02-java-with-spring.html" class="row">
+  <h3>Java with Spring</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Java</span></div>
 </a>
-<a href="../lessons/m04_03-typescript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">TypeScript</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">TypeScript</span></div>
+<a href="../lessons/m04_03-typescript.html" class="row">
+  <h3>TypeScript</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">TypeScript</span></div>
 </a>
-<a href="../lessons/m04_04-javascript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">JavaScript</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+<a href="../lessons/m04_04-javascript.html" class="row">
+  <h3>JavaScript</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">JavaScript</span></div>
 </a>
-<a href="../lessons/m04_05-python.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Python</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+<a href="../lessons/m04_05-python.html" class="row">
+  <h3>Python</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Python</span></div>
 </a>
-<a href="../lessons/m04_06-pagination-and-large-result-sets.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Pagination and Large Result Sets</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m04_06-pagination-and-large-result-sets.html" class="row">
+  <h3>Pagination and Large Result Sets</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m04_07-java-with-spring-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Java with Spring sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+<a href="../lessons/m04_07-java-with-spring-sample.html" class="row">
+  <h3>Java with Spring sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Java</span></div>
 </a>
-<a href="../lessons/m04_08-javascript-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">JavaScript sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+<a href="../lessons/m04_08-javascript-sample.html" class="row">
+  <h3>JavaScript sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">JavaScript</span></div>
 </a>
-<a href="../lessons/m04_09-python-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">Python sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+<a href="../lessons/m04_09-python-sample.html" class="row">
+  <h3>Python sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Python</span></div>
 </a>
 </div>
 </div>
-<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
-<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
-  <div class="flex items-center gap-4">
-    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
-    <div class="text-left"><h2 class="text-3xl font-bold text-white mb-1" style="font-family:'Hanken Grotesk',sans-serif;">M05: 고급 주제</h2><p class="text-on-surface-variant text-body-md">Advanced Topics</p></div>
-  </div>
-  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">16 lessons</span></div>
-</button>
-<div class="border-t border-outline-variant"><a href="../lessons/m05_01-51-integration-with-azure.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.1 Integration with Azure</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<div class="module">
+<div class="module-top" onclick="this.parentElement.classList.toggle('open')">
+  <div><h2>M05: 고급 주제 <span class="sub">Advanced Topics</span></h2></div>
+  <div style="display:flex;align-items:center;gap:12px"><span class="count">16 lessons</span><span class="chevron">&#8250;</span></div>
+</div>
+<div class="module-rows"><a href="../lessons/m05_01-51-integration-with-azure.html" class="row">
+  <h3>5.1 Integration with Azure</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_02-52-multi-modal-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.2 Multi modal sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_02-52-multi-modal-sample.html" class="row">
+  <h3>5.2 Multi modal sample</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_03-54-root-contexts.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.4 Root Contexts</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_03-54-root-contexts.html" class="row">
+  <h3>5.4 Root Contexts</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_04-55-routing.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.5 Routing</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_04-55-routing.html" class="row">
+  <h3>5.5 Routing</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_05-56-sampling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.6 Sampling</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_05-56-sampling.html" class="row">
+  <h3>5.6 Sampling</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_06-57-scaling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.7 Scaling</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_06-57-scaling.html" class="row">
+  <h3>5.7 Scaling</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_07-58-security.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.8 Security</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_07-58-security.html" class="row">
+  <h3>5.8 Security</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_08-59-web-search-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.9 Web Search sample</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+<a href="../lessons/m05_08-59-web-search-sample.html" class="row">
+  <h3>5.9 Web Search sample</h3>
+  <div class="tags"><span class="tag build">BUILD</span><span class="tag lang">Python</span></div>
 </a>
-<a href="../lessons/m05_09-510-realtime-streaming.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.10 Realtime Streaming</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_09-510-realtime-streaming.html" class="row">
+  <h3>5.10 Realtime Streaming</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_10-511-realtime-web-search.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.11 Realtime Web Search</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_10-511-realtime-web-search.html" class="row">
+  <h3>5.11 Realtime Web Search</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.12  Entra ID Authentication for Model Context Protocol Servers</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html" class="row">
+  <h3>5.12  Entra ID Authentication for Model Context Protocol Servers</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.13 Azure AI Foundry Agent Integration</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html" class="row">
+  <h3>5.13 Azure AI Foundry Agent Integration</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_13-514-context-engineering.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.14 Context Engineering</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_13-514-context-engineering.html" class="row">
+  <h3>5.14 Context Engineering</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_14-515-mcp-custom-transport.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.15 MCP Custom Transport</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_14-515-mcp-custom-transport.html" class="row">
+  <h3>5.15 MCP Custom Transport</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_15-516-protocol-features-deep-dive.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.16 Protocol Features Deep Dive</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_15-516-protocol-features-deep-dive.html" class="row">
+  <h3>5.16 Protocol Features Deep Dive</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
-<a href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><h3 class="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors" style="font-family:'Hanken Grotesk',sans-serif;">5.17 Adversarial Multi-Agent Reasoning</h3></div>
-  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+<a href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html" class="row">
+  <h3>5.17 Adversarial Multi-Agent Reasoning</h3>
+  <div class="tags"><span class="tag learn">LEARN</span></div>
 </a>
 </div>
 </div></div>
-</div>
 </main>
-<footer class="bg-surface-deep border-t border-outline-variant w-full p-gutter">
-<div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-base">
-<div>
-<span class="font-headline-md text-headline-md text-neon-cyan block mb-2">MCP Academy</span>
-<p class="font-body-md text-body-md text-outline">MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-neon-cyan hover:underline">microsoft/mcp-for-beginners</a></p>
-</div>
-<div class="flex flex-wrap md:justify-end gap-6">
-<a href="../index.html" class="text-outline hover:text-neon-cyan transition-colors font-body-md text-body-md">Home</a>
-<a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-outline hover:text-neon-cyan transition-colors font-body-md text-body-md">GitHub</a>
-<a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" target="_blank" class="text-outline hover:text-neon-cyan transition-colors font-body-md text-body-md">License</a>
-</div>
-</div>
+<footer>
+MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a>
 </footer>
 <script>
-(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);document.querySelectorAll('.module-header').forEach(function(h){{h.addEventListener('click',function(){{this.parentElement.classList.toggle('open')}})}});var tc=document.getElementById('totalCount'),total=document.querySelectorAll('.lesson-item').length;if(tc)tc.textContent='TOTAL: '+total+' LESSONS';}})();
-function filterLessons(query){{var q=query.toLowerCase().trim(),cards=document.querySelectorAll('.module-card'),any=false;cards.forEach(function(c){{var items=c.querySelectorAll('.lesson-item'),has=false;items.forEach(function(it){{var match=!q||it.querySelector('.name').textContent.toLowerCase().indexOf(q)>-1;it.style.display=match?'flex':'none';if(match)has=true;}});c.style.display=has||!q?'block':'none';if(has||!q)c.classList.add('open');if(c.style.display!=='none')any=true;}});document.getElementById('noLessons').style.display=any?'none':'block';document.getElementById('searchClear').classList.toggle('visible',q.length>0);}}
-document.getElementById('searchClear').addEventListener('click',function(){{document.getElementById('lessonSearch').value='';filterLessons('');document.getElementById('lessonSearch').focus();}});
-document.getElementById('mobileMenuBtn').addEventListener('click',function(){{document.getElementById('mobileMenu').classList.toggle('open');this.textContent=this.textContent==='menu'?'close':'menu';}});
-document.querySelectorAll('#mobileMenu a').forEach(function(a){{a.addEventListener('click',function(){{document.getElementById('mobileMenu').classList.remove('open');document.getElementById('mobileMenuBtn').textContent='menu';}});}});
-function addCopyButtons() {{
-    document.querySelectorAll('pre').forEach(function(pre) {{
-        if (!pre.querySelector('.code-copy-btn')) {{
-            var btn = document.createElement('button');
-            btn.className = 'code-copy-btn material-symbols-outlined';
-            btn.textContent = 'content_copy';
-            btn.title = 'Copy code';
-            btn.addEventListener('click', function() {{
-                var code = pre.querySelector('code').textContent;
-                navigator.clipboard.writeText(code).then(function() {{
-                    btn.textContent = 'check';
-                    btn.classList.add('copied');
-                    setTimeout(function() {{ btn.textContent = 'content_copy'; btn.classList.remove('copied'); }}, 2000);
-                }});
-            }});
-            pre.appendChild(btn);
-        }}
-    }});
-}
-document.querySelectorAll('pre code').forEach(function(block) {{ hljs.highlightElement(block); }});
-addCopyButtons();
-document.getElementById('langToggle').addEventListener('click', function() {{
-    setTimeout(function() {{
-        document.querySelectorAll('pre code').forEach(function(block) {{ hljs.highlightElement(block); }});
-        addCopyButtons();
-    }}, 0);
+(function(){{
+var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';
+function s(v){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(v==='en'){{e.classList.add('active');l.textContent='EN \21C4 KO'}}else{{k.classList.add('active');l.textContent='KO \21C4 EN'}}localStorage.setItem('mcp-lang',v)}}
+t.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);
+document.querySelectorAll('.module-top').forEach(function(m){{m.addEventListener('click',function(){{this.parentElement.classList.toggle('open')}})}});
+var tc=document.getElementById('totalCount'),total=document.querySelectorAll('.row').length;if(tc)tc.textContent='TOTAL: '+total+' LESSONS';
+}})();
+function filter(q){{
+var v=q.toLowerCase().trim(),cards=document.querySelectorAll('.module'),any=false;
+cards.forEach(function(c){{
+var rows=c.querySelectorAll('.row'),has=false;
+rows.forEach(function(r){{var match=!v||r.querySelector('h3').textContent.toLowerCase().indexOf(v)>-1;r.style.display=match?'flex':'none';if(match)has=true;}});
+c.style.display=has||!v?'':'none';if(has||!v)c.classList.add('open');
+if(c.style.display!=='none')any=true;
 }});
+document.getElementById('noResults').style.display=any?'none':'block';
+}}
 </script>
 </body>
 </html>
