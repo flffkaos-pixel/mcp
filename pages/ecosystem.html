@@ -59,6 +59,8 @@ pre {{ position:relative; }}
 pre:hover .code-copy-btn {{ opacity:1; }}
 .code-copy-btn:hover {{ background:rgba(0,240,255,0.2); }}
 .code-copy-btn.copied {{ background:var(--terminal-green);color:var(--surface-deep);border-color:var(--terminal-green); }}
+.module-chev {{ transition:transform .2s ease; }}
+.open > .module-chev,.open .module-chev {{ transform:rotate(180deg); }}
 </style>
 </head>
 <body class="bg-surface-deep text-on-surface font-body-md selection:bg-neon-cyan/30">

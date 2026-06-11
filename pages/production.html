@@ -59,6 +59,8 @@ pre {{ position:relative; }}
 pre:hover .code-copy-btn {{ opacity:1; }}
 .code-copy-btn:hover {{ background:rgba(0,240,255,0.2); }}
 .code-copy-btn.copied {{ background:var(--terminal-green);color:var(--surface-deep);border-color:var(--terminal-green); }}
+.module-chev {{ transition:transform .2s ease; }}
+.open > .module-chev,.open .module-chev {{ transform:rotate(180deg); }}
 </style>
 </head>
 <body class="bg-surface-deep text-on-surface font-body-md selection:bg-neon-cyan/30">
@@ -4298,42 +4300,108 @@ public async Task Server_ResourceEndpoint_ReturnsCorrectSchema()
 
 
 </div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M09</span>
-  <span class="module-name">Case Study<span class="ko">사례 연구</span></span>
-  <span class="module-meta">1 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m09_01-lesson.html"><span class="name"></span><span class="meta">M09</span></a>
-</div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M10</span>
-  <span class="module-name">AI Toolkit<span class="ko">AI 툴킷</span></span>
-  <span class="module-meta">4 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m10_01-module-1-ai-toolkit-fundamentals.html"><span class="name">🚀 Module 1: AI Toolkit Fundamentals</span><span class="meta">M10</span></a>
-<a class="lesson-item" href="../lessons/m10_02-module-2-mcp-with-ai-toolkit-fundamental.html"><span class="name">🌐 Module 2: MCP with AI Toolkit Fundamentals</span><span class="meta">M10</span></a>
-<a class="lesson-item" href="../lessons/m10_03-module-3-advanced-mcp-development-with-a.html"><span class="name">🔧 Module 3: Advanced MCP Development with AI Toolkit</span><span class="meta">M10</span></a>
-<a class="lesson-item" href="../lessons/m10_04-module-4-practical-mcp-development---cus.html"><span class="name">🐙 Module 4: Practical MCP Development - Custom GitHub Clone Server</span><span class="meta">M10</span></a>
-</div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M11</span>
-  <span class="module-name">PostgreSQL<span class="ko">PostgreSQL</span></span>
-  <span class="module-meta">13 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m11_01-00---introduction-to-mcp-database-integr.html"><span class="name">00 - Introduction to MCP Database Integration</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_02-01---core-architecture-concepts.html"><span class="name">01 - Core Architecture Concepts</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_03-02---security-and-multi-tenancy.html"><span class="name">02 - Security and Multi-Tenancy</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_04-03---environment-setup.html"><span class="name">03 - Environment Setup</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_05-04---database-design-and-schema.html"><span class="name">04 - Database Design and Schema</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_06-05---mcp-server-implementation.html"><span class="name">05 - MCP Server Implementation</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_07-06---tool-development.html"><span class="name">06 - Tool Development</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_08-07---semantic-search-integration.html"><span class="name">07 - Semantic Search Integration</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_09-08---testing-and-debugging.html"><span class="name">08 - Testing and Debugging</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_10-09---vs-code-integration.html"><span class="name">09 - VS Code Integration</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_11-10---deployment-strategies.html"><span class="name">10 - Deployment Strategies</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_12-11---monitoring-and-observability.html"><span class="name">11 - Monitoring and Observability</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_13-12---best-practices-and-optimization.html"><span class="name">12 - Best Practices and Optimization</span><span class="meta">M11</span></a>
-</div></div><div class="module-card"><div class="module-header">
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M09: Case Study</h2><p class="text-on-surface-variant text-body-md">사례 연구</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">1 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m09_01-lesson.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors"></span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M10: AI Toolkit</h2><p class="text-on-surface-variant text-body-md">AI 툴킷</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">4 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m10_01-module-1-ai-toolkit-fundamentals.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🚀 Module 1: AI Toolkit Fundamentals</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m10_02-module-2-mcp-with-ai-toolkit-fundamental.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🌐 Module 2: MCP with AI Toolkit Fundamentals</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m10_03-module-3-advanced-mcp-development-with-a.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🔧 Module 3: Advanced MCP Development with AI Toolkit</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m10_04-module-4-practical-mcp-development---cus.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🐙 Module 4: Practical MCP Development - Custom GitHub Clone Server</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M11: PostgreSQL</h2><p class="text-on-surface-variant text-body-md">PostgreSQL</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">13 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m11_01-00---introduction-to-mcp-database-integr.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">00 - Introduction to MCP Database Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_02-01---core-architecture-concepts.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">01 - Core Architecture Concepts</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_03-02---security-and-multi-tenancy.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">02 - Security and Multi-Tenancy</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_04-03---environment-setup.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">03 - Environment Setup</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_05-04---database-design-and-schema.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">04 - Database Design and Schema</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_06-05---mcp-server-implementation.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">05 - MCP Server Implementation</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_07-06---tool-development.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">06 - Tool Development</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_08-07---semantic-search-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">07 - Semantic Search Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_09-08---testing-and-debugging.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">08 - Testing and Debugging</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_10-09---vs-code-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">09 - VS Code Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_11-10---deployment-strategies.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">10 - Deployment Strategies</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_12-11---monitoring-and-observability.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">11 - Monitoring and Observability</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_13-12---best-practices-and-optimization.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">12 - Best Practices and Optimization</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
+</div><div class="module-card"><div class="module-header">
   <span class="module-id">SG</span><span class="module-name">Study Guide</span><span class="module-meta">1 guide</span>
 </div><div class="module-lessons"><div class="bg-surface-container-low rounded-xl p-4 mb-3 text-sm text-on-surface-variant"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Model Context Protocol (MCP) for Beginners - Study Guide</h2>
 
@@ -8988,42 +9056,108 @@ public async Task Server_ResourceEndpoint_ReturnsCorrectSchema()
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문 인간 번역을 권장합니다.</p>
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인한 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M09</span>
-  <span class="module-name">사례 연구<span class="ko">Case Study</span></span>
-  <span class="module-meta">1 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m09_01-lesson.html"><span class="name"></span><span class="meta">M09</span></a>
-</div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M10</span>
-  <span class="module-name">AI 툴킷<span class="ko">AI Toolkit</span></span>
-  <span class="module-meta">4 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m10_01-module-1-ai-toolkit-fundamentals.html"><span class="name">🚀 Module 1: AI Toolkit Fundamentals</span><span class="meta">M10</span></a>
-<a class="lesson-item" href="../lessons/m10_02-module-2-mcp-with-ai-toolkit-fundamental.html"><span class="name">🌐 Module 2: MCP with AI Toolkit Fundamentals</span><span class="meta">M10</span></a>
-<a class="lesson-item" href="../lessons/m10_03-module-3-advanced-mcp-development-with-a.html"><span class="name">🔧 Module 3: Advanced MCP Development with AI Toolkit</span><span class="meta">M10</span></a>
-<a class="lesson-item" href="../lessons/m10_04-module-4-practical-mcp-development---cus.html"><span class="name">🐙 Module 4: Practical MCP Development - Custom GitHub Clone Server</span><span class="meta">M10</span></a>
-</div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M11</span>
-  <span class="module-name">PostgreSQL<span class="ko">PostgreSQL</span></span>
-  <span class="module-meta">13 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m11_01-00---introduction-to-mcp-database-integr.html"><span class="name">00 - Introduction to MCP Database Integration</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_02-01---core-architecture-concepts.html"><span class="name">01 - Core Architecture Concepts</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_03-02---security-and-multi-tenancy.html"><span class="name">02 - Security and Multi-Tenancy</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_04-03---environment-setup.html"><span class="name">03 - Environment Setup</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_05-04---database-design-and-schema.html"><span class="name">04 - Database Design and Schema</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_06-05---mcp-server-implementation.html"><span class="name">05 - MCP Server Implementation</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_07-06---tool-development.html"><span class="name">06 - Tool Development</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_08-07---semantic-search-integration.html"><span class="name">07 - Semantic Search Integration</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_09-08---testing-and-debugging.html"><span class="name">08 - Testing and Debugging</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_10-09---vs-code-integration.html"><span class="name">09 - VS Code Integration</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_11-10---deployment-strategies.html"><span class="name">10 - Deployment Strategies</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_12-11---monitoring-and-observability.html"><span class="name">11 - Monitoring and Observability</span><span class="meta">M11</span></a>
-<a class="lesson-item" href="../lessons/m11_13-12---best-practices-and-optimization.html"><span class="name">12 - Best Practices and Optimization</span><span class="meta">M11</span></a>
-</div></div><div class="module-card"><div class="module-header">
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M09: 사례 연구</h2><p class="text-on-surface-variant text-body-md">Case Study</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">1 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m09_01-lesson.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors"></span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M10: AI 툴킷</h2><p class="text-on-surface-variant text-body-md">AI Toolkit</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">4 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m10_01-module-1-ai-toolkit-fundamentals.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🚀 Module 1: AI Toolkit Fundamentals</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m10_02-module-2-mcp-with-ai-toolkit-fundamental.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🌐 Module 2: MCP with AI Toolkit Fundamentals</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m10_03-module-3-advanced-mcp-development-with-a.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🔧 Module 3: Advanced MCP Development with AI Toolkit</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m10_04-module-4-practical-mcp-development---cus.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">🐙 Module 4: Practical MCP Development - Custom GitHub Clone Server</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M11: PostgreSQL</h2><p class="text-on-surface-variant text-body-md">PostgreSQL</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">13 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m11_01-00---introduction-to-mcp-database-integr.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">00 - Introduction to MCP Database Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_02-01---core-architecture-concepts.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">01 - Core Architecture Concepts</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_03-02---security-and-multi-tenancy.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">02 - Security and Multi-Tenancy</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_04-03---environment-setup.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">03 - Environment Setup</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_05-04---database-design-and-schema.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">04 - Database Design and Schema</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_06-05---mcp-server-implementation.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">05 - MCP Server Implementation</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_07-06---tool-development.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">06 - Tool Development</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_08-07---semantic-search-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">07 - Semantic Search Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_09-08---testing-and-debugging.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">08 - Testing and Debugging</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_10-09---vs-code-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">09 - VS Code Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_11-10---deployment-strategies.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">10 - Deployment Strategies</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_12-11---monitoring-and-observability.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">11 - Monitoring and Observability</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m11_13-12---best-practices-and-optimization.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">12 - Best Practices and Optimization</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
+</div><div class="module-card"><div class="module-header">
   <span class="module-id">SG</span><span class="module-name">스터디 가이드</span><span class="module-meta">1 guide</span>
 </div><div class="module-lessons"><div class="bg-surface-container-low rounded-xl p-4 mb-3 text-sm text-on-surface-variant"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">초보자를 위한 모델 컨텍스트 프로토콜(MCP) - 학습 가이드</h2>
 

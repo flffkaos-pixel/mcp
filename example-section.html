@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Setup & Tooling - Example</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-deep":"#050B14","surface":"#051426","surface-bright":"#2c3a4e","surface-container":"#122033","surface-container-high":"#1c2b3e","surface-container-highest":"#27354a","surface-container-lowest":"#010e21","neon-cyan":"#00F0FF","primary":"#dbfcff","secondary":"#a3c9ff","on-surface":"#d5e3fe","on-surface-variant":"#b9cacb","outline":"#849495","outline-variant":"#3b494b","terminal-green":"#00FF41","warning-gold":"#FFD700","code-bg":"#0F172A" }, borderRadius: { DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem" }, fontFamily: { "label-caps":["JetBrains Mono"],"body-md":["Inter"],"headline-md":["Hanken Grotesk"],"headline-lg":["Hanken Grotesk"],"body-lg":["Inter"],"code-sm":["JetBrains Mono"] }, fontSize: { "label-caps":["12px",{"lineHeight":"16px","letterSpacing":"0.1em","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"32px","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"headline-lg":["32px",{"lineHeight":"40px","fontWeight":"700"}],"code-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}] } } } };
+</script>
+<style>
+* { margin:0;padding:0;box-sizing:border-box; }
+body { font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }
+.material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+</style>
+</head>
+<body class="bg-surface-deep text-on-surface min-h-screen p-8">
+<div class="max-w-4xl mx-auto">
+
+<!-- Section Card -->
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg">
+  <!-- Section Header -->
+  <button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+    <div class="flex items-center gap-4">
+      <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200" id="chev">expand_more</span>
+      <div class="text-left">
+        <h2 class="font-headline-lg text-headline-lg text-white">Setup &amp; Tooling</h2>
+        <p class="text-on-surface-variant text-body-md">개발 환경 구성 및 도구 설정</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">12 lessons</span>
+    </div>
+  </button>
+
+  <!-- Lesson List -->
+  <div class="border-t border-outline-variant">
+    <!-- Row 1 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Dev Environment</span>
+        <span class="text-on-surface-variant text-body-md ml-3">개발 환경</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Python</span>
+      </div>
+    </a>
+
+    <!-- Row 2 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Git &amp; Collaboration</span>
+        <span class="text-on-surface-variant text-body-md ml-3">Git &amp; 협업</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span>
+      </div>
+    </a>
+
+    <!-- Row 3 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">GPU Setup &amp; Cloud</span>
+        <span class="text-on-surface-variant text-body-md ml-3">GPU 설정 &amp; 클라우드</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Python</span>
+      </div>
+    </a>
+
+    <!-- Row 4 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">APIs &amp; Keys</span>
+        <span class="text-on-surface-variant text-body-md ml-3">API &amp; 키</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Python</span>
+      </div>
+    </a>
+
+    <!-- Row 5 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Jupyter Notebooks</span>
+        <span class="text-on-surface-variant text-body-md ml-3">주피터 노트북</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Python</span>
+      </div>
+    </a>
+
+    <!-- Row 6 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Python Environments</span>
+        <span class="text-on-surface-variant text-body-md ml-3">파이썬 환경</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Shell</span>
+      </div>
+    </a>
+
+    <!-- Row 7 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Docker for AI</span>
+        <span class="text-on-surface-variant text-body-md ml-3">AI용 Docker</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Docker</span>
+      </div>
+    </a>
+
+    <!-- Row 8 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Editor Setup</span>
+        <span class="text-on-surface-variant text-body-md ml-3">에디터 설정</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+      </div>
+    </a>
+
+    <!-- Row 9 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Data Management</span>
+        <span class="text-on-surface-variant text-body-md ml-3">데이터 관리</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Python</span>
+      </div>
+    </a>
+
+    <!-- Row 10 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Terminal &amp; Shell</span>
+        <span class="text-on-surface-variant text-body-md ml-3">터미널 &amp; 셀</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span>
+      </div>
+    </a>
+
+    <!-- Row 11 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Linux for AI</span>
+        <span class="text-on-surface-variant text-body-md ml-3">AI용 리눅스</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span>
+      </div>
+    </a>
+
+    <!-- Row 12 -->
+    <a href="#" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group">
+      <div class="flex-1 min-w-0">
+        <span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Debugging &amp; Profiling</span>
+        <span class="text-on-surface-variant text-body-md ml-3">디버깅 &amp; 프로파일링</span>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span>
+        <span class="font-code-sm text-code-sm text-outline">Python</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

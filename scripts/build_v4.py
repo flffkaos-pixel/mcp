@@ -187,6 +187,8 @@ pre {{ position:relative; }}
 pre:hover .code-copy-btn {{ opacity:1; }}
 .code-copy-btn:hover {{ background:rgba(0,240,255,0.2); }}
 .code-copy-btn.copied {{ background:var(--terminal-green);color:var(--surface-deep);border-color:var(--terminal-green); }}
+.module-chev {{ transition:transform .2s ease; }}
+.open > .module-chev,.open .module-chev {{ transform:rotate(180deg); }}
 </style>
 </head>
 <body class="bg-surface-deep text-on-surface font-body-md selection:bg-neon-cyan/30">
@@ -501,19 +503,28 @@ def main():
             entries = []
             for num, title_en, title_ko, lps, main_en_html, main_ko_html in hub_modules:
                 if lps:
-                    lt = title_en if lang == 'en' else title_ko
-                    lessons_html = ''
+                    rows = ''
                     for item in lps:
                         fname, ltitle, _, _, llang = item if len(item) >= 5 else (item[0], item[1], None, None, '')
                         lname = ltitle if lang == 'en' else ltitle
-                        badge = f'<span class="lang-badge">{llang}</span>' if llang else ''
-                        lessons_html += f'<a class="lesson-item" href="../lessons/{fname}">{badge}<span class="name">{lname}</span><span class="meta">M{num}</span></a>\n'
-                    entries.append(f'''<div class="module-card"><div class="module-header">
-  <span class="module-id">M{num}</span>
-  <span class="module-name">{title_en if lang=="en" else title_ko}<span class="ko">{title_ko if lang=="en" else title_en}</span></span>
-  <span class="module-meta">{len(lps)} lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons">{lessons_html}</div></div>''')
+                        action = 'BUILD' if llang else 'LEARN'
+                        action_cls = 'bg-neon-cyan/20 text-neon-cyan' if llang else 'bg-terminal-green/20 text-terminal-green'
+                        lang_tag = f'<span class="font-code-sm text-code-sm text-outline">{llang}</span>' if llang else ''
+                        rows += f'''<a href="../lessons/{fname}" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">{lname}</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold {action_cls}">{action}</span>{lang_tag}</div>
+</a>
+'''
+                    entries.append(f'''<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M{num}: {title_en if lang=="en" else title_ko}</h2><p class="text-on-surface-variant text-body-md">{title_ko if lang=="en" else title_en}</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">{len(lps)} lessons</span></div>
+</button>
+<div class="border-t border-outline-variant">{rows}</div>
+</div>''')
                 else:
                     html = main_en_html if lang == 'en' else main_ko_html
                     entries.append(f'''<div class="module-card"><div class="module-header">

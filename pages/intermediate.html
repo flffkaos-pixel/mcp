@@ -59,6 +59,8 @@ pre {{ position:relative; }}
 pre:hover .code-copy-btn {{ opacity:1; }}
 .code-copy-btn:hover {{ background:rgba(0,240,255,0.2); }}
 .code-copy-btn.copied {{ background:var(--terminal-green);color:var(--surface-deep);border-color:var(--terminal-green); }}
+.module-chev {{ transition:transform .2s ease; }}
+.open > .module-chev,.open .module-chev {{ transform:rotate(180deg); }}
 </style>
 </head>
 <body class="bg-surface-deep text-on-surface font-body-md selection:bg-neon-cyan/30">
@@ -105,80 +107,246 @@ pre:hover .code-copy-btn {{ opacity:1; }}
 <button type="button" class="clear-btn material-symbols-outlined" id="searchClear" aria-label="Clear search">close</button>
 </div>
 <div class="no-lessons" id="noLessons">No lessons found matching your search.</div>
-<div id="content-en" class="lang-content"><div class="module-card"><div class="module-header">
-  <span class="module-id">M04</span>
-  <span class="module-name">Practical Implementation<span class="ko">실용적인 구현</span></span>
-  <span class="module-meta">9 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m04_01-c.html"><span class="lang-badge">C#</span><span class="name">C#</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_02-java-with-spring.html"><span class="lang-badge">Java</span><span class="name">Java with Spring</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_03-typescript.html"><span class="lang-badge">TypeScript</span><span class="name">TypeScript</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_04-javascript.html"><span class="lang-badge">JavaScript</span><span class="name">JavaScript</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_05-python.html"><span class="lang-badge">Python</span><span class="name">Python</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_06-pagination-and-large-result-sets.html"><span class="name">Pagination and Large Result Sets</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_07-java-with-spring-sample.html"><span class="lang-badge">Java</span><span class="name">Java with Spring sample</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_08-javascript-sample.html"><span class="lang-badge">JavaScript</span><span class="name">JavaScript sample</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_09-python-sample.html"><span class="lang-badge">Python</span><span class="name">Python sample</span><span class="meta">M04</span></a>
+<div id="content-en" class="lang-content"><div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M04: Practical Implementation</h2><p class="text-on-surface-variant text-body-md">실용적인 구현</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">9 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m04_01-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">C#</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">C#</span></div>
+</a>
+<a href="../lessons/m04_02-java-with-spring.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Java with Spring</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+</a>
+<a href="../lessons/m04_03-typescript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">TypeScript</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">TypeScript</span></div>
+</a>
+<a href="../lessons/m04_04-javascript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">JavaScript</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+</a>
+<a href="../lessons/m04_05-python.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Python</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+</a>
+<a href="../lessons/m04_06-pagination-and-large-result-sets.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Pagination and Large Result Sets</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m04_07-java-with-spring-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Java with Spring sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+</a>
+<a href="../lessons/m04_08-javascript-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">JavaScript sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+</a>
+<a href="../lessons/m04_09-python-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Python sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+</a>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M05: Advanced Topics</h2><p class="text-on-surface-variant text-body-md">고급 주제</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">16 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m05_01-51-integration-with-azure.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.1 Integration with Azure</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_02-52-multi-modal-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.2 Multi modal sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_03-54-root-contexts.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.4 Root Contexts</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_04-55-routing.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.5 Routing</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_05-56-sampling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.6 Sampling</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_06-57-scaling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.7 Scaling</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_07-58-security.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.8 Security</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_08-59-web-search-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.9 Web Search sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+</a>
+<a href="../lessons/m05_09-510-realtime-streaming.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.10 Realtime Streaming</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_10-511-realtime-web-search.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.11 Realtime Web Search</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.12  Entra ID Authentication for Model Context Protocol Servers</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.13 Azure AI Foundry Agent Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_13-514-context-engineering.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.14 Context Engineering</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_14-515-mcp-custom-transport.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.15 MCP Custom Transport</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_15-516-protocol-features-deep-dive.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.16 Protocol Features Deep Dive</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.17 Adversarial Multi-Agent Reasoning</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
 </div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M05</span>
-  <span class="module-name">Advanced Topics<span class="ko">고급 주제</span></span>
-  <span class="module-meta">16 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m05_01-51-integration-with-azure.html"><span class="name">5.1 Integration with Azure</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_02-52-multi-modal-sample.html"><span class="name">5.2 Multi modal sample</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_03-54-root-contexts.html"><span class="name">5.4 Root Contexts</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_04-55-routing.html"><span class="name">5.5 Routing</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_05-56-sampling.html"><span class="name">5.6 Sampling</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_06-57-scaling.html"><span class="name">5.7 Scaling</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_07-58-security.html"><span class="name">5.8 Security</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_08-59-web-search-sample.html"><span class="lang-badge">Python</span><span class="name">5.9 Web Search sample</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_09-510-realtime-streaming.html"><span class="name">5.10 Realtime Streaming</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_10-511-realtime-web-search.html"><span class="name">5.11 Realtime Web Search</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html"><span class="name">5.12  Entra ID Authentication for Model Context Protocol Servers</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html"><span class="name">5.13 Azure AI Foundry Agent Integration</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_13-514-context-engineering.html"><span class="name">5.14 Context Engineering</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_14-515-mcp-custom-transport.html"><span class="name">5.15 MCP Custom Transport</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_15-516-protocol-features-deep-dive.html"><span class="name">5.16 Protocol Features Deep Dive</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html"><span class="name">5.17 Adversarial Multi-Agent Reasoning</span><span class="meta">M05</span></a>
-</div></div></div>
-<div id="content-ko" class="lang-content"><div class="module-card"><div class="module-header">
-  <span class="module-id">M04</span>
-  <span class="module-name">실용적인 구현<span class="ko">Practical Implementation</span></span>
-  <span class="module-meta">9 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m04_01-c.html"><span class="lang-badge">C#</span><span class="name">C#</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_02-java-with-spring.html"><span class="lang-badge">Java</span><span class="name">Java with Spring</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_03-typescript.html"><span class="lang-badge">TypeScript</span><span class="name">TypeScript</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_04-javascript.html"><span class="lang-badge">JavaScript</span><span class="name">JavaScript</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_05-python.html"><span class="lang-badge">Python</span><span class="name">Python</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_06-pagination-and-large-result-sets.html"><span class="name">Pagination and Large Result Sets</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_07-java-with-spring-sample.html"><span class="lang-badge">Java</span><span class="name">Java with Spring sample</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_08-javascript-sample.html"><span class="lang-badge">JavaScript</span><span class="name">JavaScript sample</span><span class="meta">M04</span></a>
-<a class="lesson-item" href="../lessons/m04_09-python-sample.html"><span class="lang-badge">Python</span><span class="name">Python sample</span><span class="meta">M04</span></a>
+<div id="content-ko" class="lang-content"><div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M04: 실용적인 구현</h2><p class="text-on-surface-variant text-body-md">Practical Implementation</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">9 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m04_01-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">C#</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">C#</span></div>
+</a>
+<a href="../lessons/m04_02-java-with-spring.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Java with Spring</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+</a>
+<a href="../lessons/m04_03-typescript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">TypeScript</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">TypeScript</span></div>
+</a>
+<a href="../lessons/m04_04-javascript.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">JavaScript</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+</a>
+<a href="../lessons/m04_05-python.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Python</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+</a>
+<a href="../lessons/m04_06-pagination-and-large-result-sets.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Pagination and Large Result Sets</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m04_07-java-with-spring-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Java with Spring sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Java</span></div>
+</a>
+<a href="../lessons/m04_08-javascript-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">JavaScript sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">JavaScript</span></div>
+</a>
+<a href="../lessons/m04_09-python-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">Python sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+</a>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M05: 고급 주제</h2><p class="text-on-surface-variant text-body-md">Advanced Topics</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">16 lessons</span></div>
+</button>
+<div class="border-t border-outline-variant"><a href="../lessons/m05_01-51-integration-with-azure.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.1 Integration with Azure</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_02-52-multi-modal-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.2 Multi modal sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_03-54-root-contexts.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.4 Root Contexts</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_04-55-routing.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.5 Routing</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_05-56-sampling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.6 Sampling</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_06-57-scaling.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.7 Scaling</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_07-58-security.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.8 Security</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_08-59-web-search-sample.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.9 Web Search sample</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-neon-cyan/20 text-neon-cyan">BUILD</span><span class="font-code-sm text-code-sm text-outline">Python</span></div>
+</a>
+<a href="../lessons/m05_09-510-realtime-streaming.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.10 Realtime Streaming</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_10-511-realtime-web-search.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.11 Realtime Web Search</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.12  Entra ID Authentication for Model Context Protocol Servers</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.13 Azure AI Foundry Agent Integration</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_13-514-context-engineering.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.14 Context Engineering</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_14-515-mcp-custom-transport.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.15 MCP Custom Transport</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_15-516-protocol-features-deep-dive.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.16 Protocol Features Deep Dive</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+<a href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
+  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">5.17 Adversarial Multi-Agent Reasoning</span></div>
+  <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold bg-terminal-green/20 text-terminal-green">LEARN</span></div>
+</a>
+</div>
 </div></div>
-<div class="module-card"><div class="module-header">
-  <span class="module-id">M05</span>
-  <span class="module-name">고급 주제<span class="ko">Advanced Topics</span></span>
-  <span class="module-meta">16 lessons</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons"><a class="lesson-item" href="../lessons/m05_01-51-integration-with-azure.html"><span class="name">5.1 Integration with Azure</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_02-52-multi-modal-sample.html"><span class="name">5.2 Multi modal sample</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_03-54-root-contexts.html"><span class="name">5.4 Root Contexts</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_04-55-routing.html"><span class="name">5.5 Routing</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_05-56-sampling.html"><span class="name">5.6 Sampling</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_06-57-scaling.html"><span class="name">5.7 Scaling</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_07-58-security.html"><span class="name">5.8 Security</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_08-59-web-search-sample.html"><span class="lang-badge">Python</span><span class="name">5.9 Web Search sample</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_09-510-realtime-streaming.html"><span class="name">5.10 Realtime Streaming</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_10-511-realtime-web-search.html"><span class="name">5.11 Realtime Web Search</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_11-512--entra-id-authentication-for-model-c.html"><span class="name">5.12  Entra ID Authentication for Model Context Protocol Servers</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_12-513-azure-ai-foundry-agent-integration.html"><span class="name">5.13 Azure AI Foundry Agent Integration</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_13-514-context-engineering.html"><span class="name">5.14 Context Engineering</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_14-515-mcp-custom-transport.html"><span class="name">5.15 MCP Custom Transport</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_15-516-protocol-features-deep-dive.html"><span class="name">5.16 Protocol Features Deep Dive</span><span class="meta">M05</span></a>
-<a class="lesson-item" href="../lessons/m05_16-517-adversarial-multi-agent-reasoning.html"><span class="name">5.17 Adversarial Multi-Agent Reasoning</span><span class="meta">M05</span></a>
-</div></div></div>
 </div>
 </main>
 <footer class="bg-surface-deep border-t border-outline-variant w-full p-gutter">
