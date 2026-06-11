@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Community Contributions - Community Contributions - MCP Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{{--bg:#0a0f1a;--surface:#111827;--card:#1a2235;--hover:#222d42;--border:#2a3548;--text:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--green:#4ade80;--radius:12px}}
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}}
+header{{position:sticky;top:0;z-index:50;background:rgba(10,15,26,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}}
+header a{{color:var(--accent);text-decoration:none;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}}
+.badge{{font-size:12px;color:var(--muted);font-weight:500}}
+.toggle-btn{{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:600;background:none;border:1px solid var(--border);padding:6px 14px;border-radius:8px;transition:all .15s}}
+.toggle-btn:hover{{color:var(--accent);border-color:var(--accent)}}
+main{{max-width:800px;margin:0 auto;padding:32px 24px 80px}}
+.breadcrumb{{font-size:13px;color:var(--muted);margin-bottom:8px}}
+.breadcrumb a{{color:var(--accent);text-decoration:none}}
+.progress{{height:3px;background:var(--border);border-radius:2px;margin-bottom:28px;overflow:hidden}}
+.progress-fill{{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}}
+.lang-content{{display:none}}
+.lang-content.active{{display:block}}
+.overview-body h2,.overview-body h3,.overview-body h4,.overview-body h5{{color:#fff;margin:28px 0 12px;font-weight:700}}
+.overview-body h2{{font-size:28px}}
+.overview-body h3{{font-size:22px}}
+.overview-body h4{{font-size:18px}}
+.overview-body h5{{font-size:16px}}
+.overview-body p{{color:var(--muted);margin-bottom:16px;font-size:15px}}
+.overview-body ul,.overview-body ol{{color:var(--muted);padding-left:22px;margin-bottom:16px;font-size:15px}}
+.overview-body li{{margin-bottom:6px}}
+.overview-body a{{color:var(--accent)}}
+.overview-body code{{background:var(--hover);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:13px;font-family:'JetBrains Mono',monospace}}
+.overview-body pre{{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;overflow-x:auto;margin-bottom:18px;position:relative}}
+.overview-body pre code{{background:none;color:var(--text);padding:0;font-size:13px;line-height:1.6;display:block}}
+.overview-body table{{width:100%;border-collapse:collapse;margin-bottom:18px}}
+.overview-body th,.overview-body td{{border:1px solid var(--border);padding:8px 12px;text-align:left;font-size:14px}}
+.overview-body th{{background:var(--hover);color:#fff;font-weight:600}}
+.overview-body td{{color:var(--muted)}}
+.overview-body strong{{color:#fff}}
+.overview-body hr{{border:none;border-top:1px solid var(--border);margin:28px 0}}
+.nav-row{{display:flex;gap:16px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}}
+.nav-link{{flex:1;display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:all .15s}}
+.nav-link:hover{{background:var(--hover);border-color:var(--accent)}}
+.nav-link.next{{flex-direction:row-reverse;text-align:right}}
+.nav-link .dir{{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;font-family:'JetBrains Mono',monospace}}
+.nav-link .title{{font-size:14px;font-weight:600;color:#fff}}
+footer{{border-top:1px solid var(--border);padding:32px 24px;text-align:center;color:var(--muted);font-size:14px}}
+footer a{{color:var(--accent);text-decoration:none}}
+</style>
+</head>
+<body>
+<header>
+<a href="../ecosystem.html">&larr; Ecosystem</a>
+<div style="display:flex;align-items:center;gap:16px">
+<span class="badge">Module 06: Community Contributions</span>
+<button class="toggle-btn" id="langToggle"><span id="langLabel">KO &#8644; EN</span></button>
+</div>
+</header>
+<main>
+<div class="progress"><div class="progress-fill" style="width:100%"></div></div>
+<div class="breadcrumb"><a href="../ecosystem.html">Ecosystem</a> &rsaquo; Module 06: Community Contributions &rsaquo; Community Contributions</div>
+<div id="content-en" class="lang-content overview-body"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Community and Contributions</h2>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lesson focuses on how to engage with the MCP community, contribute to the MCP ecosystem, and follow best practices for collaborative development.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Understanding how to participate in open-source MCP projects is essential for those looking to shape the future of this technology.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the structure of the MCP community and ecosystem</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Participate effectively in MCP community forums and discussions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Contribute to MCP open-source repositories</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create and share custom MCP tools and servers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Follow best practices for MCP development and collaboration</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Discover community resources and frameworks for MCP development</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">The MCP Community Ecosystem</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The MCP ecosystem consists of various components and participants that work together to advance the protocol.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Key Community Components</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Core Protocol Maintainers</strong>: The official <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol">Model Context Protocol GitHub organization</a> maintains the core MCP specifications and reference implementations</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Tool Developers</strong>: Individuals and teams that create MCP tools and servers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Integration Providers</strong>: Companies that integrate MCP into their products and services</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>End Users</strong>: Developers and organizations that use MCP in their applications</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Contributors</strong>: Community members who contribute code, documentation, or other resources</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Community Resources</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Official Channels</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol">MCP GitHub Organization</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">MCP Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP Specification</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/orgs/modelcontextprotocol/discussions">GitHub Discussions</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP Examples & Servers Repository</a></li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Community-Driven Resources</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/clients">MCP Clients</a> - List of clients that support MCP integrations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers?tab=readme-ov-file#-community-servers">Community MCP Servers</a> - Growing list of community-developed MCP servers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/wong2/awesome-mcp-servers">Awesome MCP Servers</a> - Curated list of MCP servers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.pulsemcp.com/">PulseMCP</a> - Community hub & newsletter for discovering MCP resources</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://discord.gg/jHEGxQu2a5">Discord Server</a> - Connect with MCP developers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Language-specific SDK implementations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Blog posts and tutorials</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Contributing to MCP</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Types of Contributions</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The MCP ecosystem welcomes various types of contributions:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Code Contributions</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Core protocol enhancements</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Bug fixes</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Tool and server implementations</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Client/server libraries in different languages</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Documentation</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Improving existing documentation</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Creating tutorials and guides</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Translating documentation</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Creating examples and sample applications</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Community Support</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Answering questions on forums and discussions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Testing and reporting issues</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Organizing community events</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Mentoring new contributors</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Contribution Process: Core Protocol</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To contribute to the core MCP protocol or official implementations, follow these principles from the <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/CONTRIBUTING.md">official contributing guidelines</a>:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Simplicity and Minimalism</strong>: The MCP specification maintains a high bar for adding new concepts. It's easier to add things to a specification than to remove them.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Concrete Approach</strong>: Specification changes should be based on specific implementation challenges, not speculative ideas.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Stages of a Proposal</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Define: Explore the problem space, validate that other MCP users face a similar issue</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Prototype: Build an example solution and demonstrate its practical application</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Write: Based on the prototype, write a specification proposal</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Development Environment Setup</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Fork the repository
+
+git clone https://github.com/YOUR-USERNAME/modelcontextprotocol.git
+
+cd modelcontextprotocol
+
+
+
+# Install dependencies
+
+npm install
+
+
+
+# For schema changes, validate and generate schema.json:
+
+npm run check:schema:ts
+
+npm run generate:schema
+
+
+
+# For documentation changes
+
+npm run check:docs
+
+npm run format
+
+
+
+# Preview documentation locally (optional):
+
+npm run serve:docs
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Example: Contributing a Bug Fix</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Original code with bug in the typescript-sdk
+
+export function validateResource(resource: unknown): resource is MCPResource {
+
+  if (!resource || typeof resource !== &#x27;object&#x27;) {
+
+    return false;
+
+  }
+
+  
+
+  // Bug: Missing property validation
+
+  // Current implementation:
+
+  const hasName = &#x27;name&#x27; in resource;
+
+  const hasSchema = &#x27;schema&#x27; in resource;
+
+  
+
+  return hasName &amp;&amp; hasSchema;
+
+}
+
+
+
+// Fixed implementation in a contribution
+
+export function validateResource(resource: unknown): resource is MCPResource {
+
+  if (!resource || typeof resource !== &#x27;object&#x27;) {
+
+    return false;
+
+  }
+
+  
+
+  // Improved validation
+
+  const hasName = &#x27;name&#x27; in resource &amp;&amp; typeof (resource as MCPResource).name === &#x27;string&#x27;;
+
+  const hasSchema = &#x27;schema&#x27; in resource &amp;&amp; typeof (resource as MCPResource).schema === &#x27;object&#x27;;
+
+  const hasDescription = !(&#x27;description&#x27; in resource) || typeof (resource as MCPResource).description === &#x27;string&#x27;;
+
+  
+
+  return hasName &amp;&amp; hasSchema &amp;&amp; hasDescription;
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Example: Contributing a New Tool to the Standard Library</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Example contribution: A CSV data processing tool for the MCP standard library
+
+
+
+from mcp_tools import Tool, ToolRequest, ToolResponse, ToolExecutionException
+
+import pandas as pd
+
+import io
+
+import json
+
+from typing import Dict, Any, List, Optional
+
+
+
+class CsvProcessingTool(Tool):
+
+    &quot;&quot;&quot;
+
+    Tool for processing and analyzing CSV data.
+
+    
+
+    This tool allows models to extract information from CSV files,
+
+    run basic analysis, and convert data between formats.
+
+    &quot;&quot;&quot;
+
+    
+
+    def get_name(self):
+
+        return &quot;csvProcessor&quot;
+
+        
+
+    def get_description(self):
+
+        return &quot;Processes and analyzes CSV data&quot;
+
+    
+
+    def get_schema(self):
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;csvData&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;, 
+
+                    &quot;description&quot;: &quot;CSV data as a string&quot;
+
+                },
+
+                &quot;csvUrl&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;URL to a CSV file (alternative to csvData)&quot;
+
+                },
+
+                &quot;operation&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;summary&quot;, &quot;filter&quot;, &quot;transform&quot;, &quot;convert&quot;],
+
+                    &quot;description&quot;: &quot;Operation to perform on the CSV data&quot;
+
+                },
+
+                &quot;filterColumn&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Column to filter by (for filter operation)&quot;
+
+                },
+
+                &quot;filterValue&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Value to filter for (for filter operation)&quot;
+
+                },
+
+                &quot;outputFormat&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;json&quot;, &quot;csv&quot;, &quot;markdown&quot;],
+
+                    &quot;default&quot;: &quot;json&quot;,
+
+                    &quot;description&quot;: &quot;Output format for the processed data&quot;
+
+                }
+
+            },
+
+            &quot;oneOf&quot;: [
+
+                {&quot;required&quot;: [&quot;csvData&quot;, &quot;operation&quot;]},
+
+                {&quot;required&quot;: [&quot;csvUrl&quot;, &quot;operation&quot;]}
+
+            ]
+
+        }
+
+    
+
+    async def execute_async(self, request: ToolRequest) -&gt; ToolResponse:
+
+        try:
+
+            # Extract parameters
+
+            operation = request.parameters.get(&quot;operation&quot;)
+
+            output_format = request.parameters.get(&quot;outputFormat&quot;, &quot;json&quot;)
+
+            
+
+            # Get CSV data from either direct data or URL
+
+            df = await self._get_dataframe(request)
+
+            
+
+            # Process based on requested operation
+
+            result = {}
+
+            
+
+            if operation == &quot;summary&quot;:
+
+                result = self._generate_summary(df)
+
+            elif operation == &quot;filter&quot;:
+
+                column = request.parameters.get(&quot;filterColumn&quot;)
+
+                value = request.parameters.get(&quot;filterValue&quot;)
+
+                if not column:
+
+                    raise ToolExecutionException(&quot;filterColumn is required for filter operation&quot;)
+
+                result = self._filter_data(df, column, value)
+
+            elif operation == &quot;transform&quot;:
+
+                result = self._transform_data(df, request.parameters)
+
+            elif operation == &quot;convert&quot;:
+
+                result = self._convert_format(df, output_format)
+
+            else:
+
+                raise ToolExecutionException(f&quot;Unknown operation: {operation}&quot;)
+
+            
+
+            return ToolResponse(result=result)
+
+        
+
+        except Exception as e:
+
+            raise ToolExecutionException(f&quot;CSV processing failed: {str(e)}&quot;)
+
+    
+
+    async def _get_dataframe(self, request: ToolRequest) -&gt; pd.DataFrame:
+
+        &quot;&quot;&quot;Gets a pandas DataFrame from either CSV data or URL&quot;&quot;&quot;
+
+        if &quot;csvData&quot; in request.parameters:
+
+            csv_data = request.parameters.get(&quot;csvData&quot;)
+
+            return pd.read_csv(io.StringIO(csv_data))
+
+        elif &quot;csvUrl&quot; in request.parameters:
+
+            csv_url = request.parameters.get(&quot;csvUrl&quot;)
+
+            return pd.read_csv(csv_url)
+
+        else:
+
+            raise ToolExecutionException(&quot;Either csvData or csvUrl must be provided&quot;)
+
+    
+
+    def _generate_summary(self, df: pd.DataFrame) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Generates a summary of the CSV data&quot;&quot;&quot;
+
+        return {
+
+            &quot;columns&quot;: df.columns.tolist(),
+
+            &quot;rowCount&quot;: len(df),
+
+            &quot;columnCount&quot;: len(df.columns),
+
+            &quot;numericColumns&quot;: df.select_dtypes(include=[&#x27;number&#x27;]).columns.tolist(),
+
+            &quot;categoricalColumns&quot;: df.select_dtypes(include=[&#x27;object&#x27;]).columns.tolist(),
+
+            &quot;sampleRows&quot;: json.loads(df.head(5).to_json(orient=&quot;records&quot;)),
+
+            &quot;statistics&quot;: json.loads(df.describe().to_json())
+
+        }
+
+    
+
+    def _filter_data(self, df: pd.DataFrame, column: str, value: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Filters the DataFrame by a column value&quot;&quot;&quot;
+
+        if column not in df.columns:
+
+            raise ToolExecutionException(f&quot;Column &#x27;{column}&#x27; not found&quot;)
+
+            
+
+        filtered_df = df[df[column].astype(str).str.contains(value)]
+
+        
+
+        return {
+
+            &quot;originalRowCount&quot;: len(df),
+
+            &quot;filteredRowCount&quot;: len(filtered_df),
+
+            &quot;data&quot;: json.loads(filtered_df.to_json(orient=&quot;records&quot;))
+
+        }
+
+    
+
+    def _transform_data(self, df: pd.DataFrame, params: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Transforms the data based on parameters&quot;&quot;&quot;
+
+        # Implementation would include various transformations
+
+        return {
+
+            &quot;status&quot;: &quot;success&quot;,
+
+            &quot;message&quot;: &quot;Transformation applied&quot;
+
+        }
+
+    
+
+    def _convert_format(self, df: pd.DataFrame, format: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Converts the DataFrame to different formats&quot;&quot;&quot;
+
+        if format == &quot;json&quot;:
+
+            return {
+
+                &quot;data&quot;: json.loads(df.to_json(orient=&quot;records&quot;)),
+
+                &quot;format&quot;: &quot;json&quot;
+
+            }
+
+        elif format == &quot;csv&quot;:
+
+            return {
+
+                &quot;data&quot;: df.to_csv(index=False),
+
+                &quot;format&quot;: &quot;csv&quot;
+
+            }
+
+        elif format == &quot;markdown&quot;:
+
+            return {
+
+                &quot;data&quot;: df.to_markdown(),
+
+                &quot;format&quot;: &quot;markdown&quot;
+
+            }
+
+        else:
+
+            raise ToolExecutionException(f&quot;Unsupported output format: {format}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Contribution Guidelines</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To make a successful contribution to MCP projects:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Start Small</strong>: Begin with documentation, bug fixes, or small enhancements</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Follow the Style Guide</strong>: Adhere to the coding style and conventions of the project</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Write Tests</strong>: Include unit tests for your code contributions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Document Your Work</strong>: Add clear documentation for new features or changes</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Submit Targeted PRs</strong>: Keep pull requests focused on a single issue or feature</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>Engage with Feedback</strong>: Be responsive to feedback on your contributions</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Example Contribution Workflow</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Clone the repository
+
+git clone https://github.com/modelcontextprotocol/typescript-sdk.git
+
+cd typescript-sdk
+
+
+
+# Create a new branch for your contribution
+
+git checkout -b feature/my-contribution
+
+
+
+# Make your changes
+
+# ...
+
+
+
+# Run tests to ensure your changes don&#x27;t break existing functionality
+
+npm test
+
+
+
+# Commit your changes with a descriptive message
+
+git commit -am &quot;Fix validation in resource handler&quot;
+
+
+
+# Push your branch to your fork
+
+git push origin feature/my-contribution
+
+
+
+# Create a pull request from your branch to the main repository
+
+# Then engage with feedback and iterate on your PR as needed
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Creating and Sharing MCP Servers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">One of the most valuable ways to contribute to the MCP ecosystem is by creating and sharing custom MCP servers. The community has already developed hundreds of servers for various services and use cases.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP Server Development Frameworks</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Several frameworks are available to simplify MCP server development:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Official SDKs</strong> (aligned with <a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP Specification 2025-11-25</a>):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">TypeScript SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">Python SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/csharp-sdk">C# SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/go-sdk">Go SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/java-sdk">Java SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/kotlin-sdk">Kotlin SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/swift-sdk">Swift SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/rust-sdk">Rust SDK</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Community Frameworks</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://mcp-framework.com/">MCP-Framework</a> - Build MCP servers with elegance and speed in TypeScript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/codeboyzhou/mcp-declarative-java-sdk">MCP Declarative Java SDK</a> - Annotation-driven MCP servers with Java</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/quarkiverse/quarkus-mcp-server">Quarkus MCP Server SDK</a> - Java framework for MCP servers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/vercel-labs/mcp-for-next.js">Next.js MCP Server Template</a> - Starter Next.js project for MCP servers</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Developing Shareable Tools</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET Example: Creating a Shareable Tool Package</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Create a new .NET library project
+
+// dotnet new classlib -n McpFinanceTools
+
+
+
+using Microsoft.Mcp.Tools;
+
+using System.Threading.Tasks;
+
+using System.Net.Http;
+
+using System.Text.Json;
+
+
+
+namespace McpFinanceTools
+
+{
+
+    // Stock quote tool
+
+    public class StockQuoteTool : IMcpTool
+
+    {
+
+        private readonly HttpClient _httpClient;
+
+        
+
+        public StockQuoteTool(HttpClient httpClient = null)
+
+        {
+
+            _httpClient = httpClient ?? new HttpClient();
+
+        }
+
+        
+
+        public string Name =&gt; &quot;stockQuote&quot;;
+
+        public string Description =&gt; &quot;Gets current stock quotes for specified symbols&quot;;
+
+        
+
+        public object GetSchema()
+
+        {
+
+            return new {
+
+                type = &quot;object&quot;,
+
+                properties = new {
+
+                    symbol = new { 
+
+                        type = &quot;string&quot;,
+
+                        description = &quot;Stock symbol (e.g., MSFT, AAPL)&quot; 
+
+                    },
+
+                    includeHistory = new { 
+
+                        type = &quot;boolean&quot;,
+
+                        description = &quot;Whether to include historical data&quot;,
+
+                        default = false
+
+                    }
+
+                },
+
+                required = new[] { &quot;symbol&quot; }
+
+            };
+
+        }
+
+        
+
+        public async Task&lt;ToolResponse&gt; ExecuteAsync(ToolRequest request)
+
+        {
+
+            // Extract parameters
+
+            string symbol = request.Parameters.GetProperty(&quot;symbol&quot;).GetString();
+
+            bool includeHistory = false;
+
+            
+
+            if (request.Parameters.TryGetProperty(&quot;includeHistory&quot;, out var historyProp))
+
+            {
+
+                includeHistory = historyProp.GetBoolean();
+
+            }
+
+            
+
+            // Call external API (example)
+
+            var quoteResult = await GetStockQuoteAsync(symbol);
+
+            
+
+            // Add historical data if requested
+
+            if (includeHistory)
+
+            {
+
+                var historyData = await GetStockHistoryAsync(symbol);
+
+                quoteResult.Add(&quot;history&quot;, historyData);
+
+            }
+
+            
+
+            // Return formatted result
+
+            return new ToolResponse {
+
+                Result = JsonSerializer.SerializeToElement(quoteResult)
+
+            };
+
+        }
+
+        
+
+        private async Task&lt;Dictionary&lt;string, object&gt;&gt; GetStockQuoteAsync(string symbol)
+
+        {
+
+            // Implementation would call a real stock API
+
+            // This is a simplified example
+
+            return new Dictionary&lt;string, object&gt;
+
+            {
+
+                [&quot;symbol&quot;] = symbol,
+
+                [&quot;price&quot;] = 123.45,
+
+                [&quot;change&quot;] = 2.5,
+
+                [&quot;percentChange&quot;] = 1.2,
+
+                [&quot;lastUpdated&quot;] = DateTime.UtcNow
+
+            };
+
+        }
+
+        
+
+        private async Task&lt;object&gt; GetStockHistoryAsync(string symbol)
+
+        {
+
+            // Implementation would get historical data
+
+            // Simplified example
+
+            return new[]
+
+            {
+
+                new { date = DateTime.Now.AddDays(-7).Date, price = 120.25 },
+
+                new { date = DateTime.Now.AddDays(-6).Date, price = 122.50 },
+
+                new { date = DateTime.Now.AddDays(-5).Date, price = 121.75 }
+
+                // More historical data...
+
+            };
+
+        }
+
+    }
+
+}
+
+
+
+// Create package and publish to NuGet
+
+// dotnet pack -c Release
+
+// dotnet nuget push bin/Release/McpFinanceTools.1.0.0.nupkg -s https://api.nuget.org/v3/index.json -k YOUR_API_KEY
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java Example: Creating a Maven Package for Tools</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// pom.xml configuration for a shareable MCP tool package
+
+&lt;!-- 
+
+&lt;project&gt;
+
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+
+    &lt;artifactId&gt;mcp-weather-tools&lt;/artifactId&gt;
+
+    &lt;version&gt;1.0.0&lt;/version&gt;
+
+    
+
+    &lt;dependencies&gt;
+
+        &lt;dependency&gt;
+
+            &lt;groupId&gt;com.mcp&lt;/groupId&gt;
+
+            &lt;artifactId&gt;mcp-server&lt;/artifactId&gt;
+
+            &lt;version&gt;1.0.0&lt;/version&gt;
+
+        &lt;/dependency&gt;
+
+    &lt;/dependencies&gt;
+
+    
+
+    &lt;distributionManagement&gt;
+
+        &lt;repository&gt;
+
+            &lt;id&gt;github&lt;/id&gt;
+
+            &lt;name&gt;GitHub Packages&lt;/name&gt;
+
+            &lt;url&gt;https://maven.pkg.github.com/username/mcp-weather-tools&lt;/url&gt;
+
+        &lt;/repository&gt;
+
+    &lt;/distributionManagement&gt;
+
+&lt;/project&gt;
+
+--&gt;
+
+
+
+package com.example.mcp.weather;
+
+
+
+import com.mcp.tools.Tool;
+
+import com.mcp.tools.ToolRequest;
+
+import com.mcp.tools.ToolResponse;
+
+import com.mcp.tools.ToolExecutionException;
+
+
+
+import java.net.http.HttpClient;
+
+import java.net.http.HttpRequest;
+
+import java.net.http.HttpResponse;
+
+import java.net.URI;
+
+import java.util.HashMap;
+
+import java.util.Map;
+
+
+
+public class WeatherForecastTool implements Tool {
+
+    private final HttpClient httpClient;
+
+    private final String apiKey;
+
+    
+
+    public WeatherForecastTool(String apiKey) {
+
+        this.httpClient = HttpClient.newHttpClient();
+
+        this.apiKey = apiKey;
+
+    }
+
+    
+
+    @Override
+
+    public String getName() {
+
+        return &quot;weatherForecast&quot;;
+
+    }
+
+    
+
+    @Override
+
+    public String getDescription() {
+
+        return &quot;Gets weather forecast for a specified location&quot;;
+
+    }
+
+    
+
+    @Override
+
+    public Object getSchema() {
+
+        Map&lt;String, Object&gt; schema = new HashMap&lt;&gt;();
+
+        // Schema definition...
+
+        return schema;
+
+    }
+
+    
+
+    @Override
+
+    public ToolResponse execute(ToolRequest request) {
+
+        try {
+
+            String location = request.getParameters().get(&quot;location&quot;).asText();
+
+            int days = request.getParameters().has(&quot;days&quot;) ? 
+
+                request.getParameters().get(&quot;days&quot;).asInt() : 3;
+
+            
+
+            // Call weather API
+
+            Map&lt;String, Object&gt; forecast = getForecast(location, days);
+
+            
+
+            // Build response
+
+            return new ToolResponse.Builder()
+
+                .setResult(forecast)
+
+                .build();
+
+        } catch (Exception ex) {
+
+            throw new ToolExecutionException(&quot;Weather forecast failed: &quot; + ex.getMessage(), ex);
+
+        }
+
+    }
+
+    
+
+    private Map&lt;String, Object&gt; getForecast(String location, int days) {
+
+        // Implementation would call weather API
+
+        // Simplified example
+
+        Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();
+
+        // Add forecast data...
+
+        return result;
+
+    }
+
+}
+
+
+
+// Build and publish using Maven
+
+// mvn clean package
+
+// mvn deploy
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python Example: Publishing a PyPI Package</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Directory structure for a PyPI package:
+
+# mcp_nlp_tools/
+
+# ├── LICENSE
+
+# ├── README.md
+
+# ├── setup.py
+
+# ├── mcp_nlp_tools/
+
+# │   ├── __init__.py
+
+# │   ├── sentiment_tool.py
+
+# │   └── translation_tool.py
+
+
+
+# Example setup.py
+
+&quot;&quot;&quot;
+
+from setuptools import setup, find_packages
+
+
+
+setup(
+
+    name=&quot;mcp_nlp_tools&quot;,
+
+    version=&quot;0.1.0&quot;,
+
+    packages=find_packages(),
+
+    install_requires=[
+
+        &quot;mcp_server&gt;=1.0.0&quot;,
+
+        &quot;transformers&gt;=4.0.0&quot;,
+
+        &quot;torch&gt;=1.8.0&quot;
+
+    ],
+
+    author=&quot;Your Name&quot;,
+
+    author_email=&quot;your.email@example.com&quot;,
+
+    description=&quot;MCP tools for natural language processing tasks&quot;,
+
+    long_description=open(&quot;README.md&quot;).read(),
+
+    long_description_content_type=&quot;text/markdown&quot;,
+
+    url=&quot;https://github.com/username/mcp_nlp_tools&quot;,
+
+    classifiers=[
+
+        &quot;Programming Language :: Python :: 3&quot;,
+
+        &quot;License :: OSI Approved :: MIT License&quot;,
+
+        &quot;Operating System :: OS Independent&quot;,
+
+    ],
+
+    python_requires=&quot;&gt;=3.8&quot;,
+
+)
+
+&quot;&quot;&quot;
+
+
+
+# Example NLP tool implementation (sentiment_tool.py)
+
+from mcp_tools import Tool, ToolRequest, ToolResponse, ToolExecutionException
+
+from transformers import pipeline
+
+import torch
+
+
+
+class SentimentAnalysisTool(Tool):
+
+    &quot;&quot;&quot;MCP tool for sentiment analysis of text&quot;&quot;&quot;
+
+    
+
+    def __init__(self, model_name=&quot;distilbert-base-uncased-finetuned-sst-2-english&quot;):
+
+        # Load the sentiment analysis model
+
+        self.sentiment_analyzer = pipeline(&quot;sentiment-analysis&quot;, model=model_name)
+
+    
+
+    def get_name(self):
+
+        return &quot;sentimentAnalysis&quot;
+
+        
+
+    def get_description(self):
+
+        return &quot;Analyzes the sentiment of text, classifying it as positive or negative&quot;
+
+    
+
+    def get_schema(self):
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;text&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;, 
+
+                    &quot;description&quot;: &quot;The text to analyze for sentiment&quot;
+
+                },
+
+                &quot;includeScore&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Whether to include confidence scores&quot;,
+
+                    &quot;default&quot;: True
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;text&quot;]
+
+        }
+
+    
+
+    async def execute_async(self, request: ToolRequest) -&gt; ToolResponse:
+
+        try:
+
+            # Extract parameters
+
+            text = request.parameters.get(&quot;text&quot;)
+
+            include_score = request.parameters.get(&quot;includeScore&quot;, True)
+
+            
+
+            # Analyze sentiment
+
+            sentiment_result = self.sentiment_analyzer(text)[0]
+
+            
+
+            # Format result
+
+            result = {
+
+                &quot;sentiment&quot;: sentiment_result[&quot;label&quot;],
+
+                &quot;text&quot;: text
+
+            }
+
+            
+
+            if include_score:
+
+                result[&quot;score&quot;] = sentiment_result[&quot;score&quot;]
+
+            
+
+            # Return result
+
+            return ToolResponse(result=result)
+
+            
+
+        except Exception as e:
+
+            raise ToolExecutionException(f&quot;Sentiment analysis failed: {str(e)}&quot;)
+
+
+
+# To publish:
+
+# python setup.py sdist bdist_wheel
+
+# python -m twine upload dist/*
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Sharing Best Practices</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When sharing MCP tools with the community:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Complete Documentation</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Document purpose, usage, and examples</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Explain parameters and return values</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Document any external dependencies</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Error Handling</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Implement robust error handling</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Provide useful error messages</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Handle edge cases gracefully</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Performance Considerations</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Optimize for both speed and resource usage</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Implement caching when appropriate</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Consider scalability</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Security</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Use secure API keys and authentication</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Validate and sanitize inputs</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Implement rate limiting for external API calls</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Testing</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Include comprehensive test coverage</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Test with different input types and edge cases</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Document test procedures</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Community Collaboration and Best Practices</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Effective collaboration is key to a thriving MCP ecosystem.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Communication Channels</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub Issues and Discussions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Microsoft Tech Community</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Discord and Slack channels</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Stack Overflow (tag: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">model-context-protocol</code> or <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">mcp</code>)</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Code Reviews</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When reviewing MCP contributions:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Clarity</strong>: Is the code clear and well-documented?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Correctness</strong>: Does it work as expected?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Consistency</strong>: Does it follow project conventions?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Completeness</strong>: Are tests and documentation included?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Security</strong>: Are there any security concerns?</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Version Compatibility</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When developing for MCP:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Protocol Versioning</strong>: Adhere to the MCP protocol version your tool supports</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Client Compatibility</strong>: Consider backward compatibility</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Server Compatibility</strong>: Follow server implementation guidelines</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Breaking Changes</strong>: Clearly document any breaking changes</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Example Community Project: MCP Tool Registry</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">An important community contribution could be developing a public registry for MCP tools.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Example schema for a community tool registry API
+
+
+
+from fastapi import FastAPI, HTTPException, Depends
+
+from pydantic import BaseModel, Field, HttpUrl
+
+from typing import List, Optional
+
+import datetime
+
+import uuid
+
+
+
+# Models for the tool registry
+
+class ToolSchema(BaseModel):
+
+    &quot;&quot;&quot;JSON Schema for a tool&quot;&quot;&quot;
+
+    type: str
+
+    properties: dict
+
+    required: List[str] = []
+
+
+
+class ToolRegistration(BaseModel):
+
+    &quot;&quot;&quot;Information for registering a tool&quot;&quot;&quot;
+
+    name: str = Field(..., description=&quot;Unique name for the tool&quot;)
+
+    description: str = Field(..., description=&quot;Description of what the tool does&quot;)
+
+    version: str = Field(..., description=&quot;Semantic version of the tool&quot;)
+
+    schema: ToolSchema = Field(..., description=&quot;JSON Schema for tool parameters&quot;)
+
+    author: str = Field(..., description=&quot;Author of the tool&quot;)
+
+    repository: Optional[HttpUrl] = Field(None, description=&quot;Repository URL&quot;)
+
+    documentation: Optional[HttpUrl] = Field(None, description=&quot;Documentation URL&quot;)
+
+    package: Optional[HttpUrl] = Field(None, description=&quot;Package URL&quot;)
+
+    tags: List[str] = Field(default_factory=list, description=&quot;Tags for categorization&quot;)
+
+    examples: List[dict] = Field(default_factory=list, description=&quot;Example usage&quot;)
+
+
+
+class Tool(ToolRegistration):
+
+    &quot;&quot;&quot;Tool with registry metadata&quot;&quot;&quot;
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
+
+    updated_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
+
+    downloads: int = Field(default=0)
+
+    rating: float = Field(default=0.0)
+
+    ratings_count: int = Field(default=0)
+
+
+
+# FastAPI application for the registry
+
+app = FastAPI(title=&quot;MCP Tool Registry&quot;)
+
+
+
+# In-memory database for this example
+
+tools_db = {}
+
+
+
+@app.post(&quot;/tools&quot;, response_model=Tool)
+
+async def register_tool(tool: ToolRegistration):
+
+    &quot;&quot;&quot;Register a new tool in the registry&quot;&quot;&quot;
+
+    if tool.name in tools_db:
+
+        raise HTTPException(status_code=400, detail=f&quot;Tool &#x27;{tool.name}&#x27; already exists&quot;)
+
+    
+
+    new_tool = Tool(**tool.dict())
+
+    tools_db[tool.name] = new_tool
+
+    return new_tool
+
+
+
+@app.get(&quot;/tools&quot;, response_model=List[Tool])
+
+async def list_tools(tag: Optional[str] = None):
+
+    &quot;&quot;&quot;List all registered tools, optionally filtered by tag&quot;&quot;&quot;
+
+    if tag:
+
+        return [tool for tool in tools_db.values() if tag in tool.tags]
+
+    return list(tools_db.values())
+
+
+
+@app.get(&quot;/tools/{tool_name}&quot;, response_model=Tool)
+
+async def get_tool(tool_name: str):
+
+    &quot;&quot;&quot;Get information about a specific tool&quot;&quot;&quot;
+
+    if tool_name not in tools_db:
+
+        raise HTTPException(status_code=404, detail=f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;)
+
+    return tools_db[tool_name]
+
+
+
+@app.delete(&quot;/tools/{tool_name}&quot;)
+
+async def delete_tool(tool_name: str):
+
+    &quot;&quot;&quot;Delete a tool from the registry&quot;&quot;&quot;
+
+    if tool_name not in tools_db:
+
+        raise HTTPException(status_code=404, detail=f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;)
+
+    del tools_db[tool_name]
+
+    return {&quot;message&quot;: f&quot;Tool &#x27;{tool_name}&#x27; deleted&quot;}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Key Takeaways</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The MCP community is diverse and welcomes various types of contributions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Contributing to MCP can range from core protocol enhancements to custom tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Following contribution guidelines improves the chances of your PR being accepted</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Creating and sharing MCP tools is a valuable way to enhance the ecosystem</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Community collaboration is essential for the growth and improvement of MCP</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Exercise</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Identify an area in the MCP ecosystem where you could make a contribution based on your skills and interests</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Fork the MCP repository and set up a local development environment</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Create a small enhancement, bug fix, or tool that would benefit the community</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Document your contribution with proper tests and documentation</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Submit a pull request to the appropriate repository</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/topics/model-context-protocol">MCP Community Projects</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/07-LessonsfromEarlyAdoption/README.md" target="_blank">Lessons from Early Adoption</a></p>
+</div>
+<div id="content-ko" class="lang-content overview-body"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">커뮤니티 및 기여</h2>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">_(위 이미지를 클릭하여 이 수업의 영상을 시청하세요)_</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 수업은 MCP 커뮤니티와 소통하는 방법, MCP 생태계에 기여하는 방법, 그리고 협업 개발을 위한 모범 사례를 다룹니다. 오픈 소스 MCP 프로젝트에 참여하는 방법을 이해하는 것은 이 기술의 미래를 형성하려는 분들에게 필수적입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 수업을 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 커뮤니티 및 생태계 구조 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 커뮤니티 포럼과 토론에 효과적으로 참여</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 오픈 소스 저장소에 기여</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">맞춤형 MCP 도구 및 서버 생성 및 공유</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 개발 및 협업을 위한 모범 사례 준수</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 개발을 위한 커뮤니티 리소스 및 프레임워크 발견</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 커뮤니티 생태계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 생태계는 프로토콜을 발전시키기 위해 함께 일하는 다양한 구성 요소와 참여자로 이루어져 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">주요 커뮤니티 구성 요소</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>핵심 프로토콜 유지 관리자</strong>: 공식 <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol">Model Context Protocol GitHub 조직</a>은 핵심 MCP 명세와 참조 구현을 유지합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>도구 개발자</strong>: MCP 도구와 서버를 만드는 개인 및 팀</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>통합 제공자</strong>: 자사의 제품과 서비스에 MCP를 통합하는 회사들</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>최종 사용자</strong>: 애플리케이션에서 MCP를 사용하는 개발자와 조직</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>기여자</strong>: 코드, 문서 또는 기타 리소스를 기여하는 커뮤니티 멤버</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">커뮤니티 리소스</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">공식 채널</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol">MCP GitHub 조직</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">MCP 문서</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP 명세</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/orgs/modelcontextprotocol/discussions">GitHub 토론</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP 예제 및 서버 저장소</a></li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">커뮤니티 주도 리소스</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/clients">MCP 클라이언트</a> - MCP 통합을 지원하는 클라이언트 목록</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers?tab=readme-ov-file#-community-servers">커뮤니티 MCP 서버</a> - 커뮤니티에서 개발한 MCP 서버 목록 증가 중</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/wong2/awesome-mcp-servers">Awesome MCP 서버</a> - 엄선된 MCP 서버 목록</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.pulsemcp.com/">PulseMCP</a> - MCP 리소스를 발견할 수 있는 커뮤니티 허브 및 뉴스레터</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://discord.gg/jHEGxQu2a5">Discord 서버</a> - MCP 개발자와 연결</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">언어별 SDK 구현체</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">블로그 게시물 및 튜토리얼</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP에 기여하기</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">기여 유형</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 생태계는 다양한 유형의 기여를 환영합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>코드 기여</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 핵심 프로토콜 개선</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 버그 수정</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 도구 및 서버 구현</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 다양한 언어의 클라이언트/서버 라이브러리</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>문서화</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 기존 문서 개선</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 튜토리얼 및 가이드 작성</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 문서 번역</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 예제 및 샘플 애플리케이션 작성</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>커뮤니티 지원</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 포럼 및 토론에서 질문에 답변</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 테스트 및 이슈 보고</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 커뮤니티 이벤트 조직</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 신규 기여자 멘토링</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">기여 프로세스: 핵심 프로토콜</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">핵심 MCP 프로토콜 또는 공식 구현에 기여하려면, <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/CONTRIBUTING.md">공식 기여 가이드라인</a>의 원칙을 따르세요:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>단순함과 최소주의</strong>: MCP 명세는 새 개념 추가에 높은 기준을 유지합니다. 명세에 항목을 추가하는 것보다 삭제하는 것이 더 어렵습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>구체적 접근법</strong>: 명세 변경은 투기적 아이디어가 아니라 구체적 구현 문제에 기반해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>제안 단계</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 정의: 문제 영역 탐색, 다른 MCP 사용자도 유사한 문제를 겪는지 검증</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 프로토타입: 예제 솔루션 구축 및 실용성 시연</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 작성: 프로토타입을 바탕으로 명세 제안서 작성</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">개발 환경 설정</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 저장소를 포크하세요
+
+git clone https://github.com/YOUR-USERNAME/modelcontextprotocol.git
+
+cd modelcontextprotocol
+
+
+
+# 의존성을 설치하세요
+
+npm install
+
+
+
+# 스키마 변경의 경우, 검증하고 schema.json을 생성하세요:
+
+npm run check:schema:ts
+
+npm run generate:schema
+
+
+
+# 문서 변경의 경우
+
+npm run check:docs
+
+npm run format
+
+
+
+# 문서를 로컬에서 미리보기 (선택 사항):
+
+npm run serve:docs
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">예제: 버그 수정 기여하기</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// 타입스크립트 SDK의 버그가 있는 원본 코드
+
+export function validateResource(resource: unknown): resource is MCPResource {
+
+  if (!resource || typeof resource !== &#x27;object&#x27;) {
+
+    return false;
+
+  }
+
+  
+
+  // 버그: 누락된 속성 검증
+
+  // 현재 구현:
+
+  const hasName = &#x27;name&#x27; in resource;
+
+  const hasSchema = &#x27;schema&#x27; in resource;
+
+  
+
+  return hasName &amp;&amp; hasSchema;
+
+}
+
+
+
+// 기여로 수정된 구현
+
+export function validateResource(resource: unknown): resource is MCPResource {
+
+  if (!resource || typeof resource !== &#x27;object&#x27;) {
+
+    return false;
+
+  }
+
+  
+
+  // 개선된 검증
+
+  const hasName = &#x27;name&#x27; in resource &amp;&amp; typeof (resource as MCPResource).name === &#x27;string&#x27;;
+
+  const hasSchema = &#x27;schema&#x27; in resource &amp;&amp; typeof (resource as MCPResource).schema === &#x27;object&#x27;;
+
+  const hasDescription = !(&#x27;description&#x27; in resource) || typeof (resource as MCPResource).description === &#x27;string&#x27;;
+
+  
+
+  return hasName &amp;&amp; hasSchema &amp;&amp; hasDescription;
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">예제: 표준 라이브러리에 새 도구 기여하기</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 예제 기여: MCP 표준 라이브러리를 위한 CSV 데이터 처리 도구
+
+
+
+from mcp_tools import Tool, ToolRequest, ToolResponse, ToolExecutionException
+
+import pandas as pd
+
+import io
+
+import json
+
+from typing import Dict, Any, List, Optional
+
+
+
+class CsvProcessingTool(Tool):
+
+    &quot;&quot;&quot;
+
+    Tool for processing and analyzing CSV data.
+
+    
+
+    This tool allows models to extract information from CSV files,
+
+    run basic analysis, and convert data between formats.
+
+    &quot;&quot;&quot;
+
+    
+
+    def get_name(self):
+
+        return &quot;csvProcessor&quot;
+
+        
+
+    def get_description(self):
+
+        return &quot;Processes and analyzes CSV data&quot;
+
+    
+
+    def get_schema(self):
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;csvData&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;, 
+
+                    &quot;description&quot;: &quot;CSV data as a string&quot;
+
+                },
+
+                &quot;csvUrl&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;URL to a CSV file (alternative to csvData)&quot;
+
+                },
+
+                &quot;operation&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;summary&quot;, &quot;filter&quot;, &quot;transform&quot;, &quot;convert&quot;],
+
+                    &quot;description&quot;: &quot;Operation to perform on the CSV data&quot;
+
+                },
+
+                &quot;filterColumn&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Column to filter by (for filter operation)&quot;
+
+                },
+
+                &quot;filterValue&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Value to filter for (for filter operation)&quot;
+
+                },
+
+                &quot;outputFormat&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;json&quot;, &quot;csv&quot;, &quot;markdown&quot;],
+
+                    &quot;default&quot;: &quot;json&quot;,
+
+                    &quot;description&quot;: &quot;Output format for the processed data&quot;
+
+                }
+
+            },
+
+            &quot;oneOf&quot;: [
+
+                {&quot;required&quot;: [&quot;csvData&quot;, &quot;operation&quot;]},
+
+                {&quot;required&quot;: [&quot;csvUrl&quot;, &quot;operation&quot;]}
+
+            ]
+
+        }
+
+    
+
+    async def execute_async(self, request: ToolRequest) -&gt; ToolResponse:
+
+        try:
+
+            # 매개변수 추출
+
+            operation = request.parameters.get(&quot;operation&quot;)
+
+            output_format = request.parameters.get(&quot;outputFormat&quot;, &quot;json&quot;)
+
+            
+
+            # 직접 데이터 또는 URL에서 CSV 데이터 가져오기
+
+            df = await self._get_dataframe(request)
+
+            
+
+            # 요청된 작업에 따라 처리
+
+            result = {}
+
+            
+
+            if operation == &quot;summary&quot;:
+
+                result = self._generate_summary(df)
+
+            elif operation == &quot;filter&quot;:
+
+                column = request.parameters.get(&quot;filterColumn&quot;)
+
+                value = request.parameters.get(&quot;filterValue&quot;)
+
+                if not column:
+
+                    raise ToolExecutionException(&quot;filterColumn is required for filter operation&quot;)
+
+                result = self._filter_data(df, column, value)
+
+            elif operation == &quot;transform&quot;:
+
+                result = self._transform_data(df, request.parameters)
+
+            elif operation == &quot;convert&quot;:
+
+                result = self._convert_format(df, output_format)
+
+            else:
+
+                raise ToolExecutionException(f&quot;Unknown operation: {operation}&quot;)
+
+            
+
+            return ToolResponse(result=result)
+
+        
+
+        except Exception as e:
+
+            raise ToolExecutionException(f&quot;CSV processing failed: {str(e)}&quot;)
+
+    
+
+    async def _get_dataframe(self, request: ToolRequest) -&gt; pd.DataFrame:
+
+        &quot;&quot;&quot;Gets a pandas DataFrame from either CSV data or URL&quot;&quot;&quot;
+
+        if &quot;csvData&quot; in request.parameters:
+
+            csv_data = request.parameters.get(&quot;csvData&quot;)
+
+            return pd.read_csv(io.StringIO(csv_data))
+
+        elif &quot;csvUrl&quot; in request.parameters:
+
+            csv_url = request.parameters.get(&quot;csvUrl&quot;)
+
+            return pd.read_csv(csv_url)
+
+        else:
+
+            raise ToolExecutionException(&quot;Either csvData or csvUrl must be provided&quot;)
+
+    
+
+    def _generate_summary(self, df: pd.DataFrame) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Generates a summary of the CSV data&quot;&quot;&quot;
+
+        return {
+
+            &quot;columns&quot;: df.columns.tolist(),
+
+            &quot;rowCount&quot;: len(df),
+
+            &quot;columnCount&quot;: len(df.columns),
+
+            &quot;numericColumns&quot;: df.select_dtypes(include=[&#x27;number&#x27;]).columns.tolist(),
+
+            &quot;categoricalColumns&quot;: df.select_dtypes(include=[&#x27;object&#x27;]).columns.tolist(),
+
+            &quot;sampleRows&quot;: json.loads(df.head(5).to_json(orient=&quot;records&quot;)),
+
+            &quot;statistics&quot;: json.loads(df.describe().to_json())
+
+        }
+
+    
+
+    def _filter_data(self, df: pd.DataFrame, column: str, value: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Filters the DataFrame by a column value&quot;&quot;&quot;
+
+        if column not in df.columns:
+
+            raise ToolExecutionException(f&quot;Column &#x27;{column}&#x27; not found&quot;)
+
+            
+
+        filtered_df = df[df[column].astype(str).str.contains(value)]
+
+        
+
+        return {
+
+            &quot;originalRowCount&quot;: len(df),
+
+            &quot;filteredRowCount&quot;: len(filtered_df),
+
+            &quot;data&quot;: json.loads(filtered_df.to_json(orient=&quot;records&quot;))
+
+        }
+
+    
+
+    def _transform_data(self, df: pd.DataFrame, params: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Transforms the data based on parameters&quot;&quot;&quot;
+
+        # 구현에는 다양한 변환이 포함될 것입니다
+
+        return {
+
+            &quot;status&quot;: &quot;success&quot;,
+
+            &quot;message&quot;: &quot;Transformation applied&quot;
+
+        }
+
+    
+
+    def _convert_format(self, df: pd.DataFrame, format: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Converts the DataFrame to different formats&quot;&quot;&quot;
+
+        if format == &quot;json&quot;:
+
+            return {
+
+                &quot;data&quot;: json.loads(df.to_json(orient=&quot;records&quot;)),
+
+                &quot;format&quot;: &quot;json&quot;
+
+            }
+
+        elif format == &quot;csv&quot;:
+
+            return {
+
+                &quot;data&quot;: df.to_csv(index=False),
+
+                &quot;format&quot;: &quot;csv&quot;
+
+            }
+
+        elif format == &quot;markdown&quot;:
+
+            return {
+
+                &quot;data&quot;: df.to_markdown(),
+
+                &quot;format&quot;: &quot;markdown&quot;
+
+            }
+
+        else:
+
+            raise ToolExecutionException(f&quot;Unsupported output format: {format}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">기여 가이드라인</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 프로젝트에 성공적으로 기여하려면:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>작게 시작</strong>: 문서, 버그 수정 또는 작은 향상부터 시작하세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>스타일 가이드 준수</strong>: 프로젝트의 코드 스타일과 규칙을 따르세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>테스트 작성</strong>: 코드 기여에 단위 테스트 포함</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>작업 문서화</strong>: 새로운 기능이나 변경 사항에 대해 명확한 문서 추가</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>타겟 PR 제출</strong>: 하나의 문제 또는 기능에 집중한 풀 리퀘스트 유지</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>피드백 참여</strong>: 기여에 대한 피드백에 적극적으로 응답</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">예제 기여 워크플로우</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 저장소를 복제하세요
+
+git clone https://github.com/modelcontextprotocol/typescript-sdk.git
+
+cd typescript-sdk
+
+
+
+# 기여를 위해 새 브랜치를 만드세요
+
+git checkout -b feature/my-contribution
+
+
+
+# 변경사항을 만드세요
+
+# ...
+
+
+
+# 변경사항이 기존 기능을 깨뜨리지 않는지 테스트를 실행하세요
+
+npm test
+
+
+
+# 설명이 포함된 메시지와 함께 변경사항을 커밋하세요
+
+git commit -am &quot;Fix validation in resource handler&quot;
+
+
+
+# 브랜치를 자신의 포크에 푸시하세요
+
+git push origin feature/my-contribution
+
+
+
+# 브랜치에서 메인 저장소로 풀 리퀘스트를 만드세요
+
+# 그 후 피드백에 참여하고 필요에 따라 PR을 반복하세요
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 서버 생성 및 공유</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 생태계에 기여하는 가장 가치 있는 방법 중 하나는 맞춤형 MCP 서버를 생성하고 공유하는 것입니다. 커뮤니티는 이미 다양한 서비스와 사용 사례를 위한 수백 개의 서버를 개발했습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP 서버 개발 프레임워크</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버 개발을 단순화하는 다양한 프레임워크가 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>공식 SDK</strong> (<a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP 명세 2025-11-25</a>에 맞춤):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">TypeScript SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">Python SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/csharp-sdk">C# SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/go-sdk">Go SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/java-sdk">Java SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/kotlin-sdk">Kotlin SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/swift-sdk">Swift SDK</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/rust-sdk">Rust SDK</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>커뮤니티 프레임워크</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://mcp-framework.com/">MCP-Framework</a> - TypeScript로 우아하고 빠르게 MCP 서버 구축</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/codeboyzhou/mcp-declarative-java-sdk">MCP 선언적 Java SDK</a> - Java로 주석 기반 MCP 서버 개발</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/quarkiverse/quarkus-mcp-server">Quarkus MCP 서버 SDK</a> - MCP 서버용 Java 프레임워크</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <a class="text-[var(--accent)] underline" href="https://github.com/vercel-labs/mcp-for-next.js">Next.js MCP 서버 템플릿</a> - MCP 서버를 위한 Next.js 스타터 프로젝트</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">공유 가능한 도구 개발</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET 예제: 공유 가능한 도구 패키지 생성</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Create a new .NET library project
+
+// dotnet new classlib -n McpFinanceTools
+
+
+
+using Microsoft.Mcp.Tools;
+
+using System.Threading.Tasks;
+
+using System.Net.Http;
+
+using System.Text.Json;
+
+
+
+namespace McpFinanceTools
+
+{
+
+    // Stock quote tool
+
+    public class StockQuoteTool : IMcpTool
+
+    {
+
+        private readonly HttpClient _httpClient;
+
+        
+
+        public StockQuoteTool(HttpClient httpClient = null)
+
+        {
+
+            _httpClient = httpClient ?? new HttpClient();
+
+        }
+
+        
+
+        public string Name =&gt; &quot;stockQuote&quot;;
+
+        public string Description =&gt; &quot;Gets current stock quotes for specified symbols&quot;;
+
+        
+
+        public object GetSchema()
+
+        {
+
+            return new {
+
+                type = &quot;object&quot;,
+
+                properties = new {
+
+                    symbol = new { 
+
+                        type = &quot;string&quot;,
+
+                        description = &quot;Stock symbol (e.g., MSFT, AAPL)&quot; 
+
+                    },
+
+                    includeHistory = new { 
+
+                        type = &quot;boolean&quot;,
+
+                        description = &quot;Whether to include historical data&quot;,
+
+                        default = false
+
+                    }
+
+                },
+
+                required = new[] { &quot;symbol&quot; }
+
+            };
+
+        }
+
+        
+
+        public async Task&lt;ToolResponse&gt; ExecuteAsync(ToolRequest request)
+
+        {
+
+            // Extract parameters
+
+            string symbol = request.Parameters.GetProperty(&quot;symbol&quot;).GetString();
+
+            bool includeHistory = false;
+
+            
+
+            if (request.Parameters.TryGetProperty(&quot;includeHistory&quot;, out var historyProp))
+
+            {
+
+                includeHistory = historyProp.GetBoolean();
+
+            }
+
+            
+
+            // Call external API (example)
+
+            var quoteResult = await GetStockQuoteAsync(symbol);
+
+            
+
+            // Add historical data if requested
+
+            if (includeHistory)
+
+            {
+
+                var historyData = await GetStockHistoryAsync(symbol);
+
+                quoteResult.Add(&quot;history&quot;, historyData);
+
+            }
+
+            
+
+            // Return formatted result
+
+            return new ToolResponse {
+
+                Result = JsonSerializer.SerializeToElement(quoteResult)
+
+            };
+
+        }
+
+        
+
+        private async Task&lt;Dictionary&lt;string, object&gt;&gt; GetStockQuoteAsync(string symbol)
+
+        {
+
+            // Implementation would call a real stock API
+
+            // This is a simplified example
+
+            return new Dictionary&lt;string, object&gt;
+
+            {
+
+                [&quot;symbol&quot;] = symbol,
+
+                [&quot;price&quot;] = 123.45,
+
+                [&quot;change&quot;] = 2.5,
+
+                [&quot;percentChange&quot;] = 1.2,
+
+                [&quot;lastUpdated&quot;] = DateTime.UtcNow
+
+            };
+
+        }
+
+        
+
+        private async Task&lt;object&gt; GetStockHistoryAsync(string symbol)
+
+        {
+
+            // Implementation would get historical data
+
+            // Simplified example
+
+            return new[]
+
+            {
+
+                new { date = DateTime.Now.AddDays(-7).Date, price = 120.25 },
+
+                new { date = DateTime.Now.AddDays(-6).Date, price = 122.50 },
+
+                new { date = DateTime.Now.AddDays(-5).Date, price = 121.75 }
+
+                // More historical data...
+
+            };
+
+        }
+
+    }
+
+}
+
+
+
+// Create package and publish to NuGet
+
+// dotnet pack -c Release
+
+// dotnet nuget push bin/Release/McpFinanceTools.1.0.0.nupkg -s https://api.nuget.org/v3/index.json -k YOUR_API_KEY
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java 예제: 도구용 Maven 패키지 생성</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// 공유 가능한 MCP 도구 패키지를 위한 pom.xml 구성
+
+&lt;!-- 
+
+&lt;project&gt;
+
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+
+    &lt;artifactId&gt;mcp-weather-tools&lt;/artifactId&gt;
+
+    &lt;version&gt;1.0.0&lt;/version&gt;
+
+    
+
+    &lt;dependencies&gt;
+
+        &lt;dependency&gt;
+
+            &lt;groupId&gt;com.mcp&lt;/groupId&gt;
+
+            &lt;artifactId&gt;mcp-server&lt;/artifactId&gt;
+
+            &lt;version&gt;1.0.0&lt;/version&gt;
+
+        &lt;/dependency&gt;
+
+    &lt;/dependencies&gt;
+
+    
+
+    &lt;distributionManagement&gt;
+
+        &lt;repository&gt;
+
+            &lt;id&gt;github&lt;/id&gt;
+
+            &lt;name&gt;GitHub Packages&lt;/name&gt;
+
+            &lt;url&gt;https://maven.pkg.github.com/username/mcp-weather-tools&lt;/url&gt;
+
+        &lt;/repository&gt;
+
+    &lt;/distributionManagement&gt;
+
+&lt;/project&gt;
+
+--&gt;
+
+
+
+package com.example.mcp.weather;
+
+
+
+import com.mcp.tools.Tool;
+
+import com.mcp.tools.ToolRequest;
+
+import com.mcp.tools.ToolResponse;
+
+import com.mcp.tools.ToolExecutionException;
+
+
+
+import java.net.http.HttpClient;
+
+import java.net.http.HttpRequest;
+
+import java.net.http.HttpResponse;
+
+import java.net.URI;
+
+import java.util.HashMap;
+
+import java.util.Map;
+
+
+
+public class WeatherForecastTool implements Tool {
+
+    private final HttpClient httpClient;
+
+    private final String apiKey;
+
+    
+
+    public WeatherForecastTool(String apiKey) {
+
+        this.httpClient = HttpClient.newHttpClient();
+
+        this.apiKey = apiKey;
+
+    }
+
+    
+
+    @Override
+
+    public String getName() {
+
+        return &quot;weatherForecast&quot;;
+
+    }
+
+    
+
+    @Override
+
+    public String getDescription() {
+
+        return &quot;Gets weather forecast for a specified location&quot;;
+
+    }
+
+    
+
+    @Override
+
+    public Object getSchema() {
+
+        Map&lt;String, Object&gt; schema = new HashMap&lt;&gt;();
+
+        // 스키마 정의...
+
+        return schema;
+
+    }
+
+    
+
+    @Override
+
+    public ToolResponse execute(ToolRequest request) {
+
+        try {
+
+            String location = request.getParameters().get(&quot;location&quot;).asText();
+
+            int days = request.getParameters().has(&quot;days&quot;) ? 
+
+                request.getParameters().get(&quot;days&quot;).asInt() : 3;
+
+            
+
+            // 날씨 API 호출
+
+            Map&lt;String, Object&gt; forecast = getForecast(location, days);
+
+            
+
+            // 응답 생성
+
+            return new ToolResponse.Builder()
+
+                .setResult(forecast)
+
+                .build();
+
+        } catch (Exception ex) {
+
+            throw new ToolExecutionException(&quot;Weather forecast failed: &quot; + ex.getMessage(), ex);
+
+        }
+
+    }
+
+    
+
+    private Map&lt;String, Object&gt; getForecast(String location, int days) {
+
+        // 구현에서는 날씨 API를 호출합니다
+
+        // 단순화된 예제
+
+        Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();
+
+        // 예보 데이터 추가...
+
+        return result;
+
+    }
+
+}
+
+
+
+// Maven을 사용하여 빌드 및 배포
+
+// mvn clean package
+
+// mvn deploy
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python 예제: PyPI 패키지 배포</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# PyPI 패키지의 디렉토리 구조:
+
+# mcp_nlp_tools/
+
+# ├── LICENSE
+
+# ├── README.md
+
+# ├── setup.py
+
+# ├── mcp_nlp_tools/
+
+# │   ├── __init__.py
+
+# │   ├── sentiment_tool.py
+
+# │   └── translation_tool.py
+
+
+
+# setup.py 예제
+
+&quot;&quot;&quot;
+
+from setuptools import setup, find_packages
+
+
+
+setup(
+
+    name=&quot;mcp_nlp_tools&quot;,
+
+    version=&quot;0.1.0&quot;,
+
+    packages=find_packages(),
+
+    install_requires=[
+
+        &quot;mcp_server&gt;=1.0.0&quot;,
+
+        &quot;transformers&gt;=4.0.0&quot;,
+
+        &quot;torch&gt;=1.8.0&quot;
+
+    ],
+
+    author=&quot;Your Name&quot;,
+
+    author_email=&quot;your.email@example.com&quot;,
+
+    description=&quot;MCP tools for natural language processing tasks&quot;,
+
+    long_description=open(&quot;README.md&quot;).read(),
+
+    long_description_content_type=&quot;text/markdown&quot;,
+
+    url=&quot;https://github.com/username/mcp_nlp_tools&quot;,
+
+    classifiers=[
+
+        &quot;Programming Language :: Python :: 3&quot;,
+
+        &quot;License :: OSI Approved :: MIT License&quot;,
+
+        &quot;Operating System :: OS Independent&quot;,
+
+    ],
+
+    python_requires=&quot;&gt;=3.8&quot;,
+
+)
+
+&quot;&quot;&quot;
+
+
+
+# NLP 도구 구현 예제 (sentiment_tool.py)
+
+from mcp_tools import Tool, ToolRequest, ToolResponse, ToolExecutionException
+
+from transformers import pipeline
+
+import torch
+
+
+
+class SentimentAnalysisTool(Tool):
+
+    &quot;&quot;&quot;MCP tool for sentiment analysis of text&quot;&quot;&quot;
+
+    
+
+    def __init__(self, model_name=&quot;distilbert-base-uncased-finetuned-sst-2-english&quot;):
+
+        # 감정 분석 모델 로드
+
+        self.sentiment_analyzer = pipeline(&quot;sentiment-analysis&quot;, model=model_name)
+
+    
+
+    def get_name(self):
+
+        return &quot;sentimentAnalysis&quot;
+
+        
+
+    def get_description(self):
+
+        return &quot;Analyzes the sentiment of text, classifying it as positive or negative&quot;
+
+    
+
+    def get_schema(self):
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;text&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;, 
+
+                    &quot;description&quot;: &quot;The text to analyze for sentiment&quot;
+
+                },
+
+                &quot;includeScore&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Whether to include confidence scores&quot;,
+
+                    &quot;default&quot;: True
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;text&quot;]
+
+        }
+
+    
+
+    async def execute_async(self, request: ToolRequest) -&gt; ToolResponse:
+
+        try:
+
+            # 파라미터 추출
+
+            text = request.parameters.get(&quot;text&quot;)
+
+            include_score = request.parameters.get(&quot;includeScore&quot;, True)
+
+            
+
+            # 감정 분석 수행
+
+            sentiment_result = self.sentiment_analyzer(text)[0]
+
+            
+
+            # 결과 형식화
+
+            result = {
+
+                &quot;sentiment&quot;: sentiment_result[&quot;label&quot;],
+
+                &quot;text&quot;: text
+
+            }
+
+            
+
+            if include_score:
+
+                result[&quot;score&quot;] = sentiment_result[&quot;score&quot;]
+
+            
+
+            # 결과 반환
+
+            return ToolResponse(result=result)
+
+            
+
+        except Exception as e:
+
+            raise ToolExecutionException(f&quot;Sentiment analysis failed: {str(e)}&quot;)
+
+
+
+# 배포를 위해:
+
+# python setup.py sdist bdist_wheel
+
+# python -m twine upload dist/*
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">공유 시 모범 사례</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 도구를 커뮤니티와 공유할 때:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>완전한 문서화</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 목적, 사용법 및 예제 문서화</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 매개변수 및 반환값 설명</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 외부 종속성 문서화</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>오류 처리</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 견고한 오류 처리 구현</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 유용한 오류 메시지 제공</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 가장자리 케이스 우아하게 처리</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>성능 고려</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 속도와 자원 사용 최적화</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 적절할 때 캐싱 구현</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 확장성 고려</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>보안</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 안전한 API 키 및 인증 사용</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 입력값 검증 및 정제</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 외부 API 호출에 대한 속도 제한 구현</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>테스트</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 포괄적인 테스트 커버리지 포함</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 다양한 입력 유형 및 가장자리 케이스 테스트</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 테스트 절차 문서화</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">커뮤니티 협업 및 모범 사례</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">효과적인 협업은 번창하는 MCP 생태계의 핵심입니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">소통 채널</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub 이슈 및 토론</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Microsoft Tech Community</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Discord 및 Slack 채널</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Stack Overflow (태그: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">model-context-protocol</code> 또는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">mcp</code>)</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">코드 리뷰</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 기여를 검토할 때:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>명확성</strong>: 코드가 명확하고 잘 문서화되었나?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>정확성</strong>: 기대대로 작동하는가?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>일관성</strong>: 프로젝트 규칙을 따르는가?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>완성도</strong>: 테스트와 문서가 포함되었나?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>보안</strong>: 보안 문제가 있는가?</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">버전 호환성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP용 개발 시:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>프로토콜 버전 관리</strong>: 도구가 지원하는 MCP 프로토콜 버전 준수</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>클라이언트 호환성</strong>: 이전 버전과의 호환성 고려</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>서버 호환성</strong>: 서버 구현 가이드라인 준수</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>파괴적 변경</strong>: 파괴적 변경 사항을 명확히 문서화</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">예제 커뮤니티 프로젝트: MCP 도구 레지스트리</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 커뮤니티 기여로 MCP 도구를 위한 공개 레지스트리를 개발할 수 있습니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 커뮤니티 도구 등록 API 예제 스키마
+
+
+
+from fastapi import FastAPI, HTTPException, Depends
+
+from pydantic import BaseModel, Field, HttpUrl
+
+from typing import List, Optional
+
+import datetime
+
+import uuid
+
+
+
+# 도구 등록을 위한 모델
+
+class ToolSchema(BaseModel):
+
+    &quot;&quot;&quot;JSON Schema for a tool&quot;&quot;&quot;
+
+    type: str
+
+    properties: dict
+
+    required: List[str] = []
+
+
+
+class ToolRegistration(BaseModel):
+
+    &quot;&quot;&quot;Information for registering a tool&quot;&quot;&quot;
+
+    name: str = Field(..., description=&quot;Unique name for the tool&quot;)
+
+    description: str = Field(..., description=&quot;Description of what the tool does&quot;)
+
+    version: str = Field(..., description=&quot;Semantic version of the tool&quot;)
+
+    schema: ToolSchema = Field(..., description=&quot;JSON Schema for tool parameters&quot;)
+
+    author: str = Field(..., description=&quot;Author of the tool&quot;)
+
+    repository: Optional[HttpUrl] = Field(None, description=&quot;Repository URL&quot;)
+
+    documentation: Optional[HttpUrl] = Field(None, description=&quot;Documentation URL&quot;)
+
+    package: Optional[HttpUrl] = Field(None, description=&quot;Package URL&quot;)
+
+    tags: List[str] = Field(default_factory=list, description=&quot;Tags for categorization&quot;)
+
+    examples: List[dict] = Field(default_factory=list, description=&quot;Example usage&quot;)
+
+
+
+class Tool(ToolRegistration):
+
+    &quot;&quot;&quot;Tool with registry metadata&quot;&quot;&quot;
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
+
+    updated_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
+
+    downloads: int = Field(default=0)
+
+    rating: float = Field(default=0.0)
+
+    ratings_count: int = Field(default=0)
+
+
+
+# 등록을 위한 FastAPI 애플리케이션
+
+app = FastAPI(title=&quot;MCP Tool Registry&quot;)
+
+
+
+# 이 예제를 위한 메모리 내 데이터베이스
+
+tools_db = {}
+
+
+
+@app.post(&quot;/tools&quot;, response_model=Tool)
+
+async def register_tool(tool: ToolRegistration):
+
+    &quot;&quot;&quot;Register a new tool in the registry&quot;&quot;&quot;
+
+    if tool.name in tools_db:
+
+        raise HTTPException(status_code=400, detail=f&quot;Tool &#x27;{tool.name}&#x27; already exists&quot;)
+
+    
+
+    new_tool = Tool(**tool.dict())
+
+    tools_db[tool.name] = new_tool
+
+    return new_tool
+
+
+
+@app.get(&quot;/tools&quot;, response_model=List[Tool])
+
+async def list_tools(tag: Optional[str] = None):
+
+    &quot;&quot;&quot;List all registered tools, optionally filtered by tag&quot;&quot;&quot;
+
+    if tag:
+
+        return [tool for tool in tools_db.values() if tag in tool.tags]
+
+    return list(tools_db.values())
+
+
+
+@app.get(&quot;/tools/{tool_name}&quot;, response_model=Tool)
+
+async def get_tool(tool_name: str):
+
+    &quot;&quot;&quot;Get information about a specific tool&quot;&quot;&quot;
+
+    if tool_name not in tools_db:
+
+        raise HTTPException(status_code=404, detail=f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;)
+
+    return tools_db[tool_name]
+
+
+
+@app.delete(&quot;/tools/{tool_name}&quot;)
+
+async def delete_tool(tool_name: str):
+
+    &quot;&quot;&quot;Delete a tool from the registry&quot;&quot;&quot;
+
+    if tool_name not in tools_db:
+
+        raise HTTPException(status_code=404, detail=f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;)
+
+    del tools_db[tool_name]
+
+    return {&quot;message&quot;: f&quot;Tool &#x27;{tool_name}&#x27; deleted&quot;}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">주요 요점</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 커뮤니티는 다양하며 여러 유형의 기여를 환영합니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP에 기여는 핵심 프로토콜 개선부터 맞춤 도구 개발까지 다양합니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">기여 가이드라인 준수는 PR 수용 가능성을 높입니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 도구를 만들고 공유하는 것은 생태계 향상의 가치 있는 방법입니다</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">커뮤니티 협업은 MCP 성장과 개선의 필수 요소입니다</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">연습 문제</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 본인의 역량과 관심사에 기반해 MCP 생태계에서 기여할 영역을 찾아보세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. MCP 저장소를 포크하고 로컬 개발 환경을 설정하세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 커뮤니티에 도움이 될 작은 향상, 버그 수정 또는 도구를 만드세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 적절한 테스트와 문서화로 기여 내용을 문서화하세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 적절한 저장소에 풀 리퀘스트를 제출하세요</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 리소스</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/topics/model-context-protocol">MCP 커뮤니티 프로젝트</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/07-LessonsfromEarlyAdoption/README.md" target="_blank">초기 도입의 교훈</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문 인력에 의한 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="nav-row"><div></div><div></div></div>
+</main>
+<footer>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></footer>
+<script>
+(function(){{
+var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';
+function s(v){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(v==='en'){{e.classList.add('active');l.textContent='EN \21C4 KO'}}else{{k.classList.add('active');l.textContent='KO \21C4 EN'}}localStorage.setItem('mcp-lang',v)}}
+t.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);
+}})();
+</script>
+</body>
+</html>

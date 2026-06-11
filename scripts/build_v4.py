@@ -409,6 +409,12 @@ def main():
                 lang = s.get('lang', '')
                 lesson_pages.append((fname, s['title'], e_html, k_html, lang))
 
+            # If no lessons extracted, create one lesson from the full module content
+            if not subs_en:
+                safe_title = slugify(title_en)
+                fname = f'm{num}_01-{safe_title}.html'
+                lesson_pages.append((fname, title_en, main_en, main_ko, ''))
+
             for idx, (fname, lt, e_html, k_html, _) in enumerate(lesson_pages):
                 total = len(lesson_pages)
                 prev_l = lesson_pages[idx-1] if idx > 0 else None
