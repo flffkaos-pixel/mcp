@@ -511,7 +511,7 @@ def main():
                         action_cls = 'bg-neon-cyan/20 text-neon-cyan' if llang else 'bg-terminal-green/20 text-terminal-green'
                         lang_tag = f'<span class="font-code-sm text-code-sm text-outline">{llang}</span>' if llang else ''
                         rows += f'''<a href="../lessons/{fname}" class="flex items-center justify-between px-6 py-4 hover:bg-surface-container-high/50 transition-colors group border-b border-outline-variant/50">
-  <div class="flex-1 min-w-0"><span class="font-headline-md text-headline-md text-white group-hover:text-neon-cyan transition-colors">{lname}</span></div>
+  <div class="flex-1 min-w-0"><span class="text-white group-hover:text-neon-cyan transition-colors" style="font-size:20px;font-weight:600;font-family:'Hanken Grotesk',sans-serif;">{lname}</span></div>
   <div class="flex items-center gap-3 flex-shrink-0"><span class="font-label-caps text-label-caps px-3 py-1 rounded text-[10px] font-bold {action_cls}">{action}</span>{lang_tag}</div>
 </a>
 '''
@@ -519,7 +519,7 @@ def main():
 <button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
   <div class="flex items-center gap-4">
     <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
-    <div class="text-left"><h2 class="font-headline-lg text-headline-lg text-white">M{num}: {title_en if lang=="en" else title_ko}</h2><p class="text-on-surface-variant text-body-md">{title_ko if lang=="en" else title_en}</p></div>
+    <div class="text-left"><h2 class="text-white mb-1" style="font-size:32px;font-weight:700;line-height:40px;font-family:'Hanken Grotesk',sans-serif;">M{num}: {title_en if lang=="en" else title_ko}</h2><p class="text-on-surface-variant text-body-md">{title_ko if lang=="en" else title_en}</p></div>
   </div>
   <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">{len(lps)} lessons</span></div>
 </button>
