@@ -5,44 +5,50 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>08 Testing - Getting Started - MCP Curriculum</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
 :root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
 * {{ margin:0;padding:0;box-sizing:border-box; }}
 body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
-.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
-header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
-.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
-.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
-.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
-.breadcrumb a:hover {{ text-decoration:underline; }}
-.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
-.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
-.lesson-nav a:hover {{ text-decoration:underline; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
 .lang-content {{ display:none; }}
 .lang-content.active {{ display:block; }}
-footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
-footer a {{ color:var(--accent);text-decoration:none; }}
-.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+.progress-bar {{ height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:24px; }}
+.progress-fill {{ height:100%;background:var(--accent);border-radius:2px;transition:width .3s; }}
+.nav-card {{ display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;color:var(--text);transition:all .15s;flex:1; }}
+.nav-card:hover {{ background:var(--card-hover);border-color:var(--accent);box-shadow:0 2px 8px rgba(0,95,170,0.08); }}
+.nav-card.prev {{ text-align:left; }}
+.nav-card.next {{ text-align:right;flex-direction:row-reverse; }}
+.nav-card .label {{ font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em; }}
+.nav-card .lname {{ font-size:0.85rem;font-weight:500; }}
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
-<div class="header-inner">
-<div class="flex items-center gap-2">
-<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-[var(--border)] shadow-sm" style="height:56px;">
+<div class="max-w-4xl mx-auto px-5 flex justify-between items-center h-full">
+<a href="../getting-started.html" class="flex items-center gap-1.5 text-[var(--accent)] text-sm font-medium no-underline hover:underline">
 <span class="material-symbols-outlined text-lg">arrow_back</span>
-MCP Curriculum
+<span class="hidden sm:inline">Getting-Started</span><span class="sm:hidden">Back</span>
 </a>
-</div>
-<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors ml-2">
 <span class="material-symbols-outlined text-lg">translate</span>
-<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+<span class="text-xs font-semibold tracking-wide hidden sm:inline" id="langLabel">KO / EN</span>
+</div>
 </div>
 </div>
 </header>
-<main class="pt-[76px]"><div class="container">
-<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 08 Testing</div>
+<main class="pt-[56px]">
+<div class="max-w-4xl mx-auto px-5 py-6">
+<div class="progress-bar"><div class="progress-fill" style="width:44%"></div></div>
+<div class="breadcrumb text-sm text-[var(--muted)] mb-5">
+<a href="../getting-started.html" class="text-[var(--accent)] no-underline hover:underline">Getting-Started</a>
+<span class="mx-1.5">&rsaquo;</span>
+<span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]"><span>Module 03: Getting Started</span></span>
+<span class="mx-1.5">&rsaquo;</span>
+<span class="font-medium text-[var(--text)]">08 Testing</span>
+</div>
 <div id="content-en" class="lang-content"><h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Testing and Debugging</h3>
 
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before you begin testing your MCP server, it's important to understand the available tools and best practices for debugging.</p>
@@ -475,12 +481,15 @@ async def test_list_tools_cursor_parameter():
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 모든 오해나 오역에 대해 당사는 책임지지 않습니다.</p>
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
-<div class="lesson-nav">
-  <span><a href="m03_07-07-aitk.html">&larr; 07 Aitk</a></span>
-  <span><a href="m03_09-09-deployment.html">09 Deployment &rarr;</a></span>
+<div class="flex gap-4 mt-8 pt-6 border-t border-[var(--border)]">
+<a href="m03_07-07-aitk.html" class="nav-card prev"><span class="material-symbols-outlined text-[var(--accent)]">chevron_left</span><div><div class="label">Previous</div><div class="lname">07 Aitk</div></div></a>
+<a href="m03_09-09-deployment.html" class="nav-card next"><span class="material-symbols-outlined text-[var(--accent)]">chevron_right</span><div><div class="label">Next</div><div class="lname">09 Deployment</div></div></a>
 </div>
-</div></main>
-<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+</div>
+</main>
+<footer class="border-t border-[var(--border)] py-6 mt-8"><div class="max-w-4xl mx-auto px-5 text-center">
+<p class="text-sm text-[var(--muted)]">MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-[var(--accent)] no-underline hover:underline">microsoft/mcp-for-beginners</a></p>
+</div></footer>
 <script>
 (function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
 </script>

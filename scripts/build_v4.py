@@ -132,62 +132,80 @@ HUB_TPL = """<!DOCTYPE html>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>{title} - MCP Curriculum</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--border:#c2c7cf;--card:#ffffff;--card-hover:#eff4ff;--radius:12px; }}
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--border:#c2c7cf;--card:#ffffff;--card-hover:#eff4ff;--radius:12px;--code-bg:#0F172A; }}
 * {{ margin:0;padding:0;box-sizing:border-box; }}
 body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
-.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
-header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
-.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
-nav {{ display:flex;gap:20px; }}
-nav a {{ font-size:0.85rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s; }}
-nav a:hover,nav a.active {{ color:var(--accent); }}
-nav a.active {{ border-bottom:2px solid var(--accent); }}
-.module-card {{ margin-bottom:12px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card); }}
-.module-header {{ display:flex;justify-content:space-between;align-items:center;padding:14px 20px;cursor:pointer;user-select:none;transition:background .15s; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+.module-card {{ margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);transition:box-shadow .2s,transform .15s; }}
+.module-card:hover {{ box-shadow:0 4px 20px rgba(0,0,0,0.06);transform:translateY(-1px); }}
+.module-header {{ display:flex;justify-content:space-between;align-items:center;padding:16px 20px;cursor:pointer;user-select:none;transition:background .15s; }}
 .module-header:hover {{ background:var(--card-hover); }}
 .module-id {{ font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);min-width:36px; }}
 .module-name {{ font-weight:600;flex:1;font-size:0.95rem; }}
 .module-name .ko {{ color:var(--muted);font-weight:400;font-size:0.85rem;display:block;margin-top:2px; }}
 .module-meta {{ font-size:0.78rem;color:var(--muted); }}
-.module-lessons {{ display:none;padding:0 20px 14px; }}
+.module-lessons {{ display:none;padding:0 20px 16px; }}
 .module-card.open .module-lessons {{ display:block; }}
-.lesson-item {{ display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;gap:10px;text-decoration:none;color:var(--text);transition:background .15s;margin-bottom:2px; }}
+.lesson-item {{ display:flex;align-items:center;padding:10px 12px;border-radius:8px;gap:10px;text-decoration:none;color:var(--text);transition:background .15s;margin-bottom:2px; }}
 .lesson-item:hover {{ background:var(--card-hover); }}
 .lesson-item .name {{ flex:1;font-size:0.88rem;font-weight:500; }}
-.lesson-item .name .ko {{ color:var(--muted);font-weight:400;font-size:0.8rem;display:block; }}
+.lesson-item .lang-badge {{ font-size:0.65rem;padding:2px 8px;border-radius:4px;font-weight:600;background:var(--card-hover);color:var(--accent);font-family:'JetBrains Mono',monospace;white-space:nowrap; }}
 .lesson-item .meta {{ font-size:0.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace; }}
 footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
 footer a {{ color:var(--accent);text-decoration:none; }}
 .lang-content {{ display:none; }}
 .lang-content.active {{ display:block; }}
+.search-wrap {{ position:relative;margin-bottom:20px; }}
+.search-wrap input {{ width:100%;padding:10px 16px 10px 38px;border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-family:'Inter',sans-serif;background:var(--card);outline:none;transition:border-color .15s,box-shadow .15s; }}
+.search-wrap input:focus {{ border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,95,170,0.1); }}
+.search-wrap .icon {{ position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1.1rem;pointer-events:none; }}
+.no-lessons {{ display:none;text-align:center;padding:40px 20px;color:var(--muted);font-size:0.9rem; }}
+.hero {{ background:linear-gradient(135deg,#eff4ff 0%,#ffffff 100%);border-bottom:1px solid var(--border); }}
+.hub-count {{ font-size:0.85rem;color:var(--muted); }}
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
-<div class="header-inner">
-<div class="flex items-center gap-2">
+<header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-[var(--border)] shadow-sm" style="height:60px;">
+<div class="max-w-5xl mx-auto px-6 flex justify-between items-center h-full">
+<a href="../index.html" class="flex items-center gap-2 no-underline">
 <span class="material-symbols-outlined text-[var(--accent)] text-2xl">extension</span>
-<span class="font-bold text-sm">MCP Curriculum</span>
-</div>
-<nav>{nav}</nav>
+<span class="font-bold text-sm text-[var(--text)]">MCP Curriculum</span>
+</a>
+<nav class="hidden md:flex gap-5 items-center">{nav}</nav>
+<div class="flex items-center gap-2">
 <div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
 <span class="material-symbols-outlined text-lg">translate</span>
 <span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
 </div>
 </div>
+</div>
 </header>
-<main class="pt-[76px]"><div class="container">
-<h1 class="text-2xl font-bold mb-6">{title}</h1>
+<main class="pt-[60px]">
+<section class="hero"><div class="max-w-5xl mx-auto px-6 py-12">
+<h1 class="text-3xl font-bold text-[var(--text)]">{title}</h1>
+<p class="text-[var(--muted)] mt-2 max-w-2xl text-sm">MCP 학습 과정을 모듈별로 탐색하세요. 레슨을 클릭하면 상세 내용과 코드 예제를 확인할 수 있습니다.</p>
+<div id="totalCount" class="hub-count mt-3"></div>
+</div></section>
+<div class="max-w-5xl mx-auto px-6 py-5">
+<div class="search-wrap">
+<span class="icon material-symbols-outlined">search</span>
+<input type="text" id="lessonSearch" placeholder="Search lessons..." oninput="filterLessons(this.value)">
+</div>
+<div class="no-lessons" id="noLessons">No lessons found matching your search.</div>
 <div id="content-en" class="lang-content">{en_content}</div>
 <div id="content-ko" class="lang-content">{ko_content}</div>
-</div></main>
-<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p>
-<div class="flex justify-center gap-4 mt-2"><a href="index.html">Home</a> <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">GitHub</a> <a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" target="_blank">License</a></div></footer>
+</div>
+</main>
+<footer><div class="max-w-5xl mx-auto px-6">
+<p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p>
+<div class="flex justify-center gap-6 mt-3"><a href="../index.html" class="text-sm">Home</a> <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-sm">GitHub</a> <a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" target="_blank" class="text-sm">License</a></div>
+</div></footer>
 <script>
-(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);document.querySelectorAll('.module-header').forEach(function(h){{h.addEventListener('click',function(){{this.parentElement.classList.toggle('open')}})}});}})();
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);document.querySelectorAll('.module-header').forEach(function(h){{h.addEventListener('click',function(){{this.parentElement.classList.toggle('open')}})}});var tc=document.getElementById('totalCount'),total=document.querySelectorAll('.lesson-item').length;if(tc)tc.textContent='Total: '+total+' lessons';}})();
+function filterLessons(query){{var q=query.toLowerCase().trim(),cards=document.querySelectorAll('.module-card'),any=false;cards.forEach(function(c){{var items=c.querySelectorAll('.lesson-item'),has=false;items.forEach(function(it){{var match=!q||it.querySelector('.name').textContent.toLowerCase().indexOf(q)>-1;it.style.display=match?'flex':'none';if(match)has=true;}});c.style.display=has||!q?'block':'none';if(has||!q)c.classList.add('open');if(c.style.display!=='none')any=true;}});document.getElementById('noLessons').style.display=any?'none':'block';}}
 </script>
 </body>
 </html>"""
@@ -200,52 +218,61 @@ LESSON_TPL = """<!DOCTYPE html>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>{lesson_title} - {module_title} - MCP Curriculum</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
 :root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
 * {{ margin:0;padding:0;box-sizing:border-box; }}
 body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
-.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
-header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
-.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
-.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
-.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
-.breadcrumb a:hover {{ text-decoration:underline; }}
-.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
-.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
-.lesson-nav a:hover {{ text-decoration:underline; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
 .lang-content {{ display:none; }}
 .lang-content.active {{ display:block; }}
-footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
-footer a {{ color:var(--accent);text-decoration:none; }}
-.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+.progress-bar {{ height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:24px; }}
+.progress-fill {{ height:100%;background:var(--accent);border-radius:2px;transition:width .3s; }}
+.nav-card {{ display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;color:var(--text);transition:all .15s;flex:1; }}
+.nav-card:hover {{ background:var(--card-hover);border-color:var(--accent);box-shadow:0 2px 8px rgba(0,95,170,0.08); }}
+.nav-card.prev {{ text-align:left; }}
+.nav-card.next {{ text-align:right;flex-direction:row-reverse; }}
+.nav-card .label {{ font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em; }}
+.nav-card .lname {{ font-size:0.85rem;font-weight:500; }}
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
-<div class="header-inner">
-<div class="flex items-center gap-2">
-<a href="{hub_back}" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-[var(--border)] shadow-sm" style="height:56px;">
+<div class="max-w-4xl mx-auto px-5 flex justify-between items-center h-full">
+<a href="{hub_back}" class="flex items-center gap-1.5 text-[var(--accent)] text-sm font-medium no-underline hover:underline">
 <span class="material-symbols-outlined text-lg">arrow_back</span>
-MCP Curriculum
+<span class="hidden sm:inline">{hub_title}</span><span class="sm:hidden">Back</span>
 </a>
-</div>
-<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">{module_badge_inline}</span>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors ml-2">
 <span class="material-symbols-outlined text-lg">translate</span>
-<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+<span class="text-xs font-semibold tracking-wide hidden sm:inline" id="langLabel">KO / EN</span>
+</div>
 </div>
 </div>
 </header>
-<main class="pt-[76px]"><div class="container">
-<div class="breadcrumb"><a href="{hub_back}">{hub_title}</a> &rsaquo; {module_badge} &rsaquo; {lesson_title}</div>
+<main class="pt-[56px]">
+<div class="max-w-4xl mx-auto px-5 py-6">
+<div class="progress-bar"><div class="progress-fill" style="width:{progress_pct}%"></div></div>
+<div class="breadcrumb text-sm text-[var(--muted)] mb-5">
+<a href="{hub_back}" class="text-[var(--accent)] no-underline hover:underline">{hub_title}</a>
+<span class="mx-1.5">&rsaquo;</span>
+<span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">{module_badge}</span>
+<span class="mx-1.5">&rsaquo;</span>
+<span class="font-medium text-[var(--text)]">{lesson_title}</span>
+</div>
 <div id="content-en" class="lang-content">{en_content}</div>
 <div id="content-ko" class="lang-content">{ko_content}</div>
-<div class="lesson-nav">
-  <span>{prev_link}</span>
-  <span>{next_link}</span>
+<div class="flex gap-4 mt-8 pt-6 border-t border-[var(--border)]">
+{prev_link}
+{next_link}
 </div>
-</div></main>
-<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+</div>
+</main>
+<footer class="border-t border-[var(--border)] py-6 mt-8"><div class="max-w-4xl mx-auto px-5 text-center">
+<p class="text-sm text-[var(--muted)]">MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-[var(--accent)] no-underline hover:underline">microsoft/mcp-for-beginners</a></p>
+</div></footer>
 <script>
 (function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
 </script>
@@ -314,17 +341,20 @@ def main():
                 else:
                     kl = subs_ko[idx] if idx < len(subs_ko) else None
                     k_html = md_to_html(kl['content'], kl['folder'], True) if kl else e_html
-                lesson_pages.append((fname, s['title'], e_html, k_html))
+                lang = s.get('lang', '')
+                lesson_pages.append((fname, s['title'], e_html, k_html, lang))
 
-            for idx, (fname, lt, e_html, k_html) in enumerate(lesson_pages):
+            for idx, (fname, lt, e_html, k_html, _) in enumerate(lesson_pages):
                 total = len(lesson_pages)
                 prev_l = lesson_pages[idx-1] if idx > 0 else None
                 next_l = lesson_pages[idx+1] if idx < total-1 else None
-                prev_link = f'<a href="{prev_l[0]}">&larr; {prev_l[1]}</a>' if prev_l else ''
-                next_link = f'<a href="{next_l[0]}">{next_l[1]} &rarr;</a>' if next_l else ''
-                badge = f'<span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module {num}: {title_en}</span>'
+                pct = int((idx + 1) / total * 100)
+                prev_link = f'<a href="{prev_l[0]}" class="nav-card prev"><span class="material-symbols-outlined text-[var(--accent)]">chevron_left</span><div><div class="label">Previous</div><div class="lname">{prev_l[1]}</div></div></a>' if prev_l else '<div></div>'
+                next_link = f'<a href="{next_l[0]}" class="nav-card next"><span class="material-symbols-outlined text-[var(--accent)]">chevron_right</span><div><div class="label">Next</div><div class="lname">{next_l[1]}</div></div></a>' if next_l else '<div></div>'
+                badge = f'<span>Module {num}: {title_en}</span>'
+                badge_inline = f'Module {num}: {title_en}'
                 page = LESSON_TPL.replace('{lesson_title}', lt)
-                for k, v in [('{module_title}', title_en), ('{hub_back}', f'../{hub_name}'), ('{hub_title}', hub_title), ('{module_badge}', badge), ('{prev_link}', prev_link), ('{next_link}', next_link), ('{en_content}', e_html), ('{ko_content}', k_html)]:
+                for k, v in [('{module_title}', title_en), ('{hub_back}', f'../{hub_name}'), ('{hub_title}', hub_title), ('{module_badge}', badge), ('{module_badge_inline}', badge_inline), ('{progress_pct}', str(pct)), ('{prev_link}', prev_link), ('{next_link}', next_link), ('{en_content}', e_html), ('{ko_content}', k_html)]:
                     page = page.replace(k, v)
                 page = page.replace('href="index.html"', 'href="../index.html"')
                 lesson_path = os.path.join(BASE, 'lessons', fname)
@@ -341,9 +371,11 @@ def main():
                 if lps:
                     lt = title_en if lang == 'en' else title_ko
                     lessons_html = ''
-                    for fname, ltitle, _, _ in lps:
+                    for item in lps:
+                        fname, ltitle, _, _, llang = item if len(item) >= 5 else (item[0], item[1], None, None, '')
                         lname = ltitle if lang == 'en' else ltitle
-                        lessons_html += f'<a class="lesson-item" href="../lessons/{fname}"><span class="name">{lname}</span><span class="meta">M{num}</span></a>\n'
+                        badge = f'<span class="lang-badge">{llang}</span>' if llang else ''
+                        lessons_html += f'<a class="lesson-item" href="../lessons/{fname}">{badge}<span class="name">{lname}</span><span class="meta">M{num}</span></a>\n'
                     entries.append(f'''<div class="module-card"><div class="module-header">
   <span class="module-id">M{num}</span>
   <span class="module-name">{title_en if lang=="en" else title_ko}<span class="ko">{title_ko if lang=="en" else title_en}</span></span>
