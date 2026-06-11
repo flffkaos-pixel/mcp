@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html class="light" lang="ko">
+<html class="dark" lang="ko">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Getting-Started - MCP Curriculum</title>
+<title>Getting-Started - MCP Academy</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {{ darkMode: "class", theme: {{ extend: {{ colors: {{ "surface-deep":"#050B14","surface":"#051426","surface-bright":"#2c3a4e","surface-container":"#122033","surface-container-high":"#1c2b3e","surface-container-highest":"#27354a","surface-container-lowest":"#010e21","neon-cyan":"#00F0FF","primary":"#dbfcff","secondary":"#a3c9ff","on-surface":"#d5e3fe","on-surface-variant":"#b9cacb","outline":"#849495","outline-variant":"#3b494b","terminal-green":"#00FF41","warning-gold":"#FFD700" }}, borderRadius: {{ DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem" }}, spacing: {{ gutter:"24px",base:"8px","section-gap-desktop":"80px","container-max":"1280px","section-gap-mobile":"48px" }}, fontFamily: {{ "label-caps":["JetBrains Mono"],"body-md":["Inter"],"display-lg":["Hanken Grotesk"],"headline-md":["Hanken Grotesk"],"body-lg":["Inter"],"headline-lg":["Hanken Grotesk"],"code-sm":["JetBrains Mono"] }}, fontSize: {{ "label-caps":["12px",{{"lineHeight":"16px","letterSpacing":"0.1em","fontWeight":"700"}}],"body-md":["16px",{{"lineHeight":"24px","fontWeight":"400"}}],"display-lg":["48px",{{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}}],"headline-md":["24px",{{"lineHeight":"32px","fontWeight":"600"}}],"body-lg":["18px",{{"lineHeight":"28px","fontWeight":"400"}}],"headline-lg":["32px",{{"lineHeight":"40px","fontWeight":"700"}}],"code-sm":["14px",{{"lineHeight":"20px","fontWeight":"400"}}] }} }} }} }};
+</script>
 <style>
-:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--border:#c2c7cf;--card:#ffffff;--card-hover:#eff4ff;--radius:12px;--code-bg:#0F172A; }}
+:root {{ --bg:#051426;--text:#d5e3fe;--muted:#b9cacb;--accent:#00F0FF;--accent-hover:#00dbe9;--border:#3b494b;--card:#122033;--card-hover:#1c2b3e;--radius:12px;--code-bg:#0F172A; }}
 * {{ margin:0;padding:0;box-sizing:border-box; }}
 body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
 .material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
-.module-card {{ margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);transition:box-shadow .2s,transform .15s; }}
-.module-card:hover {{ box-shadow:0 4px 20px rgba(0,0,0,0.06);transform:translateY(-1px); }}
+.module-card {{ margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);transition:box-shadow .2s,transform .15s,border-color .15s; }}
+.module-card:hover {{ box-shadow:0 0 20px rgba(0,240,255,0.08);border-color:rgba(0,240,255,0.3); }}
 .module-header {{ display:flex;justify-content:space-between;align-items:center;padding:16px 20px;cursor:pointer;user-select:none;transition:background .15s; }}
 .module-header:hover {{ background:var(--card-hover); }}
 .module-id {{ font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);min-width:36px; }}
@@ -24,48 +28,52 @@ body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);li
 .lesson-item {{ display:flex;align-items:center;padding:10px 12px;border-radius:8px;gap:10px;text-decoration:none;color:var(--text);transition:background .15s;margin-bottom:2px; }}
 .lesson-item:hover {{ background:var(--card-hover); }}
 .lesson-item .name {{ flex:1;font-size:0.88rem;font-weight:500; }}
-.lesson-item .lang-badge {{ font-size:0.65rem;padding:2px 8px;border-radius:4px;font-weight:600;background:var(--card-hover);color:var(--accent);font-family:'JetBrains Mono',monospace;white-space:nowrap; }}
+.lesson-item .lang-badge {{ font-size:0.65rem;padding:2px 8px;border-radius:4px;font-weight:600;background:rgba(0,240,255,0.1);color:var(--accent);font-family:'JetBrains Mono',monospace;white-space:nowrap; }}
 .lesson-item .meta {{ font-size:0.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace; }}
-footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
-footer a {{ color:var(--accent);text-decoration:none; }}
 .lang-content {{ display:none; }}
 .lang-content.active {{ display:block; }}
 .search-wrap {{ position:relative;margin-bottom:20px; }}
-.search-wrap input {{ width:100%;padding:10px 16px 10px 38px;border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-family:'Inter',sans-serif;background:var(--card);outline:none;transition:border-color .15s,box-shadow .15s; }}
-.search-wrap input:focus {{ border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,95,170,0.1); }}
+.search-wrap input {{ width:100%;padding:10px 16px 10px 38px;border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-family:'Inter',sans-serif;background:var(--card);color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s; }}
+.search-wrap input:focus {{ border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,240,255,0.1); }}
 .search-wrap .icon {{ position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1.1rem;pointer-events:none; }}
 .no-lessons {{ display:none;text-align:center;padding:40px 20px;color:var(--muted);font-size:0.9rem; }}
-.hero {{ background:linear-gradient(135deg,#eff4ff 0%,#ffffff 100%);border-bottom:1px solid var(--border); }}
 .hub-count {{ font-size:0.85rem;color:var(--muted); }}
+nav a {{ font-size:1rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s; }}
+nav a:hover,nav a.active {{ color:var(--accent); }}
 </style>
 </head>
-<body>
-<header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-[var(--border)] shadow-sm" style="height:60px;">
-<div class="max-w-5xl mx-auto px-6 flex justify-between items-center h-full">
-<a href="../index.html" class="flex items-center gap-2 no-underline">
-<span class="material-symbols-outlined text-[var(--accent)] text-2xl">extension</span>
-<span class="font-bold text-sm text-[var(--text)]">MCP Curriculum</span>
+<body class="bg-surface-deep text-on-surface font-body-md selection:bg-neon-cyan/30">
+<header class="bg-surface/80 docked top-0 sticky z-50 backdrop-blur-xl border-b border-primary/10 shadow-[0_0_20px_rgba(0,240,255,0.1)] flex justify-between items-center px-gutter py-4 w-full">
+<div class="flex items-center gap-4">
+<a href="../index.html" class="no-underline">
+<span class="font-display-lg text-display-lg text-neon-cyan tracking-tighter">MCP Academy</span>
 </a>
-<nav class="hidden md:flex gap-5 items-center"><a class="" href="fundamentals.html">Fundamentals</a>
+</div>
+<nav class="hidden md:flex gap-8 items-center"><a class="" href="fundamentals.html">Fundamentals</a>
           <a class="active" href="getting-started.html">Getting Started</a>
           <a class="" href="intermediate.html">Intermediate</a>
           <a class="" href="ecosystem.html">Ecosystem</a>
           <a class="" href="production.html">Production</a></nav>
-<div class="flex items-center gap-2">
-<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
-<span class="material-symbols-outlined text-lg">translate</span>
-<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
-</div>
+<div class="flex items-center gap-4">
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-on-surface-variant hover:text-neon-cyan transition-colors">
+<span class="material-symbols-outlined">translate</span>
+<span class="font-label-caps text-label-caps" id="langLabel">KO / EN</span>
 </div>
 </div>
 </header>
-<main class="pt-[60px]">
-<section class="hero"><div class="max-w-5xl mx-auto px-6 py-12">
-<h1 class="text-3xl font-bold text-[var(--text)]">Getting-Started</h1>
-<p class="text-[var(--muted)] mt-2 max-w-2xl text-sm">MCP 학습 과정을 모듈별로 탐색하세요. 레슨을 클릭하면 상세 내용과 코드 예제를 확인할 수 있습니다.</p>
-<div id="totalCount" class="hub-count mt-3"></div>
-</div></section>
-<div class="max-w-5xl mx-auto px-6 py-5">
+<main>
+<section class="relative overflow-hidden border-b border-primary/10 px-gutter py-section-gap-desktop">
+<div class="max-w-5xl mx-auto">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-neon-cyan/10 border border-neon-cyan/30 rounded-full mb-6">
+<span class="material-symbols-outlined text-neon-cyan text-sm">auto_awesome</span>
+<span class="font-label-caps text-label-caps text-neon-cyan">MCP CURRICULUM</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-white mb-4">Getting-Started</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">MCP 학습 과정을 모듈별로 탐색하세요. 레슨을 클릭하면 상세 내용과 코드 예제를 확인할 수 있습니다.</p>
+<div id="totalCount" class="hub-count mt-4 font-label-caps text-label-caps"></div>
+</div>
+</section>
+<div class="max-w-5xl mx-auto px-gutter py-section-gap-mobile">
 <div class="search-wrap">
 <span class="icon material-symbols-outlined">search</span>
 <input type="text" id="lessonSearch" placeholder="Search lessons..." oninput="filterLessons(this.value)">
@@ -119,12 +127,21 @@ footer a {{ color:var(--accent);text-decoration:none; }}
 </div></div></div>
 </div>
 </main>
-<footer><div class="max-w-5xl mx-auto px-6">
-<p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p>
-<div class="flex justify-center gap-6 mt-3"><a href="../index.html" class="text-sm">Home</a> <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-sm">GitHub</a> <a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" target="_blank" class="text-sm">License</a></div>
-</div></footer>
+<footer class="bg-surface-deep border-t border-outline-variant w-full p-gutter">
+<div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-base">
+<div>
+<span class="font-headline-md text-headline-md text-neon-cyan block mb-2">MCP Academy</span>
+<p class="font-body-md text-body-md text-outline">MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-neon-cyan hover:underline">microsoft/mcp-for-beginners</a></p>
+</div>
+<div class="flex flex-wrap md:justify-end gap-6">
+<a href="../index.html" class="text-outline hover:text-neon-cyan transition-colors font-body-md text-body-md">Home</a>
+<a href="https://github.com/microsoft/mcp-for-beginners" target="_blank" class="text-outline hover:text-neon-cyan transition-colors font-body-md text-body-md">GitHub</a>
+<a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" target="_blank" class="text-outline hover:text-neon-cyan transition-colors font-body-md text-body-md">License</a>
+</div>
+</div>
+</footer>
 <script>
-(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);document.querySelectorAll('.module-header').forEach(function(h){{h.addEventListener('click',function(){{this.parentElement.classList.toggle('open')}})}});var tc=document.getElementById('totalCount'),total=document.querySelectorAll('.lesson-item').length;if(tc)tc.textContent='Total: '+total+' lessons';}})();
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);document.querySelectorAll('.module-header').forEach(function(h){{h.addEventListener('click',function(){{this.parentElement.classList.toggle('open')}})}});var tc=document.getElementById('totalCount'),total=document.querySelectorAll('.lesson-item').length;if(tc)tc.textContent='TOTAL: '+total+' LESSONS';}})();
 function filterLessons(query){{var q=query.toLowerCase().trim(),cards=document.querySelectorAll('.module-card'),any=false;cards.forEach(function(c){{var items=c.querySelectorAll('.lesson-item'),has=false;items.forEach(function(it){{var match=!q||it.querySelector('.name').textContent.toLowerCase().indexOf(q)>-1;it.style.display=match?'flex':'none';if(match)has=true;}});c.style.display=has||!q?'block':'none';if(has||!q)c.classList.add('open');if(c.style.display!=='none')any=true;}});document.getElementById('noLessons').style.display=any?'none':'block';}}
 </script>
 </body>
