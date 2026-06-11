@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 tailwind.config = {{ darkMode: "class", theme: {{ extend: {{ colors: {{ "surface-deep":"#050B14","surface":"#051426","surface-bright":"#2c3a4e","surface-container":"#122033","surface-container-high":"#1c2b3e","surface-container-highest":"#27354a","surface-container-lowest":"#010e21","neon-cyan":"#00F0FF","primary":"#dbfcff","secondary":"#a3c9ff","on-surface":"#d5e3fe","on-surface-variant":"#b9cacb","outline":"#849495","outline-variant":"#3b494b","terminal-green":"#00FF41","warning-gold":"#FFD700","code-bg":"#0F172A" }}, borderRadius: {{ DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem" }}, spacing: {{ gutter:"24px",base:"8px","section-gap-desktop":"80px","container-max":"1280px","section-gap-mobile":"48px" }}, fontFamily: {{ "label-caps":["JetBrains Mono"],"body-md":["Inter"],"display-lg":["Hanken Grotesk"],"headline-md":["Hanken Grotesk"],"headline-lg":["Hanken Grotesk"],"headline-xl":["Hanken Grotesk"],"headline-sm":["Hanken Grotesk"],"body-lg":["Inter"],"code-sm":["JetBrains Mono"] }}, fontSize: {{ "label-caps":["12px",{{"lineHeight":"16px","letterSpacing":"0.1em","fontWeight":"700"}}],"body-md":["16px",{{"lineHeight":"24px","fontWeight":"400"}}],"display-lg":["48px",{{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}}],"headline-md":["24px",{{"lineHeight":"32px","fontWeight":"600"}}],"body-lg":["18px",{{"lineHeight":"28px","fontWeight":"400"}}],"headline-lg":["32px",{{"lineHeight":"40px","fontWeight":"700"}}],"headline-xl":["36px",{{"lineHeight":"44px","fontWeight":"700"}}],"headline-sm":["18px",{{"lineHeight":"24px","fontWeight":"600"}}],"code-sm":["14px",{{"lineHeight":"20px","fontWeight":"400"}}] }} }} }} }};
 </script>
@@ -25,6 +27,11 @@ body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);li
 .nav-card.next {{ text-align:right;flex-direction:row-reverse; }}
 .nav-card .label {{ font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;font-family:'JetBrains Mono',monospace; }}
 .nav-card .lname {{ font-size:0.85rem;font-weight:500; }}
+pre {{ position:relative; }}
+.code-copy-btn {{ position:absolute;top:8px;right:8px;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:var(--accent);padding:4px 8px;border-radius:4px;font-size:0.7rem;font-family:'JetBrains Mono',monospace;cursor:pointer;opacity:0;transition:opacity .2s,background .15s; }}
+pre:hover .code-copy-btn {{ opacity:1; }}
+.code-copy-btn:hover {{ background:rgba(0,240,255,0.2); }}
+.code-copy-btn.copied {{ background:var(--terminal-green);color:var(--surface-deep);border-color:var(--terminal-green); }}
 </style>
 </head>
 <body class="bg-surface-deep text-on-surface font-body-md selection:bg-neon-cyan/30">
@@ -1186,6 +1193,46 @@ How&#x27;s the weather like in Seattle
 </footer>
 <script>
 (function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+<script>
+document.querySelectorAll('pre code').forEach(function(block) {{ hljs.highlightElement(block); }});
+document.querySelectorAll('pre').forEach(function(pre) {{
+    var btn = document.createElement('button');
+    btn.className = 'code-copy-btn material-symbols-outlined';
+    btn.textContent = 'content_copy';
+    btn.title = 'Copy code';
+    btn.addEventListener('click', function() {{
+        var code = pre.querySelector('code').textContent;
+        navigator.clipboard.writeText(code).then(function() {{
+            btn.textContent = 'check';
+            btn.classList.add('copied');
+            setTimeout(function() {{ btn.textContent = 'content_copy'; btn.classList.remove('copied'); }}, 2000);
+        }});
+    }});
+    pre.appendChild(btn);
+}});
+document.getElementById('langToggle').addEventListener('click', function() {{
+    setTimeout(function() {{
+        document.querySelectorAll('pre code').forEach(function(block) {{ hljs.highlightElement(block); }});
+        document.querySelectorAll('pre').forEach(function(pre) {{
+            if (!pre.querySelector('.code-copy-btn')) {{
+                var btn = document.createElement('button');
+                btn.className = 'code-copy-btn material-symbols-outlined';
+                btn.textContent = 'content_copy';
+                btn.title = 'Copy code';
+                btn.addEventListener('click', function() {{
+                    var code = pre.querySelector('code').textContent;
+                    navigator.clipboard.writeText(code).then(function() {{
+                        btn.textContent = 'check';
+                        btn.classList.add('copied');
+                        setTimeout(function() {{ btn.textContent = 'content_copy'; btn.classList.remove('copied'); }}, 2000);
+                    }});
+                }});
+                pre.appendChild(btn);
+            }}
+        }});
+    }}, 0);
+}});
 </script>
 </body>
 </html>
