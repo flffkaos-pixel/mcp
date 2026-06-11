@@ -527,12 +527,16 @@ def main():
 </div>''')
                 else:
                     html = main_en_html if lang == 'en' else main_ko_html
-                    entries.append(f'''<div class="module-card"><div class="module-header">
-  <span class="module-id">M{num}</span>
-  <span class="module-name">{title_en if lang=="en" else title_ko}<span class="ko">{title_ko if lang=="en" else title_en}</span></span>
-  <span class="module-meta">overview</span>
-  <span class="chevron material-symbols-outlined">expand_more</span>
-</div><div class="module-lessons">{html}</div></div>''')
+                    entries.append(f'''<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="text-white mb-1" style="font-size:32px;font-weight:700;line-height:40px;font-family:'Hanken Grotesk',sans-serif;">M{num}: {title_en if lang=="en" else title_ko}</h2><p class="text-on-surface-variant text-body-md">{title_ko if lang=="en" else title_en}</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">overview</span></div>
+</button>
+<div class="border-t border-outline-variant px-6 py-5">{html}</div>
+</div>''')
             return '\n'.join(entries)
 
         en_content = build_hub_content('en')
@@ -541,12 +545,26 @@ def main():
         if hub_name == 'production.html' and sg_en:
             sg_html = md_to_html(sg_en)
             sg_ko_html = md_to_html(sg_ko)
-            en_content += f'''<div class="module-card"><div class="module-header">
-  <span class="module-id">SG</span><span class="module-name">Study Guide</span><span class="module-meta">1 guide</span>
-</div><div class="module-lessons"><div class="bg-surface-container-low rounded-xl p-4 mb-3 text-sm text-on-surface-variant">{sg_html}</div></div></div>'''
-            ko_content += f'''<div class="module-card"><div class="module-header">
-  <span class="module-id">SG</span><span class="module-name">스터디 가이드</span><span class="module-meta">1 guide</span>
-</div><div class="module-lessons"><div class="bg-surface-container-low rounded-xl p-4 mb-3 text-sm text-on-surface-variant">{sg_ko_html}</div></div></div>'''
+            en_content += f'''<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="text-white mb-1" style="font-size:32px;font-weight:700;line-height:40px;font-family:'Hanken Grotesk',sans-serif;">Study Guide</h2><p class="text-on-surface-variant text-body-md">Reference material</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">1 guide</span></div>
+</button>
+<div class="border-t border-outline-variant px-6 py-5">{sg_html}</div>
+</div>'''
+            ko_content += f'''<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-lg mb-8">
+<button class="w-full flex items-center justify-between px-6 py-5 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="this.parentElement.classList.toggle('open')">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-neon-cyan transition-transform duration-200 module-chev">expand_more</span>
+    <div class="text-left"><h2 class="text-white mb-1" style="font-size:32px;font-weight:700;line-height:40px;font-family:'Hanken Grotesk',sans-serif;">스터디 가이드</h2><p class="text-on-surface-variant text-body-md">참고 자료</p></div>
+  </div>
+  <div class="flex items-center gap-3"><span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">1 guide</span></div>
+</button>
+<div class="border-t border-outline-variant px-6 py-5">{sg_ko_html}</div>
+</div>'''
 
         page = HUB_TPL.replace('{title}', hub_title).replace('{nav}', nav)
         page = page.replace('{en_content}', en_content).replace('{ko_content}', ko_content)
