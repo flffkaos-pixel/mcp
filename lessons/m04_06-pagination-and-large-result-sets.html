@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pagination and Large Result Sets - Practical Implementation - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 04: Practical Implementation</span> &rsaquo; Pagination and Large Result Sets</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Pagination and Large Result Sets in MCP</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When your MCP server handles large datasets - whether listing thousands of files, database records, or search results - you need pagination to manage memory efficiently and provide responsive user experiences.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This guide covers how to implement and use pagination in MCP.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Why Pagination Matters</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Without pagination, large responses can cause:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Memory exhaustion</strong> - Loading millions of records at once</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Slow response times</strong> - Users wait while all data loads</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Timeout errors</strong> - Requests exceed timeout limits</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Poor AI performance</strong> - LLMs struggle with massive context</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP uses <strong>cursor-based pagination</strong> for reliable, consistent paging through result sets.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">How MCP Pagination Works</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">The Cursor Concept</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A <strong>cursor</strong> is an opaque string that marks your position in a result set. Think of it like a bookmark in a long book.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    participant Client
+
+    participant Server
+
+    
+
+    Client-&gt;&gt;Server: tools/list (no cursor)
+
+    Server--&gt;&gt;Client: tools [1-10], nextCursor: &quot;abc123&quot;
+
+    
+
+    Client-&gt;&gt;Server: tools/list (cursor: &quot;abc123&quot;)
+
+    Server--&gt;&gt;Client: tools [11-20], nextCursor: &quot;def456&quot;
+
+    
+
+    Client-&gt;&gt;Server: tools/list (cursor: &quot;def456&quot;)
+
+    Server--&gt;&gt;Client: tools [21-25], nextCursor: null (end)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Pagination in MCP Methods</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These MCP methods support pagination:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Method | Returns | Cursor Support |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|--------|---------|----------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code> | Tool definitions | ✅ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resources/list</code> | Resource definitions | ✅ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">prompts/list</code> | Prompt definitions | ✅ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resources/templates/list</code> | Resource templates | ✅ |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Server Implementation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python (FastMCP)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import Tool, ListToolsResult
+
+import math
+
+
+
+app = Server(&quot;paginated-server&quot;)
+
+
+
+# Simulated large dataset
+
+ALL_TOOLS = [
+
+    Tool(name=f&quot;tool_{i}&quot;, description=f&quot;Tool number {i}&quot;, inputSchema={})
+
+    for i in range(100)
+
+]
+
+
+
+PAGE_SIZE = 10
+
+
+
+@app.list_tools()
+
+async def list_tools(cursor: str | None = None) -&gt; ListToolsResult:
+
+    &quot;&quot;&quot;List tools with pagination support.&quot;&quot;&quot;
+
+    
+
+    # Decode cursor to get starting index
+
+    start_index = 0
+
+    if cursor:
+
+        try:
+
+            start_index = int(cursor)
+
+        except ValueError:
+
+            start_index = 0
+
+    
+
+    # Get page of results
+
+    end_index = min(start_index + PAGE_SIZE, len(ALL_TOOLS))
+
+    page_tools = ALL_TOOLS[start_index:end_index]
+
+    
+
+    # Calculate next cursor
+
+    next_cursor = None
+
+    if end_index &lt; len(ALL_TOOLS):
+
+        next_cursor = str(end_index)
+
+    
+
+    return ListToolsResult(
+
+        tools=page_tools,
+
+        nextCursor=next_cursor
+
+    )
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+
+import { ListToolsResultSchema } from &quot;@modelcontextprotocol/sdk/types.js&quot;;
+
+
+
+const server = new Server({
+
+  name: &quot;paginated-server&quot;,
+
+  version: &quot;1.0.0&quot;
+
+});
+
+
+
+// Simulated large dataset
+
+const ALL_TOOLS = Array.from({ length: 100 }, (_, i) =&gt; ({
+
+  name: `tool_${i}`,
+
+  description: `Tool number ${i}`,
+
+  inputSchema: { type: &quot;object&quot;, properties: {} }
+
+}));
+
+
+
+const PAGE_SIZE = 10;
+
+
+
+server.setRequestHandler(ListToolsResultSchema, async (request) =&gt; {
+
+  // Decode cursor
+
+  let startIndex = 0;
+
+  if (request.params?.cursor) {
+
+    startIndex = parseInt(request.params.cursor, 10) || 0;
+
+  }
+
+  
+
+  // Get page of results
+
+  const endIndex = Math.min(startIndex + PAGE_SIZE, ALL_TOOLS.length);
+
+  const pageTools = ALL_TOOLS.slice(startIndex, endIndex);
+
+  
+
+  // Calculate next cursor
+
+  const nextCursor = endIndex &lt; ALL_TOOLS.length ? String(endIndex) : undefined;
+
+  
+
+  return {
+
+    tools: pageTools,
+
+    nextCursor
+
+  };
+
+});
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Java (Spring MCP)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@Service
+
+public class PaginatedToolService {
+
+    
+
+    private static final int PAGE_SIZE = 10;
+
+    private final List&lt;Tool&gt; allTools;
+
+    
+
+    public PaginatedToolService() {
+
+        // Initialize large dataset
+
+        this.allTools = IntStream.range(0, 100)
+
+            .mapToObj(i -&gt; new Tool(&quot;tool_&quot; + i, &quot;Tool number &quot; + i, Map.of()))
+
+            .collect(Collectors.toList());
+
+    }
+
+    
+
+    @McpMethod(&quot;tools/list&quot;)
+
+    public ListToolsResult listTools(@Param(&quot;cursor&quot;) String cursor) {
+
+        // Decode cursor
+
+        int startIndex = 0;
+
+        if (cursor != null &amp;&amp; !cursor.isEmpty()) {
+
+            try {
+
+                startIndex = Integer.parseInt(cursor);
+
+            } catch (NumberFormatException e) {
+
+                startIndex = 0;
+
+            }
+
+        }
+
+        
+
+        // Get page of results
+
+        int endIndex = Math.min(startIndex + PAGE_SIZE, allTools.size());
+
+        List&lt;Tool&gt; pageTools = allTools.subList(startIndex, endIndex);
+
+        
+
+        // Calculate next cursor
+
+        String nextCursor = endIndex &lt; allTools.size() ? String.valueOf(endIndex) : null;
+
+        
+
+        return new ListToolsResult(pageTools, nextCursor);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Client Implementation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Client</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp import ClientSession
+
+
+
+async def get_all_tools(session: ClientSession) -&gt; list:
+
+    &quot;&quot;&quot;Fetch all tools using pagination.&quot;&quot;&quot;
+
+    all_tools = []
+
+    cursor = None
+
+    
+
+    while True:
+
+        result = await session.list_tools(cursor=cursor)
+
+        all_tools.extend(result.tools)
+
+        
+
+        if result.nextCursor is None:
+
+            break
+
+        cursor = result.nextCursor
+
+    
+
+    return all_tools
+
+
+
+# Usage
+
+async with client_session as session:
+
+    tools = await get_all_tools(session)
+
+    print(f&quot;Found {len(tools)} tools&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript Client</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Client } from &quot;@modelcontextprotocol/sdk/client/index.js&quot;;
+
+
+
+async function getAllTools(client: Client): Promise&lt;Tool[]&gt; {
+
+  const allTools: Tool[] = [];
+
+  let cursor: string | undefined = undefined;
+
+  
+
+  do {
+
+    const result = await client.listTools({ cursor });
+
+    allTools.push(...result.tools);
+
+    cursor = result.nextCursor;
+
+  } while (cursor);
+
+  
+
+  return allTools;
+
+}
+
+
+
+// Usage
+
+const tools = await getAllTools(client);
+
+console.log(`Found ${tools.length} tools`);
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Lazy Loading Pattern</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For very large datasets, load pages on-demand:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class PaginatedToolIterator:
+
+    &quot;&quot;&quot;Lazily iterate through paginated tools.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, session: ClientSession):
+
+        self.session = session
+
+        self.cursor = None
+
+        self.buffer = []
+
+        self.exhausted = False
+
+    
+
+    async def __anext__(self):
+
+        # Return from buffer if available
+
+        if self.buffer:
+
+            return self.buffer.pop(0)
+
+        
+
+        # Check if we&#x27;ve exhausted all pages
+
+        if self.exhausted:
+
+            raise StopAsyncIteration
+
+        
+
+        # Fetch next page
+
+        result = await self.session.list_tools(cursor=self.cursor)
+
+        self.buffer = list(result.tools)
+
+        self.cursor = result.nextCursor
+
+        
+
+        if self.cursor is None:
+
+            self.exhausted = True
+
+        
+
+        if not self.buffer:
+
+            raise StopAsyncIteration
+
+        
+
+        return self.buffer.pop(0)
+
+    
+
+    def __aiter__(self):
+
+        return self
+
+
+
+# Usage - memory efficient for large datasets
+
+async for tool in PaginatedToolIterator(session):
+
+    process_tool(tool)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Pagination for Resources</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Resources often need pagination for directories or large datasets:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import Resource, ListResourcesResult
+
+import os
+
+
+
+app = Server(&quot;file-server&quot;)
+
+
+
+@app.list_resources()
+
+async def list_resources(cursor: str | None = None) -&gt; ListResourcesResult:
+
+    &quot;&quot;&quot;List files in directory with pagination.&quot;&quot;&quot;
+
+    
+
+    directory = &quot;/data/files&quot;
+
+    all_files = sorted(os.listdir(directory))
+
+    
+
+    # Decode cursor (file index)
+
+    start_index = int(cursor) if cursor else 0
+
+    page_size = 20
+
+    end_index = min(start_index + page_size, len(all_files))
+
+    
+
+    # Create resource list for this page
+
+    resources = []
+
+    for filename in all_files[start_index:end_index]:
+
+        filepath = os.path.join(directory, filename)
+
+        resources.append(Resource(
+
+            uri=f&quot;file://{filepath}&quot;,
+
+            name=filename,
+
+            mimeType=&quot;application/octet-stream&quot;
+
+        ))
+
+    
+
+    # Calculate next cursor
+
+    next_cursor = str(end_index) if end_index &lt; len(all_files) else None
+
+    
+
+    return ListResourcesResult(
+
+        resources=resources,
+
+        nextCursor=next_cursor
+
+    )
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Cursor Design Strategies</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Strategy 1: Index-Based (Simple)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Cursor is just the index
+
+cursor = &quot;50&quot;  # Start at item 50
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Pros:</strong> Simple, stateless</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Cons:</strong> Results can shift if items are added/removed</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Strategy 2: ID-Based (Stable)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Cursor is the last seen ID
+
+cursor = &quot;item_abc123&quot;  # Start after this item
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Pros:</strong> Stable even if items change</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Cons:</strong> Requires ordered IDs</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Strategy 3: Encoded State (Complex)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import base64
+
+import json
+
+
+
+def encode_cursor(state: dict) -&gt; str:
+
+    return base64.b64encode(json.dumps(state).encode()).decode()
+
+
+
+def decode_cursor(cursor: str) -&gt; dict:
+
+    return json.loads(base64.b64decode(cursor).decode())
+
+
+
+# Cursor contains multiple state fields
+
+cursor = encode_cursor({
+
+    &quot;offset&quot;: 50,
+
+    &quot;filter&quot;: &quot;active&quot;,
+
+    &quot;sort&quot;: &quot;name&quot;
+
+})
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Pros:</strong> Can encode complex state</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Cons:</strong> More complex, larger cursor strings</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Best Practices</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Choose Appropriate Page Sizes</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Consider the data size
+
+PAGE_SIZE_SMALL_ITEMS = 100   # Simple metadata
+
+PAGE_SIZE_MEDIUM_ITEMS = 20   # Richer objects
+
+PAGE_SIZE_LARGE_ITEMS = 5     # Complex content
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Handle Invalid Cursors Gracefully</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@app.list_tools()
+
+async def list_tools(cursor: str | None = None) -&gt; ListToolsResult:
+
+    try:
+
+        start_index = int(cursor) if cursor else 0
+
+        if start_index &lt; 0 or start_index &gt;= len(ALL_TOOLS):
+
+            start_index = 0  # Reset to beginning
+
+    except (ValueError, TypeError):
+
+        start_index = 0  # Invalid cursor, start fresh
+
+    # ...
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Include Total Count (Optional)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+return ListToolsResult(
+
+    tools=page_tools,
+
+    nextCursor=next_cursor,
+
+    # Some implementations include total for UI progress
+
+    _meta={&quot;total&quot;: len(ALL_TOOLS)}
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. Test Edge Cases</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def test_pagination():
+
+    # Empty result set
+
+    result = await session.list_tools()
+
+    assert result.tools == []
+
+    assert result.nextCursor is None
+
+    
+
+    # Single page
+
+    result = await session.list_tools()
+
+    assert len(result.tools) &lt;= PAGE_SIZE
+
+    
+
+    # Invalid cursor
+
+    result = await session.list_tools(cursor=&quot;invalid&quot;)
+
+    assert result.tools  # Should return first page
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Common Pitfalls</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">❌ Returning All Results Then Paginating Client-Side</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# BAD: Loads everything into memory
+
+@app.list_tools()
+
+async def list_tools() -&gt; ListToolsResult:
+
+    all_tools = load_all_tools()  # 1 million tools!
+
+    return ListToolsResult(tools=all_tools)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">✅ Paginate at the Data Source</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# GOOD: Only loads what&#x27;s needed
+
+@app.list_tools()
+
+async def list_tools(cursor: str | None = None) -&gt; ListToolsResult:
+
+    offset = int(cursor) if cursor else 0
+
+    tools = await db.query_tools(offset=offset, limit=PAGE_SIZE)
+
+    return ListToolsResult(tools=tools, nextCursor=...)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-contextengineering/README.md" target="_blank">Module 5.14 - Context Engineering</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/08-BestPractices/README.md" target="_blank">Module 8 - Best Practices</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/08-testing/README.md" target="_blank">3.8 - Testing Your MCP Server</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP Specification - Pagination</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://slack.engineering/evolving-api-pagination-at-slack/">Cursor-Based Pagination Explained</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk/blob/main/tests/client/test_list_methods_cursor.py">Python SDK pagination tests</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP에서 페이지네이션과 대용량 결과 집합</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버가 수천 개의 파일, 데이터베이스 레코드 또는 검색 결과와 같은 대규모 데이터셋을 처리할 때 메모리를 효율적으로 관리하고 반응성 있는 사용자 경험을 제공하려면 페이지네이션이 필요합니다. 이 가이드는 MCP에서 페이지네이션을 구현하고 사용하는 방법을 다룹니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">페이지네이션이 중요한 이유</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">페이지네이션이 없으면 대규모 응답이 다음과 같은 문제를 일으킬 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>메모리 부족</strong> - 수백만 개의 레코드를 한 번에 로드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>느린 응답 시간</strong> - 모든 데이터가 로드될 때까지 사용자 대기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>타임아웃 오류</strong> - 요청이 타임아웃 제한을 초과</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>AI 성능 저하</strong> - LLM이 방대한 컨텍스트를 처리하는 데 어려움</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 결과 집합을 안정적이고 일관되게 페이지 처리하기 위해 <strong>커서 기반 페이지네이션</strong>을 사용합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 페이지네이션 동작 방식</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">커서 개념</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>커서</strong>는 결과 집합 내 위치를 표시하는 불투명한 문자열입니다. 긴 책에서의 북마크와 같이 생각할 수 있습니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    participant Client
+
+    participant Server
+
+    
+
+    Client-&gt;&gt;Server: tools/list (커서 없음)
+
+    Server--&gt;&gt;Client: 도구 [1-10], 다음커서: &quot;abc123&quot;
+
+    
+
+    Client-&gt;&gt;Server: tools/list (커서: &quot;abc123&quot;)
+
+    Server--&gt;&gt;Client: 도구 [11-20], 다음커서: &quot;def456&quot;
+
+    
+
+    Client-&gt;&gt;Server: tools/list (커서: &quot;def456&quot;)
+
+    Server--&gt;&gt;Client: 도구 [21-25], 다음커서: null (끝)
+
+</code></pre>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP 메서드의 페이지네이션</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 MCP 메서드들이 페이지네이션을 지원합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 메서드 | 반환값 | 커서 지원 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|--------|---------|----------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code> | 도구 정의 | ✅ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resources/list</code> | 리소스 정의 | ✅ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">prompts/list</code> | 프롬프트 정의 | ✅ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resources/templates/list</code> | 리소스 템플릿 | ✅ |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">서버 구현</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python (FastMCP)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import Tool, ListToolsResult
+
+import math
+
+
+
+app = Server(&quot;paginated-server&quot;)
+
+
+
+# 시뮬레이션된 대용량 데이터셋
+
+ALL_TOOLS = [
+
+    Tool(name=f&quot;tool_{i}&quot;, description=f&quot;Tool number {i}&quot;, inputSchema={})
+
+    for i in range(100)
+
+]
+
+
+
+PAGE_SIZE = 10
+
+
+
+@app.list_tools()
+
+async def list_tools(cursor: str | None = None) -&gt; ListToolsResult:
+
+    &quot;&quot;&quot;List tools with pagination support.&quot;&quot;&quot;
+
+    
+
+    # 시작 인덱스를 얻기 위해 커서 디코딩
+
+    start_index = 0
+
+    if cursor:
+
+        try:
+
+            start_index = int(cursor)
+
+        except ValueError:
+
+            start_index = 0
+
+    
+
+    # 결과 페이지 가져오기
+
+    end_index = min(start_index + PAGE_SIZE, len(ALL_TOOLS))
+
+    page_tools = ALL_TOOLS[start_index:end_index]
+
+    
+
+    # 다음 커서 계산하기
+
+    next_cursor = None
+
+    if end_index &lt; len(ALL_TOOLS):
+
+        next_cursor = str(end_index)
+
+    
+
+    return ListToolsResult(
+
+        tools=page_tools,
+
+        nextCursor=next_cursor
+
+    )
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+
+import { ListToolsResultSchema } from &quot;@modelcontextprotocol/sdk/types.js&quot;;
+
+
+
+const server = new Server({
+
+  name: &quot;paginated-server&quot;,
+
+  version: &quot;1.0.0&quot;
+
+});
+
+
+
+// 시뮬레이션된 대용량 데이터셋
+
+const ALL_TOOLS = Array.from({ length: 100 }, (_, i) =&gt; ({
+
+  name: `tool_${i}`,
+
+  description: `Tool number ${i}`,
+
+  inputSchema: { type: &quot;object&quot;, properties: {} }
+
+}));
+
+
+
+const PAGE_SIZE = 10;
+
+
+
+server.setRequestHandler(ListToolsResultSchema, async (request) =&gt; {
+
+  // 커서 디코딩
+
+  let startIndex = 0;
+
+  if (request.params?.cursor) {
+
+    startIndex = parseInt(request.params.cursor, 10) || 0;
+
+  }
+
+  
+
+  // 결과 페이지 가져오기
+
+  const endIndex = Math.min(startIndex + PAGE_SIZE, ALL_TOOLS.length);
+
+  const pageTools = ALL_TOOLS.slice(startIndex, endIndex);
+
+  
+
+  // 다음 커서 계산하기
+
+  const nextCursor = endIndex &lt; ALL_TOOLS.length ? String(endIndex) : undefined;
+
+  
+
+  return {
+
+    tools: pageTools,
+
+    nextCursor
+
+  };
+
+});
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Java (Spring MCP)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@Service
+
+public class PaginatedToolService {
+
+    
+
+    private static final int PAGE_SIZE = 10;
+
+    private final List&lt;Tool&gt; allTools;
+
+    
+
+    public PaginatedToolService() {
+
+        // 대용량 데이터셋 초기화
+
+        this.allTools = IntStream.range(0, 100)
+
+            .mapToObj(i -&gt; new Tool(&quot;tool_&quot; + i, &quot;Tool number &quot; + i, Map.of()))
+
+            .collect(Collectors.toList());
+
+    }
+
+    
+
+    @McpMethod(&quot;tools/list&quot;)
+
+    public ListToolsResult listTools(@Param(&quot;cursor&quot;) String cursor) {
+
+        // 커서 디코딩
+
+        int startIndex = 0;
+
+        if (cursor != null &amp;&amp; !cursor.isEmpty()) {
+
+            try {
+
+                startIndex = Integer.parseInt(cursor);
+
+            } catch (NumberFormatException e) {
+
+                startIndex = 0;
+
+            }
+
+        }
+
+        
+
+        // 결과 페이지 가져오기
+
+        int endIndex = Math.min(startIndex + PAGE_SIZE, allTools.size());
+
+        List&lt;Tool&gt; pageTools = allTools.subList(startIndex, endIndex);
+
+        
+
+        // 다음 커서 계산
+
+        String nextCursor = endIndex &lt; allTools.size() ? String.valueOf(endIndex) : null;
+
+        
+
+        return new ListToolsResult(pageTools, nextCursor);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">클라이언트 구현</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 클라이언트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp import ClientSession
+
+
+
+async def get_all_tools(session: ClientSession) -&gt; list:
+
+    &quot;&quot;&quot;Fetch all tools using pagination.&quot;&quot;&quot;
+
+    all_tools = []
+
+    cursor = None
+
+    
+
+    while True:
+
+        result = await session.list_tools(cursor=cursor)
+
+        all_tools.extend(result.tools)
+
+        
+
+        if result.nextCursor is None:
+
+            break
+
+        cursor = result.nextCursor
+
+    
+
+    return all_tools
+
+
+
+# 사용법
+
+async with client_session as session:
+
+    tools = await get_all_tools(session)
+
+    print(f&quot;Found {len(tools)} tools&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript 클라이언트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Client } from &quot;@modelcontextprotocol/sdk/client/index.js&quot;;
+
+
+
+async function getAllTools(client: Client): Promise&lt;Tool[]&gt; {
+
+  const allTools: Tool[] = [];
+
+  let cursor: string | undefined = undefined;
+
+  
+
+  do {
+
+    const result = await client.listTools({ cursor });
+
+    allTools.push(...result.tools);
+
+    cursor = result.nextCursor;
+
+  } while (cursor);
+
+  
+
+  return allTools;
+
+}
+
+
+
+// 사용법
+
+const tools = await getAllTools(client);
+
+console.log(`Found ${tools.length} tools`);
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">지연 로딩 패턴</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">매우 큰 데이터셋의 경우 필요에 따라 페이지를 로드하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class PaginatedToolIterator:
+
+    &quot;&quot;&quot;Lazily iterate through paginated tools.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, session: ClientSession):
+
+        self.session = session
+
+        self.cursor = None
+
+        self.buffer = []
+
+        self.exhausted = False
+
+    
+
+    async def __anext__(self):
+
+        # 버퍼에서 가능하면 반환
+
+        if self.buffer:
+
+            return self.buffer.pop(0)
+
+        
+
+        # 모든 페이지를 다 사용했는지 확인
+
+        if self.exhausted:
+
+            raise StopAsyncIteration
+
+        
+
+        # 다음 페이지 가져오기
+
+        result = await self.session.list_tools(cursor=self.cursor)
+
+        self.buffer = list(result.tools)
+
+        self.cursor = result.nextCursor
+
+        
+
+        if self.cursor is None:
+
+            self.exhausted = True
+
+        
+
+        if not self.buffer:
+
+            raise StopAsyncIteration
+
+        
+
+        return self.buffer.pop(0)
+
+    
+
+    def __aiter__(self):
+
+        return self
+
+
+
+# 사용법 - 대용량 데이터셋에 대해 메모리 효율적임
+
+async for tool in PaginatedToolIterator(session):
+
+    process_tool(tool)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">리소스용 페이지네이션</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">리소스는 디렉터리나 대규모 데이터셋에 대해 페이지네이션이 자주 필요합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import Resource, ListResourcesResult
+
+import os
+
+
+
+app = Server(&quot;file-server&quot;)
+
+
+
+@app.list_resources()
+
+async def list_resources(cursor: str | None = None) -&gt; ListResourcesResult:
+
+    &quot;&quot;&quot;List files in directory with pagination.&quot;&quot;&quot;
+
+    
+
+    directory = &quot;/data/files&quot;
+
+    all_files = sorted(os.listdir(directory))
+
+    
+
+    # 커서 디코딩 (파일 인덱스)
+
+    start_index = int(cursor) if cursor else 0
+
+    page_size = 20
+
+    end_index = min(start_index + page_size, len(all_files))
+
+    
+
+    # 이 페이지에 대한 리소스 리스트 생성
+
+    resources = []
+
+    for filename in all_files[start_index:end_index]:
+
+        filepath = os.path.join(directory, filename)
+
+        resources.append(Resource(
+
+            uri=f&quot;file://{filepath}&quot;,
+
+            name=filename,
+
+            mimeType=&quot;application/octet-stream&quot;
+
+        ))
+
+    
+
+    # 다음 커서 계산
+
+    next_cursor = str(end_index) if end_index &lt; len(all_files) else None
+
+    
+
+    return ListResourcesResult(
+
+        resources=resources,
+
+        nextCursor=next_cursor
+
+    )
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">커서 설계 전략</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">전략 1: 인덱스 기반 (단순)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 커서는 단지 인덱스입니다
+
+cursor = &quot;50&quot;  # 50번째 항목에서 시작합니다
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>장점:</strong> 단순하고 상태 비저장  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>단점:</strong> 항목이 추가/삭제되면 결과가 이동할 수 있음</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">전략 2: ID 기반 (안정적)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 커서는 마지막으로 본 ID입니다
+
+cursor = &quot;item_abc123&quot;  # 이 항목 다음부터 시작합니다
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>장점:</strong> 항목이 변경되어도 안정적  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>단점:</strong> 정렬된 ID 필요</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">전략 3: 인코딩된 상태 (복잡)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import base64
+
+import json
+
+
+
+def encode_cursor(state: dict) -&gt; str:
+
+    return base64.b64encode(json.dumps(state).encode()).decode()
+
+
+
+def decode_cursor(cursor: str) -&gt; dict:
+
+    return json.loads(base64.b64decode(cursor).decode())
+
+
+
+# 커서는 여러 상태 필드를 포함합니다
+
+cursor = encode_cursor({
+
+    &quot;offset&quot;: 50,
+
+    &quot;filter&quot;: &quot;active&quot;,
+
+    &quot;sort&quot;: &quot;name&quot;
+
+})
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>장점:</strong> 복잡한 상태를 인코딩 가능  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>단점:</strong> 더 복잡하고 커서 문자열이 길어짐</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">모범 사례</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 적절한 페이지 크기 선택</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 데이터 크기를 고려하세요
+
+PAGE_SIZE_SMALL_ITEMS = 100   # 간단한 메타데이터
+
+PAGE_SIZE_MEDIUM_ITEMS = 20   # 더 풍부한 객체
+
+PAGE_SIZE_LARGE_ITEMS = 5     # 복잡한 내용
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 잘못된 커서 우아하게 처리</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@app.list_tools()
+
+async def list_tools(cursor: str | None = None) -&gt; ListToolsResult:
+
+    try:
+
+        start_index = int(cursor) if cursor else 0
+
+        if start_index &lt; 0 or start_index &gt;= len(ALL_TOOLS):
+
+            start_index = 0  # 처음으로 재설정
+
+    except (ValueError, TypeError):
+
+        start_index = 0  # 잘못된 커서, 새로 시작
+
+    # ...
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. 총 개수 포함 (선택 사항)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+return ListToolsResult(
+
+    tools=page_tools,
+
+    nextCursor=next_cursor,
+
+    # 일부 구현은 UI 진행 상황을 위한 전체 합계를 포함합니다
+
+    _meta={&quot;total&quot;: len(ALL_TOOLS)}
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. 극단적 케이스 테스트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def test_pagination():
+
+    # 빈 결과 집합
+
+    result = await session.list_tools()
+
+    assert result.tools == []
+
+    assert result.nextCursor is None
+
+    
+
+    # 단일 페이지
+
+    result = await session.list_tools()
+
+    assert len(result.tools) &lt;= PAGE_SIZE
+
+    
+
+    # 잘못된 커서
+
+    result = await session.list_tools(cursor=&quot;invalid&quot;)
+
+    assert result.tools  # 첫 페이지를 반환해야 함
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">자주 하는 실수</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">❌ 모든 결과를 반환한 후 클라이언트에서 페이지네이션 수행</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 나쁨: 모든 것을 메모리에 로드함
+
+@app.list_tools()
+
+async def list_tools() -&gt; ListToolsResult:
+
+    all_tools = load_all_tools()  # 100만 개의 도구!
+
+    return ListToolsResult(tools=all_tools)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">✅ 데이터 소스에서 페이지네이션 수행</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 좋음: 필요한 것만 로드합니다
+
+@app.list_tools()
+
+async def list_tools(cursor: str | None = None) -&gt; ListToolsResult:
+
+    offset = int(cursor) if cursor else 0
+
+    tools = await db.query_tools(offset=offset, limit=PAGE_SIZE)
+
+    return ListToolsResult(tools=tools, nextCursor=...)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-contextengineering/README.md" target="_blank">모듈 5.14 - 컨텍스트 엔지니어링</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/08-BestPractices/README.md" target="_blank">모듈 8 - 모범 사례</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/08-testing/README.md" target="_blank">3.8 - MCP 서버 테스트</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP 사양 - 페이지네이션</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://slack.engineering/evolving-api-pagination-at-slack/">커서 기반 페이지네이션 설명</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk/blob/main/tests/client/test_list_methods_cursor.py">Python SDK 페이지네이션 테스트</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어는 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역의 사용으로 인한 오해나 오해석에 대해 당사는 어떠한 법적 책임도 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m04_05-python.html">&larr; Python</a></span>
+  <span><a href="m04_07-java-with-spring-sample.html">Java with Spring sample &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

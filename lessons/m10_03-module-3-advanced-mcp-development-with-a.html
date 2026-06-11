@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>🔧 Module 3: Advanced MCP Development with AI Toolkit - AI Toolkit - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 10: AI Toolkit</span> &rsaquo; 🔧 Module 3: Advanced MCP Development with AI Toolkit</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">🔧 Module 3: Advanced MCP Development with AI Toolkit</h2>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Create custom MCP servers using the AI Toolkit</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Configure and use the latest MCP Python SDK (v1.9.3)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Set up and utilize the MCP Inspector for debugging</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Debug MCP servers in both Agent Builder and Inspector environments</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Understand advanced MCP server development workflows</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 Prerequisites</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Completion of Lab 2 (MCP Fundamentals)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">VS Code with AI Toolkit extension installed</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Python 3.10+ environment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Node.js and npm for Inspector setup</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏗️ What You'll Build</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this lab, you'll create a <strong>Weather MCP Server</strong> that demonstrates:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Custom MCP server implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integration with AI Toolkit Agent Builder</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Professional debugging workflows</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Modern MCP SDK usage patterns</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 Core Components Overview</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🐍 MCP Python SDK</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol Python SDK provides the foundation for building custom MCP servers. You'll use version 1.9.3 with enhanced debugging capabilities.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔍 MCP Inspector</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A powerful debugging tool that provides:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Real-time server monitoring</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Tool execution visualization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Network request/response inspection</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Interactive testing environment</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📖 Step-by-Step Implementation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 1: Create a WeatherAgent in Agent Builder</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Launch Agent Builder</strong> in VS Code through the AI Toolkit extension</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Create a new agent</strong> with the following configuration:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Agent Name: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">WeatherAgent</code></p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 2: Initialize MCP Server Project</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Navigate to Tools</strong> → <strong>Add Tool</strong> in Agent Builder</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Select "MCP Server"</strong> from the available options</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Choose "Create A new MCP Server"</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Select the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">python-weather</code> template</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Name your server:</strong> <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">weather_mcp</code></p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 3: Open and Examine the Project</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Open the generated project</strong> in VS Code</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Review the project structure:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   weather_mcp/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── src/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   ├── __init__.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   └── server.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── inspector/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   ├── package.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   └── package-lock.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── .vscode/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   ├── launch.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   └── tasks.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── pyproject.toml</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   └── README.md</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 4: Upgrade to Latest MCP SDK</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>🔍 Why Upgrade?</strong> We want to use the latest MCP SDK (v1.9.3) and Inspector service (0.14.0)  for enhanced features and better debugging capabilities.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4a. Update Python Dependencies</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Edit <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pyproject.toml</code>:</strong> update <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/code/weather_mcp/pyproject.toml" target="_blank">./code/weather_mcp/pyproject.toml</a></p>
+
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4b. Update Inspector Configuration</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Edit <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inspector/package.json</code>:</strong> update <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/code/weather_mcp/inspector/package.json" target="_blank">./code/weather_mcp/inspector/package.json</a></p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4c. Update Inspector Dependencies</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Edit <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inspector/package-lock.json</code>:</strong> update <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/code/weather_mcp/inspector/package-lock.json" target="_blank">./code/weather_mcp/inspector/package-lock.json</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>📝 Note:</strong> This file contains extensive dependency definitions. Below is the essential structure - the full content ensures proper dependency resolution.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>⚡ Full Package Lock:</strong> The complete package-lock.json contains ~3000 lines of dependency definitions. The above shows the key structure - use the provided file for complete dependency resolution.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 5: Configure VS Code Debugging</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*Note: Please copy the file in the specified path to replace the corresponding local file*</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">5a. Update Launch Configuration</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Edit <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/launch.json</code>:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;0.2.0&quot;,
+
+  &quot;configurations&quot;: [
+
+    {
+
+      &quot;name&quot;: &quot;Attach to Local MCP&quot;,
+
+      &quot;type&quot;: &quot;debugpy&quot;,
+
+      &quot;request&quot;: &quot;attach&quot;,
+
+      &quot;connect&quot;: {
+
+        &quot;host&quot;: &quot;localhost&quot;,
+
+        &quot;port&quot;: 5678
+
+      },
+
+      &quot;presentation&quot;: {
+
+        &quot;hidden&quot;: true
+
+      },
+
+      &quot;internalConsoleOptions&quot;: &quot;neverOpen&quot;,
+
+      &quot;postDebugTask&quot;: &quot;Terminate All Tasks&quot;
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Launch Inspector (Edge)&quot;,
+
+      &quot;type&quot;: &quot;msedge&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:6274?timeout=60000&amp;serverUrl=http://localhost:3001/sse#tools&quot;,
+
+      &quot;cascadeTerminateToConfigurations&quot;: [
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;presentation&quot;: {
+
+        &quot;hidden&quot;: true
+
+      },
+
+      &quot;internalConsoleOptions&quot;: &quot;neverOpen&quot;
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Launch Inspector (Chrome)&quot;,
+
+      &quot;type&quot;: &quot;chrome&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:6274?timeout=60000&amp;serverUrl=http://localhost:3001/sse#tools&quot;,
+
+      &quot;cascadeTerminateToConfigurations&quot;: [
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;presentation&quot;: {
+
+        &quot;hidden&quot;: true
+
+      },
+
+      &quot;internalConsoleOptions&quot;: &quot;neverOpen&quot;
+
+    }
+
+  ],
+
+  &quot;compounds&quot;: [
+
+    {
+
+      &quot;name&quot;: &quot;Debug in Agent Builder&quot;,
+
+      &quot;configurations&quot;: [
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;preLaunchTask&quot;: &quot;Open Agent Builder&quot;,
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Debug in Inspector (Edge)&quot;,
+
+      &quot;configurations&quot;: [
+
+        &quot;Launch Inspector (Edge)&quot;,
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;preLaunchTask&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;stopAll&quot;: true
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Debug in Inspector (Chrome)&quot;,
+
+      &quot;configurations&quot;: [
+
+        &quot;Launch Inspector (Chrome)&quot;,
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;preLaunchTask&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;stopAll&quot;: true
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Edit <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/tasks.json</code>:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;2.0.0&quot;,
+
+  &quot;tasks&quot;: [
+
+    {
+
+      &quot;label&quot;: &quot;Start MCP Server&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;python -m debugpy --listen 127.0.0.1:5678 src/__init__.py sse&quot;,
+
+      &quot;isBackground&quot;: true,
+
+      &quot;options&quot;: {
+
+        &quot;cwd&quot;: &quot;${workspaceFolder}&quot;,
+
+        &quot;env&quot;: {
+
+          &quot;PORT&quot;: &quot;3001&quot;
+
+        }
+
+      },
+
+      &quot;problemMatcher&quot;: {
+
+        &quot;pattern&quot;: [
+
+          {
+
+            &quot;regexp&quot;: &quot;^.*$&quot;,
+
+            &quot;file&quot;: 0,
+
+            &quot;location&quot;: 1,
+
+            &quot;message&quot;: 2
+
+          }
+
+        ],
+
+        &quot;background&quot;: {
+
+          &quot;activeOnStart&quot;: true,
+
+          &quot;beginsPattern&quot;: &quot;.*&quot;,
+
+          &quot;endsPattern&quot;: &quot;Application startup complete|running&quot;
+
+        }
+
+      }
+
+    },
+
+    {
+
+      &quot;label&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;npm run dev:inspector&quot;,
+
+      &quot;isBackground&quot;: true,
+
+      &quot;options&quot;: {
+
+        &quot;cwd&quot;: &quot;${workspaceFolder}/inspector&quot;,
+
+        &quot;env&quot;: {
+
+          &quot;CLIENT_PORT&quot;: &quot;6274&quot;,
+
+          &quot;SERVER_PORT&quot;: &quot;6277&quot;,
+
+        }
+
+      },
+
+      &quot;problemMatcher&quot;: {
+
+        &quot;pattern&quot;: [
+
+          {
+
+            &quot;regexp&quot;: &quot;^.*$&quot;,
+
+            &quot;file&quot;: 0,
+
+            &quot;location&quot;: 1,
+
+            &quot;message&quot;: 2
+
+          }
+
+        ],
+
+        &quot;background&quot;: {
+
+          &quot;activeOnStart&quot;: true,
+
+          &quot;beginsPattern&quot;: &quot;Starting MCP inspector&quot;,
+
+          &quot;endsPattern&quot;: &quot;Proxy server listening on port&quot;
+
+        }
+
+      },
+
+      &quot;dependsOn&quot;: [
+
+        &quot;Start MCP Server&quot;
+
+      ]
+
+    },
+
+    {
+
+      &quot;label&quot;: &quot;Open Agent Builder&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;echo ${input:openAgentBuilder}&quot;,
+
+      &quot;presentation&quot;: {
+
+        &quot;reveal&quot;: &quot;never&quot;
+
+      },
+
+      &quot;dependsOn&quot;: [
+
+        &quot;Start MCP Server&quot;
+
+      ],
+
+    },
+
+    {
+
+      &quot;label&quot;: &quot;Terminate All Tasks&quot;,
+
+      &quot;command&quot;: &quot;echo ${input:terminate}&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;problemMatcher&quot;: []
+
+    }
+
+  ],
+
+  &quot;inputs&quot;: [
+
+    {
+
+      &quot;id&quot;: &quot;openAgentBuilder&quot;,
+
+      &quot;type&quot;: &quot;command&quot;,
+
+      &quot;command&quot;: &quot;ai-mlstudio.agentBuilder&quot;,
+
+      &quot;args&quot;: {
+
+        &quot;initialMCPs&quot;: [ &quot;local-server-weather_mcp&quot; ],
+
+        &quot;triggeredFrom&quot;: &quot;vsc-tasks&quot;
+
+      }
+
+    },
+
+    {
+
+      &quot;id&quot;: &quot;terminate&quot;,
+
+      &quot;type&quot;: &quot;command&quot;,
+
+      &quot;command&quot;: &quot;workbench.action.tasks.terminate&quot;,
+
+      &quot;args&quot;: &quot;terminateAll&quot;
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 Running and Testing Your MCP Server</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 6: Install Dependencies</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After making the configuration changes, run the following commands:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Install Python dependencies:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+uv sync
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Install Inspector dependencies:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+cd inspector
+
+npm install
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 7: Debug with Agent Builder</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Press F5</strong> or use the <strong>"Debug in Agent Builder"</strong> configuration</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Select the compound configuration</strong> from the debug panel</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Wait for the server to start</strong> and Agent Builder to open</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Test your weather MCP server</strong> with natural language queries</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Input prompt like this</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">SYSTEM_PROMPT</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+You are my weather assistant
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">USER_PROMPT</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+How&#x27;s the weather like in Seattle
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Step 8: Debug with MCP Inspector</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Use the "Debug in Inspector"</strong> configuration (Edge or Chrome)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Open the Inspector interface</strong> at <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:6274</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Explore the interactive testing environment:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - View available tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Test tool execution</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Monitor network requests</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Debug server responses</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Learning Outcomes</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By completing this lab, you have:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] <strong>Created a custom MCP server</strong> using AI Toolkit templates</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] <strong>Upgraded to the latest MCP SDK</strong> (v1.9.3) for enhanced functionality</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] <strong>Configured professional debugging workflows</strong> for both Agent Builder and Inspector</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] <strong>Set up the MCP Inspector</strong> for interactive server testing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] <strong>Mastered VS Code debugging configurations</strong> for MCP development</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 Advanced Features Explored</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Feature | Description | Use Case |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|---------|-------------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Python SDK v1.9.3</strong> | Latest protocol implementation | Modern server development |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Inspector 0.14.0</strong> | Interactive debugging tool | Real-time server testing |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>VS Code Debugging</strong> | Integrated development environment | Professional debugging workflow |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Agent Builder Integration</strong> | Direct AI Toolkit connection | End-to-end agent testing |</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/sdk/python">MCP Python SDK Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/ai/ai-toolkit">AI Toolkit Extension Guide</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/editor/debugging">VS Code Debugging Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/concepts/architecture">Model Context Protocol Specification</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 Congratulations!</strong> You've successfully completed Lab 3 and can now create, debug, and deploy custom MCP servers using professional development workflows.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔜 Continue to Next Module</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Ready to apply your MCP skills to a real-world development workflow? Continue to <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab4/README.md" target="_blank">Module 4: Practical MCP Development - Custom GitHub Clone Server</a></strong> where you'll:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Build a production-ready MCP server that automates GitHub repository operations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement GitHub repository cloning functionality via MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integrate custom MCP servers with VS Code and GitHub Copilot Agent Mode</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test and deploy custom MCP servers in production environments</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Learn practical workflow automation for developers</li>
+
+
+
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">🔧 모듈 3: AI Toolkit을 활용한 고급 MCP 개발</h2>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ AI Toolkit을 사용해 맞춤형 MCP 서버 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 최신 MCP Python SDK(v1.9.3) 설정 및 활용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 디버깅을 위한 MCP Inspector 설정 및 사용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Agent Builder와 Inspector 환경에서 MCP 서버 디버깅</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 고급 MCP 서버 개발 워크플로우 이해</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 사전 준비 사항</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Lab 2 (MCP 기초) 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Toolkit 확장 프로그램이 설치된 VS Code</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Python 3.10 이상 환경</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Inspector 설정을 위한 Node.js 및 npm</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏗️ 만들게 될 것</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이번 실습에서는 <strong>Weather MCP Server</strong>를 만들어 다음을 보여줍니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">맞춤형 MCP 서버 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Toolkit Agent Builder와의 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">전문적인 디버깅 워크플로우</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">최신 MCP SDK 사용 패턴</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 핵심 구성 요소 개요</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🐍 MCP Python SDK</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol Python SDK는 맞춤형 MCP 서버 구축의 기반입니다. 디버깅 기능이 강화된 1.9.3 버전을 사용합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔍 MCP Inspector</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">강력한 디버깅 도구로 다음 기능을 제공합니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 서버 모니터링</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">도구 실행 시각화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">네트워크 요청/응답 검사</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">인터랙티브 테스트 환경</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📖 단계별 구현</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1단계: Agent Builder에서 WeatherAgent 생성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. AI Toolkit 확장 프로그램을 통해 VS Code에서 <strong>Agent Builder 실행</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 다음 설정으로 <strong>새 에이전트 생성</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 에이전트 이름: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">WeatherAgent</code></p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2단계: MCP 서버 프로젝트 초기화</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Agent Builder에서 <strong>Tools → Add Tool</strong>로 이동</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>"MCP Server" 선택</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>"Create A new MCP Server" 선택</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">python-weather</code> 템플릿 선택</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 서버 이름 지정: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">weather_mcp</code></p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3단계: 프로젝트 열고 구조 확인</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 생성된 프로젝트를 VS Code에서 <strong>열기</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 프로젝트 구조 검토:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   weather_mcp/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── src/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   ├── __init__.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   └── server.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── inspector/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   ├── package.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   └── package-lock.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── .vscode/</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   ├── launch.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   │   └── tasks.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ├── pyproject.toml</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   └── README.md</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4단계: 최신 MCP SDK로 업그레이드</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>🔍 왜 업그레이드하나요?</strong> 최신 MCP SDK(v1.9.3)와 Inspector 서비스(0.14.0)를 사용해 향상된 기능과 디버깅 성능을 얻기 위함입니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4a. Python 의존성 업데이트</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pyproject.toml</code> 편집:</strong> <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/code/weather_mcp/pyproject.toml" target="_blank">./code/weather_mcp/pyproject.toml</a> 업데이트</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4b. Inspector 설정 업데이트</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inspector/package.json</code> 편집:</strong> <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/code/weather_mcp/inspector/package.json" target="_blank">./code/weather_mcp/inspector/package.json</a> 업데이트</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4c. Inspector 의존성 업데이트</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inspector/package-lock.json</code> 편집:</strong> <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/code/weather_mcp/inspector/package-lock.json" target="_blank">./code/weather_mcp/inspector/package-lock.json</a> 업데이트</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>📝 참고:</strong> 이 파일은 방대한 의존성 정의를 포함합니다. 아래는 핵심 구조이며, 전체 내용은 올바른 의존성 해결을 위해 필요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>⚡ 전체 패키지 락:</strong> package-lock.json 전체 파일은 약 3000줄에 달하는 의존성 정의를 포함합니다. 위는 주요 구조만 보여주며, 완전한 의존성 해결을 위해 제공된 파일을 사용하세요.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">5단계: VS Code 디버깅 설정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*참고: 지정된 경로의 파일을 복사하여 로컬 파일을 교체하세요*</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">5a. 실행 구성 업데이트</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/launch.json</code> 편집:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;0.2.0&quot;,
+
+  &quot;configurations&quot;: [
+
+    {
+
+      &quot;name&quot;: &quot;Attach to Local MCP&quot;,
+
+      &quot;type&quot;: &quot;debugpy&quot;,
+
+      &quot;request&quot;: &quot;attach&quot;,
+
+      &quot;connect&quot;: {
+
+        &quot;host&quot;: &quot;localhost&quot;,
+
+        &quot;port&quot;: 5678
+
+      },
+
+      &quot;presentation&quot;: {
+
+        &quot;hidden&quot;: true
+
+      },
+
+      &quot;internalConsoleOptions&quot;: &quot;neverOpen&quot;,
+
+      &quot;postDebugTask&quot;: &quot;Terminate All Tasks&quot;
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Launch Inspector (Edge)&quot;,
+
+      &quot;type&quot;: &quot;msedge&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:6274?timeout=60000&amp;serverUrl=http://localhost:3001/sse#tools&quot;,
+
+      &quot;cascadeTerminateToConfigurations&quot;: [
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;presentation&quot;: {
+
+        &quot;hidden&quot;: true
+
+      },
+
+      &quot;internalConsoleOptions&quot;: &quot;neverOpen&quot;
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Launch Inspector (Chrome)&quot;,
+
+      &quot;type&quot;: &quot;chrome&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:6274?timeout=60000&amp;serverUrl=http://localhost:3001/sse#tools&quot;,
+
+      &quot;cascadeTerminateToConfigurations&quot;: [
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;presentation&quot;: {
+
+        &quot;hidden&quot;: true
+
+      },
+
+      &quot;internalConsoleOptions&quot;: &quot;neverOpen&quot;
+
+    }
+
+  ],
+
+  &quot;compounds&quot;: [
+
+    {
+
+      &quot;name&quot;: &quot;Debug in Agent Builder&quot;,
+
+      &quot;configurations&quot;: [
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;preLaunchTask&quot;: &quot;Open Agent Builder&quot;,
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Debug in Inspector (Edge)&quot;,
+
+      &quot;configurations&quot;: [
+
+        &quot;Launch Inspector (Edge)&quot;,
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;preLaunchTask&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;stopAll&quot;: true
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Debug in Inspector (Chrome)&quot;,
+
+      &quot;configurations&quot;: [
+
+        &quot;Launch Inspector (Chrome)&quot;,
+
+        &quot;Attach to Local MCP&quot;
+
+      ],
+
+      &quot;preLaunchTask&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;stopAll&quot;: true
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/tasks.json</code> 편집:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;2.0.0&quot;,
+
+  &quot;tasks&quot;: [
+
+    {
+
+      &quot;label&quot;: &quot;Start MCP Server&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;python -m debugpy --listen 127.0.0.1:5678 src/__init__.py sse&quot;,
+
+      &quot;isBackground&quot;: true,
+
+      &quot;options&quot;: {
+
+        &quot;cwd&quot;: &quot;${workspaceFolder}&quot;,
+
+        &quot;env&quot;: {
+
+          &quot;PORT&quot;: &quot;3001&quot;
+
+        }
+
+      },
+
+      &quot;problemMatcher&quot;: {
+
+        &quot;pattern&quot;: [
+
+          {
+
+            &quot;regexp&quot;: &quot;^.*$&quot;,
+
+            &quot;file&quot;: 0,
+
+            &quot;location&quot;: 1,
+
+            &quot;message&quot;: 2
+
+          }
+
+        ],
+
+        &quot;background&quot;: {
+
+          &quot;activeOnStart&quot;: true,
+
+          &quot;beginsPattern&quot;: &quot;.*&quot;,
+
+          &quot;endsPattern&quot;: &quot;Application startup complete|running&quot;
+
+        }
+
+      }
+
+    },
+
+    {
+
+      &quot;label&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;npm run dev:inspector&quot;,
+
+      &quot;isBackground&quot;: true,
+
+      &quot;options&quot;: {
+
+        &quot;cwd&quot;: &quot;${workspaceFolder}/inspector&quot;,
+
+        &quot;env&quot;: {
+
+          &quot;CLIENT_PORT&quot;: &quot;6274&quot;,
+
+          &quot;SERVER_PORT&quot;: &quot;6277&quot;,
+
+        }
+
+      },
+
+      &quot;problemMatcher&quot;: {
+
+        &quot;pattern&quot;: [
+
+          {
+
+            &quot;regexp&quot;: &quot;^.*$&quot;,
+
+            &quot;file&quot;: 0,
+
+            &quot;location&quot;: 1,
+
+            &quot;message&quot;: 2
+
+          }
+
+        ],
+
+        &quot;background&quot;: {
+
+          &quot;activeOnStart&quot;: true,
+
+          &quot;beginsPattern&quot;: &quot;Starting MCP inspector&quot;,
+
+          &quot;endsPattern&quot;: &quot;Proxy server listening on port&quot;
+
+        }
+
+      },
+
+      &quot;dependsOn&quot;: [
+
+        &quot;Start MCP Server&quot;
+
+      ]
+
+    },
+
+    {
+
+      &quot;label&quot;: &quot;Open Agent Builder&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;echo ${input:openAgentBuilder}&quot;,
+
+      &quot;presentation&quot;: {
+
+        &quot;reveal&quot;: &quot;never&quot;
+
+      },
+
+      &quot;dependsOn&quot;: [
+
+        &quot;Start MCP Server&quot;
+
+      ],
+
+    },
+
+    {
+
+      &quot;label&quot;: &quot;Terminate All Tasks&quot;,
+
+      &quot;command&quot;: &quot;echo ${input:terminate}&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;problemMatcher&quot;: []
+
+    }
+
+  ],
+
+  &quot;inputs&quot;: [
+
+    {
+
+      &quot;id&quot;: &quot;openAgentBuilder&quot;,
+
+      &quot;type&quot;: &quot;command&quot;,
+
+      &quot;command&quot;: &quot;ai-mlstudio.agentBuilder&quot;,
+
+      &quot;args&quot;: {
+
+        &quot;initialMCPs&quot;: [ &quot;local-server-weather_mcp&quot; ],
+
+        &quot;triggeredFrom&quot;: &quot;vsc-tasks&quot;
+
+      }
+
+    },
+
+    {
+
+      &quot;id&quot;: &quot;terminate&quot;,
+
+      &quot;type&quot;: &quot;command&quot;,
+
+      &quot;command&quot;: &quot;workbench.action.tasks.terminate&quot;,
+
+      &quot;args&quot;: &quot;terminateAll&quot;
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 MCP 서버 실행 및 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">6단계: 의존성 설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">설정 변경 후 다음 명령어 실행:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python 의존성 설치:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+uv sync
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Inspector 의존성 설치:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+cd inspector
+
+npm install
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">7단계: Agent Builder에서 디버깅</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>F5 키를 누르거나 "Debug in Agent Builder" 구성 사용</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 디버그 패널에서 <strong>복합 구성 선택</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 서버가 시작되고 Agent Builder가 열릴 때까지 대기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 자연어 쿼리로 날씨 MCP 서버 테스트</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음과 같은 입력 프롬프트 예시</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">SYSTEM_PROMPT</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+You are my weather assistant
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">USER_PROMPT</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+How&#x27;s the weather like in Seattle
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">8단계: MCP Inspector에서 디버깅</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>"Debug in Inspector" 구성 사용 (Edge 또는 Chrome)</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:6274</code>에서 Inspector 인터페이스 열기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 인터랙티브 테스트 환경 탐색:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 사용 가능한 도구 확인</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 도구 실행 테스트</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 네트워크 요청 모니터링</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 서버 응답 디버깅</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 학습 성과</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하여 다음을 달성했습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] AI Toolkit 템플릿을 활용한 맞춤형 MCP 서버 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] 향상된 기능을 위한 최신 MCP SDK(v1.9.3) 업그레이드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] Agent Builder와 Inspector 모두에 대한 전문적인 디버깅 워크플로우 구성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] 인터랙티브 서버 테스트를 위한 MCP Inspector 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[x] MCP 개발을 위한 VS Code 디버깅 구성 마스터</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 탐구한 고급 기능</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 기능 | 설명 | 활용 사례 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|---------|-------------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Python SDK v1.9.3</strong> | 최신 프로토콜 구현 | 현대적인 서버 개발 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Inspector 0.14.0</strong> | 인터랙티브 디버깅 도구 | 실시간 서버 테스트 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>VS Code 디버깅</strong> | 통합 개발 환경 | 전문적인 디버깅 워크플로우 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Agent Builder 통합</strong> | AI Toolkit과 직접 연결 | 엔드투엔드 에이전트 테스트 |</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/sdk/python">MCP Python SDK 문서</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/ai/ai-toolkit">AI Toolkit 확장 가이드</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/editor/debugging">VS Code 디버깅 문서</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/concepts/architecture">Model Context Protocol 사양</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 축하합니다!</strong> Lab 3을 성공적으로 완료하여 전문적인 개발 워크플로우로 맞춤형 MCP 서버를 생성, 디버깅, 배포할 수 있게 되었습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔜 다음 모듈로 계속 진행</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실제 개발 워크플로우에 MCP 기술을 적용할 준비가 되셨나요? <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab4/README.md" target="_blank">모듈 4: 실전 MCP 개발 - 맞춤형 GitHub 클론 서버</a></strong>로 이동하여:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub 저장소 작업을 자동화하는 프로덕션 수준 MCP 서버 구축</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP를 통한 GitHub 저장소 클론 기능 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">VS Code 및 GitHub Copilot Agent 모드와 맞춤형 MCP 서버 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">프로덕션 환경에서 맞춤형 MCP 서버 테스트 및 배포</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">개발자를 위한 실용적인 워크플로우 자동화 학습</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m10_02-module-2-mcp-with-ai-toolkit-fundamental.html">&larr; 🌐 Module 2: MCP with AI Toolkit Fundamentals</a></span>
+  <span><a href="m10_04-module-4-practical-mcp-development---cus.html">🐙 Module 4: Practical MCP Development - Custom GitHub Clone Server &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

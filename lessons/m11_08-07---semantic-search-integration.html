@@ -1,0 +1,5849 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>07 - Semantic Search Integration - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 07 - Semantic Search Integration</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Semantic Search Integration</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab provides comprehensive guidance on implementing semantic search capabilities using Azure OpenAI embeddings and PostgreSQL's pgvector extension.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll learn to build AI-powered product search that understands natural language queries and delivers relevant results based on semantic similarity.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Traditional keyword-based search often fails to capture user intent and semantic meaning.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Semantic search using vector embeddings enables natural language queries like "comfortable running shoes for rainy weather" to find relevant products even if those exact words don't appear in product descriptions.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our implementation combines Azure OpenAI's powerful embedding models with PostgreSQL's pgvector extension to create a high-performance, scalable semantic search system that enhances the retail experience with intelligent product discovery.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Integrate</strong> Azure OpenAI embedding models for text vectorization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> pgvector for efficient similarity search operations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Build</strong> semantic search tools for natural language product queries</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Create</strong> hybrid search combining traditional and vector search</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Optimize</strong> vector queries for production performance</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Design</strong> recommendation systems using embedding similarity</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧠 Semantic Search Architecture</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Vector Search Pipeline</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────┐
+
+│                User Query                       │
+
+│         &quot;comfortable running shoes&quot;            │
+
+└─────────────────────┬───────────────────────────┘
+
+                      │
+
+┌─────────────────────▼───────────────────────────┐
+
+│           Azure OpenAI API                     │
+
+│        text-embedding-3-small                  │
+
+│        Input: Query Text                       │
+
+│        Output: 1536-dimensional vector         │
+
+└─────────────────────┬───────────────────────────┘
+
+                      │
+
+┌─────────────────────▼───────────────────────────┐
+
+│              pgvector Search                   │
+
+│      Cosine Similarity: embedding &lt;=&gt; vector   │
+
+│      WHERE similarity &gt; threshold              │
+
+│      ORDER BY similarity DESC                  │
+
+└─────────────────────┬───────────────────────────┘
+
+                      │
+
+┌─────────────────────▼───────────────────────────┐
+
+│            Ranked Results                      │
+
+│    1. Nike Air Zoom (0.89 similarity)         │
+
+│    2. Adidas Ultraboost (0.85 similarity)     │
+
+│    3. New Balance Fresh Foam (0.82 similarity) │
+
+└─────────────────────────────────────────────────┘
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Embedding Generation Strategy</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/embeddings/embedding_manager.py
+
+&quot;&quot;&quot;
+
+Comprehensive embedding management for semantic search.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import hashlib
+
+import json
+
+from typing import List, Dict, Any, Optional, Tuple
+
+from datetime import datetime, timedelta
+
+import numpy as np
+
+from azure.ai.projects.aio import AIProjectClient
+
+from azure.identity.aio import DefaultAzureCredential
+
+from azure.core.exceptions import HttpResponseError
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class EmbeddingManager:
+
+    &quot;&quot;&quot;Manage text embeddings for semantic search.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, project_endpoint: str, deployment_name: str = &quot;text-embedding-3-small&quot;):
+
+        self.project_endpoint = project_endpoint
+
+        self.deployment_name = deployment_name
+
+        self.credential = DefaultAzureCredential()
+
+        self.client = None
+
+        
+
+        # Embedding configuration
+
+        self.embedding_dimension = 1536  # text-embedding-3-small dimension
+
+        self.max_tokens = 8000  # Maximum tokens per request
+
+        self.batch_size = 100  # Batch processing size
+
+        
+
+        # Caching configuration
+
+        self.embedding_cache = {}
+
+        self.cache_ttl = timedelta(hours=24)
+
+        
+
+        # Rate limiting
+
+        self.rate_limit_requests = 1000  # Per minute
+
+        self.rate_limit_tokens = 150000  # Per minute
+
+        
+
+    async def initialize(self):
+
+        &quot;&quot;&quot;Initialize the Azure AI client.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            self.client = AIProjectClient(
+
+                endpoint=self.project_endpoint,
+
+                credential=self.credential
+
+            )
+
+            
+
+            # Test connection
+
+            await self._test_connection()
+
+            
+
+            logger.info(&quot;Embedding manager initialized successfully&quot;)
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Failed to initialize embedding manager: {e}&quot;)
+
+            raise
+
+    
+
+    async def _test_connection(self):
+
+        &quot;&quot;&quot;Test Azure OpenAI connection.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            test_embedding = await self.generate_embedding(&quot;test connection&quot;)
+
+            if len(test_embedding) != self.embedding_dimension:
+
+                raise ValueError(f&quot;Unexpected embedding dimension: {len(test_embedding)}&quot;)
+
+            
+
+            logger.info(&quot;Azure OpenAI connection test successful&quot;)
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Azure OpenAI connection test failed: {e}&quot;)
+
+            raise
+
+    
+
+    async def generate_embedding(self, text: str, use_cache: bool = True) -&gt; List[float]:
+
+        &quot;&quot;&quot;Generate embedding for a single text.&quot;&quot;&quot;
+
+        
+
+        if not text or not text.strip():
+
+            raise ValueError(&quot;Text cannot be empty&quot;)
+
+        
+
+        # Check cache first
+
+        if use_cache:
+
+            cache_key = self._get_cache_key(text)
+
+            cached_embedding = self._get_cached_embedding(cache_key)
+
+            if cached_embedding:
+
+                return cached_embedding
+
+        
+
+        try:
+
+            # Ensure client is initialized
+
+            if not self.client:
+
+                await self.initialize()
+
+            
+
+            # Generate embedding
+
+            response = await self.client.embeddings.create(
+
+                model=self.deployment_name,
+
+                input=text.strip()
+
+            )
+
+            
+
+            embedding = response.data[0].embedding
+
+            
+
+            # Cache the result
+
+            if use_cache:
+
+                self._cache_embedding(cache_key, embedding)
+
+            
+
+            logger.debug(f&quot;Generated embedding for text (length: {len(text)})&quot;)
+
+            
+
+            return embedding
+
+            
+
+        except HttpResponseError as e:
+
+            logger.error(f&quot;Azure OpenAI API error: {e}&quot;)
+
+            raise Exception(f&quot;Embedding generation failed: {e}&quot;)
+
+        except Exception as e:
+
+            logger.error(f&quot;Embedding generation error: {e}&quot;)
+
+            raise
+
+    
+
+    async def generate_embeddings_batch(
+
+        self, 
+
+        texts: List[str], 
+
+        use_cache: bool = True
+
+    ) -&gt; List[List[float]]:
+
+        &quot;&quot;&quot;Generate embeddings for multiple texts efficiently.&quot;&quot;&quot;
+
+        
+
+        if not texts:
+
+            return []
+
+        
+
+        embeddings = []
+
+        cache_misses = []
+
+        cache_miss_indices = []
+
+        
+
+        # Check cache for each text
+
+        for i, text in enumerate(texts):
+
+            if not text or not text.strip():
+
+                embeddings.append([])
+
+                continue
+
+                
+
+            if use_cache:
+
+                cache_key = self._get_cache_key(text)
+
+                cached_embedding = self._get_cached_embedding(cache_key)
+
+                if cached_embedding:
+
+                    embeddings.append(cached_embedding)
+
+                    continue
+
+            
+
+            # Track cache misses
+
+            embeddings.append(None)  # Placeholder
+
+            cache_misses.append(text.strip())
+
+            cache_miss_indices.append(i)
+
+        
+
+        # Generate embeddings for cache misses
+
+        if cache_misses:
+
+            try:
+
+                # Process in batches to respect API limits
+
+                for batch_start in range(0, len(cache_misses), self.batch_size):
+
+                    batch_end = min(batch_start + self.batch_size, len(cache_misses))
+
+                    batch_texts = cache_misses[batch_start:batch_end]
+
+                    
+
+                    # Generate batch embeddings
+
+                    response = await self.client.embeddings.create(
+
+                        model=self.deployment_name,
+
+                        input=batch_texts
+
+                    )
+
+                    
+
+                    # Process batch results
+
+                    for j, embedding_data in enumerate(response.data):
+
+                        actual_index = cache_miss_indices[batch_start + j]
+
+                        embedding = embedding_data.embedding
+
+                        embeddings[actual_index] = embedding
+
+                        
+
+                        # Cache the result
+
+                        if use_cache:
+
+                            text = batch_texts[j]
+
+                            cache_key = self._get_cache_key(text)
+
+                            self._cache_embedding(cache_key, embedding)
+
+                    
+
+                    # Rate limiting - small delay between batches
+
+                    if batch_end &lt; len(cache_misses):
+
+                        await asyncio.sleep(0.1)
+
+                
+
+                logger.info(f&quot;Generated {len(cache_misses)} embeddings in batch&quot;)
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Batch embedding generation failed: {e}&quot;)
+
+                raise
+
+        
+
+        return embeddings
+
+    
+
+    def _get_cache_key(self, text: str) -&gt; str:
+
+        &quot;&quot;&quot;Generate cache key for text.&quot;&quot;&quot;
+
+        
+
+        # Use SHA-256 hash of text + model for cache key
+
+        content = f&quot;{self.deployment_name}:{text.strip()}&quot;
+
+        return hashlib.sha256(content.encode()).hexdigest()
+
+    
+
+    def _get_cached_embedding(self, cache_key: str) -&gt; Optional[List[float]]:
+
+        &quot;&quot;&quot;Get embedding from cache if not expired.&quot;&quot;&quot;
+
+        
+
+        if cache_key in self.embedding_cache:
+
+            embedding_data = self.embedding_cache[cache_key]
+
+            
+
+            # Check if cache entry is still valid
+
+            if datetime.now() - embedding_data[&#x27;timestamp&#x27;] &lt; self.cache_ttl:
+
+                return embedding_data[&#x27;embedding&#x27;]
+
+            else:
+
+                # Remove expired entry
+
+                del self.embedding_cache[cache_key]
+
+        
+
+        return None
+
+    
+
+    def _cache_embedding(self, cache_key: str, embedding: List[float]):
+
+        &quot;&quot;&quot;Cache embedding with timestamp.&quot;&quot;&quot;
+
+        
+
+        self.embedding_cache[cache_key] = {
+
+            &#x27;embedding&#x27;: embedding,
+
+            &#x27;timestamp&#x27;: datetime.now()
+
+        }
+
+        
+
+        # Limit cache size
+
+        if len(self.embedding_cache) &gt; 10000:
+
+            # Remove oldest entries
+
+            oldest_keys = sorted(
+
+                self.embedding_cache.keys(),
+
+                key=lambda k: self.embedding_cache[k][&#x27;timestamp&#x27;]
+
+            )[:1000]
+
+            
+
+            for key in oldest_keys:
+
+                del self.embedding_cache[key]
+
+    
+
+    async def cleanup(self):
+
+        &quot;&quot;&quot;Cleanup resources.&quot;&quot;&quot;
+
+        
+
+        if self.client:
+
+            await self.client.close()
+
+        
+
+        logger.info(&quot;Embedding manager cleanup completed&quot;)
+
+
+
+# Global embedding manager instance
+
+embedding_manager = EmbeddingManager(
+
+    project_endpoint=os.getenv(&#x27;PROJECT_ENDPOINT&#x27;),
+
+    deployment_name=os.getenv(&#x27;EMBEDDING_DEPLOYMENT_NAME&#x27;, &#x27;text-embedding-3-small&#x27;)
+
+)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 Product Embedding Generation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Automated Embedding Pipeline</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/embeddings/product_embedder.py
+
+&quot;&quot;&quot;
+
+Product embedding generation and management.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+from typing import List, Dict, Any, Optional
+
+from datetime import datetime
+
+import logging
+
+from .embedding_manager import embedding_manager
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class ProductEmbedder:
+
+    &quot;&quot;&quot;Generate and manage product embeddings for semantic search.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        self.db_provider = db_provider
+
+        self.embedding_manager = embedding_manager
+
+        
+
+        # Text combination strategy for products
+
+        self.text_template = &quot;{product_name} {brand} {description} {category} {tags}&quot;
+
+        
+
+    async def generate_product_embeddings(
+
+        self, 
+
+        store_id: str,
+
+        batch_size: int = 50,
+
+        force_regenerate: bool = False
+
+    ) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Generate embeddings for all products in a store.&quot;&quot;&quot;
+
+        
+
+        async with self.db_provider.get_connection() as conn:
+
+            try:
+
+                # Set store context
+
+                await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+                
+
+                # Get products that need embeddings
+
+                if force_regenerate:
+
+                    products_query = &quot;&quot;&quot;
+
+                        SELECT 
+
+                            p.product_id,
+
+                            p.product_name,
+
+                            p.product_description,
+
+                            p.brand,
+
+                            pc.category_name,
+
+                            array_to_string(p.tags, &#x27; &#x27;) as tags_text
+
+                        FROM retail.products p
+
+                        LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                        WHERE p.is_active = TRUE
+
+                        ORDER BY p.created_at DESC
+
+                    &quot;&quot;&quot;
+
+                else:
+
+                    products_query = &quot;&quot;&quot;
+
+                        SELECT 
+
+                            p.product_id,
+
+                            p.product_name,
+
+                            p.product_description,
+
+                            p.brand,
+
+                            pc.category_name,
+
+                            array_to_string(p.tags, &#x27; &#x27;) as tags_text
+
+                        FROM retail.products p
+
+                        LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                        LEFT JOIN retail.product_embeddings pe ON p.product_id = pe.product_id
+
+                        WHERE p.is_active = TRUE
+
+                          AND (pe.product_id IS NULL OR pe.updated_at &lt; p.updated_at)
+
+                        ORDER BY p.created_at DESC
+
+                    &quot;&quot;&quot;
+
+                
+
+                products = await conn.fetch(products_query)
+
+                
+
+                if not products:
+
+                    return {
+
+                        &#x27;success&#x27;: True,
+
+                        &#x27;message&#x27;: &#x27;No products need embedding generation&#x27;,
+
+                        &#x27;processed_count&#x27;: 0,
+
+                        &#x27;store_id&#x27;: store_id
+
+                    }
+
+                
+
+                logger.info(f&quot;Generating embeddings for {len(products)} products in store {store_id}&quot;)
+
+                
+
+                # Process products in batches
+
+                processed_count = 0
+
+                
+
+                for i in range(0, len(products), batch_size):
+
+                    batch = products[i:i + batch_size]
+
+                    await self._process_product_batch(conn, batch, store_id)
+
+                    processed_count += len(batch)
+
+                    
+
+                    logger.info(f&quot;Processed {processed_count}/{len(products)} products&quot;)
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: True,
+
+                    &#x27;message&#x27;: f&#x27;Successfully generated embeddings for {processed_count} products&#x27;,
+
+                    &#x27;processed_count&#x27;: processed_count,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;total_products&#x27;: len(products)
+
+                }
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Product embedding generation failed: {e}&quot;)
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: str(e),
+
+                    &#x27;store_id&#x27;: store_id
+
+                }
+
+    
+
+    async def _process_product_batch(
+
+        self, 
+
+        conn: asyncpg.Connection, 
+
+        products: List[Dict], 
+
+        store_id: str
+
+    ):
+
+        &quot;&quot;&quot;Process a batch of products for embedding generation.&quot;&quot;&quot;
+
+        
+
+        # Prepare texts for embedding
+
+        texts = []
+
+        product_ids = []
+
+        
+
+        for product in products:
+
+            # Combine product information into searchable text
+
+            combined_text = self._create_product_text(product)
+
+            texts.append(combined_text)
+
+            product_ids.append(product[&#x27;product_id&#x27;])
+
+        
+
+        # Generate embeddings
+
+        embeddings = await self.embedding_manager.generate_embeddings_batch(texts)
+
+        
+
+        # Store embeddings in database
+
+        for i, (product_id, embedding) in enumerate(zip(product_ids, embeddings)):
+
+            if embedding:  # Skip failed embeddings
+
+                await self._store_product_embedding(
+
+                    conn, 
+
+                    product_id, 
+
+                    store_id, 
+
+                    texts[i], 
+
+                    embedding
+
+                )
+
+    
+
+    def _create_product_text(self, product: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Create combined text for product embedding.&quot;&quot;&quot;
+
+        
+
+        # Handle None values
+
+        product_name = product.get(&#x27;product_name&#x27;) or &#x27;&#x27;
+
+        brand = product.get(&#x27;brand&#x27;) or &#x27;&#x27;
+
+        description = product.get(&#x27;product_description&#x27;) or &#x27;&#x27;
+
+        category = product.get(&#x27;category_name&#x27;) or &#x27;&#x27;
+
+        tags = product.get(&#x27;tags_text&#x27;) or &#x27;&#x27;
+
+        
+
+        # Combine into searchable text
+
+        combined_text = self.text_template.format(
+
+            product_name=product_name,
+
+            brand=brand,
+
+            description=description,
+
+            category=category,
+
+            tags=tags
+
+        )
+
+        
+
+        # Clean up extra whitespace
+
+        return &#x27; &#x27;.join(combined_text.split())
+
+    
+
+    async def _store_product_embedding(
+
+        self,
+
+        conn: asyncpg.Connection,
+
+        product_id: str,
+
+        store_id: str,
+
+        embedding_text: str,
+
+        embedding: List[float]
+
+    ):
+
+        &quot;&quot;&quot;Store product embedding in database.&quot;&quot;&quot;
+
+        
+
+        # Convert embedding to pgvector format
+
+        embedding_vector = f&quot;[{&#x27;,&#x27;.join(map(str, embedding))}]&quot;
+
+        
+
+        # Upsert embedding
+
+        upsert_query = &quot;&quot;&quot;
+
+            INSERT INTO retail.product_embeddings (
+
+                product_id, store_id, embedding_text, embedding, embedding_model
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+            ON CONFLICT (product_id, embedding_model) 
+
+            DO UPDATE SET
+
+                store_id = EXCLUDED.store_id,
+
+                embedding_text = EXCLUDED.embedding_text,
+
+                embedding = EXCLUDED.embedding,
+
+                updated_at = CURRENT_TIMESTAMP
+
+        &quot;&quot;&quot;
+
+        
+
+        await conn.execute(
+
+            upsert_query,
+
+            product_id,
+
+            store_id,
+
+            embedding_text,
+
+            embedding_vector,
+
+            self.embedding_manager.deployment_name
+
+        )
+
+    
+
+    async def update_product_embedding(
+
+        self, 
+
+        product_id: str, 
+
+        store_id: str
+
+    ) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Update embedding for a single product.&quot;&quot;&quot;
+
+        
+
+        async with self.db_provider.get_connection() as conn:
+
+            try:
+
+                # Set store context
+
+                await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+                
+
+                # Get product information
+
+                product_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        p.product_id,
+
+                        p.product_name,
+
+                        p.product_description,
+
+                        p.brand,
+
+                        pc.category_name,
+
+                        array_to_string(p.tags, &#x27; &#x27;) as tags_text
+
+                    FROM retail.products p
+
+                    LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                    WHERE p.product_id = $1 AND p.is_active = TRUE
+
+                &quot;&quot;&quot;
+
+                
+
+                product = await conn.fetchrow(product_query, product_id)
+
+                
+
+                if not product:
+
+                    return {
+
+                        &#x27;success&#x27;: False,
+
+                        &#x27;error&#x27;: f&#x27;Product {product_id} not found or inactive&#x27;
+
+                    }
+
+                
+
+                # Generate embedding
+
+                combined_text = self._create_product_text(dict(product))
+
+                embedding = await self.embedding_manager.generate_embedding(combined_text)
+
+                
+
+                # Store embedding
+
+                await self._store_product_embedding(
+
+                    conn, product_id, store_id, combined_text, embedding
+
+                )
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: True,
+
+                    &#x27;message&#x27;: f&#x27;Successfully updated embedding for product {product_id}&#x27;,
+
+                    &#x27;product_id&#x27;: product_id,
+
+                    &#x27;store_id&#x27;: store_id
+
+                }
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Single product embedding update failed: {e}&quot;)
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: str(e),
+
+                    &#x27;product_id&#x27;: product_id
+
+                }
+
+
+
+# Global product embedder instance
+
+product_embedder = ProductEmbedder(db_provider)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔎 Semantic Search Tools</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Semantic Product Search Tool</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/semantic_search.py
+
+&quot;&quot;&quot;
+
+Semantic search tools for natural language product queries.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List, Optional
+
+from ..tools.base import DatabaseTool, ToolResult, ToolCategory
+
+from ..embeddings.embedding_manager import embedding_manager
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class SemanticProductSearchTool(DatabaseTool):
+
+    &quot;&quot;&quot;Advanced semantic search tool for products using vector similarity.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;semantic_search_products&quot;,
+
+            description=&quot;Search products using natural language queries with semantic understanding&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.DATABASE_QUERY
+
+        self.embedding_manager = embedding_manager
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute semantic product search.&quot;&quot;&quot;
+
+        
+
+        query = kwargs.get(&#x27;query&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        limit = kwargs.get(&#x27;limit&#x27;, 20)
+
+        similarity_threshold = kwargs.get(&#x27;similarity_threshold&#x27;, 0.7)
+
+        include_metadata = kwargs.get(&#x27;include_metadata&#x27;, True)
+
+        
+
+        if not query:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;Search query is required&quot;
+
+            )
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for semantic search&quot;
+
+            )
+
+        
+
+        try:
+
+            # Generate query embedding
+
+            query_embedding = await self.embedding_manager.generate_embedding(query)
+
+            
+
+            # Perform semantic search
+
+            search_results = await self._perform_semantic_search(
+
+                query_embedding,
+
+                store_id,
+
+                limit,
+
+                similarity_threshold,
+
+                include_metadata
+
+            )
+
+            
+
+            return ToolResult(
+
+                success=True,
+
+                data=search_results,
+
+                row_count=len(search_results),
+
+                metadata={
+
+                    &#x27;query&#x27;: query,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;similarity_threshold&#x27;: similarity_threshold,
+
+                    &#x27;search_type&#x27;: &#x27;semantic&#x27;
+
+                }
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Semantic search failed: {e}&quot;)
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Semantic search failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _perform_semantic_search(
+
+        self,
+
+        query_embedding: List[float],
+
+        store_id: str,
+
+        limit: int,
+
+        similarity_threshold: float,
+
+        include_metadata: bool
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Perform vector similarity search.&quot;&quot;&quot;
+
+        
+
+        # Convert embedding to PostgreSQL vector format
+
+        embedding_vector = f&quot;[{&#x27;,&#x27;.join(map(str, query_embedding))}]&quot;
+
+        
+
+        # Build search query
+
+        if include_metadata:
+
+            search_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    p.product_id,
+
+                    p.product_name,
+
+                    p.brand,
+
+                    p.price,
+
+                    p.product_description,
+
+                    p.current_stock,
+
+                    p.rating_average,
+
+                    p.rating_count,
+
+                    p.tags,
+
+                    pc.category_name,
+
+                    pe.embedding_text,
+
+                    1 - (pe.embedding &lt;=&gt; $1::vector) as similarity_score
+
+                FROM retail.product_embeddings pe
+
+                JOIN retail.products p ON pe.product_id = p.product_id
+
+                LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                WHERE pe.store_id = $2
+
+                  AND p.is_active = TRUE
+
+                  AND 1 - (pe.embedding &lt;=&gt; $1::vector) &gt;= $3
+
+                ORDER BY pe.embedding &lt;=&gt; $1::vector
+
+                LIMIT $4
+
+            &quot;&quot;&quot;
+
+        else:
+
+            search_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    p.product_id,
+
+                    p.product_name,
+
+                    p.brand,
+
+                    p.price,
+
+                    1 - (pe.embedding &lt;=&gt; $1::vector) as similarity_score
+
+                FROM retail.product_embeddings pe
+
+                JOIN retail.products p ON pe.product_id = p.product_id
+
+                WHERE pe.store_id = $2
+
+                  AND p.is_active = TRUE
+
+                  AND 1 - (pe.embedding &lt;=&gt; $1::vector) &gt;= $3
+
+                ORDER BY pe.embedding &lt;=&gt; $1::vector
+
+                LIMIT $4
+
+            &quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Set store context
+
+            await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+            
+
+            # Execute search
+
+            results = await conn.fetch(
+
+                search_query,
+
+                embedding_vector,
+
+                store_id,
+
+                similarity_threshold,
+
+                limit
+
+            )
+
+            
+
+            return [dict(result) for result in results]
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for semantic search tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;query&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Natural language search query&quot;,
+
+                    &quot;minLength&quot;: 1,
+
+                    &quot;maxLength&quot;: 500
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for search scope&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Maximum number of results to return&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 100,
+
+                    &quot;default&quot;: 20
+
+                },
+
+                &quot;similarity_threshold&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Minimum similarity score (0.0 to 1.0)&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.7
+
+                },
+
+                &quot;include_metadata&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include detailed product metadata in results&quot;,
+
+                    &quot;default&quot;: True
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;query&quot;, &quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+
+
+class HybridSearchTool(DatabaseTool):
+
+    &quot;&quot;&quot;Hybrid search combining traditional keyword and semantic search.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;hybrid_product_search&quot;,
+
+            description=&quot;Hybrid search combining keyword matching and semantic similarity for optimal results&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.DATABASE_QUERY
+
+        self.embedding_manager = embedding_manager
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute hybrid product search.&quot;&quot;&quot;
+
+        
+
+        query = kwargs.get(&#x27;query&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        limit = kwargs.get(&#x27;limit&#x27;, 20)
+
+        semantic_weight = kwargs.get(&#x27;semantic_weight&#x27;, 0.7)
+
+        keyword_weight = kwargs.get(&#x27;keyword_weight&#x27;, 0.3)
+
+        
+
+        if not query:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;Search query is required&quot;
+
+            )
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for hybrid search&quot;
+
+            )
+
+        
+
+        try:
+
+            # Generate query embedding for semantic search
+
+            query_embedding = await self.embedding_manager.generate_embedding(query)
+
+            
+
+            # Perform hybrid search
+
+            search_results = await self._perform_hybrid_search(
+
+                query,
+
+                query_embedding,
+
+                store_id,
+
+                limit,
+
+                semantic_weight,
+
+                keyword_weight
+
+            )
+
+            
+
+            return ToolResult(
+
+                success=True,
+
+                data=search_results,
+
+                row_count=len(search_results),
+
+                metadata={
+
+                    &#x27;query&#x27;: query,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;semantic_weight&#x27;: semantic_weight,
+
+                    &#x27;keyword_weight&#x27;: keyword_weight,
+
+                    &#x27;search_type&#x27;: &#x27;hybrid&#x27;
+
+                }
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Hybrid search failed: {e}&quot;)
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Hybrid search failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _perform_hybrid_search(
+
+        self,
+
+        query: str,
+
+        query_embedding: List[float],
+
+        store_id: str,
+
+        limit: int,
+
+        semantic_weight: float,
+
+        keyword_weight: float
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Perform hybrid search combining keyword and semantic similarity.&quot;&quot;&quot;
+
+        
+
+        # Convert embedding to PostgreSQL vector format
+
+        embedding_vector = f&quot;[{&#x27;,&#x27;.join(map(str, query_embedding))}]&quot;
+
+        
+
+        # Create search terms for keyword matching
+
+        search_terms = &#x27; &amp; &#x27;.join(query.lower().split())
+
+        
+
+        hybrid_query = &quot;&quot;&quot;
+
+            WITH keyword_scores AS (
+
+                SELECT 
+
+                    p.product_id,
+
+                    ts_rank(
+
+                        to_tsvector(&#x27;english&#x27;, 
+
+                            p.product_name || &#x27; &#x27; || 
+
+                            COALESCE(p.product_description, &#x27;&#x27;) || &#x27; &#x27; || 
+
+                            COALESCE(p.brand, &#x27;&#x27;) || &#x27; &#x27; ||
+
+                            COALESCE(array_to_string(p.tags, &#x27; &#x27;), &#x27;&#x27;)
+
+                        ),
+
+                        plainto_tsquery(&#x27;english&#x27;, $2)
+
+                    ) as keyword_score
+
+                FROM retail.products p
+
+                WHERE p.is_active = TRUE
+
+                  AND p.store_id = $3
+
+                  AND (
+
+                    to_tsvector(&#x27;english&#x27;, 
+
+                        p.product_name || &#x27; &#x27; || 
+
+                        COALESCE(p.product_description, &#x27;&#x27;) || &#x27; &#x27; || 
+
+                        COALESCE(p.brand, &#x27;&#x27;) || &#x27; &#x27; ||
+
+                        COALESCE(array_to_string(p.tags, &#x27; &#x27;), &#x27;&#x27;)
+
+                    ) @@ plainto_tsquery(&#x27;english&#x27;, $2)
+
+                    OR p.product_name ILIKE &#x27;%&#x27; || $2 || &#x27;%&#x27;
+
+                    OR p.brand ILIKE &#x27;%&#x27; || $2 || &#x27;%&#x27;
+
+                  )
+
+            ),
+
+            semantic_scores AS (
+
+                SELECT 
+
+                    pe.product_id,
+
+                    1 - (pe.embedding &lt;=&gt; $1::vector) as semantic_score
+
+                FROM retail.product_embeddings pe
+
+                WHERE pe.store_id = $3
+
+                  AND 1 - (pe.embedding &lt;=&gt; $1::vector) &gt;= 0.5
+
+            ),
+
+            combined_scores AS (
+
+                SELECT 
+
+                    COALESCE(ks.product_id, ss.product_id) as product_id,
+
+                    COALESCE(ks.keyword_score, 0) * $4 as weighted_keyword_score,
+
+                    COALESCE(ss.semantic_score, 0) * $5 as weighted_semantic_score,
+
+                    COALESCE(ks.keyword_score, 0) * $4 + COALESCE(ss.semantic_score, 0) * $5 as combined_score
+
+                FROM keyword_scores ks
+
+                FULL OUTER JOIN semantic_scores ss ON ks.product_id = ss.product_id
+
+                WHERE COALESCE(ks.keyword_score, 0) * $4 + COALESCE(ss.semantic_score, 0) * $5 &gt; 0
+
+            )
+
+            SELECT 
+
+                p.product_id,
+
+                p.product_name,
+
+                p.brand,
+
+                p.price,
+
+                p.product_description,
+
+                p.current_stock,
+
+                p.rating_average,
+
+                p.rating_count,
+
+                p.tags,
+
+                pc.category_name,
+
+                cs.weighted_keyword_score,
+
+                cs.weighted_semantic_score,
+
+                cs.combined_score
+
+            FROM combined_scores cs
+
+            JOIN retail.products p ON cs.product_id = p.product_id
+
+            LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+            WHERE p.is_active = TRUE
+
+            ORDER BY cs.combined_score DESC
+
+            LIMIT $6
+
+        &quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Set store context
+
+            await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+            
+
+            # Execute hybrid search
+
+            results = await conn.fetch(
+
+                hybrid_query,
+
+                embedding_vector,  # $1
+
+                query,            # $2
+
+                store_id,         # $3
+
+                keyword_weight,   # $4
+
+                semantic_weight,  # $5
+
+                limit            # $6
+
+            )
+
+            
+
+            return [dict(result) for result in results]
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for hybrid search tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;query&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Search query (supports both keywords and natural language)&quot;,
+
+                    &quot;minLength&quot;: 1,
+
+                    &quot;maxLength&quot;: 500
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for search scope&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Maximum number of results to return&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 100,
+
+                    &quot;default&quot;: 20
+
+                },
+
+                &quot;semantic_weight&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Weight for semantic similarity (0.0 to 1.0)&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.7
+
+                },
+
+                &quot;keyword_weight&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Weight for keyword matching (0.0 to 1.0)&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.3
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;query&quot;, &quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Recommendation Systems</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Product Recommendation Engine</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/recommendations.py
+
+&quot;&quot;&quot;
+
+Product recommendation system using embedding similarity.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List, Optional
+
+from ..tools.base import DatabaseTool, ToolResult, ToolCategory
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class ProductRecommendationTool(DatabaseTool):
+
+    &quot;&quot;&quot;Generate product recommendations based on similarity and user behavior.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_product_recommendations&quot;,
+
+            description=&quot;Generate personalized product recommendations using similarity analysis&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.ANALYTICS
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute product recommendation generation.&quot;&quot;&quot;
+
+        
+
+        recommendation_type = kwargs.get(&#x27;type&#x27;, &#x27;similar_products&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for recommendations&quot;
+
+            )
+
+        
+
+        try:
+
+            if recommendation_type == &#x27;similar_products&#x27;:
+
+                return await self._get_similar_products(kwargs)
+
+            elif recommendation_type == &#x27;customer_based&#x27;:
+
+                return await self._get_customer_recommendations(kwargs)
+
+            elif recommendation_type == &#x27;trending&#x27;:
+
+                return await self._get_trending_products(kwargs)
+
+            elif recommendation_type == &#x27;cross_sell&#x27;:
+
+                return await self._get_cross_sell_recommendations(kwargs)
+
+            else:
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Unknown recommendation type: {recommendation_type}&quot;
+
+                )
+
+        
+
+        except Exception as e:
+
+            logger.error(f&quot;Product recommendation failed: {e}&quot;)
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Recommendation generation failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _get_similar_products(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get products similar to a given product using embedding similarity.&quot;&quot;&quot;
+
+        
+
+        product_id = kwargs.get(&#x27;product_id&#x27;)
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        limit = kwargs.get(&#x27;limit&#x27;, 10)
+
+        similarity_threshold = kwargs.get(&#x27;similarity_threshold&#x27;, 0.7)
+
+        
+
+        if not product_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;product_id is required for similar product recommendations&quot;
+
+            )
+
+        
+
+        similar_products_query = &quot;&quot;&quot;
+
+            WITH target_product AS (
+
+                SELECT embedding
+
+                FROM retail.product_embeddings
+
+                WHERE product_id = $1 AND store_id = $2
+
+            )
+
+            SELECT 
+
+                p.product_id,
+
+                p.product_name,
+
+                p.brand,
+
+                p.price,
+
+                p.product_description,
+
+                p.rating_average,
+
+                p.rating_count,
+
+                pc.category_name,
+
+                1 - (pe.embedding &lt;=&gt; tp.embedding) as similarity_score
+
+            FROM retail.product_embeddings pe
+
+            CROSS JOIN target_product tp
+
+            JOIN retail.products p ON pe.product_id = p.product_id
+
+            LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+            WHERE pe.store_id = $2
+
+              AND pe.product_id != $1  -- Exclude the target product itself
+
+              AND p.is_active = TRUE
+
+              AND 1 - (pe.embedding &lt;=&gt; tp.embedding) &gt;= $3
+
+            ORDER BY pe.embedding &lt;=&gt; tp.embedding
+
+            LIMIT $4
+
+        &quot;&quot;&quot;
+
+        
+
+        result = await self.execute_query(
+
+            similar_products_query,
+
+            (product_id, store_id, similarity_threshold, limit),
+
+            store_id
+
+        )
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;recommendation_type&#x27;: &#x27;similar_products&#x27;,
+
+                &#x27;target_product_id&#x27;: product_id,
+
+                &#x27;similarity_threshold&#x27;: similarity_threshold,
+
+                &#x27;store_id&#x27;: store_id
+
+            }
+
+        
+
+        return result
+
+    
+
+    async def _get_customer_recommendations(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get personalized recommendations based on customer purchase history.&quot;&quot;&quot;
+
+        
+
+        customer_id = kwargs.get(&#x27;customer_id&#x27;)
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        limit = kwargs.get(&#x27;limit&#x27;, 10)
+
+        days_back = kwargs.get(&#x27;days_back&#x27;, 90)
+
+        
+
+        if not customer_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;customer_id is required for customer-based recommendations&quot;
+
+            )
+
+        
+
+        customer_recommendations_query = &quot;&quot;&quot;
+
+            WITH customer_purchases AS (
+
+                -- Get products purchased by the customer
+
+                SELECT DISTINCT p.product_id, pe.embedding
+
+                FROM retail.sales_transactions st
+
+                JOIN retail.sales_transaction_items sti ON st.transaction_id = sti.transaction_id
+
+                JOIN retail.products p ON sti.product_id = p.product_id
+
+                JOIN retail.product_embeddings pe ON p.product_id = pe.product_id
+
+                WHERE st.customer_id = $1
+
+                  AND st.transaction_date &gt;= CURRENT_DATE - INTERVAL &#x27;%s days&#x27;
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+            ),
+
+            avg_customer_embedding AS (
+
+                -- Calculate average embedding vector for customer preferences
+
+                SELECT 
+
+                    (
+
+                        SELECT ARRAY(
+
+                            SELECT AVG(embedding_element)
+
+                            FROM customer_purchases cp,
+
+                                 LATERAL unnest(cp.embedding) WITH ORDINALITY AS t(embedding_element, ordinality)
+
+                            GROUP BY ordinality
+
+                            ORDER BY ordinality
+
+                        )
+
+                    )::vector as avg_embedding
+
+                FROM (SELECT 1) dummy
+
+                WHERE EXISTS (SELECT 1 FROM customer_purchases)
+
+            )
+
+            SELECT 
+
+                p.product_id,
+
+                p.product_name,
+
+                p.brand,
+
+                p.price,
+
+                p.product_description,
+
+                p.rating_average,
+
+                p.rating_count,
+
+                pc.category_name,
+
+                1 - (pe.embedding &lt;=&gt; ace.avg_embedding) as preference_score
+
+            FROM retail.product_embeddings pe
+
+            CROSS JOIN avg_customer_embedding ace
+
+            JOIN retail.products p ON pe.product_id = p.product_id
+
+            LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+            WHERE pe.store_id = $2
+
+              AND p.is_active = TRUE
+
+              AND pe.product_id NOT IN (SELECT product_id FROM customer_purchases)
+
+              AND 1 - (pe.embedding &lt;=&gt; ace.avg_embedding) &gt;= 0.6
+
+            ORDER BY pe.embedding &lt;=&gt; ace.avg_embedding
+
+            LIMIT $3
+
+        &quot;&quot;&quot; % days_back
+
+        
+
+        result = await self.execute_query(
+
+            customer_recommendations_query,
+
+            (customer_id, store_id, limit),
+
+            store_id
+
+        )
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;recommendation_type&#x27;: &#x27;customer_based&#x27;,
+
+                &#x27;customer_id&#x27;: customer_id,
+
+                &#x27;days_back&#x27;: days_back,
+
+                &#x27;store_id&#x27;: store_id
+
+            }
+
+        
+
+        return result
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for recommendation tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;type&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;similar_products&quot;, &quot;customer_based&quot;, &quot;trending&quot;, &quot;cross_sell&quot;],
+
+                    &quot;description&quot;: &quot;Type of recommendation to generate&quot;,
+
+                    &quot;default&quot;: &quot;similar_products&quot;
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for recommendations&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;product_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Product ID for similar product recommendations&quot;
+
+                },
+
+                &quot;customer_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Customer ID for personalized recommendations&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Maximum number of recommendations&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 50,
+
+                    &quot;default&quot;: 10
+
+                },
+
+                &quot;similarity_threshold&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Minimum similarity score&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.7
+
+                },
+
+                &quot;days_back&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Days of purchase history to consider&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 365,
+
+                    &quot;default&quot;: 90
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">⚡ Performance Optimization</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Vector Query Optimization</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Optimize pgvector performance
+
+-- Add to postgresql.conf
+
+
+
+# Increase work_mem for vector operations
+
+work_mem = &#x27;256MB&#x27;
+
+
+
+# Optimize shared_buffers for vector data
+
+shared_buffers = &#x27;512MB&#x27;
+
+
+
+# Enable parallel query execution
+
+max_parallel_workers_per_gather = 4
+
+max_parallel_workers = 8
+
+
+
+# Vector-specific optimizations
+
+SET maintenance_work_mem = &#x27;1GB&#x27;;
+
+SET max_parallel_maintenance_workers = 4;
+
+
+
+-- Optimize HNSW index parameters
+
+CREATE INDEX CONCURRENTLY idx_product_embeddings_vector_optimized 
+
+ON retail.product_embeddings 
+
+USING hnsw (embedding vector_cosine_ops)
+
+WITH (m = 16, ef_construction = 200);
+
+
+
+-- Create partial indexes for active products only
+
+CREATE INDEX CONCURRENTLY idx_product_embeddings_active
+
+ON retail.product_embeddings 
+
+USING hnsw (embedding vector_cosine_ops)
+
+WHERE store_id IN (SELECT store_id FROM retail.stores WHERE is_active = TRUE);
+
+
+
+-- Analyze vector distribution for optimization
+
+ANALYZE retail.product_embeddings;
+
+
+
+-- Vector search performance monitoring
+
+CREATE OR REPLACE FUNCTION retail.analyze_vector_performance()
+
+RETURNS TABLE (
+
+    avg_search_time_ms NUMERIC,
+
+    index_size TEXT,
+
+    total_vectors BIGINT,
+
+    cache_hit_ratio NUMERIC
+
+) AS $$
+
+BEGIN
+
+    RETURN QUERY
+
+    SELECT 
+
+        (SELECT AVG(EXTRACT(MILLISECONDS FROM clock_timestamp() - query_start))
+
+         FROM pg_stat_activity 
+
+         WHERE query LIKE &#x27;%embedding &lt;=&gt; %&#x27;
+
+         AND state = &#x27;active&#x27;) as avg_search_time_ms,
+
+        pg_size_pretty(pg_relation_size(&#x27;idx_product_embeddings_vector&#x27;)) as index_size,
+
+        COUNT(*)::BIGINT as total_vectors,
+
+        (SELECT 100.0 * blks_hit / (blks_hit + blks_read) 
+
+         FROM pg_stat_user_indexes 
+
+         WHERE indexrelname = &#x27;idx_product_embeddings_vector&#x27;) as cache_hit_ratio
+
+    FROM retail.product_embeddings;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Embedding Cache Strategy</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/embeddings/cache_manager.py
+
+&quot;&quot;&quot;
+
+Advanced caching strategy for embeddings and search results.
+
+&quot;&quot;&quot;
+
+import redis.asyncio as redis
+
+import json
+
+import hashlib
+
+from typing import Dict, Any, List, Optional
+
+from datetime import timedelta
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class EmbeddingCacheManager:
+
+    &quot;&quot;&quot;Advanced caching for embeddings and search results.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, redis_url: str = &quot;redis://localhost:6379&quot;):
+
+        self.redis_client = None
+
+        self.redis_url = redis_url
+
+        
+
+        # Cache TTL settings
+
+        self.embedding_ttl = timedelta(days=7)  # Embeddings cached for 1 week
+
+        self.search_ttl = timedelta(hours=1)    # Search results cached for 1 hour
+
+        self.recommendation_ttl = timedelta(hours=4)  # Recommendations cached for 4 hours
+
+        
+
+        # Cache key prefixes
+
+        self.EMBEDDING_PREFIX = &quot;emb:&quot;
+
+        self.SEARCH_PREFIX = &quot;search:&quot;
+
+        self.RECOMMENDATION_PREFIX = &quot;rec:&quot;
+
+    
+
+    async def initialize(self):
+
+        &quot;&quot;&quot;Initialize Redis connection.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            self.redis_client = redis.from_url(self.redis_url)
+
+            # Test connection
+
+            await self.redis_client.ping()
+
+            logger.info(&quot;Embedding cache manager initialized&quot;)
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Redis cache not available: {e}&quot;)
+
+            self.redis_client = None
+
+    
+
+    async def cache_embedding(self, text: str, embedding: List[float], model: str):
+
+        &quot;&quot;&quot;Cache text embedding.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return
+
+        
+
+        try:
+
+            cache_key = self._get_embedding_key(text, model)
+
+            cache_data = {
+
+                &#x27;embedding&#x27;: embedding,
+
+                &#x27;model&#x27;: model,
+
+                &#x27;cached_at&#x27;: str(datetime.utcnow())
+
+            }
+
+            
+
+            await self.redis_client.setex(
+
+                cache_key,
+
+                self.embedding_ttl,
+
+                json.dumps(cache_data)
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to cache embedding: {e}&quot;)
+
+    
+
+    async def get_cached_embedding(self, text: str, model: str) -&gt; Optional[List[float]]:
+
+        &quot;&quot;&quot;Get cached embedding.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return None
+
+        
+
+        try:
+
+            cache_key = self._get_embedding_key(text, model)
+
+            cached_data = await self.redis_client.get(cache_key)
+
+            
+
+            if cached_data:
+
+                data = json.loads(cached_data)
+
+                return data[&#x27;embedding&#x27;]
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to retrieve cached embedding: {e}&quot;)
+
+        
+
+        return None
+
+    
+
+    async def cache_search_results(
+
+        self, 
+
+        query: str, 
+
+        store_id: str, 
+
+        results: List[Dict],
+
+        search_params: Dict[str, Any]
+
+    ):
+
+        &quot;&quot;&quot;Cache search results.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return
+
+        
+
+        try:
+
+            cache_key = self._get_search_key(query, store_id, search_params)
+
+            cache_data = {
+
+                &#x27;results&#x27;: results,
+
+                &#x27;query&#x27;: query,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;params&#x27;: search_params,
+
+                &#x27;cached_at&#x27;: str(datetime.utcnow())
+
+            }
+
+            
+
+            await self.redis_client.setex(
+
+                cache_key,
+
+                self.search_ttl,
+
+                json.dumps(cache_data, default=str)
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to cache search results: {e}&quot;)
+
+    
+
+    async def get_cached_search_results(
+
+        self, 
+
+        query: str, 
+
+        store_id: str, 
+
+        search_params: Dict[str, Any]
+
+    ) -&gt; Optional[List[Dict]]:
+
+        &quot;&quot;&quot;Get cached search results.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return None
+
+        
+
+        try:
+
+            cache_key = self._get_search_key(query, store_id, search_params)
+
+            cached_data = await self.redis_client.get(cache_key)
+
+            
+
+            if cached_data:
+
+                data = json.loads(cached_data)
+
+                return data[&#x27;results&#x27;]
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to retrieve cached search results: {e}&quot;)
+
+        
+
+        return None
+
+    
+
+    def _get_embedding_key(self, text: str, model: str) -&gt; str:
+
+        &quot;&quot;&quot;Generate cache key for embedding.&quot;&quot;&quot;
+
+        
+
+        content = f&quot;{model}:{text.strip()}&quot;
+
+        hash_key = hashlib.sha256(content.encode()).hexdigest()
+
+        return f&quot;{self.EMBEDDING_PREFIX}{hash_key}&quot;
+
+    
+
+    def _get_search_key(self, query: str, store_id: str, params: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Generate cache key for search results.&quot;&quot;&quot;
+
+        
+
+        # Create stable hash from query and parameters
+
+        content = f&quot;{query}:{store_id}:{json.dumps(params, sort_keys=True)}&quot;
+
+        hash_key = hashlib.sha256(content.encode()).hexdigest()
+
+        return f&quot;{self.SEARCH_PREFIX}{hash_key}&quot;
+
+    
+
+    async def invalidate_store_cache(self, store_id: str):
+
+        &quot;&quot;&quot;Invalidate all cached data for a store.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return
+
+        
+
+        try:
+
+            # Find all keys related to the store
+
+            pattern = f&quot;*:{store_id}:*&quot;
+
+            keys = await self.redis_client.keys(pattern)
+
+            
+
+            if keys:
+
+                await self.redis_client.delete(*keys)
+
+                logger.info(f&quot;Invalidated {len(keys)} cache entries for store {store_id}&quot;)
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to invalidate store cache: {e}&quot;)
+
+    
+
+    async def cleanup(self):
+
+        &quot;&quot;&quot;Cleanup cache resources.&quot;&quot;&quot;
+
+        
+
+        if self.redis_client:
+
+            await self.redis_client.close()
+
+
+
+# Global cache manager
+
+cache_manager = EmbeddingCacheManager()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Azure OpenAI Integration</strong>: Complete embedding generation with caching and optimization  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Vector Search Implementation</strong>: Production-ready semantic search with pgvector  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Hybrid Search Capabilities</strong>: Combined keyword and semantic search for optimal results  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Recommendation Systems</strong>: AI-powered product recommendations using similarity  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Performance Optimization</strong>: Vector index optimization and intelligent caching  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Scalable Architecture</strong>: Enterprise-ready semantic search infrastructure  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/08-Testing/README.md" target="_blank">Lab 08: Testing and Debugging</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement comprehensive testing strategies for semantic search</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Debug vector search performance issues</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Validate embedding quality and relevance</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test recommendation system accuracy</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure OpenAI</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/cognitive-services/openai/">Azure OpenAI Service Documentation</a> - Complete service guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/api-reference/embeddings">Embeddings API Reference</a> - API documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/guides/embeddings/what-are-embeddings">Best Practices for Embeddings</a> - Implementation guidance</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Vector Databases</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/pgvector/pgvector">pgvector Documentation</a> - PostgreSQL vector extension</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.pinecone.io/learn/vector-search-optimization/">Vector Search Optimization</a> - Performance tuning</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/1603.09320">HNSW Algorithm</a> - Hierarchical navigable small world graphs</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Semantic Search</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://nlp.stanford.edu/IR-book/">Information Retrieval Fundamentals</a> - Stanford IR textbook</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://weaviate.io/blog/vector-search-best-practices">Vector Search Best Practices</a> - Implementation patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://blog.vespa.ai/hybrid-search/">Hybrid Search Strategies</a> - Combining different search approaches</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Previous</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/06-Tools/README.md" target="_blank">Lab 06: Tool Development</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/08-Testing/README.md" target="_blank">Lab 08: Testing and Debugging</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">시맨틱 검색 통합</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 Azure OpenAI 임베딩과 PostgreSQL의 pgvector 확장을 사용하여 시맨틱 검색 기능을 구현하는 방법에 대한 포괄적인 지침을 제공합니다. 자연어 쿼리를 이해하고 시맨틱 유사성에 기반하여 관련 결과를 제공하는 AI 기반 제품 검색을 구축하는 방법을 배우게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전통적인 키워드 기반 검색은 사용자 의도와 시맨틱 의미를 제대로 파악하지 못하는 경우가 많습니다. 벡터 임베딩을 활용한 시맨틱 검색은 "비 오는 날에 적합한 편안한 러닝화"와 같은 자연어 쿼리를 통해 제품 설명에 정확히 동일한 단어가 포함되지 않아도 관련 제품을 찾을 수 있도록 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리의 구현은 Azure OpenAI의 강력한 임베딩 모델과 PostgreSQL의 pgvector 확장을 결합하여 고성능, 확장 가능한 시맨틱 검색 시스템을 구축하며, 이를 통해 지능적인 제품 검색 경험을 제공합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>통합</strong>: 텍스트 벡터화를 위한 Azure OpenAI 임베딩 모델 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구현</strong>: 효율적인 유사성 검색 작업을 위한 pgvector 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구축</strong>: 자연어 제품 쿼리를 위한 시맨틱 검색 도구 개발</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>생성</strong>: 전통적 검색과 벡터 검색을 결합한 하이브리드 검색</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>최적화</strong>: 프로덕션 성능을 위한 벡터 쿼리 최적화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>설계</strong>: 임베딩 유사성을 활용한 추천 시스템 설계</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧠 시맨틱 검색 아키텍처</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">벡터 검색 파이프라인</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────┐
+
+│                User Query                       │
+
+│         &quot;comfortable running shoes&quot;            │
+
+└─────────────────────┬───────────────────────────┘
+
+                      │
+
+┌─────────────────────▼───────────────────────────┐
+
+│           Azure OpenAI API                     │
+
+│        text-embedding-3-small                  │
+
+│        Input: Query Text                       │
+
+│        Output: 1536-dimensional vector         │
+
+└─────────────────────┬───────────────────────────┘
+
+                      │
+
+┌─────────────────────▼───────────────────────────┐
+
+│              pgvector Search                   │
+
+│      Cosine Similarity: embedding &lt;=&gt; vector   │
+
+│      WHERE similarity &gt; threshold              │
+
+│      ORDER BY similarity DESC                  │
+
+└─────────────────────┬───────────────────────────┘
+
+                      │
+
+┌─────────────────────▼───────────────────────────┐
+
+│            Ranked Results                      │
+
+│    1. Nike Air Zoom (0.89 similarity)         │
+
+│    2. Adidas Ultraboost (0.85 similarity)     │
+
+│    3. New Balance Fresh Foam (0.82 similarity) │
+
+└─────────────────────────────────────────────────┘
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">임베딩 생성 전략</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/embeddings/embedding_manager.py
+
+&quot;&quot;&quot;
+
+Comprehensive embedding management for semantic search.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import hashlib
+
+import json
+
+from typing import List, Dict, Any, Optional, Tuple
+
+from datetime import datetime, timedelta
+
+import numpy as np
+
+from azure.ai.projects.aio import AIProjectClient
+
+from azure.identity.aio import DefaultAzureCredential
+
+from azure.core.exceptions import HttpResponseError
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class EmbeddingManager:
+
+    &quot;&quot;&quot;Manage text embeddings for semantic search.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, project_endpoint: str, deployment_name: str = &quot;text-embedding-3-small&quot;):
+
+        self.project_endpoint = project_endpoint
+
+        self.deployment_name = deployment_name
+
+        self.credential = DefaultAzureCredential()
+
+        self.client = None
+
+        
+
+        # Embedding configuration
+
+        self.embedding_dimension = 1536  # text-embedding-3-small dimension
+
+        self.max_tokens = 8000  # Maximum tokens per request
+
+        self.batch_size = 100  # Batch processing size
+
+        
+
+        # Caching configuration
+
+        self.embedding_cache = {}
+
+        self.cache_ttl = timedelta(hours=24)
+
+        
+
+        # Rate limiting
+
+        self.rate_limit_requests = 1000  # Per minute
+
+        self.rate_limit_tokens = 150000  # Per minute
+
+        
+
+    async def initialize(self):
+
+        &quot;&quot;&quot;Initialize the Azure AI client.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            self.client = AIProjectClient(
+
+                endpoint=self.project_endpoint,
+
+                credential=self.credential
+
+            )
+
+            
+
+            # Test connection
+
+            await self._test_connection()
+
+            
+
+            logger.info(&quot;Embedding manager initialized successfully&quot;)
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Failed to initialize embedding manager: {e}&quot;)
+
+            raise
+
+    
+
+    async def _test_connection(self):
+
+        &quot;&quot;&quot;Test Azure OpenAI connection.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            test_embedding = await self.generate_embedding(&quot;test connection&quot;)
+
+            if len(test_embedding) != self.embedding_dimension:
+
+                raise ValueError(f&quot;Unexpected embedding dimension: {len(test_embedding)}&quot;)
+
+            
+
+            logger.info(&quot;Azure OpenAI connection test successful&quot;)
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Azure OpenAI connection test failed: {e}&quot;)
+
+            raise
+
+    
+
+    async def generate_embedding(self, text: str, use_cache: bool = True) -&gt; List[float]:
+
+        &quot;&quot;&quot;Generate embedding for a single text.&quot;&quot;&quot;
+
+        
+
+        if not text or not text.strip():
+
+            raise ValueError(&quot;Text cannot be empty&quot;)
+
+        
+
+        # Check cache first
+
+        if use_cache:
+
+            cache_key = self._get_cache_key(text)
+
+            cached_embedding = self._get_cached_embedding(cache_key)
+
+            if cached_embedding:
+
+                return cached_embedding
+
+        
+
+        try:
+
+            # Ensure client is initialized
+
+            if not self.client:
+
+                await self.initialize()
+
+            
+
+            # Generate embedding
+
+            response = await self.client.embeddings.create(
+
+                model=self.deployment_name,
+
+                input=text.strip()
+
+            )
+
+            
+
+            embedding = response.data[0].embedding
+
+            
+
+            # Cache the result
+
+            if use_cache:
+
+                self._cache_embedding(cache_key, embedding)
+
+            
+
+            logger.debug(f&quot;Generated embedding for text (length: {len(text)})&quot;)
+
+            
+
+            return embedding
+
+            
+
+        except HttpResponseError as e:
+
+            logger.error(f&quot;Azure OpenAI API error: {e}&quot;)
+
+            raise Exception(f&quot;Embedding generation failed: {e}&quot;)
+
+        except Exception as e:
+
+            logger.error(f&quot;Embedding generation error: {e}&quot;)
+
+            raise
+
+    
+
+    async def generate_embeddings_batch(
+
+        self, 
+
+        texts: List[str], 
+
+        use_cache: bool = True
+
+    ) -&gt; List[List[float]]:
+
+        &quot;&quot;&quot;Generate embeddings for multiple texts efficiently.&quot;&quot;&quot;
+
+        
+
+        if not texts:
+
+            return []
+
+        
+
+        embeddings = []
+
+        cache_misses = []
+
+        cache_miss_indices = []
+
+        
+
+        # Check cache for each text
+
+        for i, text in enumerate(texts):
+
+            if not text or not text.strip():
+
+                embeddings.append([])
+
+                continue
+
+                
+
+            if use_cache:
+
+                cache_key = self._get_cache_key(text)
+
+                cached_embedding = self._get_cached_embedding(cache_key)
+
+                if cached_embedding:
+
+                    embeddings.append(cached_embedding)
+
+                    continue
+
+            
+
+            # Track cache misses
+
+            embeddings.append(None)  # Placeholder
+
+            cache_misses.append(text.strip())
+
+            cache_miss_indices.append(i)
+
+        
+
+        # Generate embeddings for cache misses
+
+        if cache_misses:
+
+            try:
+
+                # Process in batches to respect API limits
+
+                for batch_start in range(0, len(cache_misses), self.batch_size):
+
+                    batch_end = min(batch_start + self.batch_size, len(cache_misses))
+
+                    batch_texts = cache_misses[batch_start:batch_end]
+
+                    
+
+                    # Generate batch embeddings
+
+                    response = await self.client.embeddings.create(
+
+                        model=self.deployment_name,
+
+                        input=batch_texts
+
+                    )
+
+                    
+
+                    # Process batch results
+
+                    for j, embedding_data in enumerate(response.data):
+
+                        actual_index = cache_miss_indices[batch_start + j]
+
+                        embedding = embedding_data.embedding
+
+                        embeddings[actual_index] = embedding
+
+                        
+
+                        # Cache the result
+
+                        if use_cache:
+
+                            text = batch_texts[j]
+
+                            cache_key = self._get_cache_key(text)
+
+                            self._cache_embedding(cache_key, embedding)
+
+                    
+
+                    # Rate limiting - small delay between batches
+
+                    if batch_end &lt; len(cache_misses):
+
+                        await asyncio.sleep(0.1)
+
+                
+
+                logger.info(f&quot;Generated {len(cache_misses)} embeddings in batch&quot;)
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Batch embedding generation failed: {e}&quot;)
+
+                raise
+
+        
+
+        return embeddings
+
+    
+
+    def _get_cache_key(self, text: str) -&gt; str:
+
+        &quot;&quot;&quot;Generate cache key for text.&quot;&quot;&quot;
+
+        
+
+        # Use SHA-256 hash of text + model for cache key
+
+        content = f&quot;{self.deployment_name}:{text.strip()}&quot;
+
+        return hashlib.sha256(content.encode()).hexdigest()
+
+    
+
+    def _get_cached_embedding(self, cache_key: str) -&gt; Optional[List[float]]:
+
+        &quot;&quot;&quot;Get embedding from cache if not expired.&quot;&quot;&quot;
+
+        
+
+        if cache_key in self.embedding_cache:
+
+            embedding_data = self.embedding_cache[cache_key]
+
+            
+
+            # Check if cache entry is still valid
+
+            if datetime.now() - embedding_data[&#x27;timestamp&#x27;] &lt; self.cache_ttl:
+
+                return embedding_data[&#x27;embedding&#x27;]
+
+            else:
+
+                # Remove expired entry
+
+                del self.embedding_cache[cache_key]
+
+        
+
+        return None
+
+    
+
+    def _cache_embedding(self, cache_key: str, embedding: List[float]):
+
+        &quot;&quot;&quot;Cache embedding with timestamp.&quot;&quot;&quot;
+
+        
+
+        self.embedding_cache[cache_key] = {
+
+            &#x27;embedding&#x27;: embedding,
+
+            &#x27;timestamp&#x27;: datetime.now()
+
+        }
+
+        
+
+        # Limit cache size
+
+        if len(self.embedding_cache) &gt; 10000:
+
+            # Remove oldest entries
+
+            oldest_keys = sorted(
+
+                self.embedding_cache.keys(),
+
+                key=lambda k: self.embedding_cache[k][&#x27;timestamp&#x27;]
+
+            )[:1000]
+
+            
+
+            for key in oldest_keys:
+
+                del self.embedding_cache[key]
+
+    
+
+    async def cleanup(self):
+
+        &quot;&quot;&quot;Cleanup resources.&quot;&quot;&quot;
+
+        
+
+        if self.client:
+
+            await self.client.close()
+
+        
+
+        logger.info(&quot;Embedding manager cleanup completed&quot;)
+
+
+
+# Global embedding manager instance
+
+embedding_manager = EmbeddingManager(
+
+    project_endpoint=os.getenv(&#x27;PROJECT_ENDPOINT&#x27;),
+
+    deployment_name=os.getenv(&#x27;EMBEDDING_DEPLOYMENT_NAME&#x27;, &#x27;text-embedding-3-small&#x27;)
+
+)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 제품 임베딩 생성</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">자동화된 임베딩 파이프라인</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/embeddings/product_embedder.py
+
+&quot;&quot;&quot;
+
+Product embedding generation and management.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+from typing import List, Dict, Any, Optional
+
+from datetime import datetime
+
+import logging
+
+from .embedding_manager import embedding_manager
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class ProductEmbedder:
+
+    &quot;&quot;&quot;Generate and manage product embeddings for semantic search.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        self.db_provider = db_provider
+
+        self.embedding_manager = embedding_manager
+
+        
+
+        # Text combination strategy for products
+
+        self.text_template = &quot;{product_name} {brand} {description} {category} {tags}&quot;
+
+        
+
+    async def generate_product_embeddings(
+
+        self, 
+
+        store_id: str,
+
+        batch_size: int = 50,
+
+        force_regenerate: bool = False
+
+    ) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Generate embeddings for all products in a store.&quot;&quot;&quot;
+
+        
+
+        async with self.db_provider.get_connection() as conn:
+
+            try:
+
+                # Set store context
+
+                await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+                
+
+                # Get products that need embeddings
+
+                if force_regenerate:
+
+                    products_query = &quot;&quot;&quot;
+
+                        SELECT 
+
+                            p.product_id,
+
+                            p.product_name,
+
+                            p.product_description,
+
+                            p.brand,
+
+                            pc.category_name,
+
+                            array_to_string(p.tags, &#x27; &#x27;) as tags_text
+
+                        FROM retail.products p
+
+                        LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                        WHERE p.is_active = TRUE
+
+                        ORDER BY p.created_at DESC
+
+                    &quot;&quot;&quot;
+
+                else:
+
+                    products_query = &quot;&quot;&quot;
+
+                        SELECT 
+
+                            p.product_id,
+
+                            p.product_name,
+
+                            p.product_description,
+
+                            p.brand,
+
+                            pc.category_name,
+
+                            array_to_string(p.tags, &#x27; &#x27;) as tags_text
+
+                        FROM retail.products p
+
+                        LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                        LEFT JOIN retail.product_embeddings pe ON p.product_id = pe.product_id
+
+                        WHERE p.is_active = TRUE
+
+                          AND (pe.product_id IS NULL OR pe.updated_at &lt; p.updated_at)
+
+                        ORDER BY p.created_at DESC
+
+                    &quot;&quot;&quot;
+
+                
+
+                products = await conn.fetch(products_query)
+
+                
+
+                if not products:
+
+                    return {
+
+                        &#x27;success&#x27;: True,
+
+                        &#x27;message&#x27;: &#x27;No products need embedding generation&#x27;,
+
+                        &#x27;processed_count&#x27;: 0,
+
+                        &#x27;store_id&#x27;: store_id
+
+                    }
+
+                
+
+                logger.info(f&quot;Generating embeddings for {len(products)} products in store {store_id}&quot;)
+
+                
+
+                # Process products in batches
+
+                processed_count = 0
+
+                
+
+                for i in range(0, len(products), batch_size):
+
+                    batch = products[i:i + batch_size]
+
+                    await self._process_product_batch(conn, batch, store_id)
+
+                    processed_count += len(batch)
+
+                    
+
+                    logger.info(f&quot;Processed {processed_count}/{len(products)} products&quot;)
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: True,
+
+                    &#x27;message&#x27;: f&#x27;Successfully generated embeddings for {processed_count} products&#x27;,
+
+                    &#x27;processed_count&#x27;: processed_count,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;total_products&#x27;: len(products)
+
+                }
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Product embedding generation failed: {e}&quot;)
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: str(e),
+
+                    &#x27;store_id&#x27;: store_id
+
+                }
+
+    
+
+    async def _process_product_batch(
+
+        self, 
+
+        conn: asyncpg.Connection, 
+
+        products: List[Dict], 
+
+        store_id: str
+
+    ):
+
+        &quot;&quot;&quot;Process a batch of products for embedding generation.&quot;&quot;&quot;
+
+        
+
+        # Prepare texts for embedding
+
+        texts = []
+
+        product_ids = []
+
+        
+
+        for product in products:
+
+            # Combine product information into searchable text
+
+            combined_text = self._create_product_text(product)
+
+            texts.append(combined_text)
+
+            product_ids.append(product[&#x27;product_id&#x27;])
+
+        
+
+        # Generate embeddings
+
+        embeddings = await self.embedding_manager.generate_embeddings_batch(texts)
+
+        
+
+        # Store embeddings in database
+
+        for i, (product_id, embedding) in enumerate(zip(product_ids, embeddings)):
+
+            if embedding:  # Skip failed embeddings
+
+                await self._store_product_embedding(
+
+                    conn, 
+
+                    product_id, 
+
+                    store_id, 
+
+                    texts[i], 
+
+                    embedding
+
+                )
+
+    
+
+    def _create_product_text(self, product: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Create combined text for product embedding.&quot;&quot;&quot;
+
+        
+
+        # Handle None values
+
+        product_name = product.get(&#x27;product_name&#x27;) or &#x27;&#x27;
+
+        brand = product.get(&#x27;brand&#x27;) or &#x27;&#x27;
+
+        description = product.get(&#x27;product_description&#x27;) or &#x27;&#x27;
+
+        category = product.get(&#x27;category_name&#x27;) or &#x27;&#x27;
+
+        tags = product.get(&#x27;tags_text&#x27;) or &#x27;&#x27;
+
+        
+
+        # Combine into searchable text
+
+        combined_text = self.text_template.format(
+
+            product_name=product_name,
+
+            brand=brand,
+
+            description=description,
+
+            category=category,
+
+            tags=tags
+
+        )
+
+        
+
+        # Clean up extra whitespace
+
+        return &#x27; &#x27;.join(combined_text.split())
+
+    
+
+    async def _store_product_embedding(
+
+        self,
+
+        conn: asyncpg.Connection,
+
+        product_id: str,
+
+        store_id: str,
+
+        embedding_text: str,
+
+        embedding: List[float]
+
+    ):
+
+        &quot;&quot;&quot;Store product embedding in database.&quot;&quot;&quot;
+
+        
+
+        # Convert embedding to pgvector format
+
+        embedding_vector = f&quot;[{&#x27;,&#x27;.join(map(str, embedding))}]&quot;
+
+        
+
+        # Upsert embedding
+
+        upsert_query = &quot;&quot;&quot;
+
+            INSERT INTO retail.product_embeddings (
+
+                product_id, store_id, embedding_text, embedding, embedding_model
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+            ON CONFLICT (product_id, embedding_model) 
+
+            DO UPDATE SET
+
+                store_id = EXCLUDED.store_id,
+
+                embedding_text = EXCLUDED.embedding_text,
+
+                embedding = EXCLUDED.embedding,
+
+                updated_at = CURRENT_TIMESTAMP
+
+        &quot;&quot;&quot;
+
+        
+
+        await conn.execute(
+
+            upsert_query,
+
+            product_id,
+
+            store_id,
+
+            embedding_text,
+
+            embedding_vector,
+
+            self.embedding_manager.deployment_name
+
+        )
+
+    
+
+    async def update_product_embedding(
+
+        self, 
+
+        product_id: str, 
+
+        store_id: str
+
+    ) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Update embedding for a single product.&quot;&quot;&quot;
+
+        
+
+        async with self.db_provider.get_connection() as conn:
+
+            try:
+
+                # Set store context
+
+                await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+                
+
+                # Get product information
+
+                product_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        p.product_id,
+
+                        p.product_name,
+
+                        p.product_description,
+
+                        p.brand,
+
+                        pc.category_name,
+
+                        array_to_string(p.tags, &#x27; &#x27;) as tags_text
+
+                    FROM retail.products p
+
+                    LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                    WHERE p.product_id = $1 AND p.is_active = TRUE
+
+                &quot;&quot;&quot;
+
+                
+
+                product = await conn.fetchrow(product_query, product_id)
+
+                
+
+                if not product:
+
+                    return {
+
+                        &#x27;success&#x27;: False,
+
+                        &#x27;error&#x27;: f&#x27;Product {product_id} not found or inactive&#x27;
+
+                    }
+
+                
+
+                # Generate embedding
+
+                combined_text = self._create_product_text(dict(product))
+
+                embedding = await self.embedding_manager.generate_embedding(combined_text)
+
+                
+
+                # Store embedding
+
+                await self._store_product_embedding(
+
+                    conn, product_id, store_id, combined_text, embedding
+
+                )
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: True,
+
+                    &#x27;message&#x27;: f&#x27;Successfully updated embedding for product {product_id}&#x27;,
+
+                    &#x27;product_id&#x27;: product_id,
+
+                    &#x27;store_id&#x27;: store_id
+
+                }
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Single product embedding update failed: {e}&quot;)
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: str(e),
+
+                    &#x27;product_id&#x27;: product_id
+
+                }
+
+
+
+# Global product embedder instance
+
+product_embedder = ProductEmbedder(db_provider)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔎 시맨틱 검색 도구</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시맨틱 제품 검색 도구</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/semantic_search.py
+
+&quot;&quot;&quot;
+
+Semantic search tools for natural language product queries.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List, Optional
+
+from ..tools.base import DatabaseTool, ToolResult, ToolCategory
+
+from ..embeddings.embedding_manager import embedding_manager
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class SemanticProductSearchTool(DatabaseTool):
+
+    &quot;&quot;&quot;Advanced semantic search tool for products using vector similarity.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;semantic_search_products&quot;,
+
+            description=&quot;Search products using natural language queries with semantic understanding&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.DATABASE_QUERY
+
+        self.embedding_manager = embedding_manager
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute semantic product search.&quot;&quot;&quot;
+
+        
+
+        query = kwargs.get(&#x27;query&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        limit = kwargs.get(&#x27;limit&#x27;, 20)
+
+        similarity_threshold = kwargs.get(&#x27;similarity_threshold&#x27;, 0.7)
+
+        include_metadata = kwargs.get(&#x27;include_metadata&#x27;, True)
+
+        
+
+        if not query:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;Search query is required&quot;
+
+            )
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for semantic search&quot;
+
+            )
+
+        
+
+        try:
+
+            # Generate query embedding
+
+            query_embedding = await self.embedding_manager.generate_embedding(query)
+
+            
+
+            # Perform semantic search
+
+            search_results = await self._perform_semantic_search(
+
+                query_embedding,
+
+                store_id,
+
+                limit,
+
+                similarity_threshold,
+
+                include_metadata
+
+            )
+
+            
+
+            return ToolResult(
+
+                success=True,
+
+                data=search_results,
+
+                row_count=len(search_results),
+
+                metadata={
+
+                    &#x27;query&#x27;: query,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;similarity_threshold&#x27;: similarity_threshold,
+
+                    &#x27;search_type&#x27;: &#x27;semantic&#x27;
+
+                }
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Semantic search failed: {e}&quot;)
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Semantic search failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _perform_semantic_search(
+
+        self,
+
+        query_embedding: List[float],
+
+        store_id: str,
+
+        limit: int,
+
+        similarity_threshold: float,
+
+        include_metadata: bool
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Perform vector similarity search.&quot;&quot;&quot;
+
+        
+
+        # Convert embedding to PostgreSQL vector format
+
+        embedding_vector = f&quot;[{&#x27;,&#x27;.join(map(str, query_embedding))}]&quot;
+
+        
+
+        # Build search query
+
+        if include_metadata:
+
+            search_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    p.product_id,
+
+                    p.product_name,
+
+                    p.brand,
+
+                    p.price,
+
+                    p.product_description,
+
+                    p.current_stock,
+
+                    p.rating_average,
+
+                    p.rating_count,
+
+                    p.tags,
+
+                    pc.category_name,
+
+                    pe.embedding_text,
+
+                    1 - (pe.embedding &lt;=&gt; $1::vector) as similarity_score
+
+                FROM retail.product_embeddings pe
+
+                JOIN retail.products p ON pe.product_id = p.product_id
+
+                LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+                WHERE pe.store_id = $2
+
+                  AND p.is_active = TRUE
+
+                  AND 1 - (pe.embedding &lt;=&gt; $1::vector) &gt;= $3
+
+                ORDER BY pe.embedding &lt;=&gt; $1::vector
+
+                LIMIT $4
+
+            &quot;&quot;&quot;
+
+        else:
+
+            search_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    p.product_id,
+
+                    p.product_name,
+
+                    p.brand,
+
+                    p.price,
+
+                    1 - (pe.embedding &lt;=&gt; $1::vector) as similarity_score
+
+                FROM retail.product_embeddings pe
+
+                JOIN retail.products p ON pe.product_id = p.product_id
+
+                WHERE pe.store_id = $2
+
+                  AND p.is_active = TRUE
+
+                  AND 1 - (pe.embedding &lt;=&gt; $1::vector) &gt;= $3
+
+                ORDER BY pe.embedding &lt;=&gt; $1::vector
+
+                LIMIT $4
+
+            &quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Set store context
+
+            await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+            
+
+            # Execute search
+
+            results = await conn.fetch(
+
+                search_query,
+
+                embedding_vector,
+
+                store_id,
+
+                similarity_threshold,
+
+                limit
+
+            )
+
+            
+
+            return [dict(result) for result in results]
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for semantic search tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;query&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Natural language search query&quot;,
+
+                    &quot;minLength&quot;: 1,
+
+                    &quot;maxLength&quot;: 500
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for search scope&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Maximum number of results to return&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 100,
+
+                    &quot;default&quot;: 20
+
+                },
+
+                &quot;similarity_threshold&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Minimum similarity score (0.0 to 1.0)&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.7
+
+                },
+
+                &quot;include_metadata&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include detailed product metadata in results&quot;,
+
+                    &quot;default&quot;: True
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;query&quot;, &quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+
+
+class HybridSearchTool(DatabaseTool):
+
+    &quot;&quot;&quot;Hybrid search combining traditional keyword and semantic search.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;hybrid_product_search&quot;,
+
+            description=&quot;Hybrid search combining keyword matching and semantic similarity for optimal results&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.DATABASE_QUERY
+
+        self.embedding_manager = embedding_manager
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute hybrid product search.&quot;&quot;&quot;
+
+        
+
+        query = kwargs.get(&#x27;query&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        limit = kwargs.get(&#x27;limit&#x27;, 20)
+
+        semantic_weight = kwargs.get(&#x27;semantic_weight&#x27;, 0.7)
+
+        keyword_weight = kwargs.get(&#x27;keyword_weight&#x27;, 0.3)
+
+        
+
+        if not query:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;Search query is required&quot;
+
+            )
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for hybrid search&quot;
+
+            )
+
+        
+
+        try:
+
+            # Generate query embedding for semantic search
+
+            query_embedding = await self.embedding_manager.generate_embedding(query)
+
+            
+
+            # Perform hybrid search
+
+            search_results = await self._perform_hybrid_search(
+
+                query,
+
+                query_embedding,
+
+                store_id,
+
+                limit,
+
+                semantic_weight,
+
+                keyword_weight
+
+            )
+
+            
+
+            return ToolResult(
+
+                success=True,
+
+                data=search_results,
+
+                row_count=len(search_results),
+
+                metadata={
+
+                    &#x27;query&#x27;: query,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;semantic_weight&#x27;: semantic_weight,
+
+                    &#x27;keyword_weight&#x27;: keyword_weight,
+
+                    &#x27;search_type&#x27;: &#x27;hybrid&#x27;
+
+                }
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Hybrid search failed: {e}&quot;)
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Hybrid search failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _perform_hybrid_search(
+
+        self,
+
+        query: str,
+
+        query_embedding: List[float],
+
+        store_id: str,
+
+        limit: int,
+
+        semantic_weight: float,
+
+        keyword_weight: float
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Perform hybrid search combining keyword and semantic similarity.&quot;&quot;&quot;
+
+        
+
+        # Convert embedding to PostgreSQL vector format
+
+        embedding_vector = f&quot;[{&#x27;,&#x27;.join(map(str, query_embedding))}]&quot;
+
+        
+
+        # Create search terms for keyword matching
+
+        search_terms = &#x27; &amp; &#x27;.join(query.lower().split())
+
+        
+
+        hybrid_query = &quot;&quot;&quot;
+
+            WITH keyword_scores AS (
+
+                SELECT 
+
+                    p.product_id,
+
+                    ts_rank(
+
+                        to_tsvector(&#x27;english&#x27;, 
+
+                            p.product_name || &#x27; &#x27; || 
+
+                            COALESCE(p.product_description, &#x27;&#x27;) || &#x27; &#x27; || 
+
+                            COALESCE(p.brand, &#x27;&#x27;) || &#x27; &#x27; ||
+
+                            COALESCE(array_to_string(p.tags, &#x27; &#x27;), &#x27;&#x27;)
+
+                        ),
+
+                        plainto_tsquery(&#x27;english&#x27;, $2)
+
+                    ) as keyword_score
+
+                FROM retail.products p
+
+                WHERE p.is_active = TRUE
+
+                  AND p.store_id = $3
+
+                  AND (
+
+                    to_tsvector(&#x27;english&#x27;, 
+
+                        p.product_name || &#x27; &#x27; || 
+
+                        COALESCE(p.product_description, &#x27;&#x27;) || &#x27; &#x27; || 
+
+                        COALESCE(p.brand, &#x27;&#x27;) || &#x27; &#x27; ||
+
+                        COALESCE(array_to_string(p.tags, &#x27; &#x27;), &#x27;&#x27;)
+
+                    ) @@ plainto_tsquery(&#x27;english&#x27;, $2)
+
+                    OR p.product_name ILIKE &#x27;%&#x27; || $2 || &#x27;%&#x27;
+
+                    OR p.brand ILIKE &#x27;%&#x27; || $2 || &#x27;%&#x27;
+
+                  )
+
+            ),
+
+            semantic_scores AS (
+
+                SELECT 
+
+                    pe.product_id,
+
+                    1 - (pe.embedding &lt;=&gt; $1::vector) as semantic_score
+
+                FROM retail.product_embeddings pe
+
+                WHERE pe.store_id = $3
+
+                  AND 1 - (pe.embedding &lt;=&gt; $1::vector) &gt;= 0.5
+
+            ),
+
+            combined_scores AS (
+
+                SELECT 
+
+                    COALESCE(ks.product_id, ss.product_id) as product_id,
+
+                    COALESCE(ks.keyword_score, 0) * $4 as weighted_keyword_score,
+
+                    COALESCE(ss.semantic_score, 0) * $5 as weighted_semantic_score,
+
+                    COALESCE(ks.keyword_score, 0) * $4 + COALESCE(ss.semantic_score, 0) * $5 as combined_score
+
+                FROM keyword_scores ks
+
+                FULL OUTER JOIN semantic_scores ss ON ks.product_id = ss.product_id
+
+                WHERE COALESCE(ks.keyword_score, 0) * $4 + COALESCE(ss.semantic_score, 0) * $5 &gt; 0
+
+            )
+
+            SELECT 
+
+                p.product_id,
+
+                p.product_name,
+
+                p.brand,
+
+                p.price,
+
+                p.product_description,
+
+                p.current_stock,
+
+                p.rating_average,
+
+                p.rating_count,
+
+                p.tags,
+
+                pc.category_name,
+
+                cs.weighted_keyword_score,
+
+                cs.weighted_semantic_score,
+
+                cs.combined_score
+
+            FROM combined_scores cs
+
+            JOIN retail.products p ON cs.product_id = p.product_id
+
+            LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+            WHERE p.is_active = TRUE
+
+            ORDER BY cs.combined_score DESC
+
+            LIMIT $6
+
+        &quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Set store context
+
+            await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+            
+
+            # Execute hybrid search
+
+            results = await conn.fetch(
+
+                hybrid_query,
+
+                embedding_vector,  # $1
+
+                query,            # $2
+
+                store_id,         # $3
+
+                keyword_weight,   # $4
+
+                semantic_weight,  # $5
+
+                limit            # $6
+
+            )
+
+            
+
+            return [dict(result) for result in results]
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for hybrid search tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;query&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Search query (supports both keywords and natural language)&quot;,
+
+                    &quot;minLength&quot;: 1,
+
+                    &quot;maxLength&quot;: 500
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for search scope&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Maximum number of results to return&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 100,
+
+                    &quot;default&quot;: 20
+
+                },
+
+                &quot;semantic_weight&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Weight for semantic similarity (0.0 to 1.0)&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.7
+
+                },
+
+                &quot;keyword_weight&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Weight for keyword matching (0.0 to 1.0)&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.3
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;query&quot;, &quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 추천 시스템</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">제품 추천 엔진</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/recommendations.py
+
+&quot;&quot;&quot;
+
+Product recommendation system using embedding similarity.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List, Optional
+
+from ..tools.base import DatabaseTool, ToolResult, ToolCategory
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class ProductRecommendationTool(DatabaseTool):
+
+    &quot;&quot;&quot;Generate product recommendations based on similarity and user behavior.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_product_recommendations&quot;,
+
+            description=&quot;Generate personalized product recommendations using similarity analysis&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.ANALYTICS
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute product recommendation generation.&quot;&quot;&quot;
+
+        
+
+        recommendation_type = kwargs.get(&#x27;type&#x27;, &#x27;similar_products&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for recommendations&quot;
+
+            )
+
+        
+
+        try:
+
+            if recommendation_type == &#x27;similar_products&#x27;:
+
+                return await self._get_similar_products(kwargs)
+
+            elif recommendation_type == &#x27;customer_based&#x27;:
+
+                return await self._get_customer_recommendations(kwargs)
+
+            elif recommendation_type == &#x27;trending&#x27;:
+
+                return await self._get_trending_products(kwargs)
+
+            elif recommendation_type == &#x27;cross_sell&#x27;:
+
+                return await self._get_cross_sell_recommendations(kwargs)
+
+            else:
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Unknown recommendation type: {recommendation_type}&quot;
+
+                )
+
+        
+
+        except Exception as e:
+
+            logger.error(f&quot;Product recommendation failed: {e}&quot;)
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Recommendation generation failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _get_similar_products(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get products similar to a given product using embedding similarity.&quot;&quot;&quot;
+
+        
+
+        product_id = kwargs.get(&#x27;product_id&#x27;)
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        limit = kwargs.get(&#x27;limit&#x27;, 10)
+
+        similarity_threshold = kwargs.get(&#x27;similarity_threshold&#x27;, 0.7)
+
+        
+
+        if not product_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;product_id is required for similar product recommendations&quot;
+
+            )
+
+        
+
+        similar_products_query = &quot;&quot;&quot;
+
+            WITH target_product AS (
+
+                SELECT embedding
+
+                FROM retail.product_embeddings
+
+                WHERE product_id = $1 AND store_id = $2
+
+            )
+
+            SELECT 
+
+                p.product_id,
+
+                p.product_name,
+
+                p.brand,
+
+                p.price,
+
+                p.product_description,
+
+                p.rating_average,
+
+                p.rating_count,
+
+                pc.category_name,
+
+                1 - (pe.embedding &lt;=&gt; tp.embedding) as similarity_score
+
+            FROM retail.product_embeddings pe
+
+            CROSS JOIN target_product tp
+
+            JOIN retail.products p ON pe.product_id = p.product_id
+
+            LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+            WHERE pe.store_id = $2
+
+              AND pe.product_id != $1  -- Exclude the target product itself
+
+              AND p.is_active = TRUE
+
+              AND 1 - (pe.embedding &lt;=&gt; tp.embedding) &gt;= $3
+
+            ORDER BY pe.embedding &lt;=&gt; tp.embedding
+
+            LIMIT $4
+
+        &quot;&quot;&quot;
+
+        
+
+        result = await self.execute_query(
+
+            similar_products_query,
+
+            (product_id, store_id, similarity_threshold, limit),
+
+            store_id
+
+        )
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;recommendation_type&#x27;: &#x27;similar_products&#x27;,
+
+                &#x27;target_product_id&#x27;: product_id,
+
+                &#x27;similarity_threshold&#x27;: similarity_threshold,
+
+                &#x27;store_id&#x27;: store_id
+
+            }
+
+        
+
+        return result
+
+    
+
+    async def _get_customer_recommendations(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get personalized recommendations based on customer purchase history.&quot;&quot;&quot;
+
+        
+
+        customer_id = kwargs.get(&#x27;customer_id&#x27;)
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        limit = kwargs.get(&#x27;limit&#x27;, 10)
+
+        days_back = kwargs.get(&#x27;days_back&#x27;, 90)
+
+        
+
+        if not customer_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;customer_id is required for customer-based recommendations&quot;
+
+            )
+
+        
+
+        customer_recommendations_query = &quot;&quot;&quot;
+
+            WITH customer_purchases AS (
+
+                -- Get products purchased by the customer
+
+                SELECT DISTINCT p.product_id, pe.embedding
+
+                FROM retail.sales_transactions st
+
+                JOIN retail.sales_transaction_items sti ON st.transaction_id = sti.transaction_id
+
+                JOIN retail.products p ON sti.product_id = p.product_id
+
+                JOIN retail.product_embeddings pe ON p.product_id = pe.product_id
+
+                WHERE st.customer_id = $1
+
+                  AND st.transaction_date &gt;= CURRENT_DATE - INTERVAL &#x27;%s days&#x27;
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+            ),
+
+            avg_customer_embedding AS (
+
+                -- Calculate average embedding vector for customer preferences
+
+                SELECT 
+
+                    (
+
+                        SELECT ARRAY(
+
+                            SELECT AVG(embedding_element)
+
+                            FROM customer_purchases cp,
+
+                                 LATERAL unnest(cp.embedding) WITH ORDINALITY AS t(embedding_element, ordinality)
+
+                            GROUP BY ordinality
+
+                            ORDER BY ordinality
+
+                        )
+
+                    )::vector as avg_embedding
+
+                FROM (SELECT 1) dummy
+
+                WHERE EXISTS (SELECT 1 FROM customer_purchases)
+
+            )
+
+            SELECT 
+
+                p.product_id,
+
+                p.product_name,
+
+                p.brand,
+
+                p.price,
+
+                p.product_description,
+
+                p.rating_average,
+
+                p.rating_count,
+
+                pc.category_name,
+
+                1 - (pe.embedding &lt;=&gt; ace.avg_embedding) as preference_score
+
+            FROM retail.product_embeddings pe
+
+            CROSS JOIN avg_customer_embedding ace
+
+            JOIN retail.products p ON pe.product_id = p.product_id
+
+            LEFT JOIN retail.product_categories pc ON p.category_id = pc.category_id
+
+            WHERE pe.store_id = $2
+
+              AND p.is_active = TRUE
+
+              AND pe.product_id NOT IN (SELECT product_id FROM customer_purchases)
+
+              AND 1 - (pe.embedding &lt;=&gt; ace.avg_embedding) &gt;= 0.6
+
+            ORDER BY pe.embedding &lt;=&gt; ace.avg_embedding
+
+            LIMIT $3
+
+        &quot;&quot;&quot; % days_back
+
+        
+
+        result = await self.execute_query(
+
+            customer_recommendations_query,
+
+            (customer_id, store_id, limit),
+
+            store_id
+
+        )
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;recommendation_type&#x27;: &#x27;customer_based&#x27;,
+
+                &#x27;customer_id&#x27;: customer_id,
+
+                &#x27;days_back&#x27;: days_back,
+
+                &#x27;store_id&#x27;: store_id
+
+            }
+
+        
+
+        return result
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for recommendation tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;type&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;similar_products&quot;, &quot;customer_based&quot;, &quot;trending&quot;, &quot;cross_sell&quot;],
+
+                    &quot;description&quot;: &quot;Type of recommendation to generate&quot;,
+
+                    &quot;default&quot;: &quot;similar_products&quot;
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for recommendations&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;product_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Product ID for similar product recommendations&quot;
+
+                },
+
+                &quot;customer_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Customer ID for personalized recommendations&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Maximum number of recommendations&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 50,
+
+                    &quot;default&quot;: 10
+
+                },
+
+                &quot;similarity_threshold&quot;: {
+
+                    &quot;type&quot;: &quot;number&quot;,
+
+                    &quot;description&quot;: &quot;Minimum similarity score&quot;,
+
+                    &quot;minimum&quot;: 0.0,
+
+                    &quot;maximum&quot;: 1.0,
+
+                    &quot;default&quot;: 0.7
+
+                },
+
+                &quot;days_back&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;description&quot;: &quot;Days of purchase history to consider&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 365,
+
+                    &quot;default&quot;: 90
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">⚡ 성능 최적화</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">벡터 쿼리 최적화</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Optimize pgvector performance
+
+-- Add to postgresql.conf
+
+
+
+# Increase work_mem for vector operations
+
+work_mem = &#x27;256MB&#x27;
+
+
+
+# Optimize shared_buffers for vector data
+
+shared_buffers = &#x27;512MB&#x27;
+
+
+
+# Enable parallel query execution
+
+max_parallel_workers_per_gather = 4
+
+max_parallel_workers = 8
+
+
+
+# Vector-specific optimizations
+
+SET maintenance_work_mem = &#x27;1GB&#x27;;
+
+SET max_parallel_maintenance_workers = 4;
+
+
+
+-- Optimize HNSW index parameters
+
+CREATE INDEX CONCURRENTLY idx_product_embeddings_vector_optimized 
+
+ON retail.product_embeddings 
+
+USING hnsw (embedding vector_cosine_ops)
+
+WITH (m = 16, ef_construction = 200);
+
+
+
+-- Create partial indexes for active products only
+
+CREATE INDEX CONCURRENTLY idx_product_embeddings_active
+
+ON retail.product_embeddings 
+
+USING hnsw (embedding vector_cosine_ops)
+
+WHERE store_id IN (SELECT store_id FROM retail.stores WHERE is_active = TRUE);
+
+
+
+-- Analyze vector distribution for optimization
+
+ANALYZE retail.product_embeddings;
+
+
+
+-- Vector search performance monitoring
+
+CREATE OR REPLACE FUNCTION retail.analyze_vector_performance()
+
+RETURNS TABLE (
+
+    avg_search_time_ms NUMERIC,
+
+    index_size TEXT,
+
+    total_vectors BIGINT,
+
+    cache_hit_ratio NUMERIC
+
+) AS $$
+
+BEGIN
+
+    RETURN QUERY
+
+    SELECT 
+
+        (SELECT AVG(EXTRACT(MILLISECONDS FROM clock_timestamp() - query_start))
+
+         FROM pg_stat_activity 
+
+         WHERE query LIKE &#x27;%embedding &lt;=&gt; %&#x27;
+
+         AND state = &#x27;active&#x27;) as avg_search_time_ms,
+
+        pg_size_pretty(pg_relation_size(&#x27;idx_product_embeddings_vector&#x27;)) as index_size,
+
+        COUNT(*)::BIGINT as total_vectors,
+
+        (SELECT 100.0 * blks_hit / (blks_hit + blks_read) 
+
+         FROM pg_stat_user_indexes 
+
+         WHERE indexrelname = &#x27;idx_product_embeddings_vector&#x27;) as cache_hit_ratio
+
+    FROM retail.product_embeddings;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">임베딩 캐시 전략</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/embeddings/cache_manager.py
+
+&quot;&quot;&quot;
+
+Advanced caching strategy for embeddings and search results.
+
+&quot;&quot;&quot;
+
+import redis.asyncio as redis
+
+import json
+
+import hashlib
+
+from typing import Dict, Any, List, Optional
+
+from datetime import timedelta
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class EmbeddingCacheManager:
+
+    &quot;&quot;&quot;Advanced caching for embeddings and search results.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, redis_url: str = &quot;redis://localhost:6379&quot;):
+
+        self.redis_client = None
+
+        self.redis_url = redis_url
+
+        
+
+        # Cache TTL settings
+
+        self.embedding_ttl = timedelta(days=7)  # Embeddings cached for 1 week
+
+        self.search_ttl = timedelta(hours=1)    # Search results cached for 1 hour
+
+        self.recommendation_ttl = timedelta(hours=4)  # Recommendations cached for 4 hours
+
+        
+
+        # Cache key prefixes
+
+        self.EMBEDDING_PREFIX = &quot;emb:&quot;
+
+        self.SEARCH_PREFIX = &quot;search:&quot;
+
+        self.RECOMMENDATION_PREFIX = &quot;rec:&quot;
+
+    
+
+    async def initialize(self):
+
+        &quot;&quot;&quot;Initialize Redis connection.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            self.redis_client = redis.from_url(self.redis_url)
+
+            # Test connection
+
+            await self.redis_client.ping()
+
+            logger.info(&quot;Embedding cache manager initialized&quot;)
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Redis cache not available: {e}&quot;)
+
+            self.redis_client = None
+
+    
+
+    async def cache_embedding(self, text: str, embedding: List[float], model: str):
+
+        &quot;&quot;&quot;Cache text embedding.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return
+
+        
+
+        try:
+
+            cache_key = self._get_embedding_key(text, model)
+
+            cache_data = {
+
+                &#x27;embedding&#x27;: embedding,
+
+                &#x27;model&#x27;: model,
+
+                &#x27;cached_at&#x27;: str(datetime.utcnow())
+
+            }
+
+            
+
+            await self.redis_client.setex(
+
+                cache_key,
+
+                self.embedding_ttl,
+
+                json.dumps(cache_data)
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to cache embedding: {e}&quot;)
+
+    
+
+    async def get_cached_embedding(self, text: str, model: str) -&gt; Optional[List[float]]:
+
+        &quot;&quot;&quot;Get cached embedding.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return None
+
+        
+
+        try:
+
+            cache_key = self._get_embedding_key(text, model)
+
+            cached_data = await self.redis_client.get(cache_key)
+
+            
+
+            if cached_data:
+
+                data = json.loads(cached_data)
+
+                return data[&#x27;embedding&#x27;]
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to retrieve cached embedding: {e}&quot;)
+
+        
+
+        return None
+
+    
+
+    async def cache_search_results(
+
+        self, 
+
+        query: str, 
+
+        store_id: str, 
+
+        results: List[Dict],
+
+        search_params: Dict[str, Any]
+
+    ):
+
+        &quot;&quot;&quot;Cache search results.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return
+
+        
+
+        try:
+
+            cache_key = self._get_search_key(query, store_id, search_params)
+
+            cache_data = {
+
+                &#x27;results&#x27;: results,
+
+                &#x27;query&#x27;: query,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;params&#x27;: search_params,
+
+                &#x27;cached_at&#x27;: str(datetime.utcnow())
+
+            }
+
+            
+
+            await self.redis_client.setex(
+
+                cache_key,
+
+                self.search_ttl,
+
+                json.dumps(cache_data, default=str)
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to cache search results: {e}&quot;)
+
+    
+
+    async def get_cached_search_results(
+
+        self, 
+
+        query: str, 
+
+        store_id: str, 
+
+        search_params: Dict[str, Any]
+
+    ) -&gt; Optional[List[Dict]]:
+
+        &quot;&quot;&quot;Get cached search results.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return None
+
+        
+
+        try:
+
+            cache_key = self._get_search_key(query, store_id, search_params)
+
+            cached_data = await self.redis_client.get(cache_key)
+
+            
+
+            if cached_data:
+
+                data = json.loads(cached_data)
+
+                return data[&#x27;results&#x27;]
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to retrieve cached search results: {e}&quot;)
+
+        
+
+        return None
+
+    
+
+    def _get_embedding_key(self, text: str, model: str) -&gt; str:
+
+        &quot;&quot;&quot;Generate cache key for embedding.&quot;&quot;&quot;
+
+        
+
+        content = f&quot;{model}:{text.strip()}&quot;
+
+        hash_key = hashlib.sha256(content.encode()).hexdigest()
+
+        return f&quot;{self.EMBEDDING_PREFIX}{hash_key}&quot;
+
+    
+
+    def _get_search_key(self, query: str, store_id: str, params: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Generate cache key for search results.&quot;&quot;&quot;
+
+        
+
+        # Create stable hash from query and parameters
+
+        content = f&quot;{query}:{store_id}:{json.dumps(params, sort_keys=True)}&quot;
+
+        hash_key = hashlib.sha256(content.encode()).hexdigest()
+
+        return f&quot;{self.SEARCH_PREFIX}{hash_key}&quot;
+
+    
+
+    async def invalidate_store_cache(self, store_id: str):
+
+        &quot;&quot;&quot;Invalidate all cached data for a store.&quot;&quot;&quot;
+
+        
+
+        if not self.redis_client:
+
+            return
+
+        
+
+        try:
+
+            # Find all keys related to the store
+
+            pattern = f&quot;*:{store_id}:*&quot;
+
+            keys = await self.redis_client.keys(pattern)
+
+            
+
+            if keys:
+
+                await self.redis_client.delete(*keys)
+
+                logger.info(f&quot;Invalidated {len(keys)} cache entries for store {store_id}&quot;)
+
+        
+
+        except Exception as e:
+
+            logger.warning(f&quot;Failed to invalidate store cache: {e}&quot;)
+
+    
+
+    async def cleanup(self):
+
+        &quot;&quot;&quot;Cleanup cache resources.&quot;&quot;&quot;
+
+        
+
+        if self.redis_client:
+
+            await self.redis_client.close()
+
+
+
+# Global cache manager
+
+cache_manager = EmbeddingCacheManager()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 학습 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 달성할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Azure OpenAI 통합</strong>: 캐싱 및 최적화를 포함한 임베딩 생성 완료  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>벡터 검색 구현</strong>: pgvector를 활용한 프로덕션 준비된 시맨틱 검색  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>하이브리드 검색 기능</strong>: 키워드와 시맨틱 검색을 결합하여 최적의 결과 제공  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>추천 시스템</strong>: 유사성을 활용한 AI 기반 제품 추천  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>성능 최적화</strong>: 벡터 인덱스 최적화 및 지능형 캐싱  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>확장 가능한 아키텍처</strong>: 엔터프라이즈 준비된 시맨틱 검색 인프라  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/08-Testing/README.md" target="_blank">실습 08: 테스트 및 디버깅</a></strong>을 계속 진행하여:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">시맨틱 검색을 위한 포괄적인 테스트 전략 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">벡터 검색 성능 문제 디버깅</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">임베딩 품질 및 관련성 검증</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">추천 시스템 정확성 테스트</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure OpenAI</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/cognitive-services/openai/">Azure OpenAI 서비스 문서</a> - 서비스 가이드 전체</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/api-reference/embeddings">임베딩 API 참조</a> - API 문서</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/guides/embeddings/what-are-embeddings">임베딩을 위한 모범 사례</a> - 구현 지침</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">벡터 데이터베이스</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/pgvector/pgvector">pgvector 문서</a> - PostgreSQL 벡터 확장</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.pinecone.io/learn/vector-search-optimization/">벡터 검색 최적화</a> - 성능 튜닝</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/1603.09320">HNSW 알고리즘</a> - 계층적 네비게이블 스몰 월드 그래프</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시맨틱 검색</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://nlp.stanford.edu/IR-book/">정보 검색 기본</a> - 스탠포드 IR 교재</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://weaviate.io/blog/vector-search-best-practices">벡터 검색 모범 사례</a> - 구현 패턴</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://blog.vespa.ai/hybrid-search/">하이브리드 검색 전략</a> - 다양한 검색 접근법 결합</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>이전</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/06-Tools/README.md" target="_blank">실습 06: 도구 개발</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/08-Testing/README.md" target="_blank">실습 08: 테스트 및 디버깅</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_07-06---tool-development.html">&larr; 06 - Tool Development</a></span>
+  <span><a href="m11_09-08---testing-and-debugging.html">08 - Testing and Debugging &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

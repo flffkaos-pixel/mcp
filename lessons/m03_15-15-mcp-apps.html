@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>15 Mcp Apps - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 15 Mcp Apps</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP Apps</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP Apps is a new paradigm in MCP.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The idea is that not only do you respond with data back from a tool call, you also provide information on how this information should be interacted with.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">That means tool results now can contain UI information.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Why would we want that though?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Well, consider how you do things today.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You're likely consuming the results of an MCP Server by putting some type of frontend in front of it, that's code you need to write and maintain.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Sometimes that's what you want, but sometimes it would be great if you could just bring in a snippet of information that is self-contained that has it all from data to user interface.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lesson provides practical guidance on MCP Apps, how to get started with it and how to integrate it in your existing Web Apps. MCP Apps is a very new addition to the MCP Standard.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explain what MCP Apps are.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">When to use MCP Apps.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Build and integrate your own MCP Apps.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP Apps - how does it work</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The idea with MCP Apps is to provide a response that essentially is a component to be rendered.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Such a component can have both visuals and interactivity, e.g., button clicks, user input and more.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's start with the server side and our MCP Server.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To create an MCP App component you need to create a tool but also the application resource.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These two halves are connected by a resourceUri.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's an example. Let's try to visualize what's involved and what parts does what:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+server.ts -- responsible for registering tools and the component as a UI component
+
+src/
+
+  mcp-app.ts -- wiring up event handlers
+
+mcp-app.html -- the user interface
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This visual describes the architecture for creating a component and its logic.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart LR
+
+  subgraph Backend[Backend: MCP Server]
+
+    T[&quot;Register tools: registerAppTool()&quot;]
+
+    C[&quot;Register component resource: registerAppResource()&quot;]
+
+    U[resourceUri]
+
+    T --- U
+
+    C --- U
+
+  end
+
+
+
+  subgraph Parent[Parent Web Page]
+
+    H[Host application]
+
+    IFRAME[IFrame container]
+
+    H --&gt;|Inject MCP App UI| IFRAME
+
+  end
+
+
+
+  subgraph Frontend[Frontend: MCP App inside IFrame]
+
+    UI[&quot;User interface: mcp-app.html&quot;]
+
+    EH[&quot;Event handlers: src/mcp-app.ts&quot;]
+
+    UI --&gt; EH
+
+  end
+
+
+
+  IFRAME --&gt; UI
+
+  EH --&gt;|Click triggers server tool call| T
+
+  T --&gt;|Tool result data| EH
+
+  EH --&gt;|Send message to parent page| H
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's try to describe the responsibilities next for backend and frontend respectively.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">The backend</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There's two things we need to accomplish here:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Registering the tools we want to interact with.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Define the component. </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Registering the tool</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+registerAppTool(
+
+    server,
+
+    &quot;get-time&quot;,
+
+    {
+
+      title: &quot;Get Time&quot;,
+
+      description: &quot;Returns the current server time.&quot;,
+
+      inputSchema: {},
+
+      _meta: { ui: { resourceUri } }, // Links this tool to its UI resource
+
+    },
+
+    async () =&gt; {
+
+      const time = new Date().toISOString();
+
+      return { content: [{ type: &quot;text&quot;, text: time }] };
+
+    },
+
+  );
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The preceding code describes the behavior, where it exposes a tool called <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">get-time</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It takes no inputs but ends up producing the current time.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We do have the ability to define an <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inputSchema</code> for tools where we need to be able to accept user input.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Registering the component</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the same file, we also need to register the component:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const resourceUri = &quot;ui://get-time/mcp-app.html&quot;;
+
+
+
+// Register the resource, which returns the bundled HTML/JavaScript for the UI.
+
+registerAppResource(
+
+  server,
+
+  resourceUri,
+
+  resourceUri,
+
+  { mimeType: RESOURCE_MIME_TYPE },
+
+  async () =&gt; {
+
+    const html = await fs.readFile(path.join(DIST_DIR, &quot;mcp-app.html&quot;), &quot;utf-8&quot;);
+
+
+
+    return {
+
+    contents: [
+
+        { uri: resourceUri, mimeType: RESOURCE_MIME_TYPE, text: html },
+
+    ],
+
+    };
+
+  },
+
+);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Note how we mention <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resourceUri</code> to connect the component with its tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Of interest is also the callback where we load the UI file and return the component.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">The component frontend</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Just like the backend, there's two pieces here:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">A frontend written in pure HTML.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Code that handles events and what to do, e.g calling tools or messaging the parent window.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>User interface</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's have a look at the user interface.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;!-- mcp-app.html --&gt;
+
+&lt;!DOCTYPE html&gt;
+
+&lt;html lang=&quot;en&quot;&gt;
+
+  &lt;head&gt;
+
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+
+    &lt;title&gt;Get Time App&lt;/title&gt;
+
+  &lt;/head&gt;
+
+  &lt;body&gt;
+
+    &lt;p&gt;
+
+      &lt;strong&gt;Server Time:&lt;/strong&gt; &lt;code id=&quot;server-time&quot;&gt;Loading...&lt;/code&gt;
+
+    &lt;/p&gt;
+
+    &lt;button id=&quot;get-time-btn&quot;&gt;Get Server Time&lt;/button&gt;
+
+    &lt;script type=&quot;module&quot; src=&quot;/src/mcp-app.ts&quot;&gt;&lt;/script&gt;
+
+  &lt;/body&gt;
+
+&lt;/html&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Event wireup</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The last piece is the event wireup. That means we identify which part in our UI needs event handlers and what to do if events are raised:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// mcp-app.ts
+
+
+
+import { App } from &quot;@modelcontextprotocol/ext-apps&quot;;
+
+
+
+// Get element references
+
+const serverTimeEl = document.getElementById(&quot;server-time&quot;)!;
+
+const getTimeBtn = document.getElementById(&quot;get-time-btn&quot;)!;
+
+
+
+// Create app instance
+
+const app = new App({ name: &quot;Get Time App&quot;, version: &quot;1.0.0&quot; });
+
+
+
+// Handle tool results from the server. Set before `app.connect()` to avoid
+
+// missing the initial tool result.
+
+app.ontoolresult = (result) =&gt; {
+
+  const time = result.content?.find((c) =&gt; c.type === &quot;text&quot;)?.text;
+
+  serverTimeEl.textContent = time ?? &quot;[ERROR]&quot;;
+
+};
+
+
+
+// Wire up button click
+
+getTimeBtn.addEventListener(&quot;click&quot;, async () =&gt; {
+
+  // `app.callServerTool()` lets the UI request fresh data from the server
+
+  const result = await app.callServerTool({ name: &quot;get-time&quot;, arguments: {} });
+
+  const time = result.content?.find((c) =&gt; c.type === &quot;text&quot;)?.text;
+
+  serverTimeEl.textContent = time ?? &quot;[ERROR]&quot;;
+
+});
+
+
+
+// Connect to host
+
+app.connect();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As you can see from the above, this is normal code for hooking up DOM elements to events.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Worth calling out is the call to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callServerTool</code> that ends up calling a tool on the backend.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Dealing with user input</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">So far, we've seen a component that has a button that when clicked calls a tool. Let's see if we can add more UI elements like an input field and see if we can send arguments to a tool. Let's implement an FAQ functionality. Here's how it should work:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">There should be a button and an input element where the user types a keyword to search for for example "Shipping". This should call a tool on the backend that does a search in the FAQ data.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">A tool that supports the mentioned FAQ search.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's add the needed support to the backend first:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const faq: { [key: string]: string } = {
+
+    &quot;shipping&quot;: &quot;Our standard shipping time is 3-5 business days.&quot;,
+
+    &quot;return policy&quot;: &quot;You can return any item within 30 days of purchase.&quot;,
+
+    &quot;warranty&quot;: &quot;All products come with a 1-year warranty covering manufacturing defects.&quot;,
+
+  }
+
+
+
+registerAppTool(
+
+    server,
+
+    &quot;get-faq&quot;,
+
+    {
+
+      title: &quot;Search FAQ&quot;,
+
+      description: &quot;Searches the FAQ for relevant answers.&quot;,
+
+      inputSchema: zod.object({
+
+        query: zod.string().default(&quot;shipping&quot;),
+
+      }),
+
+      _meta: { ui: { resourceUri: faqResourceUri } }, // Links this tool to its UI resource
+
+    },
+
+    async ({ query }) =&gt; {
+
+      const answer: string = faq[query.toLowerCase()] || &quot;Sorry, I don&#x27;t have an answer for that.&quot;;
+
+      return { content: [{ type: &quot;text&quot;, text: answer }] };
+
+    },
+
+  );
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">What we're seeing here is how we populate <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inputSchema</code> and give it a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">zod</code> schema like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+inputSchema: zod.object({
+
+  query: zod.string().default(&quot;shipping&quot;),
+
+})
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the above schema we declare we have an input parameter called <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">query</code> and that it's optional with a default value of "shipping". </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Ok, let's move on to *mcp-app.html* to see what UI we need to create for this:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;div class=&quot;faq&quot;&gt;
+
+    &lt;h1&gt;FAQ response&lt;/h1&gt;
+
+    &lt;p&gt;FAQ Response: &lt;code id=&quot;faq-response&quot;&gt;Loading...&lt;/code&gt;&lt;/p&gt;
+
+    &lt;input type=&quot;text&quot; id=&quot;faq-query&quot; placeholder=&quot;Enter FAQ query&quot; /&gt;
+
+    &lt;button id=&quot;get-faq-btn&quot;&gt;Get FAQ Response&lt;/button&gt;
+
+  &lt;/div&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, now we have an input element and button. Let's go to *mcp-app.ts* next to wire up these events:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const getFaqBtn = document.getElementById(&quot;get-faq-btn&quot;)!;
+
+const faqQueryInput = document.getElementById(&quot;faq-query&quot;) as HTMLInputElement;
+
+
+
+getFaqBtn.addEventListener(&quot;click&quot;, async () =&gt; {
+
+  const query = faqQueryInput.value;
+
+  const result = await app.callServerTool({ name: &quot;get-faq&quot;, arguments: { query } });
+
+  const faq = result.content?.find((c) =&gt; c.type === &quot;text&quot;)?.text;
+
+  faqResponseEl.textContent = faq ?? &quot;[ERROR]&quot;;
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the code above we:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create references to the interactive UI elements.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handle a button click to parse out the input element value and we also call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.callServerTool()</code> with <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">name</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">arguments</code> where the latter is passing <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">query</code> as value. </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">What actually happens when you call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callServerTool</code> is that it sends a message to the parent window and that window ends up calling the MCP Server.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Try it out</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Trying this out we should now see the following:</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">and here's where we try it with input like "warranty"</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To run this code, head over to <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/15-mcp-apps/code/README.md" target="_blank">Code section</a></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Testing in Visual Studio Code</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Visual Studio Code has great support for MCP Apps and is probably one of the easiest ways of testing your MCP Apps. To use Visual Studio Code, add a server entry to *mcp.json* like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&quot;my-mcp-server-7178eca7&quot;: {
+
+    &quot;url&quot;: &quot;http://localhost:3001/mcp&quot;,
+
+    &quot;type&quot;: &quot;http&quot;
+
+  }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Then start the server, you should be able to communicate with your MCP App through the Chat Window provided you have GitHub Copilot installed. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You can trigger it via a prompt, for example "#get-faq":</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">and just like when you ran it through a web browser, it renders the same way like so:</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Assignment</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Create a rock paper scissor game. It should consist of the following:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">UI:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">a drop down list with options</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">a button to submit a choice</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">a label showing who picked what and who won</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Server:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">should have a tool rock paper scissor tool that takes "choice" as input. It should also render a computer choice and determine winner</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Solution</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Summary</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We learned about this new paradigm MCP Apps. It's a new paradigm that allows MCP Servers to have an opinion about not only the data but also how this data should be presented. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Additionally, we learned that these MCP Apps are hosted into an IFrame and to communicate with MCP Servers they would need to send messages to the parent web app.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There are several libraries out there for both plain JavaScript and React and more that makes this communication easier.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's what you learned:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP Apps is a new standard that can be useful when you want to ship both data and UI features.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">These types of apps run in an IFrame for security reasons.</li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/04-PracticalImplementation/README.md" target="_blank">Chapter 4</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP 앱</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 앱은 MCP의 새로운 패러다임입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">아이디어는 도구 호출에서 데이터를 반환하는 것뿐만 아니라 이 정보와 상호작용하는 방법에 대한 정보를 제공하는 것입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">즉, 도구 결과에 이제 UI 정보가 포함될 수 있다는 뜻입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">하지만 왜 그런 것이 필요할까요?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">오늘날 여러분이 하는 방식을 생각해 보세요.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버의 결과를 소비하기 위해 프런트엔드를 만들어야 하며, 이는 여러분이 작성하고 유지해야 하는 코드입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">때로는 그것이 필요한 경우도 있지만, 때로는 데이터부터 사용자 인터페이스까지 모두 포함하는 독립적인 정보 조각을 가져올 수 있다면 좋을 것입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 수업에서는 MCP 앱에 대한 실용적인 가이드, 시작 방법 및 기존 웹 앱에 통합하는 방법을 제공합니다. MCP 앱은 MCP 표준에 아주 새롭게 추가된 기능입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 수업이 끝나면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 앱이 무엇인지 설명할 수 있다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 앱을 언제 사용할지 알 수 있다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자신만의 MCP 앱을 빌드하고 통합할 수 있다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 앱 - 어떻게 작동하는가</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 앱의 아이디어는 렌더링할 구성요소를 본질적으로 응답으로 제공하는 것입니다. 이러한 구성요소는 시각적 요소와 상호작용성, 예를 들어 버튼 클릭, 사용자 입력 등을 가질 수 있습니다. 먼저 서버 측과 MCP 서버부터 시작해 봅시다. MCP 앱 구성요소를 만들려면 도구와 애플리케이션 리소스를 모두 만들어야 합니다. 이 두 부분은 resourceUri로 연결됩니다. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예를 들어 보겠습니다. 관련된 내용을 시각화하고 어떤 부분이 어떤 역할을 하는지 봅니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+server.ts -- responsible for registering tools and the component as a UI component
+
+src/
+
+  mcp-app.ts -- wiring up event handlers
+
+mcp-app.html -- the user interface
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 시각은 구성요소와 그 로직을 만드는 아키텍처를 설명합니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart LR
+
+  subgraph Backend[백엔드: MCP 서버]
+
+    T[&quot;도구 등록: registerAppTool()&quot;]
+
+    C[&quot;컴포넌트 리소스 등록: registerAppResource()&quot;]
+
+    U[resourceUri]
+
+    T --- U
+
+    C --- U
+
+  end
+
+
+
+  subgraph Parent[상위 웹 페이지]
+
+    H[호스트 애플리케이션]
+
+    IFRAME[IFrame 컨테이너]
+
+    H --&gt;|MCP 앱 UI 삽입| IFRAME
+
+  end
+
+
+
+  subgraph Frontend[프론트엔드: IFrame 내 MCP 앱]
+
+    UI[&quot;사용자 인터페이스: mcp-app.html&quot;]
+
+    EH[&quot;이벤트 핸들러: src/mcp-app.ts&quot;]
+
+    UI --&gt; EH
+
+  end
+
+
+
+  IFRAME --&gt; UI
+
+  EH --&gt;|클릭 시 서버 도구 호출 트리거| T
+
+  T --&gt;|도구 결과 데이터| EH
+
+  EH --&gt;|상위 페이지에 메시지 전송| H
+
+</code></pre>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 백엔드와 프런트엔드 각각의 책임을 설명해 봅시다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">백엔드</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서 해야 할 두 가지가 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">상호작용할 도구 등록하기.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">구성요소 정의하기. </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>도구 등록</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+registerAppTool(
+
+    server,
+
+    &quot;get-time&quot;,
+
+    {
+
+      title: &quot;Get Time&quot;,
+
+      description: &quot;Returns the current server time.&quot;,
+
+      inputSchema: {},
+
+      _meta: { ui: { resourceUri } }, // 이 도구를 UI 리소스에 연결합니다
+
+    },
+
+    async () =&gt; {
+
+      const time = new Date().toISOString();
+
+      return { content: [{ type: &quot;text&quot;, text: time }] };
+
+    },
+
+  );
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">get-time</code>이라는 도구를 노출하는 동작을 설명합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">입력은 없지만 현재 시간을 생성합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">사용자 입력을 받아야 하는 도구에 대해선 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inputSchema</code>를 정의할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>구성요소 등록</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">같은 파일에서 구성요소도 등록해야 합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const resourceUri = &quot;ui://get-time/mcp-app.html&quot;;
+
+
+
+// UI를 위한 번들된 HTML/JavaScript를 반환하는 리소스를 등록합니다.
+
+registerAppResource(
+
+  server,
+
+  resourceUri,
+
+  resourceUri,
+
+  { mimeType: RESOURCE_MIME_TYPE },
+
+  async () =&gt; {
+
+    const html = await fs.readFile(path.join(DIST_DIR, &quot;mcp-app.html&quot;), &quot;utf-8&quot;);
+
+
+
+    return {
+
+    contents: [
+
+        { uri: resourceUri, mimeType: RESOURCE_MIME_TYPE, text: html },
+
+    ],
+
+    };
+
+  },
+
+);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resourceUri</code>를 언급하여 구성요소를 도구와 연결하는 부분에 주목하세요. 또한 UI 파일을 로드하고 구성요소를 반환하는 콜백도 흥미롭습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구성요소 프런트엔드</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">백엔드와 마찬가지로 두 부분이 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">순수 HTML로 작성된 프런트엔드.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이벤트 처리 및 도구 호출 또는 부모 창에 메시지 보내기 등을 담당하는 코드.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>사용자 인터페이스</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">UI를 살펴봅시다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;!-- mcp-app.html --&gt;
+
+&lt;!DOCTYPE html&gt;
+
+&lt;html lang=&quot;en&quot;&gt;
+
+  &lt;head&gt;
+
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+
+    &lt;title&gt;Get Time App&lt;/title&gt;
+
+  &lt;/head&gt;
+
+  &lt;body&gt;
+
+    &lt;p&gt;
+
+      &lt;strong&gt;Server Time:&lt;/strong&gt; &lt;code id=&quot;server-time&quot;&gt;Loading...&lt;/code&gt;
+
+    &lt;/p&gt;
+
+    &lt;button id=&quot;get-time-btn&quot;&gt;Get Server Time&lt;/button&gt;
+
+    &lt;script type=&quot;module&quot; src=&quot;/src/mcp-app.ts&quot;&gt;&lt;/script&gt;
+
+  &lt;/body&gt;
+
+&lt;/html&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>이벤트 연결</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">마지막 부분은 이벤트 연결입니다. 즉, UI 내에서 이벤트 핸들러가 필요한 부분을 식별하고 이벤트가 발생했을 때 무엇을 할지 결정합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// mcp-app.ts
+
+
+
+import { App } from &quot;@modelcontextprotocol/ext-apps&quot;;
+
+
+
+// 요소 참조 가져오기
+
+const serverTimeEl = document.getElementById(&quot;server-time&quot;)!;
+
+const getTimeBtn = document.getElementById(&quot;get-time-btn&quot;)!;
+
+
+
+// 앱 인스턴스 생성
+
+const app = new App({ name: &quot;Get Time App&quot;, version: &quot;1.0.0&quot; });
+
+
+
+// 서버로부터 도구 결과 처리. 초기 도구 결과 누락을 방지하기 위해 `app.connect()` 전에 설정
+
+// 초기 도구 결과 누락 방지
+
+app.ontoolresult = (result) =&gt; {
+
+  const time = result.content?.find((c) =&gt; c.type === &quot;text&quot;)?.text;
+
+  serverTimeEl.textContent = time ?? &quot;[ERROR]&quot;;
+
+};
+
+
+
+// 버튼 클릭 연결
+
+getTimeBtn.addEventListener(&quot;click&quot;, async () =&gt; {
+
+  // `app.callServerTool()`은 UI가 서버로부터 새로운 데이터를 요청하도록 함
+
+  const result = await app.callServerTool({ name: &quot;get-time&quot;, arguments: {} });
+
+  const time = result.content?.find((c) =&gt; c.type === &quot;text&quot;)?.text;
+
+  serverTimeEl.textContent = time ?? &quot;[ERROR]&quot;;
+
+});
+
+
+
+// 호스트에 연결
+
+app.connect();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위에서 보듯이, DOM 요소를 이벤트에 연결하는 일반적인 코드입니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callServerTool</code> 호출은 백엔드의 도구를 호출하는 부분임을 주목할 만합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">사용자 입력 처리</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">지금까지 본 구성요소는 버튼을 클릭하면 도구를 호출하는 기능이 있었습니다. 이제 입력 필드 같은 UI 요소를 추가하고 도구에 인수를 보낼 수 있는지 봅시다. FAQ 기능을 구현해 보겠습니다. 작동 방식은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">버튼과 사용자가 검색 키워드(예: "Shipping")를 입력할 수 있는 입력 요소가 있어야 합니다. 이것은 백엔드에서 FAQ 데이터를 검색하는 도구를 호출합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">앞서 설명한 FAQ 검색을 지원하는 도구.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">먼저 백엔드에 필요한 지원을 추가해 봅시다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const faq: { [key: string]: string } = {
+
+    &quot;shipping&quot;: &quot;Our standard shipping time is 3-5 business days.&quot;,
+
+    &quot;return policy&quot;: &quot;You can return any item within 30 days of purchase.&quot;,
+
+    &quot;warranty&quot;: &quot;All products come with a 1-year warranty covering manufacturing defects.&quot;,
+
+  }
+
+
+
+registerAppTool(
+
+    server,
+
+    &quot;get-faq&quot;,
+
+    {
+
+      title: &quot;Search FAQ&quot;,
+
+      description: &quot;Searches the FAQ for relevant answers.&quot;,
+
+      inputSchema: zod.object({
+
+        query: zod.string().default(&quot;shipping&quot;),
+
+      }),
+
+      _meta: { ui: { resourceUri: faqResourceUri } }, // 이 도구를 UI 리소스에 연결합니다
+
+    },
+
+    async ({ query }) =&gt; {
+
+      const answer: string = faq[query.toLowerCase()] || &quot;Sorry, I don&#x27;t have an answer for that.&quot;;
+
+      return { content: [{ type: &quot;text&quot;, text: answer }] };
+
+    },
+
+  );
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inputSchema</code>를 채우는 방법과 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">zod</code> 스키마를 정의하는 방식을 봅니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+inputSchema: zod.object({
+
+  query: zod.string().default(&quot;shipping&quot;),
+
+})
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 스키마에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">query</code>라는 입력 매개변수가 있고, 선택적이며 기본값이 "shipping"임을 선언합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋습니다. 이제 <em>mcp-app.html</em>로 가서 어떤 UI를 만들어야 하는지 봅시다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;div class=&quot;faq&quot;&gt;
+
+    &lt;h1&gt;FAQ response&lt;/h1&gt;
+
+    &lt;p&gt;FAQ Response: &lt;code id=&quot;faq-response&quot;&gt;Loading...&lt;/code&gt;&lt;/p&gt;
+
+    &lt;input type=&quot;text&quot; id=&quot;faq-query&quot; placeholder=&quot;Enter FAQ query&quot; /&gt;
+
+    &lt;button id=&quot;get-faq-btn&quot;&gt;Get FAQ Response&lt;/button&gt;
+
+  &lt;/div&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 입력 요소와 버튼이 생겼습니다. 다음은 <em>mcp-app.ts</em>로 가서 이벤트를 연결합시다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const getFaqBtn = document.getElementById(&quot;get-faq-btn&quot;)!;
+
+const faqQueryInput = document.getElementById(&quot;faq-query&quot;) as HTMLInputElement;
+
+
+
+getFaqBtn.addEventListener(&quot;click&quot;, async () =&gt; {
+
+  const query = faqQueryInput.value;
+
+  const result = await app.callServerTool({ name: &quot;get-faq&quot;, arguments: { query } });
+
+  const faq = result.content?.find((c) =&gt; c.type === &quot;text&quot;)?.text;
+
+  faqResponseEl.textContent = faq ?? &quot;[ERROR]&quot;;
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서 우리는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">상호작용 UI 요소에 대한 참조를 만듭니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">버튼 클릭 시 입력 요소 값을 구문 분석하고 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.callServerTool()</code>을 호출하는데, 여기서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">name</code>과 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">arguments</code>를 넘기며, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">arguments</code>에는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">query</code> 값을 전달합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callServerTool</code> 호출 시 실제로는 부모 창에 메시지를 보내고 부모 창이 MCP 서버를 호출하게 됩니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">직접 해보기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 기능을 시도하면 다음과 같은 결과를 볼 수 있습니다:</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">그리고 입력을 "warranty"로 바꾸어 시도한 화면입니다:</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 코드를 실행하려면 <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/15-mcp-apps/code/README.md" target="_blank">코드 섹션</a>으로 이동하세요.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Visual Studio Code에서 테스트하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Visual Studio Code는 MCP 앱을 훌륭히 지원하며 MCP 앱을 테스트하기에 아마도 가장 쉬운 방법 중 하나입니다. Visual Studio Code를 사용하려면 <em>mcp.json</em>에 다음과 같이 서버 항목을 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&quot;my-mcp-server-7178eca7&quot;: {
+
+    &quot;url&quot;: &quot;http://localhost:3001/mcp&quot;,
+
+    &quot;type&quot;: &quot;http&quot;
+
+  }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">그런 다음 서버를 시작하면 GitHub Copilot이 설치되어 있을 경우 채팅 창을 통해 MCP 앱과 통신할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예를 들어 "#get-faq" 프롬프트로 호출할 수 있습니다:</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">웹 브라우저에서 실행했을 때와 마찬가지로 동일하게 렌더링됩니다:</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">과제</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">가위바위보 게임을 만들어 보세요. 다음과 같이 구성해야 합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">UI:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">옵션이 있는 드롭다운 리스트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">선택을 제출하는 버튼</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">누가 무엇을 선택했고 누가 이겼는지를 보여 주는 라벨</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">입력으로 "choice"를 받는 가위바위보 도구를 가져야 합니다. 컴퓨터 선택을 렌더링하고 승자를 결정합니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">해답</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">요약</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리는 MCP 앱이라는 새로운 패러다임에 대해 배웠습니다. 이는 MCP 서버가 데이터뿐 아니라 이 데이터를 어떻게 표현할지도 의견을 가질 수 있는 새로운 패러다임입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">또한, MCP 앱은 보안을 위해 IFrame에 호스팅되며 MCP 서버와 소통하려면 부모 웹 앱에 메시지를 보내야 한다는 점도 배웠습니다. 순수 자바스크립트, React 등 다양한 라이브러리가 이 통신을 쉽게 만듭니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">주요 내용 정리</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">배운 내용은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 앱은 데이터와 UI 기능을 함께 제공하려 할 때 유용한 새로운 표준입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이런 유형의 앱은 보안상 이유로 IFrame에서 실행됩니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/04-PracticalImplementation/README.md" target="_blank">4장</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있음을 양지하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문 문서는 해당 언어의 공식 자료로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보에 대해서는 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역의 사용으로 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m03_14-14-sampling.html">&larr; 14 Sampling</a></span>
+  <span><a href="m03_16-java-calculator.html">Java Calculator &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

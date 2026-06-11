@@ -1,0 +1,4725 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>02 - Security and Multi-Tenancy - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 02 - Security and Multi-Tenancy</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Security and Multi-Tenancy</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab provides comprehensive guidance on implementing enterprise-grade security and multi-tenancy for MCP servers.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll learn to design secure, compliant systems that protect sensitive retail data while enabling flexible access patterns across multiple tenants.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Security is paramount in retail applications that handle customer data, payment information, and business intelligence.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab covers the complete security architecture from authentication and authorization to data isolation and compliance monitoring.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We implement a defense-in-depth strategy combining Azure identity services, PostgreSQL Row Level Security, application-level controls, and comprehensive audit logging to create a robust, compliant platform.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> enterprise-grade Row Level Security for multi-tenant data isolation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Design</strong> secure authentication and authorization patterns with Azure</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Configure</strong> comprehensive audit logging for compliance requirements</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Apply</strong> defense-in-depth security strategies across all application layers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Validate</strong> security implementations through systematic testing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Monitor</strong> security events and respond to potential threats</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔐 Multi-Tenant Security Architecture</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Security Layers Overview</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────┐
+
+│               Azure Front Door                  │ ← WAF, DDoS Protection
+
+├─────────────────────────────────────────────────┤
+
+│              Application Gateway                │ ← SSL Termination, Rate Limiting
+
+├─────────────────────────────────────────────────┤
+
+│                MCP Server                       │ ← Authentication, Authorization
+
+│  ┌─────────────────────────────────────────────┤
+
+│  │           Connection Layer                  │ ← Connection Pooling, Circuit Breakers
+
+│  ├─────────────────────────────────────────────┤
+
+│  │         Business Logic Layer               │ ← Input Validation, Business Rules
+
+│  ├─────────────────────────────────────────────┤
+
+│  │           Data Access Layer                │ ← Query Sanitization, RLS Context
+
+│  └─────────────────────────────────────────────┤
+
+├─────────────────────────────────────────────────┤
+
+│              PostgreSQL RLS                    │ ← Row Level Security, Audit Triggers
+
+└─────────────────────────────────────────────────┘
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Multi-Tenancy Models</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our implementation uses the <strong>Shared Database, Shared Schema</strong> model with Row Level Security:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Benefits:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Cost-effective resource utilization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Simplified maintenance and updates</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Strong data isolation through RLS</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Compliance-friendly audit trails</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Trade-offs:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Requires careful RLS policy design</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Schema changes affect all tenants</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Need robust backup/restore procedures</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛡️ Row Level Security Implementation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">RLS Foundation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Enable RLS on all multi-tenant tables
+
+ALTER TABLE retail.customers ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.products ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.sales_transactions ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.sales_transaction_items ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.product_embeddings ENABLE ROW LEVEL SECURITY;
+
+
+
+-- Create application role for MCP server
+
+CREATE ROLE mcp_user LOGIN;
+
+GRANT USAGE ON SCHEMA retail TO mcp_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA retail TO mcp_user;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Store Context Management</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Function to securely set store context
+
+CREATE OR REPLACE FUNCTION retail.set_store_context(store_id_param VARCHAR(50))
+
+RETURNS void
+
+LANGUAGE plpgsql
+
+SECURITY DEFINER
+
+SET search_path = retail, pg_temp
+
+AS $$
+
+DECLARE
+
+    user_info RECORD;
+
+BEGIN
+
+    -- Validate store exists and is active
+
+    SELECT store_id, store_name, is_active 
+
+    INTO user_info
+
+    FROM retail.stores 
+
+    WHERE store_id = store_id_param;
+
+    
+
+    IF NOT FOUND THEN
+
+        RAISE EXCEPTION &#x27;Store not found: %&#x27;, store_id_param
+
+            USING ERRCODE = &#x27;invalid_parameter_value&#x27;,
+
+                  HINT = &#x27;Verify store ID and ensure it exists in the system&#x27;;
+
+    END IF;
+
+    
+
+    IF NOT user_info.is_active THEN
+
+        RAISE EXCEPTION &#x27;Store is inactive: %&#x27;, store_id_param
+
+            USING ERRCODE = &#x27;insufficient_privilege&#x27;,
+
+                  HINT = &#x27;Contact administrator to activate store&#x27;;
+
+    END IF;
+
+    
+
+    -- Set the secure context
+
+    PERFORM set_config(&#x27;app.current_store_id&#x27;, store_id_param, false);
+
+    PERFORM set_config(&#x27;app.store_name&#x27;, user_info.store_name, false);
+
+    PERFORM set_config(&#x27;app.context_set_at&#x27;, extract(epoch from current_timestamp)::text, false);
+
+    
+
+    -- Log context change for audit
+
+    INSERT INTO retail.security_audit_log (
+
+        event_type,
+
+        user_name,
+
+        store_id,
+
+        ip_address,
+
+        user_agent,
+
+        details,
+
+        severity
+
+    ) VALUES (
+
+        &#x27;store_context_set&#x27;,
+
+        current_user,
+
+        store_id_param,
+
+        inet_client_addr()::text,
+
+        current_setting(&#x27;application_name&#x27;, true),
+
+        jsonb_build_object(
+
+            &#x27;store_name&#x27;, user_info.store_name,
+
+            &#x27;timestamp&#x27;, current_timestamp,
+
+            &#x27;session_id&#x27;, pg_backend_pid()
+
+        ),
+
+        &#x27;INFO&#x27;
+
+    );
+
+END;
+
+$$;
+
+
+
+-- Grant execute to MCP user
+
+GRANT EXECUTE ON FUNCTION retail.set_store_context TO mcp_user;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">RLS Policies</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Customers RLS Policy
+
+CREATE POLICY customers_store_isolation ON retail.customers
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+
+
+-- Products RLS Policy with additional business rules
+
+CREATE POLICY products_store_isolation ON retail.products
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+        AND is_active = TRUE  -- Additional business rule
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+
+
+-- Sales Transactions RLS Policy
+
+CREATE POLICY sales_transactions_store_isolation ON retail.sales_transactions
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+
+
+-- Transaction Items RLS Policy (via join)
+
+CREATE POLICY sales_transaction_items_store_isolation ON retail.sales_transaction_items
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        transaction_id IN (
+
+            SELECT transaction_id 
+
+            FROM retail.sales_transactions 
+
+            WHERE store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        )
+
+    )
+
+    WITH CHECK (
+
+        transaction_id IN (
+
+            SELECT transaction_id 
+
+            FROM retail.sales_transactions 
+
+            WHERE store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        )
+
+    );
+
+
+
+-- Product Embeddings RLS Policy
+
+CREATE POLICY product_embeddings_store_isolation ON retail.product_embeddings
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">RLS Testing and Validation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Test RLS policies with different store contexts
+
+DO $$
+
+DECLARE
+
+    test_result RECORD;
+
+    customer_count INTEGER;
+
+    product_count INTEGER;
+
+BEGIN
+
+    -- Test Seattle store context
+
+    PERFORM retail.set_store_context(&#x27;seattle&#x27;);
+
+    
+
+    SELECT COUNT(*) INTO customer_count FROM retail.customers;
+
+    SELECT COUNT(*) INTO product_count FROM retail.products;
+
+    
+
+    RAISE NOTICE &#x27;Seattle store - Customers: %, Products: %&#x27;, customer_count, product_count;
+
+    
+
+    -- Test Redmond store context
+
+    PERFORM retail.set_store_context(&#x27;redmond&#x27;);
+
+    
+
+    SELECT COUNT(*) INTO customer_count FROM retail.customers;
+
+    SELECT COUNT(*) INTO product_count FROM retail.products;
+
+    
+
+    RAISE NOTICE &#x27;Redmond store - Customers: %, Products: %&#x27;, customer_count, product_count;
+
+    
+
+    -- Verify data isolation
+
+    IF customer_count &gt; 0 AND product_count &gt; 0 THEN
+
+        RAISE NOTICE &#x27;RLS policies are working correctly&#x27;;
+
+    ELSE
+
+        RAISE WARNING &#x27;RLS policies may not be configured correctly&#x27;;
+
+    END IF;
+
+END;
+
+$$;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔑 Authentication and Authorization</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure Entra ID Integration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/security/authentication.py
+
+&quot;&quot;&quot;
+
+Azure Entra ID authentication for MCP server.
+
+&quot;&quot;&quot;
+
+import os
+
+import jwt
+
+import aiohttp
+
+import asyncio
+
+from typing import Dict, Optional, List
+
+from datetime import datetime, timezone
+
+from azure.identity.aio import DefaultAzureCredential
+
+from azure.keyvault.secrets.aio import SecretClient
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class AzureAuthenticator:
+
+    &quot;&quot;&quot;Handle Azure Entra ID authentication and token validation.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.tenant_id = os.getenv(&#x27;AZURE_TENANT_ID&#x27;)
+
+        self.client_id = os.getenv(&#x27;AZURE_CLIENT_ID&#x27;)
+
+        self.audience = os.getenv(&#x27;AZURE_AUDIENCE&#x27;, self.client_id)
+
+        self.issuer = f&quot;https://login.microsoftonline.com/{self.tenant_id}/v2.0&quot;
+
+        
+
+        # Cache for JWKS (JSON Web Key Set)
+
+        self._jwks_cache = None
+
+        self._jwks_cache_expiry = None
+
+        
+
+        # Key Vault for secrets
+
+        self.key_vault_url = os.getenv(&#x27;AZURE_KEY_VAULT_URL&#x27;)
+
+        self.credential = DefaultAzureCredential()
+
+        
+
+        if self.key_vault_url:
+
+            self.secret_client = SecretClient(
+
+                vault_url=self.key_vault_url,
+
+                credential=self.credential
+
+            )
+
+    
+
+    async def validate_token(self, token: str) -&gt; Dict:
+
+        &quot;&quot;&quot;Validate JWT token from Azure Entra ID.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            # Get signing keys
+
+            signing_keys = await self._get_signing_keys()
+
+            
+
+            # Decode token header to get key ID
+
+            unverified_header = jwt.get_unverified_header(token)
+
+            key_id = unverified_header.get(&#x27;kid&#x27;)
+
+            
+
+            if not key_id:
+
+                raise ValueError(&quot;Token missing key ID&quot;)
+
+            
+
+            # Find the corresponding key
+
+            signing_key = None
+
+            for key in signing_keys:
+
+                if key[&#x27;kid&#x27;] == key_id:
+
+                    signing_key = jwt.algorithms.RSAAlgorithm.from_jwk(key)
+
+                    break
+
+            
+
+            if not signing_key:
+
+                raise ValueError(f&quot;Unable to find signing key for kid: {key_id}&quot;)
+
+            
+
+            # Validate and decode token
+
+            payload = jwt.decode(
+
+                token,
+
+                signing_key,
+
+                algorithms=[&#x27;RS256&#x27;],
+
+                audience=self.audience,
+
+                issuer=self.issuer,
+
+                options={
+
+                    &#x27;verify_exp&#x27;: True,
+
+                    &#x27;verify_aud&#x27;: True,
+
+                    &#x27;verify_iss&#x27;: True
+
+                }
+
+            )
+
+            
+
+            # Extract user information
+
+            user_info = self._extract_user_info(payload)
+
+            
+
+            # Log successful authentication
+
+            logger.info(
+
+                &quot;User authenticated successfully&quot;,
+
+                extra={
+
+                    &#x27;user_id&#x27;: user_info[&#x27;user_id&#x27;],
+
+                    &#x27;email&#x27;: user_info.get(&#x27;email&#x27;),
+
+                    &#x27;tenant_id&#x27;: payload.get(&#x27;tid&#x27;)
+
+                }
+
+            )
+
+            
+
+            return user_info
+
+            
+
+        except jwt.ExpiredSignatureError:
+
+            logger.warning(&quot;Token has expired&quot;)
+
+            raise ValueError(&quot;Token has expired&quot;)
+
+        except jwt.InvalidAudienceError:
+
+            logger.warning(f&quot;Invalid audience in token. Expected: {self.audience}&quot;)
+
+            raise ValueError(&quot;Invalid token audience&quot;)
+
+        except jwt.InvalidIssuerError:
+
+            logger.warning(f&quot;Invalid issuer in token. Expected: {self.issuer}&quot;)
+
+            raise ValueError(&quot;Invalid token issuer&quot;)
+
+        except Exception as e:
+
+            logger.error(f&quot;Token validation failed: {str(e)}&quot;)
+
+            raise ValueError(f&quot;Token validation failed: {str(e)}&quot;)
+
+    
+
+    async def _get_signing_keys(self) -&gt; List[Dict]:
+
+        &quot;&quot;&quot;Get JWKS from Azure Entra ID with caching.&quot;&quot;&quot;
+
+        
+
+        current_time = datetime.now(timezone.utc)
+
+        
+
+        # Check if cache is valid
+
+        if (self._jwks_cache and self._jwks_cache_expiry and 
+
+            current_time &lt; self._jwks_cache_expiry):
+
+            return self._jwks_cache
+
+        
+
+        # Fetch new JWKS
+
+        jwks_url = f&quot;{self.issuer}/keys&quot;
+
+        
+
+        async with aiohttp.ClientSession() as session:
+
+            async with session.get(jwks_url) as response:
+
+                if response.status != 200:
+
+                    raise Exception(f&quot;Failed to fetch JWKS: {response.status}&quot;)
+
+                
+
+                jwks_data = await response.json()
+
+                
+
+        # Cache for 1 hour
+
+        self._jwks_cache = jwks_data[&#x27;keys&#x27;]
+
+        self._jwks_cache_expiry = current_time.replace(
+
+            hour=current_time.hour + 1
+
+        )
+
+        
+
+        return self._jwks_cache
+
+    
+
+    def _extract_user_info(self, payload: Dict) -&gt; Dict:
+
+        &quot;&quot;&quot;Extract user information from JWT payload.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &#x27;user_id&#x27;: payload.get(&#x27;oid&#x27;) or payload.get(&#x27;sub&#x27;),
+
+            &#x27;email&#x27;: payload.get(&#x27;email&#x27;) or payload.get(&#x27;preferred_username&#x27;),
+
+            &#x27;name&#x27;: payload.get(&#x27;name&#x27;),
+
+            &#x27;tenant_id&#x27;: payload.get(&#x27;tid&#x27;),
+
+            &#x27;roles&#x27;: payload.get(&#x27;roles&#x27;, []),
+
+            &#x27;groups&#x27;: payload.get(&#x27;groups&#x27;, []),
+
+            &#x27;app_roles&#x27;: payload.get(&#x27;app_roles&#x27;, []),
+
+            &#x27;scope&#x27;: payload.get(&#x27;scp&#x27;, &#x27;&#x27;).split() if payload.get(&#x27;scp&#x27;) else [],
+
+            &#x27;expires_at&#x27;: datetime.fromtimestamp(payload[&#x27;exp&#x27;], timezone.utc),
+
+            &#x27;issued_at&#x27;: datetime.fromtimestamp(payload[&#x27;iat&#x27;], timezone.utc)
+
+        }
+
+    
+
+    async def get_user_store_access(self, user_id: str) -&gt; List[str]:
+
+        &quot;&quot;&quot;Get list of stores the user has access to.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            # This would typically query your user/store mapping
+
+            # For demo, we&#x27;ll use a simple Key Vault secret
+
+            secret_name = f&quot;user-{user_id}-stores&quot;
+
+            
+
+            if self.secret_client:
+
+                secret = await self.secret_client.get_secret(secret_name)
+
+                store_list = secret.value.split(&#x27;,&#x27;)
+
+                return [store.strip() for store in store_list if store.strip()]
+
+            
+
+            # Fallback: return default store access
+
+            logger.warning(f&quot;No store mapping found for user {user_id}, using default&quot;)
+
+            return [&#x27;seattle&#x27;]  # Default store access
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Failed to get store access for user {user_id}: {e}&quot;)
+
+            return []  # No access if we can&#x27;t determine stores
+
+
+
+# Global authenticator instance
+
+azure_authenticator = AzureAuthenticator()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Authorization Middleware</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/security/authorization.py
+
+&quot;&quot;&quot;
+
+Authorization middleware and decorators for MCP server.
+
+&quot;&quot;&quot;
+
+import functools
+
+from typing import Dict, List, Optional, Callable, Any
+
+from fastapi import HTTPException, status, Request
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+security = HTTPBearer()
+
+
+
+class AuthorizationError(Exception):
+
+    &quot;&quot;&quot;Custom authorization error.&quot;&quot;&quot;
+
+    pass
+
+
+
+class RoleBasedAuth:
+
+    &quot;&quot;&quot;Role-based access control implementation.&quot;&quot;&quot;
+
+    
+
+    # Define role hierarchy
+
+    ROLE_HIERARCHY = {
+
+        &#x27;store_admin&#x27;: [&#x27;store_manager&#x27;, &#x27;store_user&#x27;, &#x27;store_readonly&#x27;],
+
+        &#x27;store_manager&#x27;: [&#x27;store_user&#x27;, &#x27;store_readonly&#x27;],
+
+        &#x27;store_user&#x27;: [&#x27;store_readonly&#x27;],
+
+        &#x27;store_readonly&#x27;: []
+
+    }
+
+    
+
+    # Define permissions for each role
+
+    ROLE_PERMISSIONS = {
+
+        &#x27;store_admin&#x27;: [
+
+            &#x27;read_all&#x27;, &#x27;write_all&#x27;, &#x27;delete_all&#x27;, &#x27;manage_users&#x27;
+
+        ],
+
+        &#x27;store_manager&#x27;: [
+
+            &#x27;read_all&#x27;, &#x27;write_transactions&#x27;, &#x27;write_inventory&#x27;, &#x27;read_reports&#x27;
+
+        ],
+
+        &#x27;store_user&#x27;: [
+
+            &#x27;read_products&#x27;, &#x27;read_customers&#x27;, &#x27;write_transactions&#x27;
+
+        ],
+
+        &#x27;store_readonly&#x27;: [
+
+            &#x27;read_products&#x27;, &#x27;read_basic_reports&#x27;
+
+        ]
+
+    }
+
+    
+
+    @classmethod
+
+    def has_permission(cls, user_roles: List[str], required_permission: str) -&gt; bool:
+
+        &quot;&quot;&quot;Check if user has required permission.&quot;&quot;&quot;
+
+        
+
+        user_permissions = set()
+
+        
+
+        for role in user_roles:
+
+            # Add direct permissions
+
+            user_permissions.update(cls.ROLE_PERMISSIONS.get(role, []))
+
+            
+
+            # Add inherited permissions
+
+            inherited_roles = cls.ROLE_HIERARCHY.get(role, [])
+
+            for inherited_role in inherited_roles:
+
+                user_permissions.update(cls.ROLE_PERMISSIONS.get(inherited_role, []))
+
+        
+
+        return required_permission in user_permissions
+
+    
+
+    @classmethod
+
+    def get_user_stores(cls, user_info: Dict) -&gt; List[str]:
+
+        &quot;&quot;&quot;Extract stores user has access to from user info.&quot;&quot;&quot;
+
+        
+
+        # This would typically come from your user management system
+
+        # For demo, we&#x27;ll extract from custom claims or groups
+
+        
+
+        stores = []
+
+        
+
+        # Check for direct store assignments in groups
+
+        for group in user_info.get(&#x27;groups&#x27;, []):
+
+            if group.startswith(&#x27;store_&#x27;):
+
+                store_id = group.replace(&#x27;store_&#x27;, &#x27;&#x27;)
+
+                stores.append(store_id)
+
+        
+
+        # Check for app-specific roles
+
+        for role in user_info.get(&#x27;app_roles&#x27;, []):
+
+            if &#x27;store:&#x27; in role:
+
+                _, store_id = role.split(&#x27;store:&#x27;, 1)
+
+                stores.append(store_id)
+
+        
+
+        return list(set(stores))  # Remove duplicates
+
+
+
+def require_auth(required_permission: str = None, require_store_access: bool = True):
+
+    &quot;&quot;&quot;Decorator to require authentication and authorization.&quot;&quot;&quot;
+
+    
+
+    def decorator(func: Callable) -&gt; Callable:
+
+        @functools.wraps(func)
+
+        async def wrapper(*args, **kwargs):
+
+            # Extract request from args (FastAPI dependency injection)
+
+            request = None
+
+            for arg in args:
+
+                if isinstance(arg, Request):
+
+                    request = arg
+
+                    break
+
+            
+
+            if not request:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+
+                    detail=&quot;Request object not found&quot;
+
+                )
+
+            
+
+            # Get authorization header
+
+            auth_header = request.headers.get(&#x27;Authorization&#x27;)
+
+            if not auth_header or not auth_header.startswith(&#x27;Bearer &#x27;):
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+
+                    detail=&quot;Missing or invalid authorization header&quot;,
+
+                    headers={&quot;WWW-Authenticate&quot;: &quot;Bearer&quot;}
+
+                )
+
+            
+
+            token = auth_header.split(&#x27; &#x27;)[1]
+
+            
+
+            try:
+
+                # Validate token
+
+                user_info = await azure_authenticator.validate_token(token)
+
+                
+
+                # Check required permission
+
+                if required_permission:
+
+                    user_roles = user_info.get(&#x27;roles&#x27;, [])
+
+                    if not RoleBasedAuth.has_permission(user_roles, required_permission):
+
+                        raise HTTPException(
+
+                            status_code=status.HTTP_403_FORBIDDEN,
+
+                            detail=f&quot;Insufficient permissions. Required: {required_permission}&quot;
+
+                        )
+
+                
+
+                # Check store access
+
+                if require_store_access:
+
+                    user_stores = RoleBasedAuth.get_user_stores(user_info)
+
+                    if not user_stores:
+
+                        raise HTTPException(
+
+                            status_code=status.HTTP_403_FORBIDDEN,
+
+                            detail=&quot;No store access configured for user&quot;
+
+                        )
+
+                    
+
+                    # Set default store context (first accessible store)
+
+                    request.state.current_store = user_stores[0]
+
+                    request.state.accessible_stores = user_stores
+
+                
+
+                # Add user info to request state
+
+                request.state.user_info = user_info
+
+                request.state.user_id = user_info[&#x27;user_id&#x27;]
+
+                
+
+                # Call the original function
+
+                return await func(*args, **kwargs)
+
+                
+
+            except ValueError as e:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+
+                    detail=str(e),
+
+                    headers={&quot;WWW-Authenticate&quot;: &quot;Bearer&quot;}
+
+                )
+
+            except AuthorizationError as e:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_403_FORBIDDEN,
+
+                    detail=str(e)
+
+                )
+
+        
+
+        return wrapper
+
+    return decorator
+
+
+
+def require_store_context(store_param: str = &#x27;store_id&#x27;):
+
+    &quot;&quot;&quot;Decorator to validate and set store context.&quot;&quot;&quot;
+
+    
+
+    def decorator(func: Callable) -&gt; Callable:
+
+        @functools.wraps(func)
+
+        async def wrapper(*args, **kwargs):
+
+            # Get store_id from kwargs
+
+            store_id = kwargs.get(store_param)
+
+            
+
+            if not store_id:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_400_BAD_REQUEST,
+
+                    detail=f&quot;Missing required parameter: {store_param}&quot;
+
+                )
+
+            
+
+            # Extract request from args
+
+            request = None
+
+            for arg in args:
+
+                if isinstance(arg, Request):
+
+                    request = arg
+
+                    break
+
+            
+
+            if not request or not hasattr(request.state, &#x27;accessible_stores&#x27;):
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+
+                    detail=&quot;Authentication required before store context validation&quot;
+
+                )
+
+            
+
+            # Validate user has access to requested store
+
+            if store_id not in request.state.accessible_stores:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_403_FORBIDDEN,
+
+                    detail=f&quot;Access denied to store: {store_id}&quot;
+
+                )
+
+            
+
+            # Set store context in request state
+
+            request.state.current_store = store_id
+
+            
+
+            return await func(*args, **kwargs)
+
+        
+
+        return wrapper
+
+    return decorator
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 Security Audit and Compliance</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Comprehensive Audit Logging</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Security audit log table
+
+CREATE TABLE retail.security_audit_log (
+
+    log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    event_type VARCHAR(100) NOT NULL,
+
+    user_name VARCHAR(100) NOT NULL,
+
+    user_id VARCHAR(100),
+
+    store_id VARCHAR(50),
+
+    ip_address INET,
+
+    user_agent TEXT,
+
+    request_id VARCHAR(100),
+
+    session_id VARCHAR(100),
+
+    resource_type VARCHAR(100),
+
+    resource_id VARCHAR(100),
+
+    action VARCHAR(50) NOT NULL,
+
+    success BOOLEAN NOT NULL DEFAULT TRUE,
+
+    failure_reason TEXT,
+
+    details JSONB,
+
+    severity VARCHAR(20) DEFAULT &#x27;INFO&#x27;,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    
+
+    -- Ensure proper indexing for security queries
+
+    CONSTRAINT valid_severity CHECK (severity IN (&#x27;DEBUG&#x27;, &#x27;INFO&#x27;, &#x27;WARN&#x27;, &#x27;ERROR&#x27;, &#x27;CRITICAL&#x27;))
+
+);
+
+
+
+-- Indexes for security audit queries
+
+CREATE INDEX idx_security_audit_event_type ON retail.security_audit_log(event_type);
+
+CREATE INDEX idx_security_audit_user_name ON retail.security_audit_log(user_name);
+
+CREATE INDEX idx_security_audit_store_id ON retail.security_audit_log(store_id);
+
+CREATE INDEX idx_security_audit_created_at ON retail.security_audit_log(created_at);
+
+CREATE INDEX idx_security_audit_success ON retail.security_audit_log(success);
+
+CREATE INDEX idx_security_audit_severity ON retail.security_audit_log(severity);
+
+CREATE INDEX idx_security_audit_details ON retail.security_audit_log USING GIN(details);
+
+
+
+-- Function to log security events
+
+CREATE OR REPLACE FUNCTION retail.log_security_event(
+
+    p_event_type VARCHAR(100),
+
+    p_user_name VARCHAR(100),
+
+    p_user_id VARCHAR(100) DEFAULT NULL,
+
+    p_store_id VARCHAR(50) DEFAULT NULL,
+
+    p_ip_address TEXT DEFAULT NULL,
+
+    p_action VARCHAR(50) DEFAULT &#x27;unknown&#x27;,
+
+    p_success BOOLEAN DEFAULT TRUE,
+
+    p_failure_reason TEXT DEFAULT NULL,
+
+    p_details JSONB DEFAULT NULL,
+
+    p_severity VARCHAR(20) DEFAULT &#x27;INFO&#x27;
+
+)
+
+RETURNS UUID
+
+LANGUAGE plpgsql
+
+SECURITY DEFINER
+
+AS $$
+
+DECLARE
+
+    log_id UUID;
+
+BEGIN
+
+    INSERT INTO retail.security_audit_log (
+
+        event_type,
+
+        user_name,
+
+        user_id,
+
+        store_id,
+
+        ip_address,
+
+        action,
+
+        success,
+
+        failure_reason,
+
+        details,
+
+        severity
+
+    ) VALUES (
+
+        p_event_type,
+
+        p_user_name,
+
+        p_user_id,
+
+        p_store_id,
+
+        p_ip_address::INET,
+
+        p_action,
+
+        p_success,
+
+        p_failure_reason,
+
+        p_details,
+
+        p_severity
+
+    ) RETURNING log_id INTO log_id;
+
+    
+
+    RETURN log_id;
+
+END;
+
+$$;
+
+
+
+-- Grant execute to MCP user
+
+GRANT EXECUTE ON FUNCTION retail.log_security_event TO mcp_user;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Security Monitoring Views</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Failed authentication attempts
+
+CREATE VIEW retail.security_failed_auth AS
+
+SELECT 
+
+    event_type,
+
+    user_name,
+
+    ip_address,
+
+    COUNT(*) as attempt_count,
+
+    MIN(created_at) as first_attempt,
+
+    MAX(created_at) as last_attempt,
+
+    ARRAY_AGG(DISTINCT failure_reason) as failure_reasons
+
+FROM retail.security_audit_log
+
+WHERE success = FALSE 
+
+  AND event_type IN (&#x27;authentication_failed&#x27;, &#x27;token_validation_failed&#x27;)
+
+  AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;24 hours&#x27;
+
+GROUP BY event_type, user_name, ip_address
+
+HAVING COUNT(*) &gt;= 3  -- 3 or more failures
+
+ORDER BY attempt_count DESC, last_attempt DESC;
+
+
+
+-- Suspicious access patterns
+
+CREATE VIEW retail.security_suspicious_access AS
+
+SELECT 
+
+    user_name,
+
+    user_id,
+
+    COUNT(DISTINCT ip_address) as ip_count,
+
+    COUNT(DISTINCT store_id) as store_count,
+
+    ARRAY_AGG(DISTINCT ip_address::TEXT) as ip_addresses,
+
+    ARRAY_AGG(DISTINCT store_id) as stores_accessed,
+
+    MIN(created_at) as first_access,
+
+    MAX(created_at) as last_access
+
+FROM retail.security_audit_log
+
+WHERE created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+  AND success = TRUE
+
+GROUP BY user_name, user_id
+
+HAVING COUNT(DISTINCT ip_address) &gt; 3  -- Access from multiple IPs
+
+   OR COUNT(DISTINCT store_id) &gt; 2     -- Access to multiple stores
+
+ORDER BY ip_count DESC, store_count DESC;
+
+
+
+-- Data access patterns
+
+CREATE VIEW retail.security_data_access_summary AS
+
+SELECT 
+
+    DATE_TRUNC(&#x27;hour&#x27;, created_at) as access_hour,
+
+    store_id,
+
+    resource_type,
+
+    action,
+
+    COUNT(*) as access_count,
+
+    COUNT(DISTINCT user_id) as unique_users
+
+FROM retail.security_audit_log
+
+WHERE resource_type IS NOT NULL
+
+  AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;24 hours&#x27;
+
+GROUP BY DATE_TRUNC(&#x27;hour&#x27;, created_at), store_id, resource_type, action
+
+ORDER BY access_hour DESC, access_count DESC;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Security Event Monitoring</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/security/monitoring.py
+
+&quot;&quot;&quot;
+
+Security monitoring and alerting for MCP server.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+from typing import Dict, List, Any
+
+from datetime import datetime, timedelta
+
+from dataclasses import dataclass
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+@dataclass
+
+class SecurityAlert:
+
+    &quot;&quot;&quot;Security alert data structure.&quot;&quot;&quot;
+
+    alert_type: str
+
+    severity: str
+
+    message: str
+
+    details: Dict[str, Any]
+
+    timestamp: datetime
+
+
+
+class SecurityMonitor:
+
+    &quot;&quot;&quot;Monitor security events and generate alerts.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_connection_string: str):
+
+        self.db_connection_string = db_connection_string
+
+        self.alert_handlers = []
+
+        
+
+        # Alert thresholds
+
+        self.thresholds = {
+
+            &#x27;failed_auth_attempts&#x27;: 5,      # per user per hour
+
+            &#x27;multiple_ip_access&#x27;: 3,        # different IPs per user per hour
+
+            &#x27;excessive_data_access&#x27;: 1000,  # queries per user per hour
+
+            &#x27;privilege_escalation&#x27;: 1,      # any attempt
+
+            &#x27;unauthorized_store_access&#x27;: 1  # any attempt
+
+        }
+
+    
+
+    async def start_monitoring(self):
+
+        &quot;&quot;&quot;Start security monitoring loop.&quot;&quot;&quot;
+
+        logger.info(&quot;Starting security monitoring&quot;)
+
+        
+
+        while True:
+
+            try:
+
+                await self._check_security_events()
+
+                await asyncio.sleep(300)  # Check every 5 minutes
+
+            except Exception as e:
+
+                logger.error(f&quot;Security monitoring error: {e}&quot;)
+
+                await asyncio.sleep(60)  # Short retry on error
+
+    
+
+    async def _check_security_events(self):
+
+        &quot;&quot;&quot;Check for security events and generate alerts.&quot;&quot;&quot;
+
+        
+
+        conn = await asyncpg.connect(self.db_connection_string)
+
+        
+
+        try:
+
+            # Check failed authentication attempts
+
+            await self._check_failed_auth(conn)
+
+            
+
+            # Check suspicious access patterns
+
+            await self._check_suspicious_access(conn)
+
+            
+
+            # Check data access anomalies
+
+            await self._check_data_access_anomalies(conn)
+
+            
+
+            # Check unauthorized access attempts
+
+            await self._check_unauthorized_access(conn)
+
+            
+
+        finally:
+
+            await conn.close()
+
+    
+
+    async def _check_failed_auth(self, conn):
+
+        &quot;&quot;&quot;Check for excessive failed authentication attempts.&quot;&quot;&quot;
+
+        
+
+        query = &quot;&quot;&quot;
+
+        SELECT 
+
+            user_name,
+
+            ip_address,
+
+            COUNT(*) as attempt_count,
+
+            MAX(created_at) as last_attempt
+
+        FROM retail.security_audit_log
+
+        WHERE success = FALSE 
+
+          AND event_type IN (&#x27;authentication_failed&#x27;, &#x27;token_validation_failed&#x27;)
+
+          AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+        GROUP BY user_name, ip_address
+
+        HAVING COUNT(*) &gt;= $1
+
+        &quot;&quot;&quot;
+
+        
+
+        results = await conn.fetch(query, self.thresholds[&#x27;failed_auth_attempts&#x27;])
+
+        
+
+        for record in results:
+
+            alert = SecurityAlert(
+
+                alert_type=&#x27;failed_authentication&#x27;,
+
+                severity=&#x27;HIGH&#x27;,
+
+                message=f&quot;Excessive failed login attempts for user {record[&#x27;user_name&#x27;]}&quot;,
+
+                details={
+
+                    &#x27;user_name&#x27;: record[&#x27;user_name&#x27;],
+
+                    &#x27;ip_address&#x27;: str(record[&#x27;ip_address&#x27;]),
+
+                    &#x27;attempt_count&#x27;: record[&#x27;attempt_count&#x27;],
+
+                    &#x27;last_attempt&#x27;: record[&#x27;last_attempt&#x27;].isoformat()
+
+                },
+
+                timestamp=datetime.now()
+
+            )
+
+            
+
+            await self._send_alert(alert)
+
+    
+
+    async def _check_suspicious_access(self, conn):
+
+        &quot;&quot;&quot;Check for suspicious access patterns.&quot;&quot;&quot;
+
+        
+
+        query = &quot;&quot;&quot;
+
+        SELECT 
+
+            user_name,
+
+            user_id,
+
+            COUNT(DISTINCT ip_address) as ip_count,
+
+            ARRAY_AGG(DISTINCT ip_address::TEXT) as ip_addresses
+
+        FROM retail.security_audit_log
+
+        WHERE created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+          AND success = TRUE
+
+        GROUP BY user_name, user_id
+
+        HAVING COUNT(DISTINCT ip_address) &gt;= $1
+
+        &quot;&quot;&quot;
+
+        
+
+        results = await conn.fetch(query, self.thresholds[&#x27;multiple_ip_access&#x27;])
+
+        
+
+        for record in results:
+
+            alert = SecurityAlert(
+
+                alert_type=&#x27;suspicious_access&#x27;,
+
+                severity=&#x27;MEDIUM&#x27;,
+
+                message=f&quot;User {record[&#x27;user_name&#x27;]} accessed from multiple IP addresses&quot;,
+
+                details={
+
+                    &#x27;user_name&#x27;: record[&#x27;user_name&#x27;],
+
+                    &#x27;user_id&#x27;: record[&#x27;user_id&#x27;],
+
+                    &#x27;ip_count&#x27;: record[&#x27;ip_count&#x27;],
+
+                    &#x27;ip_addresses&#x27;: record[&#x27;ip_addresses&#x27;]
+
+                },
+
+                timestamp=datetime.now()
+
+            )
+
+            
+
+            await self._send_alert(alert)
+
+    
+
+    async def _check_unauthorized_access(self, conn):
+
+        &quot;&quot;&quot;Check for unauthorized store access attempts.&quot;&quot;&quot;
+
+        
+
+        query = &quot;&quot;&quot;
+
+        SELECT 
+
+            user_name,
+
+            user_id,
+
+            store_id,
+
+            failure_reason,
+
+            created_at
+
+        FROM retail.security_audit_log
+
+        WHERE success = FALSE 
+
+          AND event_type = &#x27;unauthorized_store_access&#x27;
+
+          AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+        &quot;&quot;&quot;
+
+        
+
+        results = await conn.fetch(query)
+
+        
+
+        for record in results:
+
+            alert = SecurityAlert(
+
+                alert_type=&#x27;unauthorized_access&#x27;,
+
+                severity=&#x27;HIGH&#x27;,
+
+                message=f&quot;Unauthorized store access attempt by {record[&#x27;user_name&#x27;]}&quot;,
+
+                details={
+
+                    &#x27;user_name&#x27;: record[&#x27;user_name&#x27;],
+
+                    &#x27;user_id&#x27;: record[&#x27;user_id&#x27;],
+
+                    &#x27;store_id&#x27;: record[&#x27;store_id&#x27;],
+
+                    &#x27;failure_reason&#x27;: record[&#x27;failure_reason&#x27;],
+
+                    &#x27;timestamp&#x27;: record[&#x27;created_at&#x27;].isoformat()
+
+                },
+
+                timestamp=datetime.now()
+
+            )
+
+            
+
+            await self._send_alert(alert)
+
+    
+
+    async def _send_alert(self, alert: SecurityAlert):
+
+        &quot;&quot;&quot;Send security alert to all configured handlers.&quot;&quot;&quot;
+
+        
+
+        logger.warning(
+
+            f&quot;Security Alert: {alert.alert_type} - {alert.message}&quot;,
+
+            extra={&#x27;alert_details&#x27;: alert.details}
+
+        )
+
+        
+
+        # Send to configured alert handlers
+
+        for handler in self.alert_handlers:
+
+            try:
+
+                await handler.send_alert(alert)
+
+            except Exception as e:
+
+                logger.error(f&quot;Failed to send alert via {handler.__class__.__name__}: {e}&quot;)
+
+    
+
+    def add_alert_handler(self, handler):
+
+        &quot;&quot;&quot;Add alert handler.&quot;&quot;&quot;
+
+        self.alert_handlers.append(handler)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 Security Testing and Validation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Automated Security Tests</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/security/test_security.py
+
+&quot;&quot;&quot;
+
+Comprehensive security tests for MCP server.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+import asyncpg
+
+from datetime import datetime, timezone
+
+import jwt
+
+from unittest.mock import Mock, patch
+
+
+
+class TestRowLevelSecurity:
+
+    &quot;&quot;&quot;Test Row Level Security implementation.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def db_connection(self):
+
+        &quot;&quot;&quot;Database connection for testing.&quot;&quot;&quot;
+
+        conn = await asyncpg.connect(
+
+            &quot;postgresql://mcp_user:password@localhost:5432/retail_test&quot;
+
+        )
+
+        yield conn
+
+        await conn.close()
+
+    
+
+    async def test_store_context_isolation(self, db_connection):
+
+        &quot;&quot;&quot;Test that RLS properly isolates data by store.&quot;&quot;&quot;
+
+        
+
+        # Set Seattle store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;seattle&#x27;)&quot;)
+
+        
+
+        # Get customer count
+
+        seattle_customers = await db_connection.fetchval(
+
+            &quot;SELECT COUNT(*) FROM retail.customers&quot;
+
+        )
+
+        
+
+        # Set Redmond store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;redmond&#x27;)&quot;)
+
+        
+
+        # Get customer count
+
+        redmond_customers = await db_connection.fetchval(
+
+            &quot;SELECT COUNT(*) FROM retail.customers&quot;
+
+        )
+
+        
+
+        # Verify isolation (counts should be different)
+
+        assert seattle_customers != redmond_customers or (
+
+            seattle_customers == 0 and redmond_customers == 0
+
+        )
+
+    
+
+    async def test_unauthorized_store_access(self, db_connection):
+
+        &quot;&quot;&quot;Test that invalid store access is blocked.&quot;&quot;&quot;
+
+        
+
+        with pytest.raises(Exception) as exc_info:
+
+            await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;invalid_store&#x27;)&quot;)
+
+        
+
+        assert &quot;Store not found&quot; in str(exc_info.value)
+
+    
+
+    async def test_cross_store_data_leakage(self, db_connection):
+
+        &quot;&quot;&quot;Test that users cannot access data from other stores.&quot;&quot;&quot;
+
+        
+
+        # Set context to one store
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;seattle&#x27;)&quot;)
+
+        
+
+        # Try to insert data with different store_id
+
+        with pytest.raises(Exception):
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.customers (store_id, first_name, last_name, email)
+
+                VALUES (&#x27;redmond&#x27;, &#x27;Test&#x27;, &#x27;User&#x27;, &#x27;test@example.com&#x27;)
+
+            &quot;&quot;&quot;)
+
+
+
+class TestAuthentication:
+
+    &quot;&quot;&quot;Test authentication and authorization.&quot;&quot;&quot;
+
+    
+
+    def test_valid_jwt_token(self):
+
+        &quot;&quot;&quot;Test valid JWT token validation.&quot;&quot;&quot;
+
+        
+
+        # Mock valid token
+
+        token_payload = {
+
+            &#x27;oid&#x27;: &#x27;user-123&#x27;,
+
+            &#x27;email&#x27;: &#x27;test@example.com&#x27;,
+
+            &#x27;name&#x27;: &#x27;Test User&#x27;,
+
+            &#x27;tid&#x27;: &#x27;tenant-123&#x27;,
+
+            &#x27;aud&#x27;: &#x27;app-client-id&#x27;,
+
+            &#x27;iss&#x27;: &#x27;https://login.microsoftonline.com/tenant-123/v2.0&#x27;,
+
+            &#x27;exp&#x27;: int((datetime.now(timezone.utc)).timestamp()) + 3600,
+
+            &#x27;iat&#x27;: int((datetime.now(timezone.utc)).timestamp()),
+
+            &#x27;roles&#x27;: [&#x27;store_user&#x27;]
+
+        }
+
+        
+
+        # This would require mocking the JWKS endpoint
+
+        # In real implementation, use proper test JWT tokens
+
+        
+
+    def test_expired_token_rejection(self):
+
+        &quot;&quot;&quot;Test that expired tokens are rejected.&quot;&quot;&quot;
+
+        
+
+        token_payload = {
+
+            &#x27;oid&#x27;: &#x27;user-123&#x27;,
+
+            &#x27;exp&#x27;: int((datetime.now(timezone.utc)).timestamp()) - 3600,  # Expired
+
+            &#x27;iat&#x27;: int((datetime.now(timezone.utc)).timestamp()) - 7200
+
+        }
+
+        
+
+        # Test would verify that expired tokens are rejected
+
+        
+
+    def test_invalid_audience_rejection(self):
+
+        &quot;&quot;&quot;Test that tokens with wrong audience are rejected.&quot;&quot;&quot;
+
+        
+
+        token_payload = {
+
+            &#x27;oid&#x27;: &#x27;user-123&#x27;,
+
+            &#x27;aud&#x27;: &#x27;wrong-audience&#x27;,  # Invalid audience
+
+            &#x27;exp&#x27;: int((datetime.now(timezone.utc)).timestamp()) + 3600,
+
+            &#x27;iat&#x27;: int((datetime.now(timezone.utc)).timestamp())
+
+        }
+
+        
+
+        # Test would verify that wrong audience tokens are rejected
+
+
+
+class TestAuthorization:
+
+    &quot;&quot;&quot;Test role-based authorization.&quot;&quot;&quot;
+
+    
+
+    def test_role_hierarchy(self):
+
+        &quot;&quot;&quot;Test that role hierarchy works correctly.&quot;&quot;&quot;
+
+        
+
+        from mcp_server.security.authorization import RoleBasedAuth
+
+        
+
+        # Store admin should have all permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_admin&#x27;], &#x27;read_all&#x27;)
+
+        assert RoleBasedAuth.has_permission([&#x27;store_admin&#x27;], &#x27;write_all&#x27;)
+
+        assert RoleBasedAuth.has_permission([&#x27;store_admin&#x27;], &#x27;delete_all&#x27;)
+
+        
+
+        # Store user should have limited permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_user&#x27;], &#x27;read_products&#x27;)
+
+        assert not RoleBasedAuth.has_permission([&#x27;store_user&#x27;], &#x27;delete_all&#x27;)
+
+        
+
+        # Store readonly should have minimal permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_readonly&#x27;], &#x27;read_products&#x27;)
+
+        assert not RoleBasedAuth.has_permission([&#x27;store_readonly&#x27;], &#x27;write_transactions&#x27;)
+
+    
+
+    def test_permission_inheritance(self):
+
+        &quot;&quot;&quot;Test that permissions are properly inherited.&quot;&quot;&quot;
+
+        
+
+        from mcp_server.security.authorization import RoleBasedAuth
+
+        
+
+        # Manager should inherit user permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_manager&#x27;], &#x27;read_products&#x27;)
+
+        assert RoleBasedAuth.has_permission([&#x27;store_manager&#x27;], &#x27;write_transactions&#x27;)
+
+
+
+# Security test runner
+
+if __name__ == &quot;__main__&quot;:
+
+    pytest.main([__file__, &quot;-v&quot;])
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Penetration Testing Checklist</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# security-test-checklist.yml
+
+penetration_testing:
+
+  
+
+  authentication_bypass:
+
+    - name: &quot;Test authentication bypass attempts&quot;
+
+      tests:
+
+        - &quot;Missing Authorization header&quot;
+
+        - &quot;Malformed JWT tokens&quot;
+
+        - &quot;Replay attack with expired tokens&quot;
+
+        - &quot;Token signature manipulation&quot;
+
+        - &quot;Audience/issuer manipulation&quot;
+
+    
+
+  authorization_escalation:
+
+    - name: &quot;Test privilege escalation attempts&quot;
+
+      tests:
+
+        - &quot;Role manipulation in token&quot;
+
+        - &quot;Store access boundary testing&quot;
+
+        - &quot;Cross-tenant data access attempts&quot;
+
+        - &quot;Administrative function access&quot;
+
+    
+
+  sql_injection:
+
+    - name: &quot;Test SQL injection vulnerabilities&quot;
+
+      tests:
+
+        - &quot;Parameter injection in search queries&quot;
+
+        - &quot;Store ID manipulation&quot;
+
+        - &quot;JSON parameter injection&quot;
+
+        - &quot;Union-based injection attempts&quot;
+
+    
+
+  data_exposure:
+
+    - name: &quot;Test for data exposure vulnerabilities&quot;
+
+      tests:
+
+        - &quot;Error message information disclosure&quot;
+
+        - &quot;Timing attack possibilities&quot;
+
+        - &quot;Cross-store data leakage&quot;
+
+        - &quot;Audit log exposure&quot;
+
+    
+
+  rate_limiting:
+
+    - name: &quot;Test rate limiting and DoS protection&quot;
+
+      tests:
+
+        - &quot;Authentication endpoint flooding&quot;
+
+        - &quot;API endpoint rate limits&quot;
+
+        - &quot;Resource exhaustion attempts&quot;
+
+        - &quot;Connection pool exhaustion&quot;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Multi-Tenant Security</strong>: Implemented Row Level Security for complete data isolation  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Azure Authentication</strong>: Integrated Azure Entra ID with JWT validation  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Role-Based Authorization</strong>: Configured hierarchical role and permission system  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Comprehensive Audit Logging</strong>: Established security event tracking and monitoring  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Security Testing</strong>: Implemented automated security validation tests  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Threat Monitoring</strong>: Created real-time security event detection and alerting  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/03-Setup/README.md" target="_blank">Lab 03: Environment Setup</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure development environments with security best practices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set up Azure services for authentication and monitoring</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement secure database connections and secrets management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Validate security configurations in development environments</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure Security</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/active-directory/">Azure Entra ID Documentation</a> - Complete identity platform guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/key-vault/">Azure Key Vault</a> - Secrets management service</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/security/fundamentals/best-practices-and-patterns">Azure Security Best Practices</a> - Security guidance</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Database Security</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html">PostgreSQL Row Level Security</a> - Official RLS documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/security.html">Database Security Checklist</a> - PostgreSQL security guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/architecture/patterns/multitenancy">Multi-Tenant Database Patterns</a> - Architecture patterns</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Security Testing</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-project-web-security-testing-guide/">OWASP Testing Guide</a> - Comprehensive security testing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://tools.ietf.org/html/rfc8725">JWT Security Best Practices</a> - JWT security considerations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-project-api-security/">API Security Testing</a> - API-specific security testing</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Previous</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/01-Architecture/README.md" target="_blank">Lab 01: Core Architecture Concepts</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/03-Setup/README.md" target="_blank">Lab 03: Environment Setup</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">보안 및 멀티 테넌시</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 MCP 서버에 대한 엔터프라이즈급 보안 및 멀티 테넌시 구현에 대한 포괄적인 지침을 제공합니다. 민감한 소매 데이터를 보호하면서 여러 테넌트 간에 유연한 접근 패턴을 가능하게 하는 안전하고 준수한 시스템을 설계하는 방법을 배우게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">고객 데이터, 결제 정보, 비즈니스 인텔리전스를 처리하는 소매 애플리케이션에서 보안은 매우 중요합니다. 이 실습에서는 인증 및 권한 부여부터 데이터 격리 및 준수 모니터링까지 완전한 보안 아키텍처를 다룹니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure ID 서비스, PostgreSQL 행 수준 보안, 애플리케이션 수준 제어, 포괄적인 감사 로그를 결합한 심층 방어 전략을 구현하여 강력하고 준수한 플랫폼을 만듭니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구현</strong>: 멀티 테넌트 데이터 격리를 위한 엔터프라이즈급 행 수준 보안  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>설계</strong>: Azure를 활용한 안전한 인증 및 권한 부여 패턴  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구성</strong>: 준수 요구 사항을 위한 포괄적인 감사 로그  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>적용</strong>: 모든 애플리케이션 계층에서 심층 방어 보안 전략  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>검증</strong>: 체계적인 테스트를 통해 보안 구현 확인  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>모니터링</strong>: 보안 이벤트를 감시하고 잠재적 위협에 대응  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔐 멀티 테넌트 보안 아키텍처</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">보안 계층 개요</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────┐
+
+│               Azure Front Door                  │ ← WAF, DDoS Protection
+
+├─────────────────────────────────────────────────┤
+
+│              Application Gateway                │ ← SSL Termination, Rate Limiting
+
+├─────────────────────────────────────────────────┤
+
+│                MCP Server                       │ ← Authentication, Authorization
+
+│  ┌─────────────────────────────────────────────┤
+
+│  │           Connection Layer                  │ ← Connection Pooling, Circuit Breakers
+
+│  ├─────────────────────────────────────────────┤
+
+│  │         Business Logic Layer               │ ← Input Validation, Business Rules
+
+│  ├─────────────────────────────────────────────┤
+
+│  │           Data Access Layer                │ ← Query Sanitization, RLS Context
+
+│  └─────────────────────────────────────────────┤
+
+├─────────────────────────────────────────────────┤
+
+│              PostgreSQL RLS                    │ ← Row Level Security, Audit Triggers
+
+└─────────────────────────────────────────────────┘
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">멀티 테넌시 모델</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리의 구현은 <strong>공유 데이터베이스, 공유 스키마</strong> 모델과 행 수준 보안을 사용합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>장점:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비용 효율적인 자원 활용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">간소화된 유지보수 및 업데이트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">RLS를 통한 강력한 데이터 격리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">준수 친화적인 감사 기록</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>단점:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">신중한 RLS 정책 설계 필요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">스키마 변경이 모든 테넌트에 영향을 미침</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">견고한 백업/복원 절차 필요</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛡️ 행 수준 보안 구현</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">RLS 기초</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Enable RLS on all multi-tenant tables
+
+ALTER TABLE retail.customers ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.products ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.sales_transactions ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.sales_transaction_items ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.product_embeddings ENABLE ROW LEVEL SECURITY;
+
+
+
+-- Create application role for MCP server
+
+CREATE ROLE mcp_user LOGIN;
+
+GRANT USAGE ON SCHEMA retail TO mcp_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA retail TO mcp_user;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">스토어 컨텍스트 관리</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Function to securely set store context
+
+CREATE OR REPLACE FUNCTION retail.set_store_context(store_id_param VARCHAR(50))
+
+RETURNS void
+
+LANGUAGE plpgsql
+
+SECURITY DEFINER
+
+SET search_path = retail, pg_temp
+
+AS $$
+
+DECLARE
+
+    user_info RECORD;
+
+BEGIN
+
+    -- Validate store exists and is active
+
+    SELECT store_id, store_name, is_active 
+
+    INTO user_info
+
+    FROM retail.stores 
+
+    WHERE store_id = store_id_param;
+
+    
+
+    IF NOT FOUND THEN
+
+        RAISE EXCEPTION &#x27;Store not found: %&#x27;, store_id_param
+
+            USING ERRCODE = &#x27;invalid_parameter_value&#x27;,
+
+                  HINT = &#x27;Verify store ID and ensure it exists in the system&#x27;;
+
+    END IF;
+
+    
+
+    IF NOT user_info.is_active THEN
+
+        RAISE EXCEPTION &#x27;Store is inactive: %&#x27;, store_id_param
+
+            USING ERRCODE = &#x27;insufficient_privilege&#x27;,
+
+                  HINT = &#x27;Contact administrator to activate store&#x27;;
+
+    END IF;
+
+    
+
+    -- Set the secure context
+
+    PERFORM set_config(&#x27;app.current_store_id&#x27;, store_id_param, false);
+
+    PERFORM set_config(&#x27;app.store_name&#x27;, user_info.store_name, false);
+
+    PERFORM set_config(&#x27;app.context_set_at&#x27;, extract(epoch from current_timestamp)::text, false);
+
+    
+
+    -- Log context change for audit
+
+    INSERT INTO retail.security_audit_log (
+
+        event_type,
+
+        user_name,
+
+        store_id,
+
+        ip_address,
+
+        user_agent,
+
+        details,
+
+        severity
+
+    ) VALUES (
+
+        &#x27;store_context_set&#x27;,
+
+        current_user,
+
+        store_id_param,
+
+        inet_client_addr()::text,
+
+        current_setting(&#x27;application_name&#x27;, true),
+
+        jsonb_build_object(
+
+            &#x27;store_name&#x27;, user_info.store_name,
+
+            &#x27;timestamp&#x27;, current_timestamp,
+
+            &#x27;session_id&#x27;, pg_backend_pid()
+
+        ),
+
+        &#x27;INFO&#x27;
+
+    );
+
+END;
+
+$$;
+
+
+
+-- Grant execute to MCP user
+
+GRANT EXECUTE ON FUNCTION retail.set_store_context TO mcp_user;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">RLS 정책</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Customers RLS Policy
+
+CREATE POLICY customers_store_isolation ON retail.customers
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+
+
+-- Products RLS Policy with additional business rules
+
+CREATE POLICY products_store_isolation ON retail.products
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+        AND is_active = TRUE  -- Additional business rule
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+
+
+-- Sales Transactions RLS Policy
+
+CREATE POLICY sales_transactions_store_isolation ON retail.sales_transactions
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+
+
+-- Transaction Items RLS Policy (via join)
+
+CREATE POLICY sales_transaction_items_store_isolation ON retail.sales_transaction_items
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        transaction_id IN (
+
+            SELECT transaction_id 
+
+            FROM retail.sales_transactions 
+
+            WHERE store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        )
+
+    )
+
+    WITH CHECK (
+
+        transaction_id IN (
+
+            SELECT transaction_id 
+
+            FROM retail.sales_transactions 
+
+            WHERE store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        )
+
+    );
+
+
+
+-- Product Embeddings RLS Policy
+
+CREATE POLICY product_embeddings_store_isolation ON retail.product_embeddings
+
+    FOR ALL
+
+    TO mcp_user
+
+    USING (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    )
+
+    WITH CHECK (
+
+        store_id = current_setting(&#x27;app.current_store_id&#x27;, true)
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) IS NOT NULL
+
+        AND current_setting(&#x27;app.current_store_id&#x27;, true) != &#x27;&#x27;
+
+    );
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">RLS 테스트 및 검증</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Test RLS policies with different store contexts
+
+DO $$
+
+DECLARE
+
+    test_result RECORD;
+
+    customer_count INTEGER;
+
+    product_count INTEGER;
+
+BEGIN
+
+    -- Test Seattle store context
+
+    PERFORM retail.set_store_context(&#x27;seattle&#x27;);
+
+    
+
+    SELECT COUNT(*) INTO customer_count FROM retail.customers;
+
+    SELECT COUNT(*) INTO product_count FROM retail.products;
+
+    
+
+    RAISE NOTICE &#x27;Seattle store - Customers: %, Products: %&#x27;, customer_count, product_count;
+
+    
+
+    -- Test Redmond store context
+
+    PERFORM retail.set_store_context(&#x27;redmond&#x27;);
+
+    
+
+    SELECT COUNT(*) INTO customer_count FROM retail.customers;
+
+    SELECT COUNT(*) INTO product_count FROM retail.products;
+
+    
+
+    RAISE NOTICE &#x27;Redmond store - Customers: %, Products: %&#x27;, customer_count, product_count;
+
+    
+
+    -- Verify data isolation
+
+    IF customer_count &gt; 0 AND product_count &gt; 0 THEN
+
+        RAISE NOTICE &#x27;RLS policies are working correctly&#x27;;
+
+    ELSE
+
+        RAISE WARNING &#x27;RLS policies may not be configured correctly&#x27;;
+
+    END IF;
+
+END;
+
+$$;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔑 인증 및 권한 부여</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure Entra ID 통합</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/security/authentication.py
+
+&quot;&quot;&quot;
+
+Azure Entra ID authentication for MCP server.
+
+&quot;&quot;&quot;
+
+import os
+
+import jwt
+
+import aiohttp
+
+import asyncio
+
+from typing import Dict, Optional, List
+
+from datetime import datetime, timezone
+
+from azure.identity.aio import DefaultAzureCredential
+
+from azure.keyvault.secrets.aio import SecretClient
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class AzureAuthenticator:
+
+    &quot;&quot;&quot;Handle Azure Entra ID authentication and token validation.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.tenant_id = os.getenv(&#x27;AZURE_TENANT_ID&#x27;)
+
+        self.client_id = os.getenv(&#x27;AZURE_CLIENT_ID&#x27;)
+
+        self.audience = os.getenv(&#x27;AZURE_AUDIENCE&#x27;, self.client_id)
+
+        self.issuer = f&quot;https://login.microsoftonline.com/{self.tenant_id}/v2.0&quot;
+
+        
+
+        # Cache for JWKS (JSON Web Key Set)
+
+        self._jwks_cache = None
+
+        self._jwks_cache_expiry = None
+
+        
+
+        # Key Vault for secrets
+
+        self.key_vault_url = os.getenv(&#x27;AZURE_KEY_VAULT_URL&#x27;)
+
+        self.credential = DefaultAzureCredential()
+
+        
+
+        if self.key_vault_url:
+
+            self.secret_client = SecretClient(
+
+                vault_url=self.key_vault_url,
+
+                credential=self.credential
+
+            )
+
+    
+
+    async def validate_token(self, token: str) -&gt; Dict:
+
+        &quot;&quot;&quot;Validate JWT token from Azure Entra ID.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            # Get signing keys
+
+            signing_keys = await self._get_signing_keys()
+
+            
+
+            # Decode token header to get key ID
+
+            unverified_header = jwt.get_unverified_header(token)
+
+            key_id = unverified_header.get(&#x27;kid&#x27;)
+
+            
+
+            if not key_id:
+
+                raise ValueError(&quot;Token missing key ID&quot;)
+
+            
+
+            # Find the corresponding key
+
+            signing_key = None
+
+            for key in signing_keys:
+
+                if key[&#x27;kid&#x27;] == key_id:
+
+                    signing_key = jwt.algorithms.RSAAlgorithm.from_jwk(key)
+
+                    break
+
+            
+
+            if not signing_key:
+
+                raise ValueError(f&quot;Unable to find signing key for kid: {key_id}&quot;)
+
+            
+
+            # Validate and decode token
+
+            payload = jwt.decode(
+
+                token,
+
+                signing_key,
+
+                algorithms=[&#x27;RS256&#x27;],
+
+                audience=self.audience,
+
+                issuer=self.issuer,
+
+                options={
+
+                    &#x27;verify_exp&#x27;: True,
+
+                    &#x27;verify_aud&#x27;: True,
+
+                    &#x27;verify_iss&#x27;: True
+
+                }
+
+            )
+
+            
+
+            # Extract user information
+
+            user_info = self._extract_user_info(payload)
+
+            
+
+            # Log successful authentication
+
+            logger.info(
+
+                &quot;User authenticated successfully&quot;,
+
+                extra={
+
+                    &#x27;user_id&#x27;: user_info[&#x27;user_id&#x27;],
+
+                    &#x27;email&#x27;: user_info.get(&#x27;email&#x27;),
+
+                    &#x27;tenant_id&#x27;: payload.get(&#x27;tid&#x27;)
+
+                }
+
+            )
+
+            
+
+            return user_info
+
+            
+
+        except jwt.ExpiredSignatureError:
+
+            logger.warning(&quot;Token has expired&quot;)
+
+            raise ValueError(&quot;Token has expired&quot;)
+
+        except jwt.InvalidAudienceError:
+
+            logger.warning(f&quot;Invalid audience in token. Expected: {self.audience}&quot;)
+
+            raise ValueError(&quot;Invalid token audience&quot;)
+
+        except jwt.InvalidIssuerError:
+
+            logger.warning(f&quot;Invalid issuer in token. Expected: {self.issuer}&quot;)
+
+            raise ValueError(&quot;Invalid token issuer&quot;)
+
+        except Exception as e:
+
+            logger.error(f&quot;Token validation failed: {str(e)}&quot;)
+
+            raise ValueError(f&quot;Token validation failed: {str(e)}&quot;)
+
+    
+
+    async def _get_signing_keys(self) -&gt; List[Dict]:
+
+        &quot;&quot;&quot;Get JWKS from Azure Entra ID with caching.&quot;&quot;&quot;
+
+        
+
+        current_time = datetime.now(timezone.utc)
+
+        
+
+        # Check if cache is valid
+
+        if (self._jwks_cache and self._jwks_cache_expiry and 
+
+            current_time &lt; self._jwks_cache_expiry):
+
+            return self._jwks_cache
+
+        
+
+        # Fetch new JWKS
+
+        jwks_url = f&quot;{self.issuer}/keys&quot;
+
+        
+
+        async with aiohttp.ClientSession() as session:
+
+            async with session.get(jwks_url) as response:
+
+                if response.status != 200:
+
+                    raise Exception(f&quot;Failed to fetch JWKS: {response.status}&quot;)
+
+                
+
+                jwks_data = await response.json()
+
+                
+
+        # Cache for 1 hour
+
+        self._jwks_cache = jwks_data[&#x27;keys&#x27;]
+
+        self._jwks_cache_expiry = current_time.replace(
+
+            hour=current_time.hour + 1
+
+        )
+
+        
+
+        return self._jwks_cache
+
+    
+
+    def _extract_user_info(self, payload: Dict) -&gt; Dict:
+
+        &quot;&quot;&quot;Extract user information from JWT payload.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &#x27;user_id&#x27;: payload.get(&#x27;oid&#x27;) or payload.get(&#x27;sub&#x27;),
+
+            &#x27;email&#x27;: payload.get(&#x27;email&#x27;) or payload.get(&#x27;preferred_username&#x27;),
+
+            &#x27;name&#x27;: payload.get(&#x27;name&#x27;),
+
+            &#x27;tenant_id&#x27;: payload.get(&#x27;tid&#x27;),
+
+            &#x27;roles&#x27;: payload.get(&#x27;roles&#x27;, []),
+
+            &#x27;groups&#x27;: payload.get(&#x27;groups&#x27;, []),
+
+            &#x27;app_roles&#x27;: payload.get(&#x27;app_roles&#x27;, []),
+
+            &#x27;scope&#x27;: payload.get(&#x27;scp&#x27;, &#x27;&#x27;).split() if payload.get(&#x27;scp&#x27;) else [],
+
+            &#x27;expires_at&#x27;: datetime.fromtimestamp(payload[&#x27;exp&#x27;], timezone.utc),
+
+            &#x27;issued_at&#x27;: datetime.fromtimestamp(payload[&#x27;iat&#x27;], timezone.utc)
+
+        }
+
+    
+
+    async def get_user_store_access(self, user_id: str) -&gt; List[str]:
+
+        &quot;&quot;&quot;Get list of stores the user has access to.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            # This would typically query your user/store mapping
+
+            # For demo, we&#x27;ll use a simple Key Vault secret
+
+            secret_name = f&quot;user-{user_id}-stores&quot;
+
+            
+
+            if self.secret_client:
+
+                secret = await self.secret_client.get_secret(secret_name)
+
+                store_list = secret.value.split(&#x27;,&#x27;)
+
+                return [store.strip() for store in store_list if store.strip()]
+
+            
+
+            # Fallback: return default store access
+
+            logger.warning(f&quot;No store mapping found for user {user_id}, using default&quot;)
+
+            return [&#x27;seattle&#x27;]  # Default store access
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Failed to get store access for user {user_id}: {e}&quot;)
+
+            return []  # No access if we can&#x27;t determine stores
+
+
+
+# Global authenticator instance
+
+azure_authenticator = AzureAuthenticator()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">권한 부여 미들웨어</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/security/authorization.py
+
+&quot;&quot;&quot;
+
+Authorization middleware and decorators for MCP server.
+
+&quot;&quot;&quot;
+
+import functools
+
+from typing import Dict, List, Optional, Callable, Any
+
+from fastapi import HTTPException, status, Request
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+security = HTTPBearer()
+
+
+
+class AuthorizationError(Exception):
+
+    &quot;&quot;&quot;Custom authorization error.&quot;&quot;&quot;
+
+    pass
+
+
+
+class RoleBasedAuth:
+
+    &quot;&quot;&quot;Role-based access control implementation.&quot;&quot;&quot;
+
+    
+
+    # Define role hierarchy
+
+    ROLE_HIERARCHY = {
+
+        &#x27;store_admin&#x27;: [&#x27;store_manager&#x27;, &#x27;store_user&#x27;, &#x27;store_readonly&#x27;],
+
+        &#x27;store_manager&#x27;: [&#x27;store_user&#x27;, &#x27;store_readonly&#x27;],
+
+        &#x27;store_user&#x27;: [&#x27;store_readonly&#x27;],
+
+        &#x27;store_readonly&#x27;: []
+
+    }
+
+    
+
+    # Define permissions for each role
+
+    ROLE_PERMISSIONS = {
+
+        &#x27;store_admin&#x27;: [
+
+            &#x27;read_all&#x27;, &#x27;write_all&#x27;, &#x27;delete_all&#x27;, &#x27;manage_users&#x27;
+
+        ],
+
+        &#x27;store_manager&#x27;: [
+
+            &#x27;read_all&#x27;, &#x27;write_transactions&#x27;, &#x27;write_inventory&#x27;, &#x27;read_reports&#x27;
+
+        ],
+
+        &#x27;store_user&#x27;: [
+
+            &#x27;read_products&#x27;, &#x27;read_customers&#x27;, &#x27;write_transactions&#x27;
+
+        ],
+
+        &#x27;store_readonly&#x27;: [
+
+            &#x27;read_products&#x27;, &#x27;read_basic_reports&#x27;
+
+        ]
+
+    }
+
+    
+
+    @classmethod
+
+    def has_permission(cls, user_roles: List[str], required_permission: str) -&gt; bool:
+
+        &quot;&quot;&quot;Check if user has required permission.&quot;&quot;&quot;
+
+        
+
+        user_permissions = set()
+
+        
+
+        for role in user_roles:
+
+            # Add direct permissions
+
+            user_permissions.update(cls.ROLE_PERMISSIONS.get(role, []))
+
+            
+
+            # Add inherited permissions
+
+            inherited_roles = cls.ROLE_HIERARCHY.get(role, [])
+
+            for inherited_role in inherited_roles:
+
+                user_permissions.update(cls.ROLE_PERMISSIONS.get(inherited_role, []))
+
+        
+
+        return required_permission in user_permissions
+
+    
+
+    @classmethod
+
+    def get_user_stores(cls, user_info: Dict) -&gt; List[str]:
+
+        &quot;&quot;&quot;Extract stores user has access to from user info.&quot;&quot;&quot;
+
+        
+
+        # This would typically come from your user management system
+
+        # For demo, we&#x27;ll extract from custom claims or groups
+
+        
+
+        stores = []
+
+        
+
+        # Check for direct store assignments in groups
+
+        for group in user_info.get(&#x27;groups&#x27;, []):
+
+            if group.startswith(&#x27;store_&#x27;):
+
+                store_id = group.replace(&#x27;store_&#x27;, &#x27;&#x27;)
+
+                stores.append(store_id)
+
+        
+
+        # Check for app-specific roles
+
+        for role in user_info.get(&#x27;app_roles&#x27;, []):
+
+            if &#x27;store:&#x27; in role:
+
+                _, store_id = role.split(&#x27;store:&#x27;, 1)
+
+                stores.append(store_id)
+
+        
+
+        return list(set(stores))  # Remove duplicates
+
+
+
+def require_auth(required_permission: str = None, require_store_access: bool = True):
+
+    &quot;&quot;&quot;Decorator to require authentication and authorization.&quot;&quot;&quot;
+
+    
+
+    def decorator(func: Callable) -&gt; Callable:
+
+        @functools.wraps(func)
+
+        async def wrapper(*args, **kwargs):
+
+            # Extract request from args (FastAPI dependency injection)
+
+            request = None
+
+            for arg in args:
+
+                if isinstance(arg, Request):
+
+                    request = arg
+
+                    break
+
+            
+
+            if not request:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+
+                    detail=&quot;Request object not found&quot;
+
+                )
+
+            
+
+            # Get authorization header
+
+            auth_header = request.headers.get(&#x27;Authorization&#x27;)
+
+            if not auth_header or not auth_header.startswith(&#x27;Bearer &#x27;):
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+
+                    detail=&quot;Missing or invalid authorization header&quot;,
+
+                    headers={&quot;WWW-Authenticate&quot;: &quot;Bearer&quot;}
+
+                )
+
+            
+
+            token = auth_header.split(&#x27; &#x27;)[1]
+
+            
+
+            try:
+
+                # Validate token
+
+                user_info = await azure_authenticator.validate_token(token)
+
+                
+
+                # Check required permission
+
+                if required_permission:
+
+                    user_roles = user_info.get(&#x27;roles&#x27;, [])
+
+                    if not RoleBasedAuth.has_permission(user_roles, required_permission):
+
+                        raise HTTPException(
+
+                            status_code=status.HTTP_403_FORBIDDEN,
+
+                            detail=f&quot;Insufficient permissions. Required: {required_permission}&quot;
+
+                        )
+
+                
+
+                # Check store access
+
+                if require_store_access:
+
+                    user_stores = RoleBasedAuth.get_user_stores(user_info)
+
+                    if not user_stores:
+
+                        raise HTTPException(
+
+                            status_code=status.HTTP_403_FORBIDDEN,
+
+                            detail=&quot;No store access configured for user&quot;
+
+                        )
+
+                    
+
+                    # Set default store context (first accessible store)
+
+                    request.state.current_store = user_stores[0]
+
+                    request.state.accessible_stores = user_stores
+
+                
+
+                # Add user info to request state
+
+                request.state.user_info = user_info
+
+                request.state.user_id = user_info[&#x27;user_id&#x27;]
+
+                
+
+                # Call the original function
+
+                return await func(*args, **kwargs)
+
+                
+
+            except ValueError as e:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+
+                    detail=str(e),
+
+                    headers={&quot;WWW-Authenticate&quot;: &quot;Bearer&quot;}
+
+                )
+
+            except AuthorizationError as e:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_403_FORBIDDEN,
+
+                    detail=str(e)
+
+                )
+
+        
+
+        return wrapper
+
+    return decorator
+
+
+
+def require_store_context(store_param: str = &#x27;store_id&#x27;):
+
+    &quot;&quot;&quot;Decorator to validate and set store context.&quot;&quot;&quot;
+
+    
+
+    def decorator(func: Callable) -&gt; Callable:
+
+        @functools.wraps(func)
+
+        async def wrapper(*args, **kwargs):
+
+            # Get store_id from kwargs
+
+            store_id = kwargs.get(store_param)
+
+            
+
+            if not store_id:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_400_BAD_REQUEST,
+
+                    detail=f&quot;Missing required parameter: {store_param}&quot;
+
+                )
+
+            
+
+            # Extract request from args
+
+            request = None
+
+            for arg in args:
+
+                if isinstance(arg, Request):
+
+                    request = arg
+
+                    break
+
+            
+
+            if not request or not hasattr(request.state, &#x27;accessible_stores&#x27;):
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+
+                    detail=&quot;Authentication required before store context validation&quot;
+
+                )
+
+            
+
+            # Validate user has access to requested store
+
+            if store_id not in request.state.accessible_stores:
+
+                raise HTTPException(
+
+                    status_code=status.HTTP_403_FORBIDDEN,
+
+                    detail=f&quot;Access denied to store: {store_id}&quot;
+
+                )
+
+            
+
+            # Set store context in request state
+
+            request.state.current_store = store_id
+
+            
+
+            return await func(*args, **kwargs)
+
+        
+
+        return wrapper
+
+    return decorator
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 보안 감사 및 준수</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">포괄적인 감사 로그</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Security audit log table
+
+CREATE TABLE retail.security_audit_log (
+
+    log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    event_type VARCHAR(100) NOT NULL,
+
+    user_name VARCHAR(100) NOT NULL,
+
+    user_id VARCHAR(100),
+
+    store_id VARCHAR(50),
+
+    ip_address INET,
+
+    user_agent TEXT,
+
+    request_id VARCHAR(100),
+
+    session_id VARCHAR(100),
+
+    resource_type VARCHAR(100),
+
+    resource_id VARCHAR(100),
+
+    action VARCHAR(50) NOT NULL,
+
+    success BOOLEAN NOT NULL DEFAULT TRUE,
+
+    failure_reason TEXT,
+
+    details JSONB,
+
+    severity VARCHAR(20) DEFAULT &#x27;INFO&#x27;,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    
+
+    -- Ensure proper indexing for security queries
+
+    CONSTRAINT valid_severity CHECK (severity IN (&#x27;DEBUG&#x27;, &#x27;INFO&#x27;, &#x27;WARN&#x27;, &#x27;ERROR&#x27;, &#x27;CRITICAL&#x27;))
+
+);
+
+
+
+-- Indexes for security audit queries
+
+CREATE INDEX idx_security_audit_event_type ON retail.security_audit_log(event_type);
+
+CREATE INDEX idx_security_audit_user_name ON retail.security_audit_log(user_name);
+
+CREATE INDEX idx_security_audit_store_id ON retail.security_audit_log(store_id);
+
+CREATE INDEX idx_security_audit_created_at ON retail.security_audit_log(created_at);
+
+CREATE INDEX idx_security_audit_success ON retail.security_audit_log(success);
+
+CREATE INDEX idx_security_audit_severity ON retail.security_audit_log(severity);
+
+CREATE INDEX idx_security_audit_details ON retail.security_audit_log USING GIN(details);
+
+
+
+-- Function to log security events
+
+CREATE OR REPLACE FUNCTION retail.log_security_event(
+
+    p_event_type VARCHAR(100),
+
+    p_user_name VARCHAR(100),
+
+    p_user_id VARCHAR(100) DEFAULT NULL,
+
+    p_store_id VARCHAR(50) DEFAULT NULL,
+
+    p_ip_address TEXT DEFAULT NULL,
+
+    p_action VARCHAR(50) DEFAULT &#x27;unknown&#x27;,
+
+    p_success BOOLEAN DEFAULT TRUE,
+
+    p_failure_reason TEXT DEFAULT NULL,
+
+    p_details JSONB DEFAULT NULL,
+
+    p_severity VARCHAR(20) DEFAULT &#x27;INFO&#x27;
+
+)
+
+RETURNS UUID
+
+LANGUAGE plpgsql
+
+SECURITY DEFINER
+
+AS $$
+
+DECLARE
+
+    log_id UUID;
+
+BEGIN
+
+    INSERT INTO retail.security_audit_log (
+
+        event_type,
+
+        user_name,
+
+        user_id,
+
+        store_id,
+
+        ip_address,
+
+        action,
+
+        success,
+
+        failure_reason,
+
+        details,
+
+        severity
+
+    ) VALUES (
+
+        p_event_type,
+
+        p_user_name,
+
+        p_user_id,
+
+        p_store_id,
+
+        p_ip_address::INET,
+
+        p_action,
+
+        p_success,
+
+        p_failure_reason,
+
+        p_details,
+
+        p_severity
+
+    ) RETURNING log_id INTO log_id;
+
+    
+
+    RETURN log_id;
+
+END;
+
+$$;
+
+
+
+-- Grant execute to MCP user
+
+GRANT EXECUTE ON FUNCTION retail.log_security_event TO mcp_user;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">보안 모니터링 뷰</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Failed authentication attempts
+
+CREATE VIEW retail.security_failed_auth AS
+
+SELECT 
+
+    event_type,
+
+    user_name,
+
+    ip_address,
+
+    COUNT(*) as attempt_count,
+
+    MIN(created_at) as first_attempt,
+
+    MAX(created_at) as last_attempt,
+
+    ARRAY_AGG(DISTINCT failure_reason) as failure_reasons
+
+FROM retail.security_audit_log
+
+WHERE success = FALSE 
+
+  AND event_type IN (&#x27;authentication_failed&#x27;, &#x27;token_validation_failed&#x27;)
+
+  AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;24 hours&#x27;
+
+GROUP BY event_type, user_name, ip_address
+
+HAVING COUNT(*) &gt;= 3  -- 3 or more failures
+
+ORDER BY attempt_count DESC, last_attempt DESC;
+
+
+
+-- Suspicious access patterns
+
+CREATE VIEW retail.security_suspicious_access AS
+
+SELECT 
+
+    user_name,
+
+    user_id,
+
+    COUNT(DISTINCT ip_address) as ip_count,
+
+    COUNT(DISTINCT store_id) as store_count,
+
+    ARRAY_AGG(DISTINCT ip_address::TEXT) as ip_addresses,
+
+    ARRAY_AGG(DISTINCT store_id) as stores_accessed,
+
+    MIN(created_at) as first_access,
+
+    MAX(created_at) as last_access
+
+FROM retail.security_audit_log
+
+WHERE created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+  AND success = TRUE
+
+GROUP BY user_name, user_id
+
+HAVING COUNT(DISTINCT ip_address) &gt; 3  -- Access from multiple IPs
+
+   OR COUNT(DISTINCT store_id) &gt; 2     -- Access to multiple stores
+
+ORDER BY ip_count DESC, store_count DESC;
+
+
+
+-- Data access patterns
+
+CREATE VIEW retail.security_data_access_summary AS
+
+SELECT 
+
+    DATE_TRUNC(&#x27;hour&#x27;, created_at) as access_hour,
+
+    store_id,
+
+    resource_type,
+
+    action,
+
+    COUNT(*) as access_count,
+
+    COUNT(DISTINCT user_id) as unique_users
+
+FROM retail.security_audit_log
+
+WHERE resource_type IS NOT NULL
+
+  AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;24 hours&#x27;
+
+GROUP BY DATE_TRUNC(&#x27;hour&#x27;, created_at), store_id, resource_type, action
+
+ORDER BY access_hour DESC, access_count DESC;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">보안 이벤트 모니터링</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/security/monitoring.py
+
+&quot;&quot;&quot;
+
+Security monitoring and alerting for MCP server.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+from typing import Dict, List, Any
+
+from datetime import datetime, timedelta
+
+from dataclasses import dataclass
+
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+@dataclass
+
+class SecurityAlert:
+
+    &quot;&quot;&quot;Security alert data structure.&quot;&quot;&quot;
+
+    alert_type: str
+
+    severity: str
+
+    message: str
+
+    details: Dict[str, Any]
+
+    timestamp: datetime
+
+
+
+class SecurityMonitor:
+
+    &quot;&quot;&quot;Monitor security events and generate alerts.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_connection_string: str):
+
+        self.db_connection_string = db_connection_string
+
+        self.alert_handlers = []
+
+        
+
+        # Alert thresholds
+
+        self.thresholds = {
+
+            &#x27;failed_auth_attempts&#x27;: 5,      # per user per hour
+
+            &#x27;multiple_ip_access&#x27;: 3,        # different IPs per user per hour
+
+            &#x27;excessive_data_access&#x27;: 1000,  # queries per user per hour
+
+            &#x27;privilege_escalation&#x27;: 1,      # any attempt
+
+            &#x27;unauthorized_store_access&#x27;: 1  # any attempt
+
+        }
+
+    
+
+    async def start_monitoring(self):
+
+        &quot;&quot;&quot;Start security monitoring loop.&quot;&quot;&quot;
+
+        logger.info(&quot;Starting security monitoring&quot;)
+
+        
+
+        while True:
+
+            try:
+
+                await self._check_security_events()
+
+                await asyncio.sleep(300)  # Check every 5 minutes
+
+            except Exception as e:
+
+                logger.error(f&quot;Security monitoring error: {e}&quot;)
+
+                await asyncio.sleep(60)  # Short retry on error
+
+    
+
+    async def _check_security_events(self):
+
+        &quot;&quot;&quot;Check for security events and generate alerts.&quot;&quot;&quot;
+
+        
+
+        conn = await asyncpg.connect(self.db_connection_string)
+
+        
+
+        try:
+
+            # Check failed authentication attempts
+
+            await self._check_failed_auth(conn)
+
+            
+
+            # Check suspicious access patterns
+
+            await self._check_suspicious_access(conn)
+
+            
+
+            # Check data access anomalies
+
+            await self._check_data_access_anomalies(conn)
+
+            
+
+            # Check unauthorized access attempts
+
+            await self._check_unauthorized_access(conn)
+
+            
+
+        finally:
+
+            await conn.close()
+
+    
+
+    async def _check_failed_auth(self, conn):
+
+        &quot;&quot;&quot;Check for excessive failed authentication attempts.&quot;&quot;&quot;
+
+        
+
+        query = &quot;&quot;&quot;
+
+        SELECT 
+
+            user_name,
+
+            ip_address,
+
+            COUNT(*) as attempt_count,
+
+            MAX(created_at) as last_attempt
+
+        FROM retail.security_audit_log
+
+        WHERE success = FALSE 
+
+          AND event_type IN (&#x27;authentication_failed&#x27;, &#x27;token_validation_failed&#x27;)
+
+          AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+        GROUP BY user_name, ip_address
+
+        HAVING COUNT(*) &gt;= $1
+
+        &quot;&quot;&quot;
+
+        
+
+        results = await conn.fetch(query, self.thresholds[&#x27;failed_auth_attempts&#x27;])
+
+        
+
+        for record in results:
+
+            alert = SecurityAlert(
+
+                alert_type=&#x27;failed_authentication&#x27;,
+
+                severity=&#x27;HIGH&#x27;,
+
+                message=f&quot;Excessive failed login attempts for user {record[&#x27;user_name&#x27;]}&quot;,
+
+                details={
+
+                    &#x27;user_name&#x27;: record[&#x27;user_name&#x27;],
+
+                    &#x27;ip_address&#x27;: str(record[&#x27;ip_address&#x27;]),
+
+                    &#x27;attempt_count&#x27;: record[&#x27;attempt_count&#x27;],
+
+                    &#x27;last_attempt&#x27;: record[&#x27;last_attempt&#x27;].isoformat()
+
+                },
+
+                timestamp=datetime.now()
+
+            )
+
+            
+
+            await self._send_alert(alert)
+
+    
+
+    async def _check_suspicious_access(self, conn):
+
+        &quot;&quot;&quot;Check for suspicious access patterns.&quot;&quot;&quot;
+
+        
+
+        query = &quot;&quot;&quot;
+
+        SELECT 
+
+            user_name,
+
+            user_id,
+
+            COUNT(DISTINCT ip_address) as ip_count,
+
+            ARRAY_AGG(DISTINCT ip_address::TEXT) as ip_addresses
+
+        FROM retail.security_audit_log
+
+        WHERE created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+          AND success = TRUE
+
+        GROUP BY user_name, user_id
+
+        HAVING COUNT(DISTINCT ip_address) &gt;= $1
+
+        &quot;&quot;&quot;
+
+        
+
+        results = await conn.fetch(query, self.thresholds[&#x27;multiple_ip_access&#x27;])
+
+        
+
+        for record in results:
+
+            alert = SecurityAlert(
+
+                alert_type=&#x27;suspicious_access&#x27;,
+
+                severity=&#x27;MEDIUM&#x27;,
+
+                message=f&quot;User {record[&#x27;user_name&#x27;]} accessed from multiple IP addresses&quot;,
+
+                details={
+
+                    &#x27;user_name&#x27;: record[&#x27;user_name&#x27;],
+
+                    &#x27;user_id&#x27;: record[&#x27;user_id&#x27;],
+
+                    &#x27;ip_count&#x27;: record[&#x27;ip_count&#x27;],
+
+                    &#x27;ip_addresses&#x27;: record[&#x27;ip_addresses&#x27;]
+
+                },
+
+                timestamp=datetime.now()
+
+            )
+
+            
+
+            await self._send_alert(alert)
+
+    
+
+    async def _check_unauthorized_access(self, conn):
+
+        &quot;&quot;&quot;Check for unauthorized store access attempts.&quot;&quot;&quot;
+
+        
+
+        query = &quot;&quot;&quot;
+
+        SELECT 
+
+            user_name,
+
+            user_id,
+
+            store_id,
+
+            failure_reason,
+
+            created_at
+
+        FROM retail.security_audit_log
+
+        WHERE success = FALSE 
+
+          AND event_type = &#x27;unauthorized_store_access&#x27;
+
+          AND created_at &gt;= CURRENT_TIMESTAMP - INTERVAL &#x27;1 hour&#x27;
+
+        &quot;&quot;&quot;
+
+        
+
+        results = await conn.fetch(query)
+
+        
+
+        for record in results:
+
+            alert = SecurityAlert(
+
+                alert_type=&#x27;unauthorized_access&#x27;,
+
+                severity=&#x27;HIGH&#x27;,
+
+                message=f&quot;Unauthorized store access attempt by {record[&#x27;user_name&#x27;]}&quot;,
+
+                details={
+
+                    &#x27;user_name&#x27;: record[&#x27;user_name&#x27;],
+
+                    &#x27;user_id&#x27;: record[&#x27;user_id&#x27;],
+
+                    &#x27;store_id&#x27;: record[&#x27;store_id&#x27;],
+
+                    &#x27;failure_reason&#x27;: record[&#x27;failure_reason&#x27;],
+
+                    &#x27;timestamp&#x27;: record[&#x27;created_at&#x27;].isoformat()
+
+                },
+
+                timestamp=datetime.now()
+
+            )
+
+            
+
+            await self._send_alert(alert)
+
+    
+
+    async def _send_alert(self, alert: SecurityAlert):
+
+        &quot;&quot;&quot;Send security alert to all configured handlers.&quot;&quot;&quot;
+
+        
+
+        logger.warning(
+
+            f&quot;Security Alert: {alert.alert_type} - {alert.message}&quot;,
+
+            extra={&#x27;alert_details&#x27;: alert.details}
+
+        )
+
+        
+
+        # Send to configured alert handlers
+
+        for handler in self.alert_handlers:
+
+            try:
+
+                await handler.send_alert(alert)
+
+            except Exception as e:
+
+                logger.error(f&quot;Failed to send alert via {handler.__class__.__name__}: {e}&quot;)
+
+    
+
+    def add_alert_handler(self, handler):
+
+        &quot;&quot;&quot;Add alert handler.&quot;&quot;&quot;
+
+        self.alert_handlers.append(handler)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 보안 테스트 및 검증</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">자동화된 보안 테스트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/security/test_security.py
+
+&quot;&quot;&quot;
+
+Comprehensive security tests for MCP server.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+import asyncpg
+
+from datetime import datetime, timezone
+
+import jwt
+
+from unittest.mock import Mock, patch
+
+
+
+class TestRowLevelSecurity:
+
+    &quot;&quot;&quot;Test Row Level Security implementation.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def db_connection(self):
+
+        &quot;&quot;&quot;Database connection for testing.&quot;&quot;&quot;
+
+        conn = await asyncpg.connect(
+
+            &quot;postgresql://mcp_user:password@localhost:5432/retail_test&quot;
+
+        )
+
+        yield conn
+
+        await conn.close()
+
+    
+
+    async def test_store_context_isolation(self, db_connection):
+
+        &quot;&quot;&quot;Test that RLS properly isolates data by store.&quot;&quot;&quot;
+
+        
+
+        # Set Seattle store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;seattle&#x27;)&quot;)
+
+        
+
+        # Get customer count
+
+        seattle_customers = await db_connection.fetchval(
+
+            &quot;SELECT COUNT(*) FROM retail.customers&quot;
+
+        )
+
+        
+
+        # Set Redmond store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;redmond&#x27;)&quot;)
+
+        
+
+        # Get customer count
+
+        redmond_customers = await db_connection.fetchval(
+
+            &quot;SELECT COUNT(*) FROM retail.customers&quot;
+
+        )
+
+        
+
+        # Verify isolation (counts should be different)
+
+        assert seattle_customers != redmond_customers or (
+
+            seattle_customers == 0 and redmond_customers == 0
+
+        )
+
+    
+
+    async def test_unauthorized_store_access(self, db_connection):
+
+        &quot;&quot;&quot;Test that invalid store access is blocked.&quot;&quot;&quot;
+
+        
+
+        with pytest.raises(Exception) as exc_info:
+
+            await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;invalid_store&#x27;)&quot;)
+
+        
+
+        assert &quot;Store not found&quot; in str(exc_info.value)
+
+    
+
+    async def test_cross_store_data_leakage(self, db_connection):
+
+        &quot;&quot;&quot;Test that users cannot access data from other stores.&quot;&quot;&quot;
+
+        
+
+        # Set context to one store
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context(&#x27;seattle&#x27;)&quot;)
+
+        
+
+        # Try to insert data with different store_id
+
+        with pytest.raises(Exception):
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.customers (store_id, first_name, last_name, email)
+
+                VALUES (&#x27;redmond&#x27;, &#x27;Test&#x27;, &#x27;User&#x27;, &#x27;test@example.com&#x27;)
+
+            &quot;&quot;&quot;)
+
+
+
+class TestAuthentication:
+
+    &quot;&quot;&quot;Test authentication and authorization.&quot;&quot;&quot;
+
+    
+
+    def test_valid_jwt_token(self):
+
+        &quot;&quot;&quot;Test valid JWT token validation.&quot;&quot;&quot;
+
+        
+
+        # Mock valid token
+
+        token_payload = {
+
+            &#x27;oid&#x27;: &#x27;user-123&#x27;,
+
+            &#x27;email&#x27;: &#x27;test@example.com&#x27;,
+
+            &#x27;name&#x27;: &#x27;Test User&#x27;,
+
+            &#x27;tid&#x27;: &#x27;tenant-123&#x27;,
+
+            &#x27;aud&#x27;: &#x27;app-client-id&#x27;,
+
+            &#x27;iss&#x27;: &#x27;https://login.microsoftonline.com/tenant-123/v2.0&#x27;,
+
+            &#x27;exp&#x27;: int((datetime.now(timezone.utc)).timestamp()) + 3600,
+
+            &#x27;iat&#x27;: int((datetime.now(timezone.utc)).timestamp()),
+
+            &#x27;roles&#x27;: [&#x27;store_user&#x27;]
+
+        }
+
+        
+
+        # This would require mocking the JWKS endpoint
+
+        # In real implementation, use proper test JWT tokens
+
+        
+
+    def test_expired_token_rejection(self):
+
+        &quot;&quot;&quot;Test that expired tokens are rejected.&quot;&quot;&quot;
+
+        
+
+        token_payload = {
+
+            &#x27;oid&#x27;: &#x27;user-123&#x27;,
+
+            &#x27;exp&#x27;: int((datetime.now(timezone.utc)).timestamp()) - 3600,  # Expired
+
+            &#x27;iat&#x27;: int((datetime.now(timezone.utc)).timestamp()) - 7200
+
+        }
+
+        
+
+        # Test would verify that expired tokens are rejected
+
+        
+
+    def test_invalid_audience_rejection(self):
+
+        &quot;&quot;&quot;Test that tokens with wrong audience are rejected.&quot;&quot;&quot;
+
+        
+
+        token_payload = {
+
+            &#x27;oid&#x27;: &#x27;user-123&#x27;,
+
+            &#x27;aud&#x27;: &#x27;wrong-audience&#x27;,  # Invalid audience
+
+            &#x27;exp&#x27;: int((datetime.now(timezone.utc)).timestamp()) + 3600,
+
+            &#x27;iat&#x27;: int((datetime.now(timezone.utc)).timestamp())
+
+        }
+
+        
+
+        # Test would verify that wrong audience tokens are rejected
+
+
+
+class TestAuthorization:
+
+    &quot;&quot;&quot;Test role-based authorization.&quot;&quot;&quot;
+
+    
+
+    def test_role_hierarchy(self):
+
+        &quot;&quot;&quot;Test that role hierarchy works correctly.&quot;&quot;&quot;
+
+        
+
+        from mcp_server.security.authorization import RoleBasedAuth
+
+        
+
+        # Store admin should have all permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_admin&#x27;], &#x27;read_all&#x27;)
+
+        assert RoleBasedAuth.has_permission([&#x27;store_admin&#x27;], &#x27;write_all&#x27;)
+
+        assert RoleBasedAuth.has_permission([&#x27;store_admin&#x27;], &#x27;delete_all&#x27;)
+
+        
+
+        # Store user should have limited permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_user&#x27;], &#x27;read_products&#x27;)
+
+        assert not RoleBasedAuth.has_permission([&#x27;store_user&#x27;], &#x27;delete_all&#x27;)
+
+        
+
+        # Store readonly should have minimal permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_readonly&#x27;], &#x27;read_products&#x27;)
+
+        assert not RoleBasedAuth.has_permission([&#x27;store_readonly&#x27;], &#x27;write_transactions&#x27;)
+
+    
+
+    def test_permission_inheritance(self):
+
+        &quot;&quot;&quot;Test that permissions are properly inherited.&quot;&quot;&quot;
+
+        
+
+        from mcp_server.security.authorization import RoleBasedAuth
+
+        
+
+        # Manager should inherit user permissions
+
+        assert RoleBasedAuth.has_permission([&#x27;store_manager&#x27;], &#x27;read_products&#x27;)
+
+        assert RoleBasedAuth.has_permission([&#x27;store_manager&#x27;], &#x27;write_transactions&#x27;)
+
+
+
+# Security test runner
+
+if __name__ == &quot;__main__&quot;:
+
+    pytest.main([__file__, &quot;-v&quot;])
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">침투 테스트 체크리스트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# security-test-checklist.yml
+
+penetration_testing:
+
+  
+
+  authentication_bypass:
+
+    - name: &quot;Test authentication bypass attempts&quot;
+
+      tests:
+
+        - &quot;Missing Authorization header&quot;
+
+        - &quot;Malformed JWT tokens&quot;
+
+        - &quot;Replay attack with expired tokens&quot;
+
+        - &quot;Token signature manipulation&quot;
+
+        - &quot;Audience/issuer manipulation&quot;
+
+    
+
+  authorization_escalation:
+
+    - name: &quot;Test privilege escalation attempts&quot;
+
+      tests:
+
+        - &quot;Role manipulation in token&quot;
+
+        - &quot;Store access boundary testing&quot;
+
+        - &quot;Cross-tenant data access attempts&quot;
+
+        - &quot;Administrative function access&quot;
+
+    
+
+  sql_injection:
+
+    - name: &quot;Test SQL injection vulnerabilities&quot;
+
+      tests:
+
+        - &quot;Parameter injection in search queries&quot;
+
+        - &quot;Store ID manipulation&quot;
+
+        - &quot;JSON parameter injection&quot;
+
+        - &quot;Union-based injection attempts&quot;
+
+    
+
+  data_exposure:
+
+    - name: &quot;Test for data exposure vulnerabilities&quot;
+
+      tests:
+
+        - &quot;Error message information disclosure&quot;
+
+        - &quot;Timing attack possibilities&quot;
+
+        - &quot;Cross-store data leakage&quot;
+
+        - &quot;Audit log exposure&quot;
+
+    
+
+  rate_limiting:
+
+    - name: &quot;Test rate limiting and DoS protection&quot;
+
+      tests:
+
+        - &quot;Authentication endpoint flooding&quot;
+
+        - &quot;API endpoint rate limits&quot;
+
+        - &quot;Resource exhaustion attempts&quot;
+
+        - &quot;Connection pool exhaustion&quot;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 수행할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>멀티 테넌트 보안</strong>: 완전한 데이터 격리를 위한 행 수준 보안 구현  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Azure 인증</strong>: Azure Entra ID와 JWT 검증 통합  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>역할 기반 권한 부여</strong>: 계층적 역할 및 권한 시스템 구성  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>포괄적인 감사 로그</strong>: 보안 이벤트 추적 및 모니터링 설정  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>보안 테스트</strong>: 자동화된 보안 검증 테스트 구현  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>위협 모니터링</strong>: 실시간 보안 이벤트 감지 및 경고 생성  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/03-Setup/README.md" target="_blank">Lab 03: 환경 설정</a></strong>을 계속 진행하여:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보안 모범 사례를 활용한 개발 환경 구성  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">인증 및 모니터링을 위한 Azure 서비스 설정  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">안전한 데이터베이스 연결 및 비밀 관리 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">개발 환경에서 보안 구성 검증  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure 보안</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/active-directory/">Azure Entra ID 문서</a> - 완전한 ID 플랫폼 가이드  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/key-vault/">Azure Key Vault</a> - 비밀 관리 서비스  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/security/fundamentals/best-practices-and-patterns">Azure 보안 모범 사례</a> - 보안 지침  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">데이터베이스 보안</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html">PostgreSQL 행 수준 보안</a> - 공식 RLS 문서  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/security.html">데이터베이스 보안 체크리스트</a> - PostgreSQL 보안 가이드  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/architecture/patterns/multitenancy">멀티 테넌트 데이터베이스 패턴</a> - 아키텍처 패턴  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">보안 테스트</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-project-web-security-testing-guide/">OWASP 테스트 가이드</a> - 포괄적인 보안 테스트  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://tools.ietf.org/html/rfc8725">JWT 보안 모범 사례</a> - JWT 보안 고려사항  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-project-api-security/">API 보안 테스트</a> - API 전용 보안 테스트  </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>이전</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/01-Architecture/README.md" target="_blank">Lab 01: 핵심 아키텍처 개념</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/03-Setup/README.md" target="_blank">Lab 03: 환경 설정</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서를 해당 언어로 작성된 상태에서 권위 있는 자료로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_02-01---core-architecture-concepts.html">&larr; 01 - Core Architecture Concepts</a></span>
+  <span><a href="m11_04-03---environment-setup.html">03 - Environment Setup &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

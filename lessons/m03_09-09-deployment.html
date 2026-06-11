@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>09 Deployment - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 09 Deployment</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Deploying MCP Servers</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Deploying your MCP server allows others to access its tools and resources beyond your local environment.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There are several deployment strategies to consider, depending on your requirements for scalability, reliability, and ease of management.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Below you'll find guidance for deploying MCP servers locally, in containers, and to the cloud.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lesson covers how to deploy your MCP Server app.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Evaluate different deployment approaches.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Deploy your app.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Local development and deployment</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If your server is meant to be consumed by running on users machine, you can follow the following steps:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Download the server</strong>. If you didn't write the server, then download it first to your machine. </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Start the server process</strong>: Run your MCP server application </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For SSE (not needed for stdio type server)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Configure networking</strong>: Ensure the server is accessible on the expected port </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Connect clients</strong>: Use local connection URLs like <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:3000</code></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Cloud Deployment</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP servers can be deployed to various cloud platforms:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Serverless Functions</strong>: Deploy lightweight MCP servers as serverless functions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Container Services</strong>: Use services like Azure Container Apps, AWS ECS, or Google Cloud Run</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Kubernetes</strong>: Deploy and manage MCP servers in Kubernetes clusters for high availability</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Example: Azure Container Apps</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure Container Apps support deployment of MCP Servers. It's still a work in progress and it currently supports SSE servers.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's how you can go about it:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Clone a repo:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  git clone https://github.com/anthonychu/azure-container-apps-mcp-sample.git</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Run it locally to test things out:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  uv venv</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  uv sync</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  # linux/macOS</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  export API_KEYS=<AN_API_KEY></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  # windows</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  set API_KEYS=<AN_API_KEY></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  uv run fastapi dev main.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. To try it locally, create an *mcp.json* file in a *.vscode* directory and add the following content:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "inputs": [</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "type": "promptString",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "id": "weather-api-key",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "description": "Weather API Key",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "password": true</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "servers": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          "weather-sse": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "type": "sse",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "url": "http://localhost:8000/sse",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "headers": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                  "x-api-key": "${input:weather-api-key}"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  Once the SSE server is started, you can click the play icon in the JSON file, you should now see tools on the server being picked up by GitHub Copilot, see the Tool icon. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. To deploy, run the following command:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  az containerapp up -g <RESOURCE_GROUP_NAME> -n weather-mcp --environment mcp -l westus --env-vars API_KEYS=<AN_API_KEY> --source .</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There you have it, deploy it locally, deploy it to Azure through these steps.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/samples/azure-samples/remote-mcp-functions-dotnet/remote-mcp-functions-dotnet/">Azure Functions + MCP</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://techcommunity.microsoft.com/blog/appsonazureblog/host-remote-mcp-servers-in-azure-container-apps/4403550">Azure Container Apps article</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/anthonychu/azure-container-apps-mcp-sample">Azure Container Apps MCP repo</a></li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/10-advanced/README.md" target="_blank">Advanced Server Topics</a></li></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP 서버 배포</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버를 배포하면 로컬 환경을 넘어서 다른 사람들이 해당 도구와 리소스에 접근할 수 있습니다. 확장성, 신뢰성, 관리 용이성에 대한 요구 사항에 따라 고려할 수 있는 여러 배포 전략이 있습니다. 아래에는 MCP 서버를 로컬, 컨테이너, 클라우드에 배포하는 방법에 대한 안내가 나와 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 레슨에서는 MCP 서버 앱을 배포하는 방법을 다룹니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 레슨을 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 배포 접근 방식을 평가할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">앱을 배포할 수 있습니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">로컬 개발 및 배포</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버가 사용자 머신에서 실행되어 소비되는 경우 다음 단계를 따르십시오:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>서버 다운로드</strong>. 서버를 직접 작성하지 않았다면 먼저 서버를 머신에 다운로드하십시오.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>서버 프로세스 시작</strong>: MCP 서버 애플리케이션을 실행합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">SSE의 경우 (stdio 유형 서버에는 필요하지 않음)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>네트워킹 구성</strong>: 서버가 예상된 포트에서 접근 가능하도록 설정합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>클라이언트 연결</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:3000</code> 같은 로컬 연결 URL을 사용합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">클라우드 배포</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버는 여러 클라우드 플랫폼에 배포할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>서버리스 함수</strong>: 경량 MCP 서버를 서버리스 함수로 배포</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨테이너 서비스</strong>: Azure Container Apps, AWS ECS, Google Cloud Run 등의 서비스를 사용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>쿠버네티스</strong>: 고가용성을 위해 쿠버네티스 클러스터에서 MCP 서버를 배포 및 관리</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">예시: Azure Container Apps</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure Container Apps는 MCP 서버 배포를 지원합니다. 아직 개발 중이며 현재는 SSE 서버를 지원합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">방법은 다음과 같습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 리포지토리를 클론합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  git clone https://github.com/anthonychu/azure-container-apps-mcp-sample.git</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 로컬에서 실행하여 테스트합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  uv venv</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  uv sync</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  # 리눅스/macOS</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  export API_KEYS=<AN_API_KEY></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  # 윈도우</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  set API_KEYS=<AN_API_KEY></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  uv run fastapi dev main.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 로컬에서 시도하려면 *.vscode* 디렉터리에 *mcp.json* 파일을 생성하고 다음 내용을 추가합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "inputs": [</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "type": "promptString",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "id": "weather-api-key",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "description": "Weather API Key",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "password": true</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "servers": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          "weather-sse": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "type": "sse",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "url": "http://localhost:8000/sse",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              "headers": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                  "x-api-key": "${input:weather-api-key}"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">              }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  SSE 서버가 시작되면 JSON 파일의 재생 아이콘을 클릭할 수 있습니다. 이제 GitHub Copilot에서 서버의 도구를 인식하는 것을 확인할 수 있으며, 도구 아이콘을 참조하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 배포하려면 다음 명령을 실행합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  az containerapp up -g <RESOURCE_GROUP_NAME> -n weather-mcp --environment mcp -l westus --env-vars API_KEYS=<AN_API_KEY> --source .</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이렇게 하면 로컬에 배포하고, 이 단계들을 통해 Azure에 배포할 수 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/samples/azure-samples/remote-mcp-functions-dotnet/remote-mcp-functions-dotnet/">Azure Functions + MCP</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://techcommunity.microsoft.com/blog/appsonazureblog/host-remote-mcp-servers-in-azure-container-apps/4403550">Azure Container Apps 기사</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/anthonychu/azure-container-apps-mcp-sample">Azure Container Apps MCP 리포지토리</a></li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/10-advanced/README.md" target="_blank">고급 서버 주제</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다했지만, 자동 번역에는 오류나 부정확성이 포함될 수 있음을 알려드립니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서는 해당 언어로 작성된 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 모든 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m03_08-08-testing.html">&larr; 08 Testing</a></span>
+  <span><a href="m03_10-10-advanced.html">10 Advanced &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

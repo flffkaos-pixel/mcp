@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>01 - Core Architecture Concepts - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 01 - Core Architecture Concepts</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Core Architecture Concepts</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab provides an in-depth exploration of MCP server architecture patterns, database design principles, and the technical implementation strategies that power robust, scalable database-integrated AI applications.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Building a production-ready MCP server with database integration requires careful architectural decisions.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab breaks down the key components, design patterns, and technical considerations that make our Zava Retail analytics solution robust, secure, and scalable.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll understand how each layer interacts, why specific technologies were chosen, and how to apply these patterns to your own MCP implementations.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Analyze</strong> the layered architecture of an MCP server with database integration</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Understand</strong> the role and responsibilities of each architectural component</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Design</strong> database schemas that support multi-tenant MCP applications</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> connection pooling and resource management strategies</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Apply</strong> error handling and logging patterns for production systems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Evaluate</strong> trade-offs between different architectural approaches</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏗️ MCP Server Architecture Layers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our MCP server implements a <strong>layered architecture</strong> that separates concerns and promotes maintainability:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Layer 1: Protocol Layer (FastMCP)</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Responsibility</strong>: Handle MCP protocol communication and message routing</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# FastMCP server setup
+
+from fastmcp import FastMCP
+
+
+
+mcp = FastMCP(&quot;Zava Retail Analytics&quot;)
+
+
+
+# Tool registration with type safety
+
+@mcp.tool()
+
+async def execute_sales_query(
+
+    ctx: Context,
+
+    postgresql_query: Annotated[str, Field(description=&quot;Well-formed PostgreSQL query&quot;)]
+
+) -&gt; str:
+
+    &quot;&quot;&quot;Execute PostgreSQL queries with Row Level Security.&quot;&quot;&quot;
+
+    return await query_executor.execute(postgresql_query, ctx)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Key Features</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Protocol Compliance</strong>: Full MCP specification support</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Type Safety</strong>: Pydantic models for request/response validation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Async Support</strong>: Non-blocking I/O for high concurrency</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Error Handling</strong>: Standardized error responses</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Layer 2: Business Logic Layer</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Responsibility</strong>: Implement business rules and coordinate between protocol and data layers</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class SalesAnalyticsService:
+
+    &quot;&quot;&quot;Business logic for retail analytics operations.&quot;&quot;&quot;
+
+    
+
+    async def get_store_performance(
+
+        self, 
+
+        store_id: str, 
+
+        time_period: str
+
+    ) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Calculate store performance metrics.&quot;&quot;&quot;
+
+        
+
+        # Validate business rules
+
+        if not self._validate_store_access(store_id):
+
+            raise UnauthorizedError(&quot;Access denied for store&quot;)
+
+        
+
+        # Coordinate data retrieval
+
+        sales_data = await self.db_provider.get_sales_data(store_id, time_period)
+
+        metrics = self._calculate_metrics(sales_data)
+
+        
+
+        return {
+
+            &quot;store_id&quot;: store_id,
+
+            &quot;period&quot;: time_period,
+
+            &quot;metrics&quot;: metrics,
+
+            &quot;insights&quot;: self._generate_insights(metrics)
+
+        }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Key Features</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Business Rule Enforcement</strong>: Store access validation and data integrity</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Service Coordination</strong>: Orchestration between database and AI services</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Data Transformation</strong>: Converting raw data to business insights</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Caching Strategy</strong>: Performance optimization for frequent queries</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Layer 3: Data Access Layer</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Responsibility</strong>: Manage database connections, query execution, and data mapping</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class PostgreSQLProvider:
+
+    &quot;&quot;&quot;Data access layer for PostgreSQL operations.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, connection_config: Dict[str, Any]):
+
+        self.connection_pool: Optional[Pool] = None
+
+        self.config = connection_config
+
+    
+
+    async def execute_query(
+
+        self, 
+
+        query: str, 
+
+        rls_user_id: str
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Execute query with RLS context.&quot;&quot;&quot;
+
+        
+
+        async with self.connection_pool.acquire() as conn:
+
+            # Set RLS context
+
+            await conn.execute(
+
+                &quot;SELECT set_config(&#x27;app.current_rls_user_id&#x27;, $1, false)&quot;,
+
+                rls_user_id
+
+            )
+
+            
+
+            # Execute query with timeout
+
+            try:
+
+                rows = await asyncio.wait_for(
+
+                    conn.fetch(query),
+
+                    timeout=30.0
+
+                )
+
+                return [dict(row) for row in rows]
+
+            except asyncio.TimeoutError:
+
+                raise QueryTimeoutError(&quot;Query execution exceeded timeout&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Key Features</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Connection Pooling</strong>: Efficient resource management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Transaction Management</strong>: ACID compliance and rollback handling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Query Optimization</strong>: Performance monitoring and optimization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RLS Integration</strong>: Row-level security context management</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Layer 4: Infrastructure Layer</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Responsibility</strong>: Handle cross-cutting concerns like logging, monitoring, and configuration</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class InfrastructureManager:
+
+    &quot;&quot;&quot;Infrastructure concerns management.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.logger = self._setup_logging()
+
+        self.metrics = self._setup_metrics()
+
+        self.config = self._load_configuration()
+
+    
+
+    def _setup_logging(self) -&gt; Logger:
+
+        &quot;&quot;&quot;Configure structured logging.&quot;&quot;&quot;
+
+        logging.basicConfig(
+
+            level=logging.INFO,
+
+            format=&#x27;%(asctime)s - %(name)s - %(levelname)s - %(message)s&#x27;,
+
+            handlers=[
+
+                logging.StreamHandler(),
+
+                logging.FileHandler(&#x27;mcp_server.log&#x27;)
+
+            ]
+
+        )
+
+        return logging.getLogger(__name__)
+
+    
+
+    async def track_query_execution(
+
+        self, 
+
+        query_type: str, 
+
+        duration: float, 
+
+        success: bool
+
+    ):
+
+        &quot;&quot;&quot;Track query performance metrics.&quot;&quot;&quot;
+
+        self.metrics.counter(&#x27;query_total&#x27;).labels(
+
+            type=query_type,
+
+            status=&#x27;success&#x27; if success else &#x27;error&#x27;
+
+        ).inc()
+
+        
+
+        self.metrics.histogram(&#x27;query_duration&#x27;).labels(
+
+            type=query_type
+
+        ).observe(duration)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🗄️ Database Design Patterns</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our PostgreSQL schema implements several key patterns for multi-tenant MCP applications:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Multi-Tenant Schema Design</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Core retail entities with store-based partitioning
+
+CREATE TABLE retail.stores (
+
+    store_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    name VARCHAR(100) NOT NULL,
+
+    location VARCHAR(200) NOT NULL,
+
+    manager_id UUID NOT NULL,
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+
+
+CREATE TABLE retail.customers (
+
+    customer_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    store_id UUID REFERENCES retail.stores(store_id),
+
+    first_name VARCHAR(50) NOT NULL,
+
+    last_name VARCHAR(50) NOT NULL,
+
+    email VARCHAR(100) UNIQUE,
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+
+
+CREATE TABLE retail.orders (
+
+    order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    customer_id UUID REFERENCES retail.customers(customer_id),
+
+    store_id UUID REFERENCES retail.stores(store_id),
+
+    order_date TIMESTAMP DEFAULT NOW(),
+
+    total_amount DECIMAL(10,2) NOT NULL,
+
+    status VARCHAR(20) DEFAULT &#x27;pending&#x27;
+
+);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Design Principles</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Foreign Key Consistency</strong>: Ensure data integrity across tables</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Store ID Propagation</strong>: Every transactional table includes store_id</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>UUID Primary Keys</strong>: Globally unique identifiers for distributed systems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Timestamp Tracking</strong>: Audit trail for all data changes</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Row Level Security Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Enable RLS on multi-tenant tables
+
+ALTER TABLE retail.customers ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.orders ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.order_items ENABLE ROW LEVEL SECURITY;
+
+
+
+-- Store manager can only see their store&#x27;s data
+
+CREATE POLICY store_manager_customers ON retail.customers
+
+    FOR ALL TO store_managers
+
+    USING (store_id = get_current_user_store());
+
+
+
+CREATE POLICY store_manager_orders ON retail.orders
+
+    FOR ALL TO store_managers
+
+    USING (store_id = get_current_user_store());
+
+
+
+-- Regional managers see multiple stores
+
+CREATE POLICY regional_manager_orders ON retail.orders
+
+    FOR ALL TO regional_managers
+
+    USING (store_id = ANY(get_user_store_list()));
+
+
+
+-- Support function for RLS context
+
+CREATE OR REPLACE FUNCTION get_current_user_store()
+
+RETURNS UUID AS $$
+
+BEGIN
+
+    RETURN current_setting(&#x27;app.current_rls_user_id&#x27;)::UUID;
+
+EXCEPTION WHEN OTHERS THEN
+
+    RETURN &#x27;00000000-0000-0000-0000-000000000000&#x27;::UUID;
+
+END;
+
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>RLS Benefits</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Automatic Filtering</strong>: Database enforces data isolation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Application Simplicity</strong>: No complex WHERE clauses needed</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Security by Default</strong>: Impossible to accidentally access wrong data</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Audit Compliance</strong>: Clear data access boundaries</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Vector Search Schema</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Product embeddings for semantic search
+
+CREATE TABLE retail.product_description_embeddings (
+
+    product_id UUID PRIMARY KEY REFERENCES retail.products(product_id),
+
+    description_embedding vector(1536),
+
+    last_updated TIMESTAMP DEFAULT NOW()
+
+);
+
+
+
+-- Optimize vector similarity search
+
+CREATE INDEX idx_product_embeddings_vector 
+
+ON retail.product_description_embeddings 
+
+USING ivfflat (description_embedding vector_cosine_ops);
+
+
+
+-- Semantic search function
+
+CREATE OR REPLACE FUNCTION search_products_by_description(
+
+    query_embedding vector(1536),
+
+    similarity_threshold FLOAT DEFAULT 0.7,
+
+    max_results INTEGER DEFAULT 20
+
+)
+
+RETURNS TABLE(
+
+    product_id UUID,
+
+    name VARCHAR,
+
+    description TEXT,
+
+    similarity_score FLOAT
+
+) AS $$
+
+BEGIN
+
+    RETURN QUERY
+
+    SELECT 
+
+        p.product_id,
+
+        p.name,
+
+        p.description,
+
+        (1 - (pde.description_embedding &lt;=&gt; query_embedding)) AS similarity_score
+
+    FROM retail.products p
+
+    JOIN retail.product_description_embeddings pde ON p.product_id = pde.product_id
+
+    WHERE (pde.description_embedding &lt;=&gt; query_embedding) &lt;= (1 - similarity_threshold)
+
+    ORDER BY similarity_score DESC
+
+    LIMIT max_results;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔌 Connection Management Patterns</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Efficient database connection management is critical for MCP server performance:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Connection Pool Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class ConnectionPoolManager:
+
+    &quot;&quot;&quot;Manages PostgreSQL connection pools.&quot;&quot;&quot;
+
+    
+
+    async def create_pool(self) -&gt; Pool:
+
+        &quot;&quot;&quot;Create optimized connection pool.&quot;&quot;&quot;
+
+        return await asyncpg.create_pool(
+
+            host=self.config.db_host,
+
+            port=self.config.db_port,
+
+            database=self.config.db_name,
+
+            user=self.config.db_user,
+
+            password=self.config.db_password,
+
+            
+
+            # Pool configuration
+
+            min_size=2,          # Minimum connections
+
+            max_size=10,         # Maximum connections
+
+            max_inactive_connection_lifetime=300,  # 5 minutes
+
+            
+
+            # Query configuration
+
+            command_timeout=30,   # Query timeout
+
+            server_settings={
+
+                &quot;application_name&quot;: &quot;zava-mcp-server&quot;,
+
+                &quot;jit&quot;: &quot;off&quot;,          # Disable JIT for stability
+
+                &quot;work_mem&quot;: &quot;4MB&quot;,     # Limit work memory
+
+                &quot;statement_timeout&quot;: &quot;30s&quot;
+
+            }
+
+        )
+
+    
+
+    async def execute_with_retry(
+
+        self, 
+
+        query: str, 
+
+        params: Tuple = None,
+
+        max_retries: int = 3
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Execute query with automatic retry logic.&quot;&quot;&quot;
+
+        
+
+        for attempt in range(max_retries):
+
+            try:
+
+                async with self.pool.acquire() as conn:
+
+                    if params:
+
+                        rows = await conn.fetch(query, *params)
+
+                    else:
+
+                        rows = await conn.fetch(query)
+
+                    return [dict(row) for row in rows]
+
+                    
+
+            except (ConnectionError, InterfaceError) as e:
+
+                if attempt == max_retries - 1:
+
+                    raise
+
+                
+
+                # Exponential backoff
+
+                await asyncio.sleep(2 ** attempt)
+
+                logger.warning(f&quot;Database connection failed, retrying ({attempt + 1}/{max_retries})&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Resource Lifecycle Management</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class MCPServerManager:
+
+    &quot;&quot;&quot;Manages MCP server lifecycle and resources.&quot;&quot;&quot;
+
+    
+
+    async def startup(self):
+
+        &quot;&quot;&quot;Initialize server resources.&quot;&quot;&quot;
+
+        # Create database connection pool
+
+        self.db_pool = await self.pool_manager.create_pool()
+
+        
+
+        # Initialize AI services
+
+        self.ai_client = await self.create_ai_client()
+
+        
+
+        # Setup monitoring
+
+        self.metrics_collector = MetricsCollector()
+
+        
+
+        logger.info(&quot;MCP server startup complete&quot;)
+
+    
+
+    async def shutdown(self):
+
+        &quot;&quot;&quot;Cleanup server resources.&quot;&quot;&quot;
+
+        try:
+
+            # Close database connections
+
+            if self.db_pool:
+
+                await self.db_pool.close()
+
+            
+
+            # Cleanup AI client
+
+            if self.ai_client:
+
+                await self.ai_client.close()
+
+            
+
+            # Flush metrics
+
+            await self.metrics_collector.flush()
+
+            
+
+            logger.info(&quot;MCP server shutdown complete&quot;)
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Error during shutdown: {e}&quot;)
+
+    
+
+    async def health_check(self) -&gt; Dict[str, str]:
+
+        &quot;&quot;&quot;Verify server health status.&quot;&quot;&quot;
+
+        status = {}
+
+        
+
+        # Check database connection
+
+        try:
+
+            async with self.db_pool.acquire() as conn:
+
+                await conn.fetchval(&quot;SELECT 1&quot;)
+
+            status[&quot;database&quot;] = &quot;healthy&quot;
+
+        except Exception as e:
+
+            status[&quot;database&quot;] = f&quot;unhealthy: {e}&quot;
+
+        
+
+        # Check AI service
+
+        try:
+
+            await self.ai_client.health_check()
+
+            status[&quot;ai_service&quot;] = &quot;healthy&quot;
+
+        except Exception as e:
+
+            status[&quot;ai_service&quot;] = f&quot;unhealthy: {e}&quot;
+
+        
+
+        return status
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛡️ Error Handling and Resilience Patterns</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Robust error handling ensures reliable MCP server operation:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Hierarchical Error Types</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class MCPError(Exception):
+
+    &quot;&quot;&quot;Base MCP server error.&quot;&quot;&quot;
+
+    def __init__(self, message: str, error_code: str = &quot;MCP_ERROR&quot;):
+
+        self.message = message
+
+        self.error_code = error_code
+
+        super().__init__(message)
+
+
+
+class DatabaseError(MCPError):
+
+    &quot;&quot;&quot;Database operation errors.&quot;&quot;&quot;
+
+    def __init__(self, message: str, query: str = None):
+
+        super().__init__(message, &quot;DATABASE_ERROR&quot;)
+
+        self.query = query
+
+
+
+class AuthorizationError(MCPError):
+
+    &quot;&quot;&quot;Access control errors.&quot;&quot;&quot;
+
+    def __init__(self, message: str, user_id: str = None):
+
+        super().__init__(message, &quot;AUTHORIZATION_ERROR&quot;)
+
+        self.user_id = user_id
+
+
+
+class QueryTimeoutError(DatabaseError):
+
+    &quot;&quot;&quot;Query execution timeout.&quot;&quot;&quot;
+
+    def __init__(self, query: str):
+
+        super().__init__(f&quot;Query timeout: {query[:100]}...&quot;, query)
+
+        self.error_code = &quot;QUERY_TIMEOUT&quot;
+
+
+
+class ValidationError(MCPError):
+
+    &quot;&quot;&quot;Input validation errors.&quot;&quot;&quot;
+
+    def __init__(self, field: str, value: Any, constraint: str):
+
+        message = f&quot;Validation failed for {field}: {constraint}&quot;
+
+        super().__init__(message, &quot;VALIDATION_ERROR&quot;)
+
+        self.field = field
+
+        self.value = value
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Error Handling Middleware</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@contextmanager
+
+async def error_handling_context(operation_name: str, user_id: str = None):
+
+    &quot;&quot;&quot;Centralized error handling for operations.&quot;&quot;&quot;
+
+    start_time = time.time()
+
+    
+
+    try:
+
+        yield
+
+        
+
+        # Success metrics
+
+        duration = time.time() - start_time
+
+        metrics.operation_success.labels(operation=operation_name).inc()
+
+        metrics.operation_duration.labels(operation=operation_name).observe(duration)
+
+        
+
+    except ValidationError as e:
+
+        logger.warning(f&quot;Validation error in {operation_name}: {e.message}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;validation&quot;,
+
+            &quot;field&quot;: e.field
+
+        })
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;validation&quot;).inc()
+
+        raise
+
+        
+
+    except AuthorizationError as e:
+
+        logger.warning(f&quot;Authorization error in {operation_name}: {e.message}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;authorization&quot;
+
+        })
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;authorization&quot;).inc()
+
+        raise
+
+        
+
+    except DatabaseError as e:
+
+        logger.error(f&quot;Database error in {operation_name}: {e.message}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;database&quot;,
+
+            &quot;query&quot;: e.query[:100] if e.query else None
+
+        })
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;database&quot;).inc()
+
+        raise
+
+        
+
+    except Exception as e:
+
+        logger.error(f&quot;Unexpected error in {operation_name}: {str(e)}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;unexpected&quot;
+
+        }, exc_info=True)
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;unexpected&quot;).inc()
+
+        raise MCPError(f&quot;Internal server error in {operation_name}&quot;)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 Performance Optimization Strategies</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Query Performance Monitoring</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class QueryPerformanceMonitor:
+
+    &quot;&quot;&quot;Monitor and optimize query performance.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.slow_query_threshold = 1.0  # seconds
+
+        self.query_stats = defaultdict(list)
+
+    
+
+    @contextmanager
+
+    async def monitor_query(self, query: str, operation_type: str = &quot;unknown&quot;):
+
+        &quot;&quot;&quot;Monitor query execution time and performance.&quot;&quot;&quot;
+
+        start_time = time.time()
+
+        query_hash = hashlib.md5(query.encode()).hexdigest()[:8]
+
+        
+
+        try:
+
+            yield
+
+            
+
+            duration = time.time() - start_time
+
+            
+
+            # Record performance metrics
+
+            self.query_stats[operation_type].append(duration)
+
+            
+
+            # Log slow queries
+
+            if duration &gt; self.slow_query_threshold:
+
+                logger.warning(f&quot;Slow query detected&quot;, extra={
+
+                    &quot;query_hash&quot;: query_hash,
+
+                    &quot;duration&quot;: duration,
+
+                    &quot;operation_type&quot;: operation_type,
+
+                    &quot;query&quot;: query[:200]
+
+                })
+
+            
+
+            # Update metrics
+
+            metrics.query_duration.labels(type=operation_type).observe(duration)
+
+            
+
+        except Exception as e:
+
+            duration = time.time() - start_time
+
+            logger.error(f&quot;Query failed&quot;, extra={
+
+                &quot;query_hash&quot;: query_hash,
+
+                &quot;duration&quot;: duration,
+
+                &quot;operation_type&quot;: operation_type,
+
+                &quot;error&quot;: str(e)
+
+            })
+
+            raise
+
+    
+
+    def get_performance_summary(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Generate performance summary report.&quot;&quot;&quot;
+
+        summary = {}
+
+        
+
+        for operation_type, durations in self.query_stats.items():
+
+            if durations:
+
+                summary[operation_type] = {
+
+                    &quot;count&quot;: len(durations),
+
+                    &quot;avg_duration&quot;: sum(durations) / len(durations),
+
+                    &quot;max_duration&quot;: max(durations),
+
+                    &quot;min_duration&quot;: min(durations),
+
+                    &quot;slow_queries&quot;: len([d for d in durations if d &gt; self.slow_query_threshold])
+
+                }
+
+        
+
+        return summary
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Caching Strategy</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class QueryCache:
+
+    &quot;&quot;&quot;Intelligent query result caching.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, redis_url: str = None):
+
+        self.cache = {}  # In-memory fallback
+
+        self.redis_client = redis.Redis.from_url(redis_url) if redis_url else None
+
+        self.cache_ttl = 300  # 5 minutes default
+
+    
+
+    async def get_cached_result(
+
+        self, 
+
+        cache_key: str, 
+
+        query_func: Callable,
+
+        ttl: int = None
+
+    ) -&gt; Any:
+
+        &quot;&quot;&quot;Get result from cache or execute query.&quot;&quot;&quot;
+
+        ttl = ttl or self.cache_ttl
+
+        
+
+        # Try cache first
+
+        cached_result = await self._get_from_cache(cache_key)
+
+        if cached_result is not None:
+
+            metrics.cache_hit.labels(type=&quot;query&quot;).inc()
+
+            return cached_result
+
+        
+
+        # Execute query
+
+        metrics.cache_miss.labels(type=&quot;query&quot;).inc()
+
+        result = await query_func()
+
+        
+
+        # Cache result
+
+        await self._set_in_cache(cache_key, result, ttl)
+
+        
+
+        return result
+
+    
+
+    def _generate_cache_key(self, query: str, user_context: str) -&gt; str:
+
+        &quot;&quot;&quot;Generate consistent cache key.&quot;&quot;&quot;
+
+        key_data = f&quot;{query}:{user_context}&quot;
+
+        return hashlib.sha256(key_data.encode()).hexdigest()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should understand:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Layered Architecture</strong>: How to separate concerns in MCP server design  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Database Patterns</strong>: Multi-tenant schema design and RLS implementation  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Connection Management</strong>: Efficient pooling and resource lifecycle  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Error Handling</strong>: Hierarchical error types and resilience patterns  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Performance Optimization</strong>: Monitoring, caching, and query optimization  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Production Readiness</strong>: Infrastructure concerns and operational patterns  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/02-Security/README.md" target="_blank">Lab 02: Security and Multi-Tenancy</a></strong> to dive deep into:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Row Level Security implementation details</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Authentication and authorization patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Multi-tenant data isolation strategies</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Security audit and compliance considerations</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Architecture Patterns</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/cosmic-python/code">Clean Architecture in Python</a> - Architectural patterns for Python applications</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://en.wikipedia.org/wiki/Database_design">Database Design Patterns</a> - Relational database design principles</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://microservices.io/patterns/">Microservices Patterns</a> - Service architecture patterns</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">PostgreSQL Advanced Topics</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://wiki.postgresql.org/wiki/Performance_Optimization">PostgreSQL Performance Tuning</a> - Database optimization guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-connection.html">Connection Pooling Best Practices</a> - Connection management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/planner-optimizer.html">Query Planning and Optimization</a> - Query performance</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Async Patterns</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">AsyncIO Best Practices</a> - Async programming patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/advanced/">FastAPI Architecture</a> - Modern Python web architecture</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://pydantic-docs.helpmanual.io/">Pydantic Models</a> - Data validation and serialization</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: Ready to explore security patterns? Continue with <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/02-Security/README.md" target="_blank">Lab 02: Security and Multi-Tenancy</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">핵심 아키텍처 개념</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 MCP 서버 아키텍처 패턴, 데이터베이스 설계 원칙, 그리고 견고하고 확장 가능한 데이터베이스 통합 AI 애플리케이션을 구현하는 기술적 전략에 대한 심층적인 탐구를 제공합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">데이터베이스 통합을 포함한 프로덕션 준비 MCP 서버를 구축하려면 신중한 아키텍처 결정이 필요합니다. 이 실습에서는 Zava Retail 분석 솔루션을 견고하고 안전하며 확장 가능하게 만드는 핵심 구성 요소, 설계 패턴, 기술적 고려 사항을 분해하여 설명합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">각 계층이 어떻게 상호작용하는지, 특정 기술이 왜 선택되었는지, 그리고 이러한 패턴을 자신의 MCP 구현에 어떻게 적용할 수 있는지를 이해하게 될 것입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>분석</strong>: 데이터베이스 통합 MCP 서버의 계층화된 아키텍처 분석</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>이해</strong>: 각 아키텍처 구성 요소의 역할과 책임</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>설계</strong>: 다중 테넌트 MCP 애플리케이션을 지원하는 데이터베이스 스키마 설계</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구현</strong>: 연결 풀링 및 리소스 관리 전략</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>적용</strong>: 프로덕션 시스템을 위한 오류 처리 및 로깅 패턴</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>평가</strong>: 다양한 아키텍처 접근 방식 간의 트레이드오프 평가</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏗️ MCP 서버 아키텍처 계층</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리의 MCP 서버는 <strong>계층화된 아키텍처</strong>를 구현하여 관심사를 분리하고 유지보수를 촉진합니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계층 1: 프로토콜 계층 (FastMCP)</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>책임</strong>: MCP 프로토콜 통신 및 메시지 라우팅 처리</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# FastMCP server setup
+
+from fastmcp import FastMCP
+
+
+
+mcp = FastMCP(&quot;Zava Retail Analytics&quot;)
+
+
+
+# Tool registration with type safety
+
+@mcp.tool()
+
+async def execute_sales_query(
+
+    ctx: Context,
+
+    postgresql_query: Annotated[str, Field(description=&quot;Well-formed PostgreSQL query&quot;)]
+
+) -&gt; str:
+
+    &quot;&quot;&quot;Execute PostgreSQL queries with Row Level Security.&quot;&quot;&quot;
+
+    return await query_executor.execute(postgresql_query, ctx)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>주요 기능</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>프로토콜 준수</strong>: MCP 사양 완벽 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>타입 안전성</strong>: 요청/응답 유효성 검사를 위한 Pydantic 모델</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>비동기 지원</strong>: 높은 동시성을 위한 비차단 I/O</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>오류 처리</strong>: 표준화된 오류 응답</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계층 2: 비즈니스 로직 계층</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>책임</strong>: 비즈니스 규칙 구현 및 프로토콜과 데이터 계층 간 조정</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class SalesAnalyticsService:
+
+    &quot;&quot;&quot;Business logic for retail analytics operations.&quot;&quot;&quot;
+
+    
+
+    async def get_store_performance(
+
+        self, 
+
+        store_id: str, 
+
+        time_period: str
+
+    ) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Calculate store performance metrics.&quot;&quot;&quot;
+
+        
+
+        # Validate business rules
+
+        if not self._validate_store_access(store_id):
+
+            raise UnauthorizedError(&quot;Access denied for store&quot;)
+
+        
+
+        # Coordinate data retrieval
+
+        sales_data = await self.db_provider.get_sales_data(store_id, time_period)
+
+        metrics = self._calculate_metrics(sales_data)
+
+        
+
+        return {
+
+            &quot;store_id&quot;: store_id,
+
+            &quot;period&quot;: time_period,
+
+            &quot;metrics&quot;: metrics,
+
+            &quot;insights&quot;: self._generate_insights(metrics)
+
+        }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>주요 기능</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>비즈니스 규칙 준수</strong>: 저장소 접근 검증 및 데이터 무결성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>서비스 조정</strong>: 데이터베이스와 AI 서비스 간 오케스트레이션</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>데이터 변환</strong>: 원시 데이터를 비즈니스 인사이트로 변환</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>캐싱 전략</strong>: 빈번한 쿼리에 대한 성능 최적화</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계층 3: 데이터 접근 계층</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>책임</strong>: 데이터베이스 연결 관리, 쿼리 실행 및 데이터 매핑</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class PostgreSQLProvider:
+
+    &quot;&quot;&quot;Data access layer for PostgreSQL operations.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, connection_config: Dict[str, Any]):
+
+        self.connection_pool: Optional[Pool] = None
+
+        self.config = connection_config
+
+    
+
+    async def execute_query(
+
+        self, 
+
+        query: str, 
+
+        rls_user_id: str
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Execute query with RLS context.&quot;&quot;&quot;
+
+        
+
+        async with self.connection_pool.acquire() as conn:
+
+            # Set RLS context
+
+            await conn.execute(
+
+                &quot;SELECT set_config(&#x27;app.current_rls_user_id&#x27;, $1, false)&quot;,
+
+                rls_user_id
+
+            )
+
+            
+
+            # Execute query with timeout
+
+            try:
+
+                rows = await asyncio.wait_for(
+
+                    conn.fetch(query),
+
+                    timeout=30.0
+
+                )
+
+                return [dict(row) for row in rows]
+
+            except asyncio.TimeoutError:
+
+                raise QueryTimeoutError(&quot;Query execution exceeded timeout&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>주요 기능</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>연결 풀링</strong>: 효율적인 리소스 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>트랜잭션 관리</strong>: ACID 준수 및 롤백 처리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>쿼리 최적화</strong>: 성능 모니터링 및 최적화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RLS 통합</strong>: 행 수준 보안 컨텍스트 관리</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계층 4: 인프라 계층</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>책임</strong>: 로깅, 모니터링, 구성과 같은 횡단 관심사 처리</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class InfrastructureManager:
+
+    &quot;&quot;&quot;Infrastructure concerns management.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.logger = self._setup_logging()
+
+        self.metrics = self._setup_metrics()
+
+        self.config = self._load_configuration()
+
+    
+
+    def _setup_logging(self) -&gt; Logger:
+
+        &quot;&quot;&quot;Configure structured logging.&quot;&quot;&quot;
+
+        logging.basicConfig(
+
+            level=logging.INFO,
+
+            format=&#x27;%(asctime)s - %(name)s - %(levelname)s - %(message)s&#x27;,
+
+            handlers=[
+
+                logging.StreamHandler(),
+
+                logging.FileHandler(&#x27;mcp_server.log&#x27;)
+
+            ]
+
+        )
+
+        return logging.getLogger(__name__)
+
+    
+
+    async def track_query_execution(
+
+        self, 
+
+        query_type: str, 
+
+        duration: float, 
+
+        success: bool
+
+    ):
+
+        &quot;&quot;&quot;Track query performance metrics.&quot;&quot;&quot;
+
+        self.metrics.counter(&#x27;query_total&#x27;).labels(
+
+            type=query_type,
+
+            status=&#x27;success&#x27; if success else &#x27;error&#x27;
+
+        ).inc()
+
+        
+
+        self.metrics.histogram(&#x27;query_duration&#x27;).labels(
+
+            type=query_type
+
+        ).observe(duration)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🗄️ 데이터베이스 설계 패턴</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리의 PostgreSQL 스키마는 다중 테넌트 MCP 애플리케이션을 위한 몇 가지 주요 패턴을 구현합니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 다중 테넌트 스키마 설계</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Core retail entities with store-based partitioning
+
+CREATE TABLE retail.stores (
+
+    store_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    name VARCHAR(100) NOT NULL,
+
+    location VARCHAR(200) NOT NULL,
+
+    manager_id UUID NOT NULL,
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+
+
+CREATE TABLE retail.customers (
+
+    customer_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    store_id UUID REFERENCES retail.stores(store_id),
+
+    first_name VARCHAR(50) NOT NULL,
+
+    last_name VARCHAR(50) NOT NULL,
+
+    email VARCHAR(100) UNIQUE,
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+
+
+CREATE TABLE retail.orders (
+
+    order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    customer_id UUID REFERENCES retail.customers(customer_id),
+
+    store_id UUID REFERENCES retail.stores(store_id),
+
+    order_date TIMESTAMP DEFAULT NOW(),
+
+    total_amount DECIMAL(10,2) NOT NULL,
+
+    status VARCHAR(20) DEFAULT &#x27;pending&#x27;
+
+);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>설계 원칙</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>외래 키 일관성</strong>: 테이블 간 데이터 무결성 보장</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>저장소 ID 전파</strong>: 모든 트랜잭션 테이블에 store_id 포함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>UUID 기본 키</strong>: 분산 시스템을 위한 전역적으로 고유한 식별자</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>타임스탬프 추적</strong>: 모든 데이터 변경에 대한 감사 기록</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 행 수준 보안 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Enable RLS on multi-tenant tables
+
+ALTER TABLE retail.customers ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.orders ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE retail.order_items ENABLE ROW LEVEL SECURITY;
+
+
+
+-- Store manager can only see their store&#x27;s data
+
+CREATE POLICY store_manager_customers ON retail.customers
+
+    FOR ALL TO store_managers
+
+    USING (store_id = get_current_user_store());
+
+
+
+CREATE POLICY store_manager_orders ON retail.orders
+
+    FOR ALL TO store_managers
+
+    USING (store_id = get_current_user_store());
+
+
+
+-- Regional managers see multiple stores
+
+CREATE POLICY regional_manager_orders ON retail.orders
+
+    FOR ALL TO regional_managers
+
+    USING (store_id = ANY(get_user_store_list()));
+
+
+
+-- Support function for RLS context
+
+CREATE OR REPLACE FUNCTION get_current_user_store()
+
+RETURNS UUID AS $$
+
+BEGIN
+
+    RETURN current_setting(&#x27;app.current_rls_user_id&#x27;)::UUID;
+
+EXCEPTION WHEN OTHERS THEN
+
+    RETURN &#x27;00000000-0000-0000-0000-000000000000&#x27;::UUID;
+
+END;
+
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>RLS의 이점</strong>:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>자동 필터링</strong>: 데이터베이스가 데이터 격리를 강제</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>애플리케이션 단순화</strong>: 복잡한 WHERE 절 불필요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>기본 보안</strong>: 잘못된 데이터 접근이 불가능</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>감사 준수</strong>: 명확한 데이터 접근 경계</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. 벡터 검색 스키마</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+-- Product embeddings for semantic search
+
+CREATE TABLE retail.product_description_embeddings (
+
+    product_id UUID PRIMARY KEY REFERENCES retail.products(product_id),
+
+    description_embedding vector(1536),
+
+    last_updated TIMESTAMP DEFAULT NOW()
+
+);
+
+
+
+-- Optimize vector similarity search
+
+CREATE INDEX idx_product_embeddings_vector 
+
+ON retail.product_description_embeddings 
+
+USING ivfflat (description_embedding vector_cosine_ops);
+
+
+
+-- Semantic search function
+
+CREATE OR REPLACE FUNCTION search_products_by_description(
+
+    query_embedding vector(1536),
+
+    similarity_threshold FLOAT DEFAULT 0.7,
+
+    max_results INTEGER DEFAULT 20
+
+)
+
+RETURNS TABLE(
+
+    product_id UUID,
+
+    name VARCHAR,
+
+    description TEXT,
+
+    similarity_score FLOAT
+
+) AS $$
+
+BEGIN
+
+    RETURN QUERY
+
+    SELECT 
+
+        p.product_id,
+
+        p.name,
+
+        p.description,
+
+        (1 - (pde.description_embedding &lt;=&gt; query_embedding)) AS similarity_score
+
+    FROM retail.products p
+
+    JOIN retail.product_description_embeddings pde ON p.product_id = pde.product_id
+
+    WHERE (pde.description_embedding &lt;=&gt; query_embedding) &lt;= (1 - similarity_threshold)
+
+    ORDER BY similarity_score DESC
+
+    LIMIT max_results;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔌 연결 관리 패턴</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">효율적인 데이터베이스 연결 관리는 MCP 서버 성능에 중요합니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연결 풀 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class ConnectionPoolManager:
+
+    &quot;&quot;&quot;Manages PostgreSQL connection pools.&quot;&quot;&quot;
+
+    
+
+    async def create_pool(self) -&gt; Pool:
+
+        &quot;&quot;&quot;Create optimized connection pool.&quot;&quot;&quot;
+
+        return await asyncpg.create_pool(
+
+            host=self.config.db_host,
+
+            port=self.config.db_port,
+
+            database=self.config.db_name,
+
+            user=self.config.db_user,
+
+            password=self.config.db_password,
+
+            
+
+            # Pool configuration
+
+            min_size=2,          # Minimum connections
+
+            max_size=10,         # Maximum connections
+
+            max_inactive_connection_lifetime=300,  # 5 minutes
+
+            
+
+            # Query configuration
+
+            command_timeout=30,   # Query timeout
+
+            server_settings={
+
+                &quot;application_name&quot;: &quot;zava-mcp-server&quot;,
+
+                &quot;jit&quot;: &quot;off&quot;,          # Disable JIT for stability
+
+                &quot;work_mem&quot;: &quot;4MB&quot;,     # Limit work memory
+
+                &quot;statement_timeout&quot;: &quot;30s&quot;
+
+            }
+
+        )
+
+    
+
+    async def execute_with_retry(
+
+        self, 
+
+        query: str, 
+
+        params: Tuple = None,
+
+        max_retries: int = 3
+
+    ) -&gt; List[Dict[str, Any]]:
+
+        &quot;&quot;&quot;Execute query with automatic retry logic.&quot;&quot;&quot;
+
+        
+
+        for attempt in range(max_retries):
+
+            try:
+
+                async with self.pool.acquire() as conn:
+
+                    if params:
+
+                        rows = await conn.fetch(query, *params)
+
+                    else:
+
+                        rows = await conn.fetch(query)
+
+                    return [dict(row) for row in rows]
+
+                    
+
+            except (ConnectionError, InterfaceError) as e:
+
+                if attempt == max_retries - 1:
+
+                    raise
+
+                
+
+                # Exponential backoff
+
+                await asyncio.sleep(2 ** attempt)
+
+                logger.warning(f&quot;Database connection failed, retrying ({attempt + 1}/{max_retries})&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">리소스 라이프사이클 관리</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class MCPServerManager:
+
+    &quot;&quot;&quot;Manages MCP server lifecycle and resources.&quot;&quot;&quot;
+
+    
+
+    async def startup(self):
+
+        &quot;&quot;&quot;Initialize server resources.&quot;&quot;&quot;
+
+        # Create database connection pool
+
+        self.db_pool = await self.pool_manager.create_pool()
+
+        
+
+        # Initialize AI services
+
+        self.ai_client = await self.create_ai_client()
+
+        
+
+        # Setup monitoring
+
+        self.metrics_collector = MetricsCollector()
+
+        
+
+        logger.info(&quot;MCP server startup complete&quot;)
+
+    
+
+    async def shutdown(self):
+
+        &quot;&quot;&quot;Cleanup server resources.&quot;&quot;&quot;
+
+        try:
+
+            # Close database connections
+
+            if self.db_pool:
+
+                await self.db_pool.close()
+
+            
+
+            # Cleanup AI client
+
+            if self.ai_client:
+
+                await self.ai_client.close()
+
+            
+
+            # Flush metrics
+
+            await self.metrics_collector.flush()
+
+            
+
+            logger.info(&quot;MCP server shutdown complete&quot;)
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Error during shutdown: {e}&quot;)
+
+    
+
+    async def health_check(self) -&gt; Dict[str, str]:
+
+        &quot;&quot;&quot;Verify server health status.&quot;&quot;&quot;
+
+        status = {}
+
+        
+
+        # Check database connection
+
+        try:
+
+            async with self.db_pool.acquire() as conn:
+
+                await conn.fetchval(&quot;SELECT 1&quot;)
+
+            status[&quot;database&quot;] = &quot;healthy&quot;
+
+        except Exception as e:
+
+            status[&quot;database&quot;] = f&quot;unhealthy: {e}&quot;
+
+        
+
+        # Check AI service
+
+        try:
+
+            await self.ai_client.health_check()
+
+            status[&quot;ai_service&quot;] = &quot;healthy&quot;
+
+        except Exception as e:
+
+            status[&quot;ai_service&quot;] = f&quot;unhealthy: {e}&quot;
+
+        
+
+        return status
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛡️ 오류 처리 및 복원력 패턴</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">견고한 오류 처리는 MCP 서버의 안정적인 운영을 보장합니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계층적 오류 유형</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class MCPError(Exception):
+
+    &quot;&quot;&quot;Base MCP server error.&quot;&quot;&quot;
+
+    def __init__(self, message: str, error_code: str = &quot;MCP_ERROR&quot;):
+
+        self.message = message
+
+        self.error_code = error_code
+
+        super().__init__(message)
+
+
+
+class DatabaseError(MCPError):
+
+    &quot;&quot;&quot;Database operation errors.&quot;&quot;&quot;
+
+    def __init__(self, message: str, query: str = None):
+
+        super().__init__(message, &quot;DATABASE_ERROR&quot;)
+
+        self.query = query
+
+
+
+class AuthorizationError(MCPError):
+
+    &quot;&quot;&quot;Access control errors.&quot;&quot;&quot;
+
+    def __init__(self, message: str, user_id: str = None):
+
+        super().__init__(message, &quot;AUTHORIZATION_ERROR&quot;)
+
+        self.user_id = user_id
+
+
+
+class QueryTimeoutError(DatabaseError):
+
+    &quot;&quot;&quot;Query execution timeout.&quot;&quot;&quot;
+
+    def __init__(self, query: str):
+
+        super().__init__(f&quot;Query timeout: {query[:100]}...&quot;, query)
+
+        self.error_code = &quot;QUERY_TIMEOUT&quot;
+
+
+
+class ValidationError(MCPError):
+
+    &quot;&quot;&quot;Input validation errors.&quot;&quot;&quot;
+
+    def __init__(self, field: str, value: Any, constraint: str):
+
+        message = f&quot;Validation failed for {field}: {constraint}&quot;
+
+        super().__init__(message, &quot;VALIDATION_ERROR&quot;)
+
+        self.field = field
+
+        self.value = value
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">오류 처리 미들웨어</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@contextmanager
+
+async def error_handling_context(operation_name: str, user_id: str = None):
+
+    &quot;&quot;&quot;Centralized error handling for operations.&quot;&quot;&quot;
+
+    start_time = time.time()
+
+    
+
+    try:
+
+        yield
+
+        
+
+        # Success metrics
+
+        duration = time.time() - start_time
+
+        metrics.operation_success.labels(operation=operation_name).inc()
+
+        metrics.operation_duration.labels(operation=operation_name).observe(duration)
+
+        
+
+    except ValidationError as e:
+
+        logger.warning(f&quot;Validation error in {operation_name}: {e.message}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;validation&quot;,
+
+            &quot;field&quot;: e.field
+
+        })
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;validation&quot;).inc()
+
+        raise
+
+        
+
+    except AuthorizationError as e:
+
+        logger.warning(f&quot;Authorization error in {operation_name}: {e.message}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;authorization&quot;
+
+        })
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;authorization&quot;).inc()
+
+        raise
+
+        
+
+    except DatabaseError as e:
+
+        logger.error(f&quot;Database error in {operation_name}: {e.message}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;database&quot;,
+
+            &quot;query&quot;: e.query[:100] if e.query else None
+
+        })
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;database&quot;).inc()
+
+        raise
+
+        
+
+    except Exception as e:
+
+        logger.error(f&quot;Unexpected error in {operation_name}: {str(e)}&quot;, extra={
+
+            &quot;operation&quot;: operation_name,
+
+            &quot;user_id&quot;: user_id,
+
+            &quot;error_type&quot;: &quot;unexpected&quot;
+
+        }, exc_info=True)
+
+        metrics.operation_error.labels(operation=operation_name, type=&quot;unexpected&quot;).inc()
+
+        raise MCPError(f&quot;Internal server error in {operation_name}&quot;)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 성능 최적화 전략</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">쿼리 성능 모니터링</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class QueryPerformanceMonitor:
+
+    &quot;&quot;&quot;Monitor and optimize query performance.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.slow_query_threshold = 1.0  # seconds
+
+        self.query_stats = defaultdict(list)
+
+    
+
+    @contextmanager
+
+    async def monitor_query(self, query: str, operation_type: str = &quot;unknown&quot;):
+
+        &quot;&quot;&quot;Monitor query execution time and performance.&quot;&quot;&quot;
+
+        start_time = time.time()
+
+        query_hash = hashlib.md5(query.encode()).hexdigest()[:8]
+
+        
+
+        try:
+
+            yield
+
+            
+
+            duration = time.time() - start_time
+
+            
+
+            # Record performance metrics
+
+            self.query_stats[operation_type].append(duration)
+
+            
+
+            # Log slow queries
+
+            if duration &gt; self.slow_query_threshold:
+
+                logger.warning(f&quot;Slow query detected&quot;, extra={
+
+                    &quot;query_hash&quot;: query_hash,
+
+                    &quot;duration&quot;: duration,
+
+                    &quot;operation_type&quot;: operation_type,
+
+                    &quot;query&quot;: query[:200]
+
+                })
+
+            
+
+            # Update metrics
+
+            metrics.query_duration.labels(type=operation_type).observe(duration)
+
+            
+
+        except Exception as e:
+
+            duration = time.time() - start_time
+
+            logger.error(f&quot;Query failed&quot;, extra={
+
+                &quot;query_hash&quot;: query_hash,
+
+                &quot;duration&quot;: duration,
+
+                &quot;operation_type&quot;: operation_type,
+
+                &quot;error&quot;: str(e)
+
+            })
+
+            raise
+
+    
+
+    def get_performance_summary(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Generate performance summary report.&quot;&quot;&quot;
+
+        summary = {}
+
+        
+
+        for operation_type, durations in self.query_stats.items():
+
+            if durations:
+
+                summary[operation_type] = {
+
+                    &quot;count&quot;: len(durations),
+
+                    &quot;avg_duration&quot;: sum(durations) / len(durations),
+
+                    &quot;max_duration&quot;: max(durations),
+
+                    &quot;min_duration&quot;: min(durations),
+
+                    &quot;slow_queries&quot;: len([d for d in durations if d &gt; self.slow_query_threshold])
+
+                }
+
+        
+
+        return summary
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">캐싱 전략</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class QueryCache:
+
+    &quot;&quot;&quot;Intelligent query result caching.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, redis_url: str = None):
+
+        self.cache = {}  # In-memory fallback
+
+        self.redis_client = redis.Redis.from_url(redis_url) if redis_url else None
+
+        self.cache_ttl = 300  # 5 minutes default
+
+    
+
+    async def get_cached_result(
+
+        self, 
+
+        cache_key: str, 
+
+        query_func: Callable,
+
+        ttl: int = None
+
+    ) -&gt; Any:
+
+        &quot;&quot;&quot;Get result from cache or execute query.&quot;&quot;&quot;
+
+        ttl = ttl or self.cache_ttl
+
+        
+
+        # Try cache first
+
+        cached_result = await self._get_from_cache(cache_key)
+
+        if cached_result is not None:
+
+            metrics.cache_hit.labels(type=&quot;query&quot;).inc()
+
+            return cached_result
+
+        
+
+        # Execute query
+
+        metrics.cache_miss.labels(type=&quot;query&quot;).inc()
+
+        result = await query_func()
+
+        
+
+        # Cache result
+
+        await self._set_in_cache(cache_key, result, ttl)
+
+        
+
+        return result
+
+    
+
+    def _generate_cache_key(self, query: str, user_context: str) -&gt; str:
+
+        &quot;&quot;&quot;Generate consistent cache key.&quot;&quot;&quot;
+
+        key_data = f&quot;{query}:{user_context}&quot;
+
+        return hashlib.sha256(key_data.encode()).hexdigest()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 이해할 수 있어야 합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>계층화된 아키텍처</strong>: MCP 서버 설계에서 관심사를 분리하는 방법  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>데이터베이스 패턴</strong>: 다중 테넌트 스키마 설계 및 RLS 구현  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>연결 관리</strong>: 효율적인 풀링 및 리소스 라이프사이클  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>오류 처리</strong>: 계층적 오류 유형 및 복원력 패턴  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>성능 최적화</strong>: 모니터링, 캐싱 및 쿼리 최적화  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>프로덕션 준비</strong>: 인프라 관심사 및 운영 패턴  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/02-Security/README.md" target="_blank">Lab 02: 보안 및 다중 테넌트</a></strong>로 계속 진행하여 다음을 심층적으로 탐구하세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">행 수준 보안 구현 세부사항</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">인증 및 권한 부여 패턴</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다중 테넌트 데이터 격리 전략</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보안 감사 및 준수 고려 사항</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">아키텍처 패턴</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/cosmic-python/code">Python에서의 클린 아키텍처</a> - Python 애플리케이션을 위한 아키텍처 패턴</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://en.wikipedia.org/wiki/Database_design">데이터베이스 설계 패턴</a> - 관계형 데이터베이스 설계 원칙</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://microservices.io/patterns/">마이크로서비스 패턴</a> - 서비스 아키텍처 패턴</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">PostgreSQL 고급 주제</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://wiki.postgresql.org/wiki/Performance_Optimization">PostgreSQL 성능 튜닝</a> - 데이터베이스 최적화 가이드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-connection.html">연결 풀링 모범 사례</a> - 연결 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/planner-optimizer.html">쿼리 계획 및 최적화</a> - 쿼리 성능</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 비동기 패턴</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">AsyncIO 모범 사례</a> - 비동기 프로그래밍 패턴</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/advanced/">FastAPI 아키텍처</a> - 현대적인 Python 웹 아키텍처</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://pydantic-docs.helpmanual.io/">Pydantic 모델</a> - 데이터 유효성 검사 및 직렬화</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: 보안 패턴을 탐구할 준비가 되셨나요? <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/02-Security/README.md" target="_blank">Lab 02: 보안 및 다중 테넌트</a>로 계속 진행하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_01-00---introduction-to-mcp-database-integr.html">&larr; 00 - Introduction to MCP Database Integration</a></span>
+  <span><a href="m11_03-02---security-and-multi-tenancy.html">02 - Security and Multi-Tenancy &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

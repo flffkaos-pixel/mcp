@@ -1,0 +1,3995 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>09 - VS Code Integration - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 09 - VS Code Integration</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">VS Code Integration</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab provides comprehensive guidance on integrating your MCP server with VS Code to enable natural language queries through AI Chat.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll learn to configure VS Code for optimal MCP usage, debug server connections, and leverage the full power of AI-assisted database interactions.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code's MCP integration transforms how developers interact with databases and APIs through natural language.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By connecting your retail MCP server to VS Code Chat, you enable intelligent querying of sales data, product catalogs, and business analytics using conversational AI.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This integration allows developers to ask questions like "Show me top selling products this month" or "Find customers who haven't purchased in 90 days" and get structured data responses without writing SQL queries.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Configure</strong> VS Code MCP settings for your retail server</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Integrate</strong> MCP servers with VS Code AI Chat functionality</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Debug</strong> MCP server connections and troubleshoot issues</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Optimize</strong> natural language query patterns for better results</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Customize</strong> VS Code workspace for MCP development</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Deploy</strong> multi-server configurations for complex scenarios</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 VS Code MCP Configuration</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Initial Setup and Installation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/settings.json
+
+{
+
+    &quot;mcp.servers&quot;: {
+
+        &quot;retail-mcp-server&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-m&quot;, &quot;mcp_server.main&quot;
+
+            ],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_PORT&quot;: &quot;5432&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;mcp_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:POSTGRES_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;,
+
+                &quot;AZURE_CLIENT_ID&quot;: &quot;${env:AZURE_CLIENT_ID}&quot;,
+
+                &quot;AZURE_CLIENT_SECRET&quot;: &quot;${env:AZURE_CLIENT_SECRET}&quot;,
+
+                &quot;AZURE_TENANT_ID&quot;: &quot;${env:AZURE_TENANT_ID}&quot;,
+
+                &quot;LOG_LEVEL&quot;: &quot;INFO&quot;,
+
+                &quot;MCP_SERVER_DEBUG&quot;: &quot;false&quot;
+
+            },
+
+            &quot;cwd&quot;: &quot;${workspaceFolder}&quot;,
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;store_id&quot;: &quot;seattle&quot;,
+
+                &quot;enable_semantic_search&quot;: true,
+
+                &quot;enable_analytics&quot;: true,
+
+                &quot;cache_embeddings&quot;: true
+
+            }
+
+        }
+
+    },
+
+    &quot;mcp.serverTimeout&quot;: 30000,
+
+    &quot;mcp.enableLogging&quot;: true,
+
+    &quot;mcp.logLevel&quot;: &quot;info&quot;
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Environment Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# .env file for development
+
+POSTGRES_HOST=localhost
+
+POSTGRES_PORT=5432
+
+POSTGRES_DB=retail_db
+
+POSTGRES_USER=mcp_user
+
+POSTGRES_PASSWORD=your_secure_password
+
+
+
+# Azure Configuration
+
+PROJECT_ENDPOINT=https://your-project.openai.azure.com
+
+AZURE_CLIENT_ID=your-client-id
+
+AZURE_CLIENT_SECRET=your-client-secret
+
+AZURE_TENANT_ID=your-tenant-id
+
+
+
+# Optional: Azure Key Vault
+
+AZURE_KEY_VAULT_URL=https://your-keyvault.vault.azure.net/
+
+
+
+# Server Configuration
+
+MCP_SERVER_PORT=8000
+
+MCP_SERVER_HOST=127.0.0.1
+
+LOG_LEVEL=INFO
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Workspace Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/launch.json
+
+{
+
+    &quot;version&quot;: &quot;0.2.0&quot;,
+
+    &quot;configurations&quot;: [
+
+        {
+
+            &quot;name&quot;: &quot;Debug MCP Server&quot;,
+
+            &quot;type&quot;: &quot;python&quot;,
+
+            &quot;request&quot;: &quot;launch&quot;,
+
+            &quot;module&quot;: &quot;mcp_server.main&quot;,
+
+            &quot;console&quot;: &quot;integratedTerminal&quot;,
+
+            &quot;envFile&quot;: &quot;${workspaceFolder}/.env&quot;,
+
+            &quot;env&quot;: {
+
+                &quot;MCP_SERVER_DEBUG&quot;: &quot;true&quot;,
+
+                &quot;LOG_LEVEL&quot;: &quot;DEBUG&quot;
+
+            },
+
+            &quot;args&quot;: [],
+
+            &quot;justMyCode&quot;: false,
+
+            &quot;stopOnEntry&quot;: false
+
+        },
+
+        {
+
+            &quot;name&quot;: &quot;Test MCP Server&quot;,
+
+            &quot;type&quot;: &quot;python&quot;,
+
+            &quot;request&quot;: &quot;launch&quot;,
+
+            &quot;module&quot;: &quot;pytest&quot;,
+
+            &quot;console&quot;: &quot;integratedTerminal&quot;,
+
+            &quot;envFile&quot;: &quot;${workspaceFolder}/.env.test&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;tests/&quot;,
+
+                &quot;-v&quot;,
+
+                &quot;--tb=short&quot;
+
+            ]
+
+        }
+
+    ]
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Task Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/tasks.json
+
+{
+
+    &quot;version&quot;: &quot;2.0.0&quot;,
+
+    &quot;tasks&quot;: [
+
+        {
+
+            &quot;label&quot;: &quot;Start MCP Server&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-m&quot;, &quot;mcp_server.main&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;build&quot;,
+
+            &quot;presentation&quot;: {
+
+                &quot;echo&quot;: true,
+
+                &quot;reveal&quot;: &quot;always&quot;,
+
+                &quot;focus&quot;: false,
+
+                &quot;panel&quot;: &quot;new&quot;
+
+            },
+
+            &quot;options&quot;: {
+
+                &quot;env&quot;: {
+
+                    &quot;PYTHONPATH&quot;: &quot;${workspaceFolder}&quot;
+
+                }
+
+            },
+
+            &quot;isBackground&quot;: true,
+
+            &quot;problemMatcher&quot;: {
+
+                &quot;pattern&quot;: {
+
+                    &quot;regexp&quot;: &quot;^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$&quot;,
+
+                    &quot;file&quot;: 1,
+
+                    &quot;line&quot;: 2,
+
+                    &quot;column&quot;: 3,
+
+                    &quot;severity&quot;: 4,
+
+                    &quot;message&quot;: 5
+
+                },
+
+                &quot;background&quot;: {
+
+                    &quot;activeOnStart&quot;: true,
+
+                    &quot;beginsPattern&quot;: &quot;^.*Starting MCP server.*$&quot;,
+
+                    &quot;endsPattern&quot;: &quot;^.*MCP server ready.*$&quot;
+
+                }
+
+            }
+
+        },
+
+        {
+
+            &quot;label&quot;: &quot;Run Tests&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-m&quot;, &quot;pytest&quot;,
+
+                &quot;tests/&quot;,
+
+                &quot;-v&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;test&quot;,
+
+            &quot;presentation&quot;: {
+
+                &quot;echo&quot;: true,
+
+                &quot;reveal&quot;: &quot;always&quot;,
+
+                &quot;focus&quot;: false,
+
+                &quot;panel&quot;: &quot;shared&quot;
+
+            }
+
+        },
+
+        {
+
+            &quot;label&quot;: &quot;Generate Sample Data&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;scripts/generate_sample_data.py&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;build&quot;,
+
+            &quot;presentation&quot;: {
+
+                &quot;echo&quot;: true,
+
+                &quot;reveal&quot;: &quot;always&quot;,
+
+                &quot;focus&quot;: false,
+
+                &quot;panel&quot;: &quot;shared&quot;
+
+            }
+
+        },
+
+        {
+
+            &quot;label&quot;: &quot;Create Database Schema&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;psql&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-h&quot;, &quot;${env:POSTGRES_HOST}&quot;,
+
+                &quot;-p&quot;, &quot;${env:POSTGRES_PORT}&quot;,
+
+                &quot;-U&quot;, &quot;${env:POSTGRES_USER}&quot;,
+
+                &quot;-d&quot;, &quot;${env:POSTGRES_DB}&quot;,
+
+                &quot;-f&quot;, &quot;scripts/create_schema.sql&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;build&quot;
+
+        }
+
+    ]
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">💬 AI Chat Integration</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Natural Language Query Patterns</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Example query patterns for VS Code Chat
+
+interface QueryPattern {
+
+    intent: string;
+
+    examples: string[];
+
+    expectedTools: string[];
+
+}
+
+
+
+const retailQueryPatterns: QueryPattern[] = [
+
+    {
+
+        intent: &quot;sales_analysis&quot;,
+
+        examples: [
+
+            &quot;Show me daily sales for the last 30 days&quot;,
+
+            &quot;What are our top selling products this month?&quot;,
+
+            &quot;Which customers have spent the most this quarter?&quot;,
+
+            &quot;Compare sales performance between stores&quot;
+
+        ],
+
+        expectedTools: [&quot;execute_sales_query&quot;]
+
+    },
+
+    {
+
+        intent: &quot;product_search&quot;,
+
+        examples: [
+
+            &quot;Find running shoes for women&quot;,
+
+            &quot;Show me electronics under $500&quot;,
+
+            &quot;What laptops do we have in stock?&quot;,
+
+            &quot;Search for wireless headphones&quot;
+
+        ],
+
+        expectedTools: [&quot;semantic_search_products&quot;, &quot;hybrid_product_search&quot;]
+
+    },
+
+    {
+
+        intent: &quot;inventory_management&quot;,
+
+        examples: [
+
+            &quot;Which products are low on stock?&quot;,
+
+            &quot;Show me products that need reordering&quot;,
+
+            &quot;What&#x27;s our current inventory value?&quot;,
+
+            &quot;Find products with zero stock&quot;
+
+        ],
+
+        expectedTools: [&quot;execute_sales_query&quot;]
+
+    },
+
+    {
+
+        intent: &quot;customer_analysis&quot;,
+
+        examples: [
+
+            &quot;Show me customers who haven&#x27;t purchased in 90 days&quot;,
+
+            &quot;What&#x27;s the average customer lifetime value?&quot;,
+
+            &quot;Which customers are in the gold tier?&quot;,
+
+            &quot;Find customers with returns&quot;
+
+        ],
+
+        expectedTools: [&quot;execute_sales_query&quot;]
+
+    },
+
+    {
+
+        intent: &quot;business_intelligence&quot;,
+
+        examples: [
+
+            &quot;Generate a business summary for this month&quot;,
+
+            &quot;Show me seasonal trends&quot;,
+
+            &quot;What are our best performing categories?&quot;,
+
+            &quot;Create a sales forecast&quot;
+
+        ],
+
+        expectedTools: [&quot;generate_business_insights&quot;]
+
+    },
+
+    {
+
+        intent: &quot;recommendations&quot;,
+
+        examples: [
+
+            &quot;Recommend products similar to product X&quot;,
+
+            &quot;What should we recommend to customer Y?&quot;,
+
+            &quot;Show me trending products&quot;,
+
+            &quot;Find cross-sell opportunities&quot;
+
+        ],
+
+        expectedTools: [&quot;get_product_recommendations&quot;]
+
+    }
+
+];
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Chat Integration Examples</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;!-- Examples of VS Code Chat interactions --&gt;
+
+
+
+## Sales Analysis Queries
+
+
+
+**User**: Show me the top 10 selling products in the Seattle store for the last month
+
+
+
+**Expected Response**: 
+
+- Tool: execute_sales_query
+
+- Parameters: query_type=&quot;top_products&quot;, store_id=&quot;seattle&quot;, start_date=&quot;2025-08-29&quot;, end_date=&quot;2025-09-29&quot;, limit=10
+
+- Result: Formatted table with product names, quantities sold, revenue, and performance metrics
+
+
+
+**User**: What was our daily revenue trend last week?
+
+
+
+**Expected Response**:
+
+- Tool: execute_sales_query  
+
+- Parameters: query_type=&quot;daily_sales&quot;, store_id=&quot;seattle&quot;, start_date=&quot;2025-09-22&quot;, end_date=&quot;2025-09-29&quot;
+
+- Result: Chart-ready data with daily revenue figures and growth percentages
+
+
+
+## Product Search Queries
+
+
+
+**User**: Find comfortable running shoes for outdoor activities
+
+
+
+**Expected Response**:
+
+- Tool: semantic_search_products
+
+- Parameters: query=&quot;comfortable running shoes outdoor activities&quot;, store_id=&quot;seattle&quot;, similarity_threshold=0.7
+
+- Result: Ranked list of relevant products with similarity scores and detailed information
+
+
+
+**User**: Search for laptops under $1500 with good reviews
+
+
+
+**Expected Response**:
+
+- Tool: hybrid_product_search
+
+- Parameters: query=&quot;laptops under $1500 good reviews&quot;, store_id=&quot;seattle&quot;, semantic_weight=0.6, keyword_weight=0.4
+
+- Result: Combined keyword and semantic search results with price and rating filters
+
+
+
+## Business Intelligence Queries
+
+
+
+**User**: Generate a comprehensive business summary for September
+
+
+
+**Expected Response**:
+
+- Tool: generate_business_insights
+
+- Parameters: analysis_type=&quot;summary&quot;, store_id=&quot;seattle&quot;, days=30
+
+- Result: KPI dashboard with revenue, customer metrics, top categories, and growth trends
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Chat Response Formatting</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/chat/response_formatter.py
+
+&quot;&quot;&quot;
+
+Format MCP tool responses for optimal VS Code Chat display.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List
+
+import json
+
+from datetime import datetime
+
+
+
+class ChatResponseFormatter:
+
+    &quot;&quot;&quot;Format tool responses for VS Code Chat consumption.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    def format_sales_data(data: List[Dict[str, Any]], query_type: str) -&gt; str:
+
+        &quot;&quot;&quot;Format sales data for chat display.&quot;&quot;&quot;
+
+        
+
+        if not data:
+
+            return &quot;No sales data found for the specified criteria.&quot;
+
+        
+
+        if query_type == &quot;daily_sales&quot;:
+
+            return ChatResponseFormatter._format_daily_sales(data)
+
+        elif query_type == &quot;top_products&quot;:
+
+            return ChatResponseFormatter._format_top_products(data)
+
+        elif query_type == &quot;customer_analysis&quot;:
+
+            return ChatResponseFormatter._format_customer_analysis(data)
+
+        else:
+
+            return ChatResponseFormatter._format_generic_table(data)
+
+    
+
+    @staticmethod
+
+    def _format_daily_sales(data: List[Dict[str, Any]]) -&gt; str:
+
+        &quot;&quot;&quot;Format daily sales data.&quot;&quot;&quot;
+
+        
+
+        response = &quot;## Daily Sales Summary\n\n&quot;
+
+        response += &quot;| Date | Revenue | Transactions | Avg Order Value | Customers |\n&quot;
+
+        response += &quot;|------|---------|-------------|----------------|----------|\n&quot;
+
+        
+
+        total_revenue = 0
+
+        total_transactions = 0
+
+        
+
+        for day in data:
+
+            revenue = float(day.get(&#x27;total_revenue&#x27;, 0))
+
+            transactions = int(day.get(&#x27;transaction_count&#x27;, 0))
+
+            avg_value = float(day.get(&#x27;avg_transaction_value&#x27;, 0))
+
+            customers = int(day.get(&#x27;unique_customers&#x27;, 0))
+
+            
+
+            total_revenue += revenue
+
+            total_transactions += transactions
+
+            
+
+            response += f&quot;| {day.get(&#x27;sales_date&#x27;, &#x27;N/A&#x27;)} | &quot;
+
+            response += f&quot;${revenue:,.2f} | &quot;
+
+            response += f&quot;{transactions:,} | &quot;
+
+            response += f&quot;${avg_value:.2f} | &quot;
+
+            response += f&quot;{customers:,} |\n&quot;
+
+        
+
+        response += f&quot;\n**Totals**: ${total_revenue:,.2f} revenue, {total_transactions:,} transactions&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def _format_top_products(data: List[Dict[str, Any]]) -&gt; str:
+
+        &quot;&quot;&quot;Format top products data.&quot;&quot;&quot;
+
+        
+
+        response = &quot;## Top Selling Products\n\n&quot;
+
+        response += &quot;| Rank | Product | Brand | Revenue | Qty Sold | Avg Price |\n&quot;
+
+        response += &quot;|------|---------|-------|---------|----------|----------|\n&quot;
+
+        
+
+        for i, product in enumerate(data, 1):
+
+            response += f&quot;| {i} | &quot;
+
+            response += f&quot;{product.get(&#x27;product_name&#x27;, &#x27;N/A&#x27;)} | &quot;
+
+            response += f&quot;{product.get(&#x27;brand&#x27;, &#x27;N/A&#x27;)} | &quot;
+
+            response += f&quot;${float(product.get(&#x27;total_revenue&#x27;, 0)):,.2f} | &quot;
+
+            response += f&quot;{int(product.get(&#x27;total_quantity_sold&#x27;, 0)):,} | &quot;
+
+            response += f&quot;${float(product.get(&#x27;avg_price&#x27;, 0)):.2f} |\n&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def format_search_results(data: List[Dict[str, Any]], search_type: str) -&gt; str:
+
+        &quot;&quot;&quot;Format product search results.&quot;&quot;&quot;
+
+        
+
+        if not data:
+
+            return &quot;No products found matching your search criteria.&quot;
+
+        
+
+        response = f&quot;## Product Search Results ({search_type})\n\n&quot;
+
+        
+
+        for i, product in enumerate(data, 1):
+
+            response += f&quot;### {i}. {product.get(&#x27;product_name&#x27;, &#x27;Unknown Product&#x27;)}\n&quot;
+
+            response += f&quot;**Brand**: {product.get(&#x27;brand&#x27;, &#x27;N/A&#x27;)}\n&quot;
+
+            response += f&quot;**Price**: ${float(product.get(&#x27;price&#x27;, 0)):.2f}\n&quot;
+
+            response += f&quot;**Stock**: {int(product.get(&#x27;current_stock&#x27;, 0))} units\n&quot;
+
+            
+
+            if &#x27;similarity_score&#x27; in product:
+
+                score = float(product[&#x27;similarity_score&#x27;])
+
+                response += f&quot;**Relevance**: {score:.1%}\n&quot;
+
+            
+
+            if &#x27;rating_average&#x27; in product and product[&#x27;rating_average&#x27;]:
+
+                rating = float(product[&#x27;rating_average&#x27;])
+
+                count = int(product.get(&#x27;rating_count&#x27;, 0))
+
+                response += f&quot;**Rating**: {rating:.1f}/5.0 ({count:,} reviews)\n&quot;
+
+            
+
+            if product.get(&#x27;product_description&#x27;):
+
+                desc = product[&#x27;product_description&#x27;]
+
+                if len(desc) &gt; 150:
+
+                    desc = desc[:150] + &quot;...&quot;
+
+                response += f&quot;**Description**: {desc}\n&quot;
+
+            
+
+            response += &quot;\n---\n\n&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def format_business_insights(data: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Format business intelligence data.&quot;&quot;&quot;
+
+        
+
+        response = &quot;## Business Intelligence Summary\n\n&quot;
+
+        
+
+        # Key metrics
+
+        response += &quot;### Key Performance Indicators\n\n&quot;
+
+        response += f&quot;- **Total Revenue**: ${float(data.get(&#x27;total_revenue&#x27;, 0)):,.2f}\n&quot;
+
+        response += f&quot;- **Total Transactions**: {int(data.get(&#x27;total_transactions&#x27;, 0)):,}\n&quot;
+
+        response += f&quot;- **Unique Customers**: {int(data.get(&#x27;unique_customers&#x27;, 0)):,}\n&quot;
+
+        response += f&quot;- **Average Order Value**: ${float(data.get(&#x27;avg_transaction_value&#x27;, 0)):.2f}\n&quot;
+
+        response += f&quot;- **Products Sold**: {int(data.get(&#x27;products_sold&#x27;, 0)):,} items\n\n&quot;
+
+        
+
+        # Performance indicators
+
+        if &#x27;insights&#x27; in data and &#x27;performance_indicators&#x27; in data[&#x27;insights&#x27;]:
+
+            pi = data[&#x27;insights&#x27;][&#x27;performance_indicators&#x27;]
+
+            response += &quot;### Performance Indicators\n\n&quot;
+
+            response += f&quot;- **Transactions per Day**: {float(pi.get(&#x27;transactions_per_day&#x27;, 0)):.1f}\n&quot;
+
+            response += f&quot;- **Revenue per Customer**: ${float(pi.get(&#x27;revenue_per_customer&#x27;, 0)):,.2f}\n&quot;
+
+            response += f&quot;- **Items per Transaction**: {float(pi.get(&#x27;items_per_transaction&#x27;, 0)):.1f}\n\n&quot;
+
+        
+
+        # Top category
+
+        if data.get(&#x27;top_category&#x27;):
+
+            response += f&quot;### Top Performing Category\n\n&quot;
+
+            response += f&quot;**{data[&#x27;top_category&#x27;]}** - ${float(data.get(&#x27;top_category_revenue&#x27;, 0)):,.2f} revenue\n\n&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def format_error_response(error: str, tool_name: str) -&gt; str:
+
+        &quot;&quot;&quot;Format error responses for chat.&quot;&quot;&quot;
+
+        
+
+        response = f&quot;## ❌ Error in {tool_name}\n\n&quot;
+
+        response += f&quot;I encountered an issue while processing your request:\n\n&quot;
+
+        response += f&quot;**Error**: {error}\n\n&quot;
+
+        response += &quot;Please try:\n&quot;
+
+        response += &quot;- Checking your query parameters\n&quot;
+
+        response += &quot;- Verifying store access permissions\n&quot;
+
+        response += &quot;- Simplifying your request\n&quot;
+
+        response += &quot;- Contacting support if the issue persists\n&quot;
+
+        
+
+        return response
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 Debugging and Troubleshooting</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code Debug Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/debug/vscode_debug.py
+
+&quot;&quot;&quot;
+
+VS Code specific debugging utilities for MCP server.
+
+&quot;&quot;&quot;
+
+import logging
+
+import json
+
+from typing import Dict, Any
+
+from datetime import datetime
+
+
+
+class VSCodeDebugLogger:
+
+    &quot;&quot;&quot;Enhanced logging for VS Code debugging.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.logger = logging.getLogger(&quot;mcp_vscode_debug&quot;)
+
+        self.setup_vscode_logging()
+
+    
+
+    def setup_vscode_logging(self):
+
+        &quot;&quot;&quot;Configure logging for VS Code debugging.&quot;&quot;&quot;
+
+        
+
+        # Create VS Code specific formatter
+
+        formatter = logging.Formatter(
+
+            &#x27;[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s&#x27;
+
+        )
+
+        
+
+        # Console handler for VS Code terminal
+
+        console_handler = logging.StreamHandler()
+
+        console_handler.setFormatter(formatter)
+
+        console_handler.setLevel(logging.DEBUG)
+
+        
+
+        self.logger.addHandler(console_handler)
+
+        self.logger.setLevel(logging.DEBUG)
+
+    
+
+    def log_mcp_request(self, method: str, params: Dict[str, Any]):
+
+        &quot;&quot;&quot;Log MCP requests for debugging.&quot;&quot;&quot;
+
+        
+
+        self.logger.info(f&quot;MCP Request: {method}&quot;)
+
+        self.logger.debug(f&quot;Parameters: {json.dumps(params, indent=2)}&quot;)
+
+    
+
+    def log_tool_execution(self, tool_name: str, result: Dict[str, Any]):
+
+        &quot;&quot;&quot;Log tool execution results.&quot;&quot;&quot;
+
+        
+
+        success = result.get(&#x27;success&#x27;, False)
+
+        level = logging.INFO if success else logging.ERROR
+
+        
+
+        self.logger.log(level, f&quot;Tool &#x27;{tool_name}&#x27; - {&#x27;Success&#x27; if success else &#x27;Failed&#x27;}&quot;)
+
+        
+
+        if not success and result.get(&#x27;error&#x27;):
+
+            self.logger.error(f&quot;Error: {result[&#x27;error&#x27;]}&quot;)
+
+        
+
+        if result.get(&#x27;data&#x27;):
+
+            data_summary = self._summarize_data(result[&#x27;data&#x27;])
+
+            self.logger.debug(f&quot;Result summary: {data_summary}&quot;)
+
+    
+
+    def _summarize_data(self, data: Any) -&gt; str:
+
+        &quot;&quot;&quot;Create a summary of result data.&quot;&quot;&quot;
+
+        
+
+        if isinstance(data, list):
+
+            return f&quot;List with {len(data)} items&quot;
+
+        elif isinstance(data, dict):
+
+            return f&quot;Dict with keys: {list(data.keys())}&quot;
+
+        else:
+
+            return f&quot;Data type: {type(data).__name__}&quot;
+
+
+
+# Global debug logger
+
+vscode_debug_logger = VSCodeDebugLogger()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Connection Troubleshooting</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# scripts/debug_mcp_connection.py
+
+&quot;&quot;&quot;
+
+Debug script for troubleshooting MCP server connections in VS Code.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+import os
+
+import sys
+
+from typing import Dict, Any
+
+
+
+async def test_database_connection() -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;Test database connectivity.&quot;&quot;&quot;
+
+    
+
+    try:
+
+        # Get connection parameters from environment
+
+        connection_params = {
+
+            &#x27;host&#x27;: os.getenv(&#x27;POSTGRES_HOST&#x27;, &#x27;localhost&#x27;),
+
+            &#x27;port&#x27;: int(os.getenv(&#x27;POSTGRES_PORT&#x27;, &#x27;5432&#x27;)),
+
+            &#x27;database&#x27;: os.getenv(&#x27;POSTGRES_DB&#x27;, &#x27;retail_db&#x27;),
+
+            &#x27;user&#x27;: os.getenv(&#x27;POSTGRES_USER&#x27;, &#x27;mcp_user&#x27;),
+
+            &#x27;password&#x27;: os.getenv(&#x27;POSTGRES_PASSWORD&#x27;, &#x27;&#x27;)
+
+        }
+
+        
+
+        print(f&quot;Testing connection to {connection_params[&#x27;host&#x27;]}:{connection_params[&#x27;port&#x27;]}&quot;)
+
+        
+
+        # Test connection
+
+        conn = await asyncpg.connect(**connection_params)
+
+        
+
+        # Test basic query
+
+        result = await conn.fetchval(&quot;SELECT version()&quot;)
+
+        
+
+        # Test schema access
+
+        tables = await conn.fetch(&quot;&quot;&quot;
+
+            SELECT table_name FROM information_schema.tables 
+
+            WHERE table_schema = &#x27;retail&#x27;
+
+        &quot;&quot;&quot;)
+
+        
+
+        await conn.close()
+
+        
+
+        return {
+
+            &#x27;success&#x27;: True,
+
+            &#x27;database_version&#x27;: result,
+
+            &#x27;retail_tables&#x27;: len(tables),
+
+            &#x27;table_names&#x27;: [table[&#x27;table_name&#x27;] for table in tables]
+
+        }
+
+        
+
+    except Exception as e:
+
+        return {
+
+            &#x27;success&#x27;: False,
+
+            &#x27;error&#x27;: str(e),
+
+            &#x27;connection_params&#x27;: {k: v for k, v in connection_params.items() if k != &#x27;password&#x27;}
+
+        }
+
+
+
+async def test_azure_openai_connection() -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;Test Azure OpenAI connectivity.&quot;&quot;&quot;
+
+    
+
+    try:
+
+        from azure.identity import DefaultAzureCredential
+
+        from azure.ai.projects import AIProjectClient
+
+        
+
+        project_endpoint = os.getenv(&#x27;PROJECT_ENDPOINT&#x27;)
+
+        if not project_endpoint:
+
+            return {
+
+                &#x27;success&#x27;: False,
+
+                &#x27;error&#x27;: &#x27;PROJECT_ENDPOINT not configured&#x27;
+
+            }
+
+        
+
+        print(f&quot;Testing Azure OpenAI connection to {project_endpoint}&quot;)
+
+        
+
+        credential = DefaultAzureCredential()
+
+        client = AIProjectClient(
+
+            endpoint=project_endpoint,
+
+            credential=credential
+
+        )
+
+        
+
+        # Test embedding generation
+
+        response = await client.embeddings.create(
+
+            model=&quot;text-embedding-3-small&quot;,
+
+            input=&quot;test connection&quot;
+
+        )
+
+        
+
+        embedding = response.data[0].embedding
+
+        
+
+        return {
+
+            &#x27;success&#x27;: True,
+
+            &#x27;project_endpoint&#x27;: project_endpoint,
+
+            &#x27;embedding_dimension&#x27;: len(embedding),
+
+            &#x27;model&#x27;: &#x27;text-embedding-3-small&#x27;
+
+        }
+
+        
+
+    except Exception as e:
+
+        return {
+
+            &#x27;success&#x27;: False,
+
+            &#x27;error&#x27;: str(e),
+
+            &#x27;project_endpoint&#x27;: os.getenv(&#x27;PROJECT_ENDPOINT&#x27;, &#x27;Not configured&#x27;)
+
+        }
+
+
+
+async def test_mcp_tools() -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;Test MCP tool availability.&quot;&quot;&quot;
+
+    
+
+    try:
+
+        # Import MCP server components
+
+        sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+        
+
+        from mcp_server.server import MCPServer
+
+        from mcp_server.database import DatabaseProvider
+
+        from mcp_server.config import Config
+
+        
+
+        # Create test configuration
+
+        config = Config()
+
+        db_provider = DatabaseProvider(config.database.connection_string)
+
+        
+
+        # Initialize server
+
+        server = MCPServer(config, db_provider)
+
+        await server.initialize()
+
+        
+
+        # Get available tools
+
+        tools = server.get_available_tools()
+
+        
+
+        # Test a simple tool
+
+        test_result = await server.execute_tool(
+
+            &#x27;get_current_utc_date&#x27;,
+
+            {&#x27;format&#x27;: &#x27;iso&#x27;}
+
+        )
+
+        
+
+        await server.cleanup()
+
+        
+
+        return {
+
+            &#x27;success&#x27;: True,
+
+            &#x27;available_tools&#x27;: [tool.name for tool in tools],
+
+            &#x27;tool_count&#x27;: len(tools),
+
+            &#x27;test_tool_result&#x27;: test_result.get(&#x27;success&#x27;, False)
+
+        }
+
+        
+
+    except Exception as e:
+
+        return {
+
+            &#x27;success&#x27;: False,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+
+
+async def main():
+
+    &quot;&quot;&quot;Run comprehensive connection tests.&quot;&quot;&quot;
+
+    
+
+    print(&quot;🔍 MCP Server Connection Diagnostics&quot;)
+
+    print(&quot;=&quot; * 50)
+
+    
+
+    # Test database connection
+
+    print(&quot;\n📊 Testing Database Connection...&quot;)
+
+    db_result = await test_database_connection()
+
+    
+
+    if db_result[&#x27;success&#x27;]:
+
+        print(&quot;✅ Database connection successful&quot;)
+
+        print(f&quot;   Database version: {db_result[&#x27;database_version&#x27;]}&quot;)
+
+        print(f&quot;   Retail tables found: {db_result[&#x27;retail_tables&#x27;]}&quot;)
+
+        print(f&quot;   Table names: {&#x27;, &#x27;.join(db_result[&#x27;table_names&#x27;])}&quot;)
+
+    else:
+
+        print(&quot;❌ Database connection failed&quot;)
+
+        print(f&quot;   Error: {db_result[&#x27;error&#x27;]}&quot;)
+
+    
+
+    # Test Azure OpenAI connection
+
+    print(&quot;\n🤖 Testing Azure OpenAI Connection...&quot;)
+
+    azure_result = await test_azure_openai_connection()
+
+    
+
+    if azure_result[&#x27;success&#x27;]:
+
+        print(&quot;✅ Azure OpenAI connection successful&quot;)
+
+        print(f&quot;   Endpoint: {azure_result[&#x27;project_endpoint&#x27;]}&quot;)
+
+        print(f&quot;   Embedding dimension: {azure_result[&#x27;embedding_dimension&#x27;]}&quot;)
+
+    else:
+
+        print(&quot;❌ Azure OpenAI connection failed&quot;)
+
+        print(f&quot;   Error: {azure_result[&#x27;error&#x27;]}&quot;)
+
+    
+
+    # Test MCP tools
+
+    print(&quot;\n🛠️  Testing MCP Tools...&quot;)
+
+    tools_result = await test_mcp_tools()
+
+    
+
+    if tools_result[&#x27;success&#x27;]:
+
+        print(&quot;✅ MCP tools loaded successfully&quot;)
+
+        print(f&quot;   Available tools: {tools_result[&#x27;tool_count&#x27;]}&quot;)
+
+        print(f&quot;   Tool names: {&#x27;, &#x27;.join(tools_result[&#x27;available_tools&#x27;])}&quot;)
+
+        print(f&quot;   Test execution: {&#x27;✅&#x27; if tools_result[&#x27;test_tool_result&#x27;] else &#x27;❌&#x27;}&quot;)
+
+    else:
+
+        print(&quot;❌ MCP tools loading failed&quot;)
+
+        print(f&quot;   Error: {tools_result[&#x27;error&#x27;]}&quot;)
+
+    
+
+    # Overall status
+
+    print(&quot;\n📋 Overall Status&quot;)
+
+    print(&quot;=&quot; * 50)
+
+    
+
+    all_success = all([
+
+        db_result[&#x27;success&#x27;],
+
+        azure_result[&#x27;success&#x27;],
+
+        tools_result[&#x27;success&#x27;]
+
+    ])
+
+    
+
+    if all_success:
+
+        print(&quot;🎉 All systems ready! MCP server should work correctly in VS Code.&quot;)
+
+    else:
+
+        print(&quot;⚠️  Some issues detected. Please resolve the errors above.&quot;)
+
+        print(&quot;\n💡 Troubleshooting tips:&quot;)
+
+        print(&quot;   - Check environment variables in .env file&quot;)
+
+        print(&quot;   - Verify database is running and accessible&quot;)
+
+        print(&quot;   - Confirm Azure credentials are configured&quot;)
+
+        print(&quot;   - Review VS Code MCP server configuration&quot;)
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(main())
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 Advanced Configuration</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Multi-Server Setup</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/settings.json - Multiple MCP servers
+
+{
+
+    &quot;mcp.servers&quot;: {
+
+        &quot;retail-seattle&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_server.main&quot;],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;mcp_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:POSTGRES_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;,
+
+                &quot;DEFAULT_STORE_ID&quot;: &quot;seattle&quot;
+
+            },
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;store_id&quot;: &quot;seattle&quot;,
+
+                &quot;server_name&quot;: &quot;Seattle Store&quot;
+
+            }
+
+        },
+
+        &quot;retail-redmond&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_server.main&quot;],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;mcp_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:POSTGRES_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;,
+
+                &quot;DEFAULT_STORE_ID&quot;: &quot;redmond&quot;
+
+            },
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;store_id&quot;: &quot;redmond&quot;,
+
+                &quot;server_name&quot;: &quot;Redmond Store&quot;
+
+            }
+
+        },
+
+        &quot;retail-analytics&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_server.analytics_main&quot;],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;analytics_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:ANALYTICS_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;
+
+            },
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;mode&quot;: &quot;analytics&quot;,
+
+                &quot;cross_store_access&quot;: true
+
+            }
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Custom VS Code Extension</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// src/extension.ts - Custom MCP retail extension
+
+import * as vscode from &#x27;vscode&#x27;;
+
+
+
+export function activate(context: vscode.ExtensionContext) {
+
+    
+
+    // Register MCP retail commands
+
+    const disposable = vscode.commands.registerCommand(
+
+        &#x27;mcp-retail.quickQuery&#x27;, 
+
+        async () =&gt; {
+
+            const quickPick = vscode.window.createQuickPick();
+
+            quickPick.items = [
+
+                {
+
+                    label: &#x27;📊 Daily Sales&#x27;,
+
+                    description: &#x27;Show daily sales for the last 30 days&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;🏆 Top Products&#x27;,
+
+                    description: &#x27;Show top selling products this month&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;👥 Customer Analysis&#x27;,
+
+                    description: &#x27;Analyze customer behavior and trends&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;🔍 Product Search&#x27;,
+
+                    description: &#x27;Search for products using natural language&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;📈 Business Insights&#x27;,
+
+                    description: &#x27;Generate comprehensive business summary&#x27;
+
+                }
+
+            ];
+
+            
+
+            quickPick.onDidChangeSelection(selection =&gt; {
+
+                if (selection[0]) {
+
+                    executeQuickQuery(selection[0].label);
+
+                }
+
+            });
+
+            
+
+            quickPick.onDidHide(() =&gt; quickPick.dispose());
+
+            quickPick.show();
+
+        }
+
+    );
+
+    
+
+    context.subscriptions.push(disposable);
+
+    
+
+    // Register store switcher
+
+    const storeSwitcher = vscode.commands.registerCommand(
+
+        &#x27;mcp-retail.switchStore&#x27;,
+
+        async () =&gt; {
+
+            const stores = [&#x27;seattle&#x27;, &#x27;redmond&#x27;, &#x27;bellevue&#x27;, &#x27;online&#x27;];
+
+            const selected = await vscode.window.showQuickPick(stores, {
+
+                placeHolder: &#x27;Select store for queries&#x27;
+
+            });
+
+            
+
+            if (selected) {
+
+                // Update configuration
+
+                const config = vscode.workspace.getConfiguration(&#x27;mcp&#x27;);
+
+                await config.update(&#x27;defaultStore&#x27;, selected, true);
+
+                
+
+                vscode.window.showInformationMessage(
+
+                    `Switched to ${selected.charAt(0).toUpperCase() + selected.slice(1)} store`
+
+                );
+
+            }
+
+        }
+
+    );
+
+    
+
+    context.subscriptions.push(storeSwitcher);
+
+}
+
+
+
+async function executeQuickQuery(queryType: string) {
+
+    // Execute predefined queries in VS Code Chat
+
+    const chatCommands = {
+
+        &#x27;📊 Daily Sales&#x27;: &#x27;@retail Show me daily sales for the last 30 days&#x27;,
+
+        &#x27;🏆 Top Products&#x27;: &#x27;@retail What are the top 10 selling products this month?&#x27;,
+
+        &#x27;👥 Customer Analysis&#x27;: &#x27;@retail Show me customer analysis for active customers&#x27;,
+
+        &#x27;🔍 Product Search&#x27;: &#x27;@retail Find products matching &quot;laptop computer&quot;&#x27;,
+
+        &#x27;📈 Business Insights&#x27;: &#x27;@retail Generate a business summary for this month&#x27;
+
+    };
+
+    
+
+    const command = chatCommands[queryType];
+
+    if (command) {
+
+        await vscode.commands.executeCommand(&#x27;workbench.action.chat.open&#x27;);
+
+        await vscode.commands.executeCommand(&#x27;workbench.action.chat.insert&#x27;, command);
+
+    }
+
+}
+
+
+
+export function deactivate() {}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Extension Package Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// package.json for VS Code extension
+
+{
+
+    &quot;name&quot;: &quot;mcp-retail-assistant&quot;,
+
+    &quot;displayName&quot;: &quot;MCP Retail Assistant&quot;,
+
+    &quot;description&quot;: &quot;AI-powered retail data analysis through MCP&quot;,
+
+    &quot;version&quot;: &quot;1.0.0&quot;,
+
+    &quot;engines&quot;: {
+
+        &quot;vscode&quot;: &quot;^1.74.0&quot;
+
+    },
+
+    &quot;categories&quot;: [
+
+        &quot;Other&quot;,
+
+        &quot;Data Science&quot;,
+
+        &quot;Machine Learning&quot;
+
+    ],
+
+    &quot;activationEvents&quot;: [
+
+        &quot;onCommand:mcp-retail.quickQuery&quot;,
+
+        &quot;onCommand:mcp-retail.switchStore&quot;
+
+    ],
+
+    &quot;main&quot;: &quot;./out/extension.js&quot;,
+
+    &quot;contributes&quot;: {
+
+        &quot;commands&quot;: [
+
+            {
+
+                &quot;command&quot;: &quot;mcp-retail.quickQuery&quot;,
+
+                &quot;title&quot;: &quot;Quick Retail Query&quot;,
+
+                &quot;category&quot;: &quot;MCP Retail&quot;
+
+            },
+
+            {
+
+                &quot;command&quot;: &quot;mcp-retail.switchStore&quot;,
+
+                &quot;title&quot;: &quot;Switch Store&quot;,
+
+                &quot;category&quot;: &quot;MCP Retail&quot;
+
+            }
+
+        ],
+
+        &quot;keybindings&quot;: [
+
+            {
+
+                &quot;command&quot;: &quot;mcp-retail.quickQuery&quot;,
+
+                &quot;key&quot;: &quot;ctrl+shift+r&quot;,
+
+                &quot;mac&quot;: &quot;cmd+shift+r&quot;
+
+            }
+
+        ],
+
+        &quot;configuration&quot;: {
+
+            &quot;title&quot;: &quot;MCP Retail&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;mcp-retail.defaultStore&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;default&quot;: &quot;seattle&quot;,
+
+                    &quot;enum&quot;: [&quot;seattle&quot;, &quot;redmond&quot;, &quot;bellevue&quot;, &quot;online&quot;],
+
+                    &quot;description&quot;: &quot;Default store for retail queries&quot;
+
+                },
+
+                &quot;mcp-retail.enableAnalytics&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;default&quot;: true,
+
+                    &quot;description&quot;: &quot;Enable advanced analytics features&quot;
+
+                }
+
+            }
+
+        }
+
+    },
+
+    &quot;scripts&quot;: {
+
+        &quot;vscode:prepublish&quot;: &quot;npm run compile&quot;,
+
+        &quot;compile&quot;: &quot;tsc -p ./&quot;,
+
+        &quot;watch&quot;: &quot;tsc -watch -p ./&quot;
+
+    },
+
+    &quot;devDependencies&quot;: {
+
+        &quot;@types/vscode&quot;: &quot;^1.74.0&quot;,
+
+        &quot;@types/node&quot;: &quot;16.x&quot;,
+
+        &quot;typescript&quot;: &quot;^4.9.4&quot;
+
+    }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>VS Code MCP Configuration</strong>: Complete setup for optimal MCP integration  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>AI Chat Integration</strong>: Natural language querying capabilities in VS Code  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Debugging Tools</strong>: Comprehensive troubleshooting and connection diagnostics  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Multi-Server Setup</strong>: Configuration for multiple MCP server instances  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Custom Extensions</strong>: Enhanced VS Code experience with retail-specific features  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Production Readiness</strong>: Enterprise-ready VS Code development environment  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/10-Deployment/README.md" target="_blank">Lab 10: Deployment Strategies</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Deploy MCP servers to production environments</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure cloud infrastructure for scalability</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement CI/CD pipelines for automated deployment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Monitor production MCP server performance</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code Development</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/api">VS Code Extension API</a> - Official extension development guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/copilot/copilot-extensibility-overview">VS Code MCP Documentation</a> - MCP integration documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/languages/typescript">TypeScript for VS Code</a> - TypeScript development in VS Code</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP Protocol</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/specification">Model Context Protocol Specification</a> - Official MCP specification</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/best-practices">MCP Best Practices</a> - Implementation best practices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/jlowin/fastmcp">FastMCP Framework</a> - Python MCP implementation</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Development Tools</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/python/python-tutorial">Python in VS Code</a> - Python development setup</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/editor/debugging">Debugging in VS Code</a> - Advanced debugging techniques</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/editor/tasks">VS Code Tasks</a> - Task automation and configuration</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Previous</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/08-Testing/README.md" target="_blank">Lab 08: Testing and Debugging</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/10-Deployment/README.md" target="_blank">Lab 10: Deployment Strategies</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">VS Code 통합</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 MCP 서버를 VS Code와 통합하여 AI 채팅을 통한 자연어 쿼리를 활성화하는 방법에 대한 종합적인 가이드를 제공합니다. VS Code를 MCP 사용에 최적화하도록 설정하고, 서버 연결을 디버깅하며, AI 지원 데이터베이스 상호작용의 모든 기능을 활용하는 방법을 배우게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code의 MCP 통합은 개발자가 자연어를 통해 데이터베이스와 API를 상호작용하는 방식을 혁신적으로 변화시킵니다. 소매 MCP 서버를 VS Code Chat에 연결하면, 대화형 AI를 사용하여 판매 데이터, 제품 카탈로그, 비즈니스 분석을 지능적으로 쿼리할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 통합을 통해 개발자는 "이번 달에 가장 많이 팔린 제품을 보여줘" 또는 "90일 동안 구매하지 않은 고객을 찾아줘"와 같은 질문을 하고, SQL 쿼리를 작성하지 않고도 구조화된 데이터 응답을 받을 수 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>VS Code MCP 설정 구성</strong>: 소매 서버에 맞게 VS Code 설정  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP 서버 통합</strong>: VS Code AI Chat 기능과 MCP 서버 연결  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>서버 연결 디버깅</strong>: 문제 해결 및 디버깅  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>자연어 쿼리 최적화</strong>: 더 나은 결과를 위한 쿼리 패턴 최적화  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>VS Code 작업 공간 맞춤화</strong>: MCP 개발을 위한 작업 공간 설정  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>다중 서버 구성 배포</strong>: 복잡한 시나리오를 위한 다중 서버 설정  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 VS Code MCP 설정</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">초기 설정 및 설치</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/settings.json
+
+{
+
+    &quot;mcp.servers&quot;: {
+
+        &quot;retail-mcp-server&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-m&quot;, &quot;mcp_server.main&quot;
+
+            ],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_PORT&quot;: &quot;5432&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;mcp_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:POSTGRES_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;,
+
+                &quot;AZURE_CLIENT_ID&quot;: &quot;${env:AZURE_CLIENT_ID}&quot;,
+
+                &quot;AZURE_CLIENT_SECRET&quot;: &quot;${env:AZURE_CLIENT_SECRET}&quot;,
+
+                &quot;AZURE_TENANT_ID&quot;: &quot;${env:AZURE_TENANT_ID}&quot;,
+
+                &quot;LOG_LEVEL&quot;: &quot;INFO&quot;,
+
+                &quot;MCP_SERVER_DEBUG&quot;: &quot;false&quot;
+
+            },
+
+            &quot;cwd&quot;: &quot;${workspaceFolder}&quot;,
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;store_id&quot;: &quot;seattle&quot;,
+
+                &quot;enable_semantic_search&quot;: true,
+
+                &quot;enable_analytics&quot;: true,
+
+                &quot;cache_embeddings&quot;: true
+
+            }
+
+        }
+
+    },
+
+    &quot;mcp.serverTimeout&quot;: 30000,
+
+    &quot;mcp.enableLogging&quot;: true,
+
+    &quot;mcp.logLevel&quot;: &quot;info&quot;
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">환경 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# .env file for development
+
+POSTGRES_HOST=localhost
+
+POSTGRES_PORT=5432
+
+POSTGRES_DB=retail_db
+
+POSTGRES_USER=mcp_user
+
+POSTGRES_PASSWORD=your_secure_password
+
+
+
+# Azure Configuration
+
+PROJECT_ENDPOINT=https://your-project.openai.azure.com
+
+AZURE_CLIENT_ID=your-client-id
+
+AZURE_CLIENT_SECRET=your-client-secret
+
+AZURE_TENANT_ID=your-tenant-id
+
+
+
+# Optional: Azure Key Vault
+
+AZURE_KEY_VAULT_URL=https://your-keyvault.vault.azure.net/
+
+
+
+# Server Configuration
+
+MCP_SERVER_PORT=8000
+
+MCP_SERVER_HOST=127.0.0.1
+
+LOG_LEVEL=INFO
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">작업 공간 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/launch.json
+
+{
+
+    &quot;version&quot;: &quot;0.2.0&quot;,
+
+    &quot;configurations&quot;: [
+
+        {
+
+            &quot;name&quot;: &quot;Debug MCP Server&quot;,
+
+            &quot;type&quot;: &quot;python&quot;,
+
+            &quot;request&quot;: &quot;launch&quot;,
+
+            &quot;module&quot;: &quot;mcp_server.main&quot;,
+
+            &quot;console&quot;: &quot;integratedTerminal&quot;,
+
+            &quot;envFile&quot;: &quot;${workspaceFolder}/.env&quot;,
+
+            &quot;env&quot;: {
+
+                &quot;MCP_SERVER_DEBUG&quot;: &quot;true&quot;,
+
+                &quot;LOG_LEVEL&quot;: &quot;DEBUG&quot;
+
+            },
+
+            &quot;args&quot;: [],
+
+            &quot;justMyCode&quot;: false,
+
+            &quot;stopOnEntry&quot;: false
+
+        },
+
+        {
+
+            &quot;name&quot;: &quot;Test MCP Server&quot;,
+
+            &quot;type&quot;: &quot;python&quot;,
+
+            &quot;request&quot;: &quot;launch&quot;,
+
+            &quot;module&quot;: &quot;pytest&quot;,
+
+            &quot;console&quot;: &quot;integratedTerminal&quot;,
+
+            &quot;envFile&quot;: &quot;${workspaceFolder}/.env.test&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;tests/&quot;,
+
+                &quot;-v&quot;,
+
+                &quot;--tb=short&quot;
+
+            ]
+
+        }
+
+    ]
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">작업(Task) 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/tasks.json
+
+{
+
+    &quot;version&quot;: &quot;2.0.0&quot;,
+
+    &quot;tasks&quot;: [
+
+        {
+
+            &quot;label&quot;: &quot;Start MCP Server&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-m&quot;, &quot;mcp_server.main&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;build&quot;,
+
+            &quot;presentation&quot;: {
+
+                &quot;echo&quot;: true,
+
+                &quot;reveal&quot;: &quot;always&quot;,
+
+                &quot;focus&quot;: false,
+
+                &quot;panel&quot;: &quot;new&quot;
+
+            },
+
+            &quot;options&quot;: {
+
+                &quot;env&quot;: {
+
+                    &quot;PYTHONPATH&quot;: &quot;${workspaceFolder}&quot;
+
+                }
+
+            },
+
+            &quot;isBackground&quot;: true,
+
+            &quot;problemMatcher&quot;: {
+
+                &quot;pattern&quot;: {
+
+                    &quot;regexp&quot;: &quot;^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$&quot;,
+
+                    &quot;file&quot;: 1,
+
+                    &quot;line&quot;: 2,
+
+                    &quot;column&quot;: 3,
+
+                    &quot;severity&quot;: 4,
+
+                    &quot;message&quot;: 5
+
+                },
+
+                &quot;background&quot;: {
+
+                    &quot;activeOnStart&quot;: true,
+
+                    &quot;beginsPattern&quot;: &quot;^.*Starting MCP server.*$&quot;,
+
+                    &quot;endsPattern&quot;: &quot;^.*MCP server ready.*$&quot;
+
+                }
+
+            }
+
+        },
+
+        {
+
+            &quot;label&quot;: &quot;Run Tests&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-m&quot;, &quot;pytest&quot;,
+
+                &quot;tests/&quot;,
+
+                &quot;-v&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;test&quot;,
+
+            &quot;presentation&quot;: {
+
+                &quot;echo&quot;: true,
+
+                &quot;reveal&quot;: &quot;always&quot;,
+
+                &quot;focus&quot;: false,
+
+                &quot;panel&quot;: &quot;shared&quot;
+
+            }
+
+        },
+
+        {
+
+            &quot;label&quot;: &quot;Generate Sample Data&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;scripts/generate_sample_data.py&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;build&quot;,
+
+            &quot;presentation&quot;: {
+
+                &quot;echo&quot;: true,
+
+                &quot;reveal&quot;: &quot;always&quot;,
+
+                &quot;focus&quot;: false,
+
+                &quot;panel&quot;: &quot;shared&quot;
+
+            }
+
+        },
+
+        {
+
+            &quot;label&quot;: &quot;Create Database Schema&quot;,
+
+            &quot;type&quot;: &quot;shell&quot;,
+
+            &quot;command&quot;: &quot;psql&quot;,
+
+            &quot;args&quot;: [
+
+                &quot;-h&quot;, &quot;${env:POSTGRES_HOST}&quot;,
+
+                &quot;-p&quot;, &quot;${env:POSTGRES_PORT}&quot;,
+
+                &quot;-U&quot;, &quot;${env:POSTGRES_USER}&quot;,
+
+                &quot;-d&quot;, &quot;${env:POSTGRES_DB}&quot;,
+
+                &quot;-f&quot;, &quot;scripts/create_schema.sql&quot;
+
+            ],
+
+            &quot;group&quot;: &quot;build&quot;
+
+        }
+
+    ]
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">💬 AI 채팅 통합</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">자연어 쿼리 패턴</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Example query patterns for VS Code Chat
+
+interface QueryPattern {
+
+    intent: string;
+
+    examples: string[];
+
+    expectedTools: string[];
+
+}
+
+
+
+const retailQueryPatterns: QueryPattern[] = [
+
+    {
+
+        intent: &quot;sales_analysis&quot;,
+
+        examples: [
+
+            &quot;Show me daily sales for the last 30 days&quot;,
+
+            &quot;What are our top selling products this month?&quot;,
+
+            &quot;Which customers have spent the most this quarter?&quot;,
+
+            &quot;Compare sales performance between stores&quot;
+
+        ],
+
+        expectedTools: [&quot;execute_sales_query&quot;]
+
+    },
+
+    {
+
+        intent: &quot;product_search&quot;,
+
+        examples: [
+
+            &quot;Find running shoes for women&quot;,
+
+            &quot;Show me electronics under $500&quot;,
+
+            &quot;What laptops do we have in stock?&quot;,
+
+            &quot;Search for wireless headphones&quot;
+
+        ],
+
+        expectedTools: [&quot;semantic_search_products&quot;, &quot;hybrid_product_search&quot;]
+
+    },
+
+    {
+
+        intent: &quot;inventory_management&quot;,
+
+        examples: [
+
+            &quot;Which products are low on stock?&quot;,
+
+            &quot;Show me products that need reordering&quot;,
+
+            &quot;What&#x27;s our current inventory value?&quot;,
+
+            &quot;Find products with zero stock&quot;
+
+        ],
+
+        expectedTools: [&quot;execute_sales_query&quot;]
+
+    },
+
+    {
+
+        intent: &quot;customer_analysis&quot;,
+
+        examples: [
+
+            &quot;Show me customers who haven&#x27;t purchased in 90 days&quot;,
+
+            &quot;What&#x27;s the average customer lifetime value?&quot;,
+
+            &quot;Which customers are in the gold tier?&quot;,
+
+            &quot;Find customers with returns&quot;
+
+        ],
+
+        expectedTools: [&quot;execute_sales_query&quot;]
+
+    },
+
+    {
+
+        intent: &quot;business_intelligence&quot;,
+
+        examples: [
+
+            &quot;Generate a business summary for this month&quot;,
+
+            &quot;Show me seasonal trends&quot;,
+
+            &quot;What are our best performing categories?&quot;,
+
+            &quot;Create a sales forecast&quot;
+
+        ],
+
+        expectedTools: [&quot;generate_business_insights&quot;]
+
+    },
+
+    {
+
+        intent: &quot;recommendations&quot;,
+
+        examples: [
+
+            &quot;Recommend products similar to product X&quot;,
+
+            &quot;What should we recommend to customer Y?&quot;,
+
+            &quot;Show me trending products&quot;,
+
+            &quot;Find cross-sell opportunities&quot;
+
+        ],
+
+        expectedTools: [&quot;get_product_recommendations&quot;]
+
+    }
+
+];
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">채팅 통합 예제</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;!-- Examples of VS Code Chat interactions --&gt;
+
+
+
+## Sales Analysis Queries
+
+
+
+**User**: Show me the top 10 selling products in the Seattle store for the last month
+
+
+
+**Expected Response**: 
+
+- Tool: execute_sales_query
+
+- Parameters: query_type=&quot;top_products&quot;, store_id=&quot;seattle&quot;, start_date=&quot;2025-08-29&quot;, end_date=&quot;2025-09-29&quot;, limit=10
+
+- Result: Formatted table with product names, quantities sold, revenue, and performance metrics
+
+
+
+**User**: What was our daily revenue trend last week?
+
+
+
+**Expected Response**:
+
+- Tool: execute_sales_query  
+
+- Parameters: query_type=&quot;daily_sales&quot;, store_id=&quot;seattle&quot;, start_date=&quot;2025-09-22&quot;, end_date=&quot;2025-09-29&quot;
+
+- Result: Chart-ready data with daily revenue figures and growth percentages
+
+
+
+## Product Search Queries
+
+
+
+**User**: Find comfortable running shoes for outdoor activities
+
+
+
+**Expected Response**:
+
+- Tool: semantic_search_products
+
+- Parameters: query=&quot;comfortable running shoes outdoor activities&quot;, store_id=&quot;seattle&quot;, similarity_threshold=0.7
+
+- Result: Ranked list of relevant products with similarity scores and detailed information
+
+
+
+**User**: Search for laptops under $1500 with good reviews
+
+
+
+**Expected Response**:
+
+- Tool: hybrid_product_search
+
+- Parameters: query=&quot;laptops under $1500 good reviews&quot;, store_id=&quot;seattle&quot;, semantic_weight=0.6, keyword_weight=0.4
+
+- Result: Combined keyword and semantic search results with price and rating filters
+
+
+
+## Business Intelligence Queries
+
+
+
+**User**: Generate a comprehensive business summary for September
+
+
+
+**Expected Response**:
+
+- Tool: generate_business_insights
+
+- Parameters: analysis_type=&quot;summary&quot;, store_id=&quot;seattle&quot;, days=30
+
+- Result: KPI dashboard with revenue, customer metrics, top categories, and growth trends
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">채팅 응답 형식화</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/chat/response_formatter.py
+
+&quot;&quot;&quot;
+
+Format MCP tool responses for optimal VS Code Chat display.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List
+
+import json
+
+from datetime import datetime
+
+
+
+class ChatResponseFormatter:
+
+    &quot;&quot;&quot;Format tool responses for VS Code Chat consumption.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    def format_sales_data(data: List[Dict[str, Any]], query_type: str) -&gt; str:
+
+        &quot;&quot;&quot;Format sales data for chat display.&quot;&quot;&quot;
+
+        
+
+        if not data:
+
+            return &quot;No sales data found for the specified criteria.&quot;
+
+        
+
+        if query_type == &quot;daily_sales&quot;:
+
+            return ChatResponseFormatter._format_daily_sales(data)
+
+        elif query_type == &quot;top_products&quot;:
+
+            return ChatResponseFormatter._format_top_products(data)
+
+        elif query_type == &quot;customer_analysis&quot;:
+
+            return ChatResponseFormatter._format_customer_analysis(data)
+
+        else:
+
+            return ChatResponseFormatter._format_generic_table(data)
+
+    
+
+    @staticmethod
+
+    def _format_daily_sales(data: List[Dict[str, Any]]) -&gt; str:
+
+        &quot;&quot;&quot;Format daily sales data.&quot;&quot;&quot;
+
+        
+
+        response = &quot;## Daily Sales Summary\n\n&quot;
+
+        response += &quot;| Date | Revenue | Transactions | Avg Order Value | Customers |\n&quot;
+
+        response += &quot;|------|---------|-------------|----------------|----------|\n&quot;
+
+        
+
+        total_revenue = 0
+
+        total_transactions = 0
+
+        
+
+        for day in data:
+
+            revenue = float(day.get(&#x27;total_revenue&#x27;, 0))
+
+            transactions = int(day.get(&#x27;transaction_count&#x27;, 0))
+
+            avg_value = float(day.get(&#x27;avg_transaction_value&#x27;, 0))
+
+            customers = int(day.get(&#x27;unique_customers&#x27;, 0))
+
+            
+
+            total_revenue += revenue
+
+            total_transactions += transactions
+
+            
+
+            response += f&quot;| {day.get(&#x27;sales_date&#x27;, &#x27;N/A&#x27;)} | &quot;
+
+            response += f&quot;${revenue:,.2f} | &quot;
+
+            response += f&quot;{transactions:,} | &quot;
+
+            response += f&quot;${avg_value:.2f} | &quot;
+
+            response += f&quot;{customers:,} |\n&quot;
+
+        
+
+        response += f&quot;\n**Totals**: ${total_revenue:,.2f} revenue, {total_transactions:,} transactions&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def _format_top_products(data: List[Dict[str, Any]]) -&gt; str:
+
+        &quot;&quot;&quot;Format top products data.&quot;&quot;&quot;
+
+        
+
+        response = &quot;## Top Selling Products\n\n&quot;
+
+        response += &quot;| Rank | Product | Brand | Revenue | Qty Sold | Avg Price |\n&quot;
+
+        response += &quot;|------|---------|-------|---------|----------|----------|\n&quot;
+
+        
+
+        for i, product in enumerate(data, 1):
+
+            response += f&quot;| {i} | &quot;
+
+            response += f&quot;{product.get(&#x27;product_name&#x27;, &#x27;N/A&#x27;)} | &quot;
+
+            response += f&quot;{product.get(&#x27;brand&#x27;, &#x27;N/A&#x27;)} | &quot;
+
+            response += f&quot;${float(product.get(&#x27;total_revenue&#x27;, 0)):,.2f} | &quot;
+
+            response += f&quot;{int(product.get(&#x27;total_quantity_sold&#x27;, 0)):,} | &quot;
+
+            response += f&quot;${float(product.get(&#x27;avg_price&#x27;, 0)):.2f} |\n&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def format_search_results(data: List[Dict[str, Any]], search_type: str) -&gt; str:
+
+        &quot;&quot;&quot;Format product search results.&quot;&quot;&quot;
+
+        
+
+        if not data:
+
+            return &quot;No products found matching your search criteria.&quot;
+
+        
+
+        response = f&quot;## Product Search Results ({search_type})\n\n&quot;
+
+        
+
+        for i, product in enumerate(data, 1):
+
+            response += f&quot;### {i}. {product.get(&#x27;product_name&#x27;, &#x27;Unknown Product&#x27;)}\n&quot;
+
+            response += f&quot;**Brand**: {product.get(&#x27;brand&#x27;, &#x27;N/A&#x27;)}\n&quot;
+
+            response += f&quot;**Price**: ${float(product.get(&#x27;price&#x27;, 0)):.2f}\n&quot;
+
+            response += f&quot;**Stock**: {int(product.get(&#x27;current_stock&#x27;, 0))} units\n&quot;
+
+            
+
+            if &#x27;similarity_score&#x27; in product:
+
+                score = float(product[&#x27;similarity_score&#x27;])
+
+                response += f&quot;**Relevance**: {score:.1%}\n&quot;
+
+            
+
+            if &#x27;rating_average&#x27; in product and product[&#x27;rating_average&#x27;]:
+
+                rating = float(product[&#x27;rating_average&#x27;])
+
+                count = int(product.get(&#x27;rating_count&#x27;, 0))
+
+                response += f&quot;**Rating**: {rating:.1f}/5.0 ({count:,} reviews)\n&quot;
+
+            
+
+            if product.get(&#x27;product_description&#x27;):
+
+                desc = product[&#x27;product_description&#x27;]
+
+                if len(desc) &gt; 150:
+
+                    desc = desc[:150] + &quot;...&quot;
+
+                response += f&quot;**Description**: {desc}\n&quot;
+
+            
+
+            response += &quot;\n---\n\n&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def format_business_insights(data: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Format business intelligence data.&quot;&quot;&quot;
+
+        
+
+        response = &quot;## Business Intelligence Summary\n\n&quot;
+
+        
+
+        # Key metrics
+
+        response += &quot;### Key Performance Indicators\n\n&quot;
+
+        response += f&quot;- **Total Revenue**: ${float(data.get(&#x27;total_revenue&#x27;, 0)):,.2f}\n&quot;
+
+        response += f&quot;- **Total Transactions**: {int(data.get(&#x27;total_transactions&#x27;, 0)):,}\n&quot;
+
+        response += f&quot;- **Unique Customers**: {int(data.get(&#x27;unique_customers&#x27;, 0)):,}\n&quot;
+
+        response += f&quot;- **Average Order Value**: ${float(data.get(&#x27;avg_transaction_value&#x27;, 0)):.2f}\n&quot;
+
+        response += f&quot;- **Products Sold**: {int(data.get(&#x27;products_sold&#x27;, 0)):,} items\n\n&quot;
+
+        
+
+        # Performance indicators
+
+        if &#x27;insights&#x27; in data and &#x27;performance_indicators&#x27; in data[&#x27;insights&#x27;]:
+
+            pi = data[&#x27;insights&#x27;][&#x27;performance_indicators&#x27;]
+
+            response += &quot;### Performance Indicators\n\n&quot;
+
+            response += f&quot;- **Transactions per Day**: {float(pi.get(&#x27;transactions_per_day&#x27;, 0)):.1f}\n&quot;
+
+            response += f&quot;- **Revenue per Customer**: ${float(pi.get(&#x27;revenue_per_customer&#x27;, 0)):,.2f}\n&quot;
+
+            response += f&quot;- **Items per Transaction**: {float(pi.get(&#x27;items_per_transaction&#x27;, 0)):.1f}\n\n&quot;
+
+        
+
+        # Top category
+
+        if data.get(&#x27;top_category&#x27;):
+
+            response += f&quot;### Top Performing Category\n\n&quot;
+
+            response += f&quot;**{data[&#x27;top_category&#x27;]}** - ${float(data.get(&#x27;top_category_revenue&#x27;, 0)):,.2f} revenue\n\n&quot;
+
+        
+
+        return response
+
+    
+
+    @staticmethod
+
+    def format_error_response(error: str, tool_name: str) -&gt; str:
+
+        &quot;&quot;&quot;Format error responses for chat.&quot;&quot;&quot;
+
+        
+
+        response = f&quot;## ❌ Error in {tool_name}\n\n&quot;
+
+        response += f&quot;I encountered an issue while processing your request:\n\n&quot;
+
+        response += f&quot;**Error**: {error}\n\n&quot;
+
+        response += &quot;Please try:\n&quot;
+
+        response += &quot;- Checking your query parameters\n&quot;
+
+        response += &quot;- Verifying store access permissions\n&quot;
+
+        response += &quot;- Simplifying your request\n&quot;
+
+        response += &quot;- Contacting support if the issue persists\n&quot;
+
+        
+
+        return response
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 디버깅 및 문제 해결</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code 디버그 설정</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/debug/vscode_debug.py
+
+&quot;&quot;&quot;
+
+VS Code specific debugging utilities for MCP server.
+
+&quot;&quot;&quot;
+
+import logging
+
+import json
+
+from typing import Dict, Any
+
+from datetime import datetime
+
+
+
+class VSCodeDebugLogger:
+
+    &quot;&quot;&quot;Enhanced logging for VS Code debugging.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.logger = logging.getLogger(&quot;mcp_vscode_debug&quot;)
+
+        self.setup_vscode_logging()
+
+    
+
+    def setup_vscode_logging(self):
+
+        &quot;&quot;&quot;Configure logging for VS Code debugging.&quot;&quot;&quot;
+
+        
+
+        # Create VS Code specific formatter
+
+        formatter = logging.Formatter(
+
+            &#x27;[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s&#x27;
+
+        )
+
+        
+
+        # Console handler for VS Code terminal
+
+        console_handler = logging.StreamHandler()
+
+        console_handler.setFormatter(formatter)
+
+        console_handler.setLevel(logging.DEBUG)
+
+        
+
+        self.logger.addHandler(console_handler)
+
+        self.logger.setLevel(logging.DEBUG)
+
+    
+
+    def log_mcp_request(self, method: str, params: Dict[str, Any]):
+
+        &quot;&quot;&quot;Log MCP requests for debugging.&quot;&quot;&quot;
+
+        
+
+        self.logger.info(f&quot;MCP Request: {method}&quot;)
+
+        self.logger.debug(f&quot;Parameters: {json.dumps(params, indent=2)}&quot;)
+
+    
+
+    def log_tool_execution(self, tool_name: str, result: Dict[str, Any]):
+
+        &quot;&quot;&quot;Log tool execution results.&quot;&quot;&quot;
+
+        
+
+        success = result.get(&#x27;success&#x27;, False)
+
+        level = logging.INFO if success else logging.ERROR
+
+        
+
+        self.logger.log(level, f&quot;Tool &#x27;{tool_name}&#x27; - {&#x27;Success&#x27; if success else &#x27;Failed&#x27;}&quot;)
+
+        
+
+        if not success and result.get(&#x27;error&#x27;):
+
+            self.logger.error(f&quot;Error: {result[&#x27;error&#x27;]}&quot;)
+
+        
+
+        if result.get(&#x27;data&#x27;):
+
+            data_summary = self._summarize_data(result[&#x27;data&#x27;])
+
+            self.logger.debug(f&quot;Result summary: {data_summary}&quot;)
+
+    
+
+    def _summarize_data(self, data: Any) -&gt; str:
+
+        &quot;&quot;&quot;Create a summary of result data.&quot;&quot;&quot;
+
+        
+
+        if isinstance(data, list):
+
+            return f&quot;List with {len(data)} items&quot;
+
+        elif isinstance(data, dict):
+
+            return f&quot;Dict with keys: {list(data.keys())}&quot;
+
+        else:
+
+            return f&quot;Data type: {type(data).__name__}&quot;
+
+
+
+# Global debug logger
+
+vscode_debug_logger = VSCodeDebugLogger()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연결 문제 해결</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# scripts/debug_mcp_connection.py
+
+&quot;&quot;&quot;
+
+Debug script for troubleshooting MCP server connections in VS Code.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+import os
+
+import sys
+
+from typing import Dict, Any
+
+
+
+async def test_database_connection() -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;Test database connectivity.&quot;&quot;&quot;
+
+    
+
+    try:
+
+        # Get connection parameters from environment
+
+        connection_params = {
+
+            &#x27;host&#x27;: os.getenv(&#x27;POSTGRES_HOST&#x27;, &#x27;localhost&#x27;),
+
+            &#x27;port&#x27;: int(os.getenv(&#x27;POSTGRES_PORT&#x27;, &#x27;5432&#x27;)),
+
+            &#x27;database&#x27;: os.getenv(&#x27;POSTGRES_DB&#x27;, &#x27;retail_db&#x27;),
+
+            &#x27;user&#x27;: os.getenv(&#x27;POSTGRES_USER&#x27;, &#x27;mcp_user&#x27;),
+
+            &#x27;password&#x27;: os.getenv(&#x27;POSTGRES_PASSWORD&#x27;, &#x27;&#x27;)
+
+        }
+
+        
+
+        print(f&quot;Testing connection to {connection_params[&#x27;host&#x27;]}:{connection_params[&#x27;port&#x27;]}&quot;)
+
+        
+
+        # Test connection
+
+        conn = await asyncpg.connect(**connection_params)
+
+        
+
+        # Test basic query
+
+        result = await conn.fetchval(&quot;SELECT version()&quot;)
+
+        
+
+        # Test schema access
+
+        tables = await conn.fetch(&quot;&quot;&quot;
+
+            SELECT table_name FROM information_schema.tables 
+
+            WHERE table_schema = &#x27;retail&#x27;
+
+        &quot;&quot;&quot;)
+
+        
+
+        await conn.close()
+
+        
+
+        return {
+
+            &#x27;success&#x27;: True,
+
+            &#x27;database_version&#x27;: result,
+
+            &#x27;retail_tables&#x27;: len(tables),
+
+            &#x27;table_names&#x27;: [table[&#x27;table_name&#x27;] for table in tables]
+
+        }
+
+        
+
+    except Exception as e:
+
+        return {
+
+            &#x27;success&#x27;: False,
+
+            &#x27;error&#x27;: str(e),
+
+            &#x27;connection_params&#x27;: {k: v for k, v in connection_params.items() if k != &#x27;password&#x27;}
+
+        }
+
+
+
+async def test_azure_openai_connection() -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;Test Azure OpenAI connectivity.&quot;&quot;&quot;
+
+    
+
+    try:
+
+        from azure.identity import DefaultAzureCredential
+
+        from azure.ai.projects import AIProjectClient
+
+        
+
+        project_endpoint = os.getenv(&#x27;PROJECT_ENDPOINT&#x27;)
+
+        if not project_endpoint:
+
+            return {
+
+                &#x27;success&#x27;: False,
+
+                &#x27;error&#x27;: &#x27;PROJECT_ENDPOINT not configured&#x27;
+
+            }
+
+        
+
+        print(f&quot;Testing Azure OpenAI connection to {project_endpoint}&quot;)
+
+        
+
+        credential = DefaultAzureCredential()
+
+        client = AIProjectClient(
+
+            endpoint=project_endpoint,
+
+            credential=credential
+
+        )
+
+        
+
+        # Test embedding generation
+
+        response = await client.embeddings.create(
+
+            model=&quot;text-embedding-3-small&quot;,
+
+            input=&quot;test connection&quot;
+
+        )
+
+        
+
+        embedding = response.data[0].embedding
+
+        
+
+        return {
+
+            &#x27;success&#x27;: True,
+
+            &#x27;project_endpoint&#x27;: project_endpoint,
+
+            &#x27;embedding_dimension&#x27;: len(embedding),
+
+            &#x27;model&#x27;: &#x27;text-embedding-3-small&#x27;
+
+        }
+
+        
+
+    except Exception as e:
+
+        return {
+
+            &#x27;success&#x27;: False,
+
+            &#x27;error&#x27;: str(e),
+
+            &#x27;project_endpoint&#x27;: os.getenv(&#x27;PROJECT_ENDPOINT&#x27;, &#x27;Not configured&#x27;)
+
+        }
+
+
+
+async def test_mcp_tools() -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;Test MCP tool availability.&quot;&quot;&quot;
+
+    
+
+    try:
+
+        # Import MCP server components
+
+        sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+        
+
+        from mcp_server.server import MCPServer
+
+        from mcp_server.database import DatabaseProvider
+
+        from mcp_server.config import Config
+
+        
+
+        # Create test configuration
+
+        config = Config()
+
+        db_provider = DatabaseProvider(config.database.connection_string)
+
+        
+
+        # Initialize server
+
+        server = MCPServer(config, db_provider)
+
+        await server.initialize()
+
+        
+
+        # Get available tools
+
+        tools = server.get_available_tools()
+
+        
+
+        # Test a simple tool
+
+        test_result = await server.execute_tool(
+
+            &#x27;get_current_utc_date&#x27;,
+
+            {&#x27;format&#x27;: &#x27;iso&#x27;}
+
+        )
+
+        
+
+        await server.cleanup()
+
+        
+
+        return {
+
+            &#x27;success&#x27;: True,
+
+            &#x27;available_tools&#x27;: [tool.name for tool in tools],
+
+            &#x27;tool_count&#x27;: len(tools),
+
+            &#x27;test_tool_result&#x27;: test_result.get(&#x27;success&#x27;, False)
+
+        }
+
+        
+
+    except Exception as e:
+
+        return {
+
+            &#x27;success&#x27;: False,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+
+
+async def main():
+
+    &quot;&quot;&quot;Run comprehensive connection tests.&quot;&quot;&quot;
+
+    
+
+    print(&quot;🔍 MCP Server Connection Diagnostics&quot;)
+
+    print(&quot;=&quot; * 50)
+
+    
+
+    # Test database connection
+
+    print(&quot;\n📊 Testing Database Connection...&quot;)
+
+    db_result = await test_database_connection()
+
+    
+
+    if db_result[&#x27;success&#x27;]:
+
+        print(&quot;✅ Database connection successful&quot;)
+
+        print(f&quot;   Database version: {db_result[&#x27;database_version&#x27;]}&quot;)
+
+        print(f&quot;   Retail tables found: {db_result[&#x27;retail_tables&#x27;]}&quot;)
+
+        print(f&quot;   Table names: {&#x27;, &#x27;.join(db_result[&#x27;table_names&#x27;])}&quot;)
+
+    else:
+
+        print(&quot;❌ Database connection failed&quot;)
+
+        print(f&quot;   Error: {db_result[&#x27;error&#x27;]}&quot;)
+
+    
+
+    # Test Azure OpenAI connection
+
+    print(&quot;\n🤖 Testing Azure OpenAI Connection...&quot;)
+
+    azure_result = await test_azure_openai_connection()
+
+    
+
+    if azure_result[&#x27;success&#x27;]:
+
+        print(&quot;✅ Azure OpenAI connection successful&quot;)
+
+        print(f&quot;   Endpoint: {azure_result[&#x27;project_endpoint&#x27;]}&quot;)
+
+        print(f&quot;   Embedding dimension: {azure_result[&#x27;embedding_dimension&#x27;]}&quot;)
+
+    else:
+
+        print(&quot;❌ Azure OpenAI connection failed&quot;)
+
+        print(f&quot;   Error: {azure_result[&#x27;error&#x27;]}&quot;)
+
+    
+
+    # Test MCP tools
+
+    print(&quot;\n🛠️  Testing MCP Tools...&quot;)
+
+    tools_result = await test_mcp_tools()
+
+    
+
+    if tools_result[&#x27;success&#x27;]:
+
+        print(&quot;✅ MCP tools loaded successfully&quot;)
+
+        print(f&quot;   Available tools: {tools_result[&#x27;tool_count&#x27;]}&quot;)
+
+        print(f&quot;   Tool names: {&#x27;, &#x27;.join(tools_result[&#x27;available_tools&#x27;])}&quot;)
+
+        print(f&quot;   Test execution: {&#x27;✅&#x27; if tools_result[&#x27;test_tool_result&#x27;] else &#x27;❌&#x27;}&quot;)
+
+    else:
+
+        print(&quot;❌ MCP tools loading failed&quot;)
+
+        print(f&quot;   Error: {tools_result[&#x27;error&#x27;]}&quot;)
+
+    
+
+    # Overall status
+
+    print(&quot;\n📋 Overall Status&quot;)
+
+    print(&quot;=&quot; * 50)
+
+    
+
+    all_success = all([
+
+        db_result[&#x27;success&#x27;],
+
+        azure_result[&#x27;success&#x27;],
+
+        tools_result[&#x27;success&#x27;]
+
+    ])
+
+    
+
+    if all_success:
+
+        print(&quot;🎉 All systems ready! MCP server should work correctly in VS Code.&quot;)
+
+    else:
+
+        print(&quot;⚠️  Some issues detected. Please resolve the errors above.&quot;)
+
+        print(&quot;\n💡 Troubleshooting tips:&quot;)
+
+        print(&quot;   - Check environment variables in .env file&quot;)
+
+        print(&quot;   - Verify database is running and accessible&quot;)
+
+        print(&quot;   - Confirm Azure credentials are configured&quot;)
+
+        print(&quot;   - Review VS Code MCP server configuration&quot;)
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(main())
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 고급 설정</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">다중 서버 설정</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/settings.json - Multiple MCP servers
+
+{
+
+    &quot;mcp.servers&quot;: {
+
+        &quot;retail-seattle&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_server.main&quot;],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;mcp_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:POSTGRES_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;,
+
+                &quot;DEFAULT_STORE_ID&quot;: &quot;seattle&quot;
+
+            },
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;store_id&quot;: &quot;seattle&quot;,
+
+                &quot;server_name&quot;: &quot;Seattle Store&quot;
+
+            }
+
+        },
+
+        &quot;retail-redmond&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_server.main&quot;],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;mcp_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:POSTGRES_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;,
+
+                &quot;DEFAULT_STORE_ID&quot;: &quot;redmond&quot;
+
+            },
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;store_id&quot;: &quot;redmond&quot;,
+
+                &quot;server_name&quot;: &quot;Redmond Store&quot;
+
+            }
+
+        },
+
+        &quot;retail-analytics&quot;: {
+
+            &quot;command&quot;: &quot;python&quot;,
+
+            &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_server.analytics_main&quot;],
+
+            &quot;env&quot;: {
+
+                &quot;POSTGRES_HOST&quot;: &quot;localhost&quot;,
+
+                &quot;POSTGRES_DB&quot;: &quot;retail_db&quot;,
+
+                &quot;POSTGRES_USER&quot;: &quot;analytics_user&quot;,
+
+                &quot;POSTGRES_PASSWORD&quot;: &quot;${env:ANALYTICS_PASSWORD}&quot;,
+
+                &quot;PROJECT_ENDPOINT&quot;: &quot;${env:PROJECT_ENDPOINT}&quot;
+
+            },
+
+            &quot;initializationOptions&quot;: {
+
+                &quot;mode&quot;: &quot;analytics&quot;,
+
+                &quot;cross_store_access&quot;: true
+
+            }
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">사용자 정의 VS Code 확장</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// src/extension.ts - Custom MCP retail extension
+
+import * as vscode from &#x27;vscode&#x27;;
+
+
+
+export function activate(context: vscode.ExtensionContext) {
+
+    
+
+    // Register MCP retail commands
+
+    const disposable = vscode.commands.registerCommand(
+
+        &#x27;mcp-retail.quickQuery&#x27;, 
+
+        async () =&gt; {
+
+            const quickPick = vscode.window.createQuickPick();
+
+            quickPick.items = [
+
+                {
+
+                    label: &#x27;📊 Daily Sales&#x27;,
+
+                    description: &#x27;Show daily sales for the last 30 days&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;🏆 Top Products&#x27;,
+
+                    description: &#x27;Show top selling products this month&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;👥 Customer Analysis&#x27;,
+
+                    description: &#x27;Analyze customer behavior and trends&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;🔍 Product Search&#x27;,
+
+                    description: &#x27;Search for products using natural language&#x27;
+
+                },
+
+                {
+
+                    label: &#x27;📈 Business Insights&#x27;,
+
+                    description: &#x27;Generate comprehensive business summary&#x27;
+
+                }
+
+            ];
+
+            
+
+            quickPick.onDidChangeSelection(selection =&gt; {
+
+                if (selection[0]) {
+
+                    executeQuickQuery(selection[0].label);
+
+                }
+
+            });
+
+            
+
+            quickPick.onDidHide(() =&gt; quickPick.dispose());
+
+            quickPick.show();
+
+        }
+
+    );
+
+    
+
+    context.subscriptions.push(disposable);
+
+    
+
+    // Register store switcher
+
+    const storeSwitcher = vscode.commands.registerCommand(
+
+        &#x27;mcp-retail.switchStore&#x27;,
+
+        async () =&gt; {
+
+            const stores = [&#x27;seattle&#x27;, &#x27;redmond&#x27;, &#x27;bellevue&#x27;, &#x27;online&#x27;];
+
+            const selected = await vscode.window.showQuickPick(stores, {
+
+                placeHolder: &#x27;Select store for queries&#x27;
+
+            });
+
+            
+
+            if (selected) {
+
+                // Update configuration
+
+                const config = vscode.workspace.getConfiguration(&#x27;mcp&#x27;);
+
+                await config.update(&#x27;defaultStore&#x27;, selected, true);
+
+                
+
+                vscode.window.showInformationMessage(
+
+                    `Switched to ${selected.charAt(0).toUpperCase() + selected.slice(1)} store`
+
+                );
+
+            }
+
+        }
+
+    );
+
+    
+
+    context.subscriptions.push(storeSwitcher);
+
+}
+
+
+
+async function executeQuickQuery(queryType: string) {
+
+    // Execute predefined queries in VS Code Chat
+
+    const chatCommands = {
+
+        &#x27;📊 Daily Sales&#x27;: &#x27;@retail Show me daily sales for the last 30 days&#x27;,
+
+        &#x27;🏆 Top Products&#x27;: &#x27;@retail What are the top 10 selling products this month?&#x27;,
+
+        &#x27;👥 Customer Analysis&#x27;: &#x27;@retail Show me customer analysis for active customers&#x27;,
+
+        &#x27;🔍 Product Search&#x27;: &#x27;@retail Find products matching &quot;laptop computer&quot;&#x27;,
+
+        &#x27;📈 Business Insights&#x27;: &#x27;@retail Generate a business summary for this month&#x27;
+
+    };
+
+    
+
+    const command = chatCommands[queryType];
+
+    if (command) {
+
+        await vscode.commands.executeCommand(&#x27;workbench.action.chat.open&#x27;);
+
+        await vscode.commands.executeCommand(&#x27;workbench.action.chat.insert&#x27;, command);
+
+    }
+
+}
+
+
+
+export function deactivate() {}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">확장 패키지 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// package.json for VS Code extension
+
+{
+
+    &quot;name&quot;: &quot;mcp-retail-assistant&quot;,
+
+    &quot;displayName&quot;: &quot;MCP Retail Assistant&quot;,
+
+    &quot;description&quot;: &quot;AI-powered retail data analysis through MCP&quot;,
+
+    &quot;version&quot;: &quot;1.0.0&quot;,
+
+    &quot;engines&quot;: {
+
+        &quot;vscode&quot;: &quot;^1.74.0&quot;
+
+    },
+
+    &quot;categories&quot;: [
+
+        &quot;Other&quot;,
+
+        &quot;Data Science&quot;,
+
+        &quot;Machine Learning&quot;
+
+    ],
+
+    &quot;activationEvents&quot;: [
+
+        &quot;onCommand:mcp-retail.quickQuery&quot;,
+
+        &quot;onCommand:mcp-retail.switchStore&quot;
+
+    ],
+
+    &quot;main&quot;: &quot;./out/extension.js&quot;,
+
+    &quot;contributes&quot;: {
+
+        &quot;commands&quot;: [
+
+            {
+
+                &quot;command&quot;: &quot;mcp-retail.quickQuery&quot;,
+
+                &quot;title&quot;: &quot;Quick Retail Query&quot;,
+
+                &quot;category&quot;: &quot;MCP Retail&quot;
+
+            },
+
+            {
+
+                &quot;command&quot;: &quot;mcp-retail.switchStore&quot;,
+
+                &quot;title&quot;: &quot;Switch Store&quot;,
+
+                &quot;category&quot;: &quot;MCP Retail&quot;
+
+            }
+
+        ],
+
+        &quot;keybindings&quot;: [
+
+            {
+
+                &quot;command&quot;: &quot;mcp-retail.quickQuery&quot;,
+
+                &quot;key&quot;: &quot;ctrl+shift+r&quot;,
+
+                &quot;mac&quot;: &quot;cmd+shift+r&quot;
+
+            }
+
+        ],
+
+        &quot;configuration&quot;: {
+
+            &quot;title&quot;: &quot;MCP Retail&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;mcp-retail.defaultStore&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;default&quot;: &quot;seattle&quot;,
+
+                    &quot;enum&quot;: [&quot;seattle&quot;, &quot;redmond&quot;, &quot;bellevue&quot;, &quot;online&quot;],
+
+                    &quot;description&quot;: &quot;Default store for retail queries&quot;
+
+                },
+
+                &quot;mcp-retail.enableAnalytics&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;default&quot;: true,
+
+                    &quot;description&quot;: &quot;Enable advanced analytics features&quot;
+
+                }
+
+            }
+
+        }
+
+    },
+
+    &quot;scripts&quot;: {
+
+        &quot;vscode:prepublish&quot;: &quot;npm run compile&quot;,
+
+        &quot;compile&quot;: &quot;tsc -p ./&quot;,
+
+        &quot;watch&quot;: &quot;tsc -watch -p ./&quot;
+
+    },
+
+    &quot;devDependencies&quot;: {
+
+        &quot;@types/vscode&quot;: &quot;^1.74.0&quot;,
+
+        &quot;@types/node&quot;: &quot;16.x&quot;,
+
+        &quot;typescript&quot;: &quot;^4.9.4&quot;
+
+    }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 내용 요약</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 달성할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>VS Code MCP 설정</strong>: MCP 통합을 위한 최적의 설정 완료  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>AI 채팅 통합</strong>: VS Code에서 자연어 쿼리 기능 활성화  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>디버깅 도구</strong>: 포괄적인 문제 해결 및 연결 진단  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>다중 서버 설정</strong>: 여러 MCP 서버 인스턴스 구성  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>사용자 정의 확장</strong>: 소매업에 특화된 VS Code 경험 강화  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>프로덕션 준비</strong>: 엔터프라이즈 수준의 VS Code 개발 환경  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/10-Deployment/README.md" target="_blank">실습 10: 배포 전략</a></strong>을 계속 진행하여:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버를 프로덕션 환경에 배포  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">확장성을 위한 클라우드 인프라 구성  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자동 배포를 위한 CI/CD 파이프라인 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">프로덕션 MCP 서버 성능 모니터링  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code 개발</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/api">VS Code Extension API</a> - 공식 확장 개발 가이드  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/copilot/copilot-extensibility-overview">VS Code MCP Documentation</a> - MCP 통합 문서  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/languages/typescript">TypeScript for VS Code</a> - VS Code에서 TypeScript 개발  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP 프로토콜</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/specification">Model Context Protocol Specification</a> - 공식 MCP 사양  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/best-practices">MCP Best Practices</a> - 구현 모범 사례  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/jlowin/fastmcp">FastMCP Framework</a> - Python MCP 구현  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">개발 도구</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/python/python-tutorial">Python in VS Code</a> - VS Code에서 Python 개발 설정  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/editor/debugging">Debugging in VS Code</a> - 고급 디버깅 기술  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/editor/tasks">VS Code Tasks</a> - 작업 자동화 및 구성  </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>이전</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/08-Testing/README.md" target="_blank">실습 08: 테스트 및 디버깅</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/10-Deployment/README.md" target="_blank">실습 10: 배포 전략</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전을 권위 있는 자료로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_09-08---testing-and-debugging.html">&larr; 08 - Testing and Debugging</a></span>
+  <span><a href="m11_11-10---deployment-strategies.html">10 - Deployment Strategies &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>07 Aitk - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 07 Aitk</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Consuming a server from the AI Toolkit extension for Visual Studio Code</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When you’re building an AI agent, it’s not just about generating smart responses; it’s also about giving your agent the ability to take action.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">That’s where the Model Context Protocol (MCP) comes in.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP makes it easy for agents to access external tools and services in a consistent way.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Think of it like plugging your agent into a toolbox it can *actually* use.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let’s say you connect an agent to your calculator MCP server. Suddenly, your agent can perform math operations just by receiving a prompt like “What’s 47 times 89?”—no need to hardcode logic or build custom APIs.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lesson covers how to connect a calculator MCP server to an agent with the <a class="text-[var(--accent)] underline" href="https://aka.ms/AIToolkit">AI Toolkit</a> extension in Visual Studio Code, enabling your agent to perform math operations such as addition, subtraction, multiplication, and division through natural language.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">AI Toolkit is a powerful extension for Visual Studio Code that streamlines agent development.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">AI Engineers can easily build AI applications by developing and testing generative AI models—locally or in the cloud.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The extension supports most major generative models available today.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*Note*: The AI Toolkit currently supports Python and TypeScript.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Consume an MCP server via the AI Toolkit.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure an agent configuration to enable it to discover and utilize tools provided by the MCP server.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Utilize MCP tools via natural language.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Approach</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's how we need to approach this at a high level:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create an agent and define its system prompt.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create a MCP server with calculator tools.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Connect the Agent Builder to the MCP server.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test the agent's tool invocation via natural language.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, now that we understand the flow, let's configure an AI agent to leverage external tools through MCP, enhancing its capabilities!</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Prerequisites</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/">Visual Studio Code</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://aka.ms/AIToolkit">AI Toolkit for Visual Studio Code</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Exercise: Consuming a server</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!WARNING]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> Note for macOS Users.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We're currently investigating an issue affecting dependency installation on macOS.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As a result, macOS users won’t be able to complete this tutorial at this time.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We’ll update the instructions as soon as a fix is available.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Thank you for your patience and understanding!</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this exercise, you will build, run, and enhance an AI agent with tools from a MCP server inside Visual Studio Code using the AI Toolkit.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-0- Prestep, add the OpenAI GPT-4o model to My Models</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The exercise leverages the <strong>GPT-4o</strong> model. The model should be added to <strong>My Models</strong> before creating the agent.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Open the <strong>AI Toolkit</strong> extension from the <strong>Activity Bar</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. In the <strong>Catalog</strong> section, select <strong>Models</strong> to open the <strong>Model Catalog</strong>. Selecting <strong>Models</strong> opens the <strong>Model Catalog</strong> in a new editor tab.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. In the <strong>Model Catalog</strong> search bar, enter <strong>OpenAI GPT-4o</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Click <strong>+ Add</strong> to add the model to your <strong>My Models</strong> list. Ensure that you've selected the model that's <strong>Hosted by GitHub</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. In the <strong>Activity Bar</strong>, confirm that the <strong>OpenAI GPT-4o</strong> model appears in the list.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- Create an agent</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <strong>Agent (Prompt) Builder</strong> enables you to create and customize your own AI-powered agents. In this section, you’ll create a new agent and assign a model to power the conversation.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Open the <strong>AI Toolkit</strong> extension from the <strong>Activity Bar</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. In the <strong>Tools</strong> section, select <strong>Agent (Prompt) Builder</strong>. Selecting <strong>Agent (Prompt) Builder</strong> opens the <strong>Agent (Prompt) Builder</strong> in a new editor tab.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Click the <strong>+ New Agent</strong> button. The extension will launch a setup wizard via the <strong>Command Palette</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Enter the name <strong>Calculator Agent</strong> and press <strong>Enter</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. In the <strong>Agent (Prompt) Builder</strong>, for the <strong>Model</strong> field, select the <strong>OpenAI GPT-4o (via GitHub)</strong> model.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- Create a system prompt for the agent</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">With the agent scaffolded, it’s time to define its personality and purpose.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this section, you’ll use the <strong>Generate system prompt</strong> feature to describe the agent’s intended behavior—in this case, a calculator agent—and have the model write the system prompt for you.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. For the <strong>Prompts</strong> section, click the <strong>Generate system prompt</strong> button. This button opens in the prompt builder which leverages AI to generate a system prompt for the agent.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the <strong>Generate a prompt</strong> window, enter the following: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">You are a helpful and efficient math assistant.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When given a problem involving basic arithmetic, you respond with the correct result.</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Click the <strong>Generate</strong> button.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A notification will appear in the bottom-right corner confirming that the system prompt is being generated.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Once the prompt generation is complete, the prompt will appear in the <strong>System prompt</strong> field of the <strong>Agent (Prompt) Builder</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Review the <strong>System prompt</strong> and modify if necessary.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- Create a MCP server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now that you've defined your agent's system prompt—guiding its behavior and responses—it's time to equip the agent with practical capabilities.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this section, you’ll create a calculator MCP server with tools to execute addition, subtraction, multiplication, and division calculations.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This server will enable your agent to perform real-time math operations in response to natural language prompts.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">AI Toolkit is equipped with templates for ease of creating your own MCP server. We'll use the Python template for creating the calculator MCP server.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*Note*: The AI Toolkit currently supports Python and TypeScript.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. In the <strong>Tools</strong> section of the <strong>Agent (Prompt) Builder</strong>, click the <strong>+ MCP Server</strong> button. The extension will launch a setup wizard via the <strong>Command Palette</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select <strong>+ Add Server</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select <strong>Create a New MCP Server</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select <strong>python-weather</strong> as the template.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select <strong>Default folder</strong> to save the MCP server template.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Enter the following name for the server: <strong>Calculator</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. A new Visual Studio Code window will open. Select <strong>Yes, I trust the authors</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Using the terminal (<strong>Terminal</strong> > <strong>New Terminal</strong>), create a virtual environment: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">python -m venv .venv</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Using the terminal, activate the virtual environment:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    1. Windows - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.venv\Scripts\activate</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    1. macOS/Linux - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">source .venv/bin/activate</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Using the terminal, install the dependencies: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pip install -e .[dev]</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. In the <strong>Explorer</strong> view of the <strong>Activity Bar</strong>, expand the <strong>src</strong> directory and select <strong>server.py</strong> to open the file in the editor.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Replace the code in the <strong>server.py</strong> file with the following and save:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    """</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    Sample MCP Calculator Server implementation in Python.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    This module demonstrates how to create a simple MCP server with calculator tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    that can perform basic arithmetic operations (add, subtract, multiply, divide).</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    """</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from mcp.server.fastmcp import FastMCP</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    server = FastMCP("calculator")</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def add(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """Add two numbers together and return the result."""</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a + b</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def subtract(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """Subtract b from a and return the result."""</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a - b</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def multiply(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """Multiply two numbers together and return the result."""</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a * b</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def divide(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Divide a by b and return the result.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Raises:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            ValueError: If b is zero</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        if b == 0:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            raise ValueError("Cannot divide by zero")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a / b</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-4- Run the agent with the calculator MCP server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now that your agent has tools, it's time to use them! In this section, you'll submit prompts to the agent to test and validate whether the agent leverages the appropriate tool from the calculator MCP server.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You will run the calculator MCP server on your local dev machine via the <strong>Agent Builder</strong> as the MCP client.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Press <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">F5</code> to start debugging the MCP server.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <strong>Agent (Prompt) Builder</strong> will open in a new editor tab.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The status of the server is visible in the terminal.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the <strong>User prompt</strong> field of the <strong>Agent (Prompt) Builder</strong>, enter the following prompt: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">I bought 3 items priced at $25 each, and then used a $20 discount.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">How much did I pay?</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Click the <strong>Run</strong> button to generate the agent's response.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Review the agent output. The model should conclude that you paid <strong>$55</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Here's a breakdown of what should occur:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - The agent selects the <strong>multiply</strong> and <strong>substract</strong> tools to aid in the calculation.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- The respective <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">a</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">b</code> values are assigned for the <strong>multiply</strong> tool.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- The respective <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">a</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">b</code> values are assigned for the <strong>subtract</strong> tool.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - The response from each tool is provided in the respective <strong>Tool Response</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - The final output from the model is provided in the final <strong>Model Response</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Submit additional prompts to further test the agent. You can modify the existing prompt in the <strong>User prompt</strong> field by clicking into the field and replacing the existing prompt.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Once you're done testing the agent, you can stop the server via the <strong>terminal</strong> by entering <strong>CTRL/CMD+C</strong> to quit.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Assignment</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Try adding an additional tool entry to your <strong>server.py</strong> file (ex: return the square root of a number).</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Submit additional prompts that would require the agent to leverage your new tool (or existing tools).</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Be sure to restart the server to load newly added tools.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Solution</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The takeaways from this chapter is the following:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The AI Toolkit extension is a great client that lets you consume MCP Servers and their tools.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">You can add new tools to MCP servers, expanding the agent's capabilities to meet evolving requirements.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The AI Toolkit includes templates (e.g., Python MCP server templates) to simplify the creation of custom tools.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://aka.ms/AIToolkit/doc">AI Toolkit docs</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/08-testing/README.md" target="_blank">Testing & Debugging</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Visual Studio Code의 AI Toolkit 확장을 사용하여 서버 활용하기</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">AI 에이전트를 구축할 때, 단순히 스마트한 응답을 생성하는 것만이 아니라 에이전트가 실제로 행동을 취할 수 있는 능력을 부여하는 것이 중요합니다. 바로 여기서 Model Context Protocol (MCP)이 등장합니다. MCP는 에이전트가 외부 도구와 서비스를 일관된 방식으로 쉽게 접근할 수 있도록 해줍니다. 마치 에이전트를 실제로 사용할 수 있는 도구 상자에 연결하는 것과 같습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예를 들어, 에이전트를 계산기 MCP 서버에 연결했다고 가정해봅시다. 그러면 에이전트는 "47 곱하기 89는 얼마야?"와 같은 프롬프트를 받는 것만으로 수학 연산을 수행할 수 있게 됩니다. 로직을 하드코딩하거나 커스텀 API를 구축할 필요가 없습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 레슨에서는 Visual Studio Code의 <a class="text-[var(--accent)] underline" href="https://aka.ms/AIToolkit">AI Toolkit</a> 확장을 사용하여 계산기 MCP 서버를 에이전트에 연결하는 방법을 다룹니다. 이를 통해 에이전트가 덧셈, 뺄셈, 곱셈, 나눗셈과 같은 수학 연산을 자연어를 통해 수행할 수 있게 됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">AI Toolkit은 Visual Studio Code에서 에이전트 개발을 간소화하는 강력한 확장 프로그램입니다. AI 엔지니어는 로컬 또는 클라우드에서 생성형 AI 모델을 개발하고 테스트하여 AI 애플리케이션을 쉽게 구축할 수 있습니다. 이 확장은 현재 사용 가능한 주요 생성형 모델 대부분을 지원합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*참고*: AI Toolkit은 현재 Python과 TypeScript를 지원합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 레슨을 마치면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Toolkit을 통해 MCP 서버를 활용하기.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버가 제공하는 도구를 발견하고 사용할 수 있도록 에이전트 설정을 구성하기.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자연어를 통해 MCP 도구를 활용하기.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">접근 방식</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음은 전체적인 접근 방식입니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">에이전트를 생성하고 시스템 프롬프트를 정의합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">계산기 도구를 포함한 MCP 서버를 생성합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Agent Builder를 MCP 서버에 연결합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자연어를 통해 에이전트의 도구 호출을 테스트합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋습니다. 이제 흐름을 이해했으니, MCP를 통해 외부 도구를 활용하여 AI 에이전트의 기능을 확장해봅시다!</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">사전 준비</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/">Visual Studio Code</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://aka.ms/AIToolkit">Visual Studio Code용 AI Toolkit</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">실습: 서버 활용하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!WARNING]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> macOS 사용자 참고: 현재 macOS에서 종속성 설치에 영향을 미치는 문제를 조사 중입니다. 이로 인해 macOS 사용자는 이 튜토리얼을 현재 완료할 수 없습니다. 문제가 해결되는 대로 지침을 업데이트하겠습니다. 기다려주셔서 감사합니다!</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습에서는 Visual Studio Code의 AI Toolkit을 사용하여 MCP 서버의 도구를 활용하여 AI 에이전트를 구축, 실행 및 개선합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-0- 사전 단계: OpenAI GPT-4o 모델을 My Models에 추가하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습에서는 <strong>GPT-4o</strong> 모델을 사용합니다. 에이전트를 생성하기 전에 이 모델을 <strong>My Models</strong>에 추가해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Activity Bar</strong>에서 <strong>AI Toolkit</strong> 확장을 엽니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Catalog</strong> 섹션에서 <strong>Models</strong>를 선택하여 <strong>Model Catalog</strong>를 엽니다. <strong>Models</strong>를 선택하면 <strong>Model Catalog</strong>가 새 편집기 탭에서 열립니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Model Catalog</strong> 검색창에 <strong>OpenAI GPT-4o</strong>를 입력합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>+ Add</strong>를 클릭하여 모델을 <strong>My Models</strong> 목록에 추가합니다. <strong>GitHub에서 호스팅된</strong> 모델을 선택했는지 확인하세요.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Activity Bar</strong>에서 <strong>OpenAI GPT-4o</strong> 모델이 목록에 나타나는지 확인합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- 에이전트 생성하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Agent (Prompt) Builder</strong>를 사용하면 AI 기반 에이전트를 생성하고 사용자 정의할 수 있습니다. 이 섹션에서는 새 에이전트를 생성하고 대화를 구동할 모델을 지정합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Activity Bar</strong>에서 <strong>AI Toolkit</strong> 확장을 엽니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Tools</strong> 섹션에서 <strong>Agent (Prompt) Builder</strong>를 선택합니다. <strong>Agent (Prompt) Builder</strong>를 선택하면 새 편집기 탭에서 <strong>Agent (Prompt) Builder</strong>가 열립니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>+ New Agent</strong> 버튼을 클릭합니다. 확장은 <strong>Command Palette</strong>를 통해 설정 마법사를 실행합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 이름으로 <strong>Calculator Agent</strong>를 입력하고 <strong>Enter</strong>를 누릅니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Agent (Prompt) Builder</strong>에서 <strong>Model</strong> 필드에 <strong>OpenAI GPT-4o (via GitHub)</strong> 모델을 선택합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- 에이전트의 시스템 프롬프트 생성하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">에이전트의 기본 구조를 생성한 후, 이제 에이전트의 성격과 목적을 정의할 차례입니다. 이 섹션에서는 <strong>Generate system prompt</strong> 기능을 사용하여 계산기 에이전트의 의도된 동작을 설명하고 모델이 시스템 프롬프트를 작성하도록 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Prompts</strong> 섹션에서 <strong>Generate system prompt</strong> 버튼을 클릭합니다. 이 버튼은 에이전트의 시스템 프롬프트를 생성하는 프롬프트 빌더를 엽니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Generate a prompt</strong> 창에서 다음을 입력합니다: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">당신은 유용하고 효율적인 수학 도우미입니다. 기본 산술 문제를 받으면 올바른 결과를 제공합니다.</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Generate</strong> 버튼을 클릭합니다. 오른쪽 하단에 시스템 프롬프트가 생성 중임을 알리는 알림이 나타납니다. 프롬프트 생성이 완료되면 <strong>Agent (Prompt) Builder</strong>의 <strong>System prompt</strong> 필드에 프롬프트가 나타납니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>System prompt</strong>를 검토하고 필요하면 수정합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- MCP 서버 생성하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">에이전트의 시스템 프롬프트를 정의하여 동작과 응답을 안내한 후, 이제 에이전트에 실질적인 기능을 추가할 차례입니다. 이 섹션에서는 덧셈, 뺄셈, 곱셈, 나눗셈 계산을 실행할 도구를 포함한 계산기 MCP 서버를 생성합니다. 이 서버는 에이전트가 자연어 프롬프트에 따라 실시간으로 수학 연산을 수행할 수 있도록 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">AI Toolkit은 사용자 정의 MCP 서버를 쉽게 생성할 수 있는 템플릿을 제공합니다. 우리는 계산기 MCP 서버를 생성하기 위해 Python 템플릿을 사용할 것입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*참고*: AI Toolkit은 현재 Python과 TypeScript를 지원합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Agent (Prompt) Builder</strong>의 <strong>Tools</strong> 섹션에서 <strong>+ MCP Server</strong> 버튼을 클릭합니다. 확장은 <strong>Command Palette</strong>를 통해 설정 마법사를 실행합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>+ Add Server</strong>를 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Create a New MCP Server</strong>를 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 템플릿으로 <strong>python-weather</strong>를 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. MCP 서버 템플릿을 저장할 폴더로 <strong>Default folder</strong>를 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 서버 이름으로 <strong>Calculator</strong>를 입력합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 새 Visual Studio Code 창이 열립니다. <strong>Yes, I trust the authors</strong>를 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Terminal</strong> 메뉴에서 <strong>New Terminal</strong>을 열어 가상 환경을 생성합니다: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">python -m venv .venv</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 터미널에서 가상 환경을 활성화합니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Windows - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.venv\Scripts\activate</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - macOS/Linux - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">source .venv/bin/activate</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 터미널에서 종속성을 설치합니다: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pip install -e .[dev]</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Activity Bar</strong>의 <strong>Explorer</strong> 보기에서 <strong>src</strong> 디렉토리를 확장하고 <strong>server.py</strong>를 선택하여 파일을 편집기에서 엽니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>server.py</strong> 파일의 코드를 다음으로 교체하고 저장합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    """</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    Sample MCP Calculator Server implementation in Python.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    This module demonstrates how to create a simple MCP server with calculator tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    that can perform basic arithmetic operations (add, subtract, multiply, divide).</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    """</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from mcp.server.fastmcp import FastMCP</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    server = FastMCP("calculator")</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def add(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """Add two numbers together and return the result."""</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a + b</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def subtract(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """Subtract b from a and return the result."""</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a - b</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def multiply(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """Multiply two numbers together and return the result."""</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a * b</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    @server.tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def divide(a: float, b: float) -> float:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Divide a by b and return the result.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Raises:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            ValueError: If b is zero</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        """</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        if b == 0:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            raise ValueError("Cannot divide by zero")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return a / b</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-4- 계산기 MCP 서버와 함께 에이전트 실행하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 에이전트가 도구를 갖췄으니 이를 사용해볼 차례입니다! 이 섹션에서는 에이전트에 프롬프트를 제출하여 계산기 MCP 서버의 적절한 도구를 활용하는지 테스트하고 검증합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. MCP 서버를 디버깅하려면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">F5</code>를 누릅니다. <strong>Agent (Prompt) Builder</strong>가 새 편집기 탭에서 열립니다. 서버 상태는 터미널에서 확인할 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Agent (Prompt) Builder</strong>의 <strong>User prompt</strong> 필드에 다음 프롬프트를 입력합니다: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">나는 각각 $25인 물건 3개를 샀고, $20 할인권을 사용했어. 총 얼마를 지불했지?</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Run</strong> 버튼을 클릭하여 에이전트의 응답을 생성합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 에이전트 출력을 검토합니다. 모델은 <strong>$55</strong>를 지불했다고 결론을 내려야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 다음과 같은 과정이 발생해야 합니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 에이전트가 계산을 돕기 위해 <strong>multiply</strong>와 <strong>subtract</strong> 도구를 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <strong>multiply</strong> 도구에 각각 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">a</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">b</code> 값이 할당됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <strong>subtract</strong> 도구에 각각 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">a</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">b</code> 값이 할당됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 각 도구의 응답이 <strong>Tool Response</strong>에 제공됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 모델의 최종 출력이 <strong>Model Response</strong>에 제공됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 추가 프롬프트를 제출하여 에이전트를 더 테스트합니다. <strong>User prompt</strong> 필드에서 기존 프롬프트를 클릭하여 수정할 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 테스트가 끝나면 <strong>터미널</strong>에서 <strong>CTRL/CMD+C</strong>를 입력하여 서버를 종료할 수 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">과제</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>server.py</strong> 파일에 추가 도구 항목(예: 숫자의 제곱근 반환)을 추가해보세요. 에이전트가 새 도구(또는 기존 도구)를 활용해야 하는 추가 프롬프트를 제출하세요. 새로 추가된 도구를 로드하려면 서버를 재시작해야 합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">솔루션</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">주요 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 장의 주요 내용은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Toolkit 확장은 MCP 서버와 그 도구를 활용할 수 있는 훌륭한 클라이언트입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버에 새 도구를 추가하여 에이전트의 기능을 확장하고 변화하는 요구 사항을 충족할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Toolkit은 사용자 정의 도구 생성을 간소화하는 템플릿(예: Python MCP 서버 템플릿)을 포함하고 있습니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://aka.ms/AIToolkit/doc">AI Toolkit 문서</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/08-testing/README.md" target="_blank">테스트 및 디버깅</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있지만, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어를 신뢰할 수 있는 권위 있는 출처로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m03_06-06-http-streaming.html">&larr; 06 Http Streaming</a></span>
+  <span><a href="m03_08-08-testing.html">08 Testing &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

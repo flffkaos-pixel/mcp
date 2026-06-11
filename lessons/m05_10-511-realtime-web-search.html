@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.11 Realtime Web Search - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.11 Realtime Web Search</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Model Context Protocol for Real-Time Web Search</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time web search has become essential in today's information-driven environment, where applications need immediate access to up-to-date information across the internet to provide relevant and timely responses.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) represents a significant advancement in optimizing these real-time search processes, enhancing search efficiency, maintaining contextual integrity, and improving overall system performance.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This module explores how MCP transforms real-time web search by providing a standardized approach to context management across AI models, search engines, and applications.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">What You'll Learn</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this comprehensive guide, you'll discover:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">How MCP creates a seamless bridge between AI models and real-time web search capabilities</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Architectural patterns for implementing efficient and scalable search solutions with MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Techniques for preserving search context across multiple queries and interactions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Practical code implementations in Python and JavaScript for various search scenarios</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Methods to balance relevance, recency, and performance in MCP-powered search systems</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction to Real-Time Web Search</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time web search is a technological approach that enables continuous querying, processing, and analysis of web-based information as it's published or updated, allowing systems to provide fresh and relevant information with minimal latency.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Unlike traditional search systems that operate on indexed data which may be hours or days old, real-time search processes live data from the web, delivering insights and information that reflect the current state of online content.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Core Concepts of Real-Time Web Search:</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Continuous Query Processing</strong>: Search queries are processed against constantly updating data sources</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Recency Prioritization</strong>: Systems are designed to prioritize fresh information</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Relevance Balancing</strong>: Maintaining a balance between relevance and recency</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Scalable Architecture</strong>: Systems must handle variable query loads and data volumes</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Contextual Understanding</strong>: Maintaining user context across search iterations is crucial for meaningful results</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Dynamic Query Reformulation</strong>: Adaptively modifying queries based on context and previous results</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Multi-Source Integration</strong>: Combining results from multiple search providers and web sources</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Semantic Understanding</strong>: Processing queries and content based on meaning rather than just keywords</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Real-Time Ranking</strong>: Continuously adjusting result rankings as new information becomes available</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">The Model Context Protocol and Real-Time Web Search</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) addresses several critical challenges in real-time web search environments:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Search Context Preservation</strong>: MCP standardizes how context is maintained across distributed search components, ensuring that AI models and processing nodes have access to relevant query history and user preferences.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Efficient Query Management</strong>: By providing structured mechanisms for context transmission, MCP reduces the overhead of repeating context in each search iteration.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Interoperability</strong>: MCP creates a common language for context sharing between diverse search technologies and AI models, enabling more flexible and extensible architectures.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Search-Optimized Context</strong>: MCP implementations can prioritize which context elements are most relevant for effective search, optimizing for both performance and accuracy.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Adaptive Search Processing</strong>: With proper context management through MCP, search systems can dynamically adjust processing based on evolving user needs and information landscapes.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In modern applications ranging from news aggregation to research assistants, the integration of MCP with web search technologies enables more intelligent, context-aware search that can provide increasingly relevant results as user interactions continue.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the fundamentals of real-time web search and its challenges in modern applications</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explain how the Model Context Protocol (MCP) enhances real-time web search capabilities</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement MCP-based search solutions using popular frameworks and APIs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Design and deploy scalable, high-performance search architectures with MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply MCP concepts to various use cases including semantic search, research assistance, and AI-augmented browsing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Evaluate emerging trends and future innovations in MCP-based search technologies</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Develop context-aware search systems that learn from user interactions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integrate web search capabilities into AI assistants using standardized MCP protocols</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create multi-stage search pipelines that progressively refine results based on context</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Optimize search performance while maintaining comprehensive context awareness</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Definition and Significance</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time web search involves the continuous querying, retrieval, and delivery of web-based information with minimal latency.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Unlike traditional search engines that periodically crawl and index the web, real-time search aims to surface information as it becomes available, enabling immediate access to the most current content.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Key characteristics of real-time web search include:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Freshness</strong>: Prioritizing recent content and updates</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Continuous Processing</strong>: Constantly monitoring for new information</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Query Adaptation</strong>: Refining search queries based on context and feedback</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Immediate Delivery</strong>: Providing search results with minimal delay</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Context Retention</strong>: Building on previous queries for improved relevance</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenges in Traditional Web Search</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Traditional web search approaches face several limitations when applied to real-time scenarios:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Context Fragmentation</strong>: Difficulty maintaining search context across multiple queries</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Information Freshness</strong>: Challenges in accessing and prioritizing the most recent information</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Integration Complexity</strong>: Problems with interoperability between search systems and applications</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Latency Issues</strong>: Balancing comprehensive search with response time requirements</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Relevance Tuning</strong>: Ensuring accuracy and relevance while prioritizing recency</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Understanding Model Context Protocol (MCP) for Search</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">What is MCP in Search Contexts?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) is a standardized communication protocol designed to facilitate efficient interaction between AI models and applications. In the context of real-time web search, MCP provides a framework for:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Preserving search context throughout query sequences</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Standardizing search query and result formats</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Optimizing the transmission of search parameters and results</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enhancing model-to-search engine communication</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Core Components and Architecture</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP architecture for real-time web search consists of several key components:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Query Context Handlers</strong>: Manage and maintain search context across multiple queries</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Search Processors</strong>: Process incoming search requests using context-aware techniques</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Protocol Adapters</strong>: Convert between different search APIs while preserving context</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Context Store</strong>: Efficiently store and retrieve search history and preferences</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Search Connectors</strong>: Connect to various search engines and web APIs</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    subgraph &quot;Data Sources&quot;
+
+        Web[Web Content]
+
+        APIs[External APIs]
+
+        DB[Knowledge Bases]
+
+        News[News Feeds]
+
+    end
+
+
+
+    subgraph &quot;MCP Search Layer&quot;
+
+        SC[Search Connectors]
+
+        PA[Protocol Adapters]
+
+        CH[Context Handlers]
+
+        SP[Search Processors]
+
+        CS[Context Store]
+
+    end
+
+
+
+    subgraph &quot;Processing &amp; Analysis&quot;
+
+        RE[Relevance Engine]
+
+        ML[ML Models]
+
+        NLP[NLP Processing]
+
+        Rank[Ranking System]
+
+    end
+
+
+
+    subgraph &quot;Applications &amp; Services&quot;
+
+        RA[Research Assistant]
+
+        Alerts[Alert Systems]
+
+        KB[Knowledge Base]
+
+        API[API Services]
+
+    end
+
+
+
+    Web --&gt;|Content| SC
+
+    APIs --&gt;|Data| SC
+
+    DB --&gt;|Knowledge| SC
+
+    News --&gt;|Updates| SC
+
+    
+
+    SC --&gt;|Raw Results| PA
+
+    PA --&gt;|Normalized Results| CH
+
+    CH &lt;--&gt;|Context Operations| CS
+
+    CH --&gt;|Context-Enriched Results| SP
+
+    SP --&gt;|Processed Results| RE
+
+    SP --&gt;|Features| ML
+
+    SP --&gt;|Text| NLP
+
+    
+
+    RE --&gt;|Ranked Results| Rank
+
+    ML --&gt;|Predictions| Rank
+
+    NLP --&gt;|Entities &amp; Relations| Rank
+
+    
+
+    Rank --&gt;|Final Results| RA
+
+    ML --&gt;|Insights| Alerts
+
+    NLP --&gt;|Structured Data| KB
+
+    
+
+    RA --&gt;|Research| Users((Users))
+
+    Alerts --&gt;|Notifications| Users
+
+    KB &lt;--&gt;|Knowledge Access| API
+
+    
+
+    classDef sources fill:#f9f,stroke:#333,stroke-width:2px
+
+    classDef mcp fill:#bbf,stroke:#333,stroke-width:2px
+
+    classDef processing fill:#bfb,stroke:#333,stroke-width:2px
+
+    classDef apps fill:#fbb,stroke:#333,stroke-width:2px
+
+    
+
+    class Web,APIs,DB,News sources
+
+    class SC,PA,CH,SP,CS mcp
+
+    class RE,ML,NLP,Rank processing
+
+    class RA,Alerts,KB,API apps
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">How MCP Improves Real-Time Web Search</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP addresses traditional web search challenges through:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Contextual Continuity</strong>: Maintaining relationships between queries across the entire search session</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Optimized Transmission</strong>: Reducing redundancy in search parameters through intelligent context management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Standardized Interfaces</strong>: Providing consistent APIs for search components</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Reduced Latency</strong>: Minimizing processing overhead through efficient context handling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Enhanced Relevance</strong>: Improving search relevance by preserving user intent across multiple queries</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Integration and Implementation</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time web search systems require careful architectural design and implementation to maintain both performance and contextual integrity.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol offers a standardized approach to integrating AI models and search technologies, allowing for more sophisticated, context-aware search pipelines.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Overview of MCP Integration in Search Architectures</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Implementing MCP in real-time web search environments involves several key considerations:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Search Context Serialization</strong>: MCP provides efficient mechanisms for encoding contextual information within search requests, ensuring that essential context follows the query throughout the processing pipeline.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This includes standardized serialization formats optimized for search-related metadata.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Stateful Search Processing</strong>: MCP enables more intelligent stateful processing by maintaining consistent context representation across search iterations.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is particularly valuable in multi-stage search pipelines where context refinement improves results.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Query Expansion and Refinement</strong>: MCP implementations in search systems can facilitate sophisticated query expansion and refinement based on accumulated context, allowing for increasingly relevant results as the search session progresses.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Result Caching and Prioritization</strong>: By standardizing context handling, MCP helps manage result caching and prioritization, allowing components to adapt based on the evolving search context.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Search Federation and Aggregation</strong>: MCP facilitates more sophisticated federation of search across multiple backends by providing structured representations of search context, enabling more meaningful aggregation of results from diverse sources.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The implementation of MCP across various search technologies creates a unified approach to context management, reducing the need for custom integration code while enhancing the system's ability to maintain meaningful context as search queries evolve.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP in Various Web Search Implementations</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These examples follow the current MCP specification which focuses on a JSON-RPC based protocol with distinct transport mechanisms.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The code demonstrates how you can implement custom search integrations while maintaining full compatibility with the MCP protocol.</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><details></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><summary>Python Implementation with Generic Search API</summary></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+import json
+
+import aiohttp
+
+from typing import Dict, Any, Optional, List
+
+from contextlib import asynccontextmanager
+
+from collections.abc import AsyncIterator
+
+
+
+# Import standard MCP libraries
+
+from mcp.client.session import ClientSession
+
+from mcp.client.streamable_http import streamablehttp_client
+
+from mcp.types import TextContent, CreateMessageRequestParams, CreateMessageResult
+
+from mcp.server.fastmcp import FastMCP
+
+
+
+# Create a FastMCP server for web search
+
+search_server = FastMCP(&quot;WebSearch&quot;)
+
+
+
+# Class to handle web search operations
+
+class WebSearchHandler:
+
+    def __init__(self, api_endpoint: str, api_key: str):
+
+        self.api_endpoint = api_endpoint
+
+        self.api_key = api_key
+
+        self.session = None
+
+        
+
+    async def initialize(self):
+
+        &quot;&quot;&quot;Initialize the HTTP session&quot;&quot;&quot;
+
+        self.session = aiohttp.ClientSession(
+
+            headers={&quot;Authorization&quot;: f&quot;Bearer {self.api_key}&quot;}
+
+        )
+
+    
+
+    async def close(self):
+
+        &quot;&quot;&quot;Close the HTTP session&quot;&quot;&quot;
+
+        if self.session:
+
+            await self.session.close()
+
+            
+
+    async def perform_search(self, query: str, max_results: int = 5, 
+
+                           include_domains: List[str] = None, 
+
+                           exclude_domains: List[str] = None,
+
+                           time_period: str = &quot;any&quot;) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Perform web search using the search API&quot;&quot;&quot;
+
+        # Construct search parameters
+
+        search_params = {
+
+            &quot;q&quot;: query,
+
+            &quot;limit&quot;: max_results,
+
+            &quot;time&quot;: time_period
+
+        }
+
+        
+
+        if include_domains:
+
+            search_params[&quot;site&quot;] = &quot;,&quot;.join(include_domains)
+
+            
+
+        if exclude_domains:
+
+            search_params[&quot;exclude_site&quot;] = &quot;,&quot;.join(exclude_domains)
+
+        
+
+        # Perform the search request
+
+        try:
+
+            async with self.session.get(
+
+                self.api_endpoint,
+
+                params=search_params
+
+            ) as response:
+
+                if response.status != 200:
+
+                    error_text = await response.text()
+
+                    raise Exception(f&quot;Search API error: {response.status} - {error_text}&quot;)
+
+                
+
+                search_data = await response.json()
+
+                
+
+                # Transform API-specific response to a standard format
+
+                results = []
+
+                for item in search_data.get(&quot;results&quot;, []):
+
+                    results.append({
+
+                        &quot;title&quot;: item.get(&quot;title&quot;, &quot;&quot;),
+
+                        &quot;url&quot;: item.get(&quot;url&quot;, &quot;&quot;),
+
+                        &quot;snippet&quot;: item.get(&quot;snippet&quot;, &quot;&quot;),
+
+                        &quot;date&quot;: item.get(&quot;published_date&quot;, &quot;&quot;),
+
+                        &quot;source&quot;: item.get(&quot;source&quot;, &quot;&quot;)
+
+                    })
+
+                
+
+                return {
+
+                    &quot;query&quot;: query,
+
+                    &quot;totalResults&quot;: len(results),
+
+                    &quot;results&quot;: results
+
+                }
+
+        except Exception as e:
+
+            print(f&quot;Search API request error: {e}&quot;)
+
+            raise
+
+
+
+# Initialize the search handler
+
+search_handler = WebSearchHandler(
+
+    api_endpoint=&quot;https://api.search-service.example/search&quot;,
+
+    api_key=&quot;your-api-key-here&quot;
+
+)
+
+
+
+# Setup lifespan to manage the search handler
+
+@asyncio.asynccontextmanager
+
+async def app_lifespan(server: FastMCP):
+
+    &quot;&quot;&quot;Manage application lifecycle&quot;&quot;&quot;
+
+    await search_handler.initialize()
+
+    try:
+
+        yield {&quot;search_handler&quot;: search_handler}
+
+    finally:
+
+        await search_handler.close()
+
+
+
+# Set lifespan for the server
+
+search_server = FastMCP(&quot;WebSearch&quot;, lifespan=app_lifespan)
+
+
+
+# Register a web search tool
+
+@search_server.tool()
+
+async def web_search(query: str, max_results: int = 5, 
+
+                   include_domains: List[str] = None,
+
+                   exclude_domains: List[str] = None,
+
+                   time_period: str = &quot;any&quot;) -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;
+
+    Search the web for information
+
+    
+
+    Args:
+
+        query: The search query
+
+        max_results: Maximum number of results to return (default: 5)
+
+        include_domains: List of domains to include in search results
+
+        exclude_domains: List of domains to exclude from search results
+
+        time_period: Time period for results (&quot;day&quot;, &quot;week&quot;, &quot;month&quot;, &quot;any&quot;)
+
+        
+
+    Returns:
+
+        Dictionary containing search results
+
+    &quot;&quot;&quot;
+
+    ctx = search_server.get_context()
+
+    search_handler = ctx.request_context.lifespan_context[&quot;search_handler&quot;]
+
+    
+
+    results = await search_handler.perform_search(
+
+        query=query,
+
+        max_results=max_results,
+
+        include_domains=include_domains,
+
+        exclude_domains=exclude_domains,
+
+        time_period=time_period
+
+    )
+
+    
+
+    return results
+
+
+
+# Example client usage
+
+async def client_example():
+
+    # Connect to the search server using Streamable HTTP transport
+
+    async with streamablehttp_client(&quot;http://localhost:8000/mcp&quot;) as (read, write, _):
+
+        async with ClientSession(read, write) as session:
+
+            # Initialize the connection
+
+            await session.initialize()
+
+            
+
+            # Call the web_search tool
+
+            search_results = await session.call_tool(
+
+                &quot;web_search&quot;, 
+
+                {
+
+                    &quot;query&quot;: &quot;latest developments in AI and Model Context Protocol&quot;,
+
+                    &quot;max_results&quot;: 5,
+
+                    &quot;time_period&quot;: &quot;day&quot;,
+
+                    &quot;include_domains&quot;: [&quot;github.com&quot;, &quot;microsoft.com&quot;]
+
+                }
+
+            )
+
+            
+
+            print(f&quot;Search results: {search_results}&quot;)
+
+
+
+# Server execution example
+
+if __name__ == &quot;__main__&quot;:
+
+    # Run the server with Streamable HTTP transport
+
+    search_server.run(transport=&quot;streamable-http&quot;)
+
+</code></pre>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"></details> </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><details></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><summary>JavaScript Implementation with Browser-Based Search</summary></p>
+
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// MCP server implementation for web search
+
+import { McpServer, ResourceTemplate } from &#x27;@modelcontextprotocol/sdk/server/mcp.js&#x27;;
+
+import { StreamableHTTPServerTransport } from &#x27;@modelcontextprotocol/sdk/server/streamableHttp.js&#x27;;
+
+import { z } from &#x27;zod&#x27;;
+
+
+
+// Create an MCP server for web search
+
+const searchServer = new McpServer({
+
+    name: &quot;BrowserSearch&quot;,
+
+    description: &quot;A server that provides web search capabilities&quot;
+
+});
+
+
+
+// Search service class
+
+class SearchService {
+
+    constructor(searchApiUrl, apiKey) {
+
+        this.searchApiUrl = searchApiUrl;
+
+        this.apiKey = apiKey;
+
+    }
+
+
+
+    async performSearch(parameters) {
+
+        const {
+
+            query = &#x27;&#x27;,
+
+            maxResults = 5,
+
+            includeDomains = [],
+
+            excludeDomains = [],
+
+            timePeriod = &#x27;any&#x27;
+
+        } = parameters;
+
+        
+
+        // Construct search URL with parameters
+
+        const url = new URL(this.searchApiUrl);
+
+        url.searchParams.append(&#x27;q&#x27;, query);
+
+        url.searchParams.append(&#x27;limit&#x27;, maxResults);
+
+        url.searchParams.append(&#x27;time&#x27;, timePeriod);
+
+        
+
+        if (includeDomains.length &gt; 0) {
+
+            url.searchParams.append(&#x27;site&#x27;, includeDomains.join(&#x27;,&#x27;));
+
+        }
+
+        
+
+        if (excludeDomains.length &gt; 0) {
+
+            url.searchParams.append(&#x27;exclude_site&#x27;, excludeDomains.join(&#x27;,&#x27;));
+
+        }
+
+        
+
+        try {
+
+            const response = await fetch(url.toString(), {
+
+                method: &#x27;GET&#x27;,
+
+                headers: {
+
+                    &#x27;Authorization&#x27;: `Bearer ${this.apiKey}`,
+
+                    &#x27;Content-Type&#x27;: &#x27;application/json&#x27;
+
+                }
+
+            });
+
+            
+
+            if (!response.ok) {
+
+                const errorText = await response.text();
+
+                throw new Error(`Search API error: ${response.status} - ${errorText}`);
+
+            }
+
+            
+
+            const searchData = await response.json();
+
+            
+
+            // Transform API-specific response to a standard format
+
+            const results = searchData.results?.map(item =&gt; ({
+
+                title: item.title || &#x27;&#x27;,
+
+                url: item.url || &#x27;&#x27;,
+
+                snippet: item.snippet || &#x27;&#x27;,
+
+                date: item.published_date || &#x27;&#x27;,
+
+                source: item.source || &#x27;&#x27;
+
+            })) || [];
+
+            
+
+            return {
+
+                query,
+
+                totalResults: results.length,
+
+                results
+
+            };
+
+        } catch (error) {
+
+            console.error(&#x27;Search API request error:&#x27;, error);
+
+            throw error;
+
+        }
+
+    }
+
+}
+
+
+
+// Initialize the search service
+
+const searchService = new SearchService(
+
+    &#x27;https://api.search-service.example/search&#x27;,
+
+    &#x27;your-api-key-here&#x27;
+
+);
+
+
+
+// Setup the context provider for the server
+
+searchServer.setContextProvider(() =&gt; {
+
+    return {
+
+        searchService
+
+    };
+
+});
+
+
+
+// Register web search tool
+
+searchServer.tool({
+
+    name: &#x27;web_search&#x27;,
+
+    description: &#x27;Search the web for information&#x27;,
+
+    parameters: {
+
+        type: &#x27;object&#x27;,
+
+        properties: {
+
+            query: {
+
+                type: &#x27;string&#x27;,
+
+                description: &#x27;The search query&#x27;
+
+            },
+
+            maxResults: {
+
+                type: &#x27;integer&#x27;,
+
+                description: &#x27;Maximum number of results to return&#x27;,
+
+                default: 5
+
+            },
+
+            includeDomains: {
+
+                type: &#x27;array&#x27;,
+
+                items: { type: &#x27;string&#x27; },
+
+                description: &#x27;List of domains to include in search results&#x27;
+
+            },
+
+            excludeDomains: {
+
+                type: &#x27;array&#x27;,
+
+                items: { type: &#x27;string&#x27; },
+
+                description: &#x27;List of domains to exclude from search results&#x27;
+
+            },
+
+            timePeriod: {
+
+                type: &#x27;string&#x27;,
+
+                description: &#x27;Time period for results&#x27;,
+
+                enum: [&#x27;day&#x27;, &#x27;week&#x27;, &#x27;month&#x27;, &#x27;any&#x27;],
+
+                default: &#x27;any&#x27;
+
+            }
+
+        },
+
+        required: [&#x27;query&#x27;]
+
+    },
+
+    handler: async (params, context) =&gt; {
+
+        const { searchService } = context;
+
+        return await searchService.performSearch(params);
+
+    }
+
+});
+
+
+
+// Example client code to connect to the search server
+
+import { Client } from &#x27;@modelcontextprotocol/sdk/client/index.js&#x27;;
+
+import { StreamableHTTPClientTransport } from &#x27;@modelcontextprotocol/sdk/client/streamableHttp.js&#x27;;
+
+
+
+async function connectToSearchServer() {
+
+    // Connect to the search server
+
+    const transport = new StreamableHTTPClientTransport(
+
+        new URL(&#x27;http://localhost:8000/mcp&#x27;)
+
+    );
+
+    
+
+    const client = new Client({
+
+        name: &#x27;search-client&#x27;,
+
+        version: &#x27;1.0.0&#x27;
+
+    });
+
+    
+
+    await client.connect(transport);
+
+    
+
+    // Execute the search tool
+
+    const searchResults = await client.callTool({
+
+        name: &#x27;web_search&#x27;,
+
+        arguments: {
+
+            query: &#x27;Model Context Protocol implementation examples&#x27;,
+
+            maxResults: 10,
+
+            timePeriod: &#x27;week&#x27;,
+
+            includeDomains: [&#x27;github.com&#x27;, &#x27;docs.microsoft.com&#x27;]
+
+        }
+
+    });
+
+    
+
+    console.log(&#x27;Search results:&#x27;, searchResults);
+
+    
+
+    // Cleanup
+
+    await client.disconnect();
+
+}
+
+
+
+// Start the server
+
+const transport = new StreamableHTTPServerTransport();
+
+await searchServer.connect(transport);
+
+console.log(&#x27;Search server running at http://localhost:8000/mcp&#x27;);
+
+
+
+// In a separate process or after server is started
+
+// connectToSearchServer().catch(console.error);
+
+</code></pre>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"></details> </p>
+
+
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Code Examples Disclaimer</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>Important Note</strong>: The code examples below demonstrate the integration of the Model Context Protocol (MCP) with web search functionality.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">While they follow the patterns and structures of the official MCP SDKs, they have been simplified for educational purposes.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> These examples showcase:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 1. <strong>Python Implementation</strong>: A FastMCP server implementation that provides a web search tool and connects to an external search API.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This example demonstrates proper lifespan management, context handling, and tool implementation following the patterns of the <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">official MCP Python SDK</a>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The server utilizes the recommended Streamable HTTP transport which has superseded the older SSE transport for production deployments.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 2. <strong>JavaScript Implementation</strong>: A TypeScript/JavaScript implementation using the FastMCP pattern from the <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">official MCP TypeScript SDK</a> to create a search server with proper tool definitions and client connections.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It follows the latest recommended patterns for session management and context preservation.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> These examples would require additional error handling, authentication, and specific API integration code for production use.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The search API endpoints shown (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">https://api.search-service.example/search</code>) are placeholders and would need to be replaced with actual search service endpoints.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> For complete implementation details and the most up-to-date approaches, please refer to the <a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">official MCP specification</a> and SDK documentation.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Core Concepts</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">The Model Context Protocol (MCP) Framework</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">At its foundation, the Model Context Protocol provides a standardized way for AI models, applications, and services to exchange context.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In real-time web search, this framework is essential for creating coherent, multi-turn search experiences.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Key components include:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Client-Server Architecture</strong>: MCP establishes a clear separation between search clients (requesters) and search servers (providers), allowing for flexible deployment models.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>JSON-RPC Communication</strong>: The protocol uses JSON-RPC for message exchange, making it compatible with web technologies and easy to implement across different platforms.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Context Management</strong>: MCP defines structured methods for maintaining, updating, and leveraging search context across multiple interactions.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Tool Definitions</strong>: Search capabilities are exposed as standardized tools with well-defined parameters and return values.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Streaming Support</strong>: The protocol supports streaming results, essential for real-time search where results may arrive progressively.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Web Search Integration Patterns</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When integrating MCP with web search, several patterns emerge:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. Direct Search Provider Integration</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    Client[MCP Client] --&gt; |MCP Request| Server[MCP Server]
+
+    Server --&gt; |API Call| SearchAPI[Search API]
+
+    SearchAPI --&gt; |Results| Server
+
+    Server --&gt; |MCP Response| Client
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this pattern, the MCP server directly interfaces with one or more search APIs, translating MCP requests into API-specific calls and formatting the results as MCP responses.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. Federated Search with Context Preservation</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    Client[MCP Client] --&gt; |MCP Request| Federation[MCP Federation Layer]
+
+    Federation --&gt; |MCP Request 1| Search1[Search Provider 1]
+
+    Federation --&gt; |MCP Request 2| Search2[Search Provider 2]
+
+    Federation --&gt; |MCP Request 3| Search3[Search Provider 3]
+
+    Search1 --&gt; |MCP Response 1| Federation
+
+    Search2 --&gt; |MCP Response 2| Federation
+
+    Search3 --&gt; |MCP Response 3| Federation
+
+    Federation --&gt; |Aggregated MCP Response| Client
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This pattern distributes search queries across multiple MCP-compatible search providers, each potentially specializing in different types of content or search capabilities, while maintaining a unified context.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. Context-Enhanced Search Chain</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    Client[MCP Client] --&gt; |Query + Context| Server[MCP Server]
+
+    Server --&gt; |1. Query Analysis| NLP[NLP Service]
+
+    NLP --&gt; |Enhanced Query| Server
+
+    Server --&gt; |2. Search Execution| Search[Search Engine]
+
+    Search --&gt; |Raw Results| Server
+
+    Server --&gt; |3. Result Processing| Enhancement[Result Enhancement]
+
+    Enhancement --&gt; |Enhanced Results| Server
+
+    Server --&gt; |Final Results + Updated Context| Client
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this pattern, the search process is divided into multiple stages, with context being enriched at each step, resulting in progressively more relevant results.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Search Context Components</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In MCP-based web search, context typically includes:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Query History</strong>: Previous search queries in the session</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>User Preferences</strong>: Language, region, safe search settings</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Interaction History</strong>: Which results were clicked, time spent on results</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Search Parameters</strong>: Filters, sort orders, and other search modifiers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Domain Knowledge</strong>: Subject-specific context relevant to the search</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Temporal Context</strong>: Time-based relevance factors</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Source Preferences</strong>: Trusted or preferred information sources</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Use Cases and Applications</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Research and Information Gathering</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP enhances research workflows by:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Preserving research context across search sessions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enabling more sophisticated and contextually relevant queries</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Supporting multi-source search federation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Facilitating knowledge extraction from search results</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Real-Time News and Trend Monitoring</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP-powered search offers advantages for news monitoring:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Near-real-time discovery of emerging news stories</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Contextual filtering of relevant information</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Topic and entity tracking across multiple sources</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Personalized news alerts based on user context</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">AI-Augmented Browsing and Research</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP creates new possibilities for AI-augmented browsing:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Contextual search suggestions based on current browser activity</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Seamless integration of web search with LLM-powered assistants</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Multi-turn search refinement with maintained context</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enhanced fact-checking and information verification</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Future Trends and Innovations</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Evolution of MCP in Web Search</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Looking ahead, we anticipate MCP evolving to address:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Multimodal Search</strong>: Integrating text, image, audio, and video search with preserved context</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Decentralized Search</strong>: Supporting distributed and federated search ecosystems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Search Privacy</strong>: Context-aware privacy-preserving search mechanisms</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Query Understanding</strong>: Deep semantic parsing of natural language search queries</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Potential Advancements in Technology</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Emerging technologies that will shape the future of MCP search:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Neural Search Architectures</strong>: Embedding-based search systems optimized for MCP</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Personalized Search Context</strong>: Learning individual user search patterns over time</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Knowledge Graph Integration</strong>: Contextual search enhanced by domain-specific knowledge graphs</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Cross-Modal Context</strong>: Maintaining context across different search modalities</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Hands-On Exercises</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 1: Setting Up a Basic MCP Search Pipeline</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this exercise, you'll learn how to:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure a basic MCP search environment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement context handlers for web search</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test and validate context preservation across search iterations</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 2: Building a Research Assistant with MCP Search</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Create a complete application that:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Processes natural language research questions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Performs context-aware web searches</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Synthesizes information from multiple sources</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Presents organized research findings</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 3: Implementing Multi-Source Search Federation with MCP</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Advanced exercise covering:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Context-aware query dispatching to multiple search engines</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Result ranking and aggregation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Contextual deduplication of search results</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handling source-specific metadata</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">Model Context Protocol Specification</a> - Official MCP specification and detailed protocol documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">Model Context Protocol Documentation</a> - Detailed tutorials and implementation guides</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">MCP Python SDK</a> - Official Python implementation of the MCP protocol</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">MCP TypeScript SDK</a> - Official TypeScript implementation of the MCP protocol</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP Reference Servers</a> - Reference implementations of MCP servers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/overview">Bing Web Search API Documentation</a> - Microsoft's web search API</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://developers.google.com/custom-search/v1/overview">Google Custom Search JSON API</a> - Google's programmable search engine</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://serpapi.com/search-api">SerpAPI Documentation</a> - Search engine results page API</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.meilisearch.com/docs">Meilisearch Documentation</a> - Open-source search engine</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.elastic.co/guide/index.html">Elasticsearch Documentation</a> - Distributed search and analytics engine</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://python.langchain.com/docs/get_started/introduction">LangChain Documentation</a> - Building applications with LLMs</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Outcomes</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By completing this module, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the fundamentals of real-time web search and its challenges</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explain how the Model Context Protocol (MCP) enhances real-time web search capabilities</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement MCP-based search solutions using popular frameworks and APIs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Design and deploy scalable, high-performance search architectures with MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply MCP concepts to various use cases including semantic search, research assistance, and AI-augmented browsing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Evaluate emerging trends and future innovations in MCP-based search technologies</li>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Trust and Safety Considerations</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When implementing MCP-based web search solutions, remember these important principles from the MCP specification:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>User Consent and Control</strong>: Users must explicitly consent to and understand all data access and operations. This is particularly important for web search implementations that may access external data sources.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Data Privacy</strong>: Ensure appropriate handling of search queries and results, especially when they might contain sensitive information. Implement appropriate access controls to protect user data.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Tool Safety</strong>: Implement proper authorization and validation for search tools, as they represent potential security risks through arbitrary code execution.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Descriptions of tool behavior should be considered untrusted unless obtained from a trusted server.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Clear Documentation</strong>: Provide clear documentation about the capabilities, limitations, and security considerations of your MCP-based search implementation, following the implementation guidelines from the MCP specification.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Robust Consent Flows</strong>: Build robust consent and authorization flows that clearly explain what each tool does before authorizing its use, especially for tools that interact with external web resources.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For complete details on MCP security and trust considerations, refer to the <a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/specification/2025-03-26#security-and-trust-%26-safety">official documentation</a>.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next </h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-security-entra/README.md" target="_blank">5.12 Entra ID Authentication for Model Context Protocol Servers</a></li></div>
+<div id="content-ko" class="lang-content"><h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">코드 예제 면책 조항</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>중요 참고</strong>: 아래 코드 예제는 Model Context Protocol(MCP)과 웹 검색 기능의 통합을 보여줍니다. 공식 MCP SDK의 패턴과 구조를 따르지만 교육 목적으로 단순화되어 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 이 예제들은 다음을 보여줍니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 1. <strong>파이썬 구현</strong>: FastMCP 서버 구현으로, 웹 검색 도구를 제공하고 외부 검색 API에 연결합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 예제는 <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">공식 MCP Python SDK</a>의 패턴을 따라 적절한 수명 주기 관리, 컨텍스트 처리, 도구 구현을 시연합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버는 프로덕션 배포에서 이전 SSE 전송 방식을 대체한 권장 Streamable HTTP 전송을 사용합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 2. <strong>자바스크립트 구현</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">공식 MCP TypeScript SDK</a>의 FastMCP 패턴을 활용한 TypeScript/JavaScript 구현으로, 적절한 도구 정의와 클라이언트 연결을 갖춘 검색 서버를 만듭니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">최신 권장 세션 관리 및 컨텍스트 보존 패턴을 따릅니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 이 예제들은 프로덕션 환경에서는 추가적인 오류 처리, 인증, 특정 API 통합 코드가 필요합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예시로 사용된 검색 API 엔드포인트(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">https://api.search-service.example/search</code>)는 자리 표시자이며 실제 검색 서비스 엔드포인트로 교체해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 완전한 구현 세부사항과 최신 접근법은 <a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">공식 MCP 명세</a>와 SDK 문서를 참고하시기 바랍니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">핵심 개념</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Model Context Protocol (MCP) 프레임워크</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 AI 모델, 애플리케이션, 서비스 간에 컨텍스트를 교환하기 위한 표준화된 방식을 제공합니다. 실시간 웹 검색에서는 일관된 다중 턴 검색 경험을 만드는 데 필수적입니다. 주요 구성 요소는 다음과 같습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>클라이언트-서버 아키텍처</strong>: MCP는 검색 클라이언트(요청자)와 검색 서버(제공자)를 명확히 분리하여 유연한 배포 모델을 지원합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>JSON-RPC 통신</strong>: 프로토콜은 JSON-RPC를 사용해 메시지를 교환하며, 웹 기술과 호환되고 다양한 플랫폼에서 쉽게 구현할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>컨텍스트 관리</strong>: MCP는 여러 상호작용에 걸쳐 검색 컨텍스트를 유지, 업데이트, 활용하는 구조화된 방법을 정의합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>도구 정의</strong>: 검색 기능을 명확한 매개변수와 반환값을 가진 표준화된 도구로 노출합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>스트리밍 지원</strong>: 결과가 점진적으로 도착하는 실시간 검색에 필수적인 스트리밍 결과를 지원합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">웹 검색 통합 패턴</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP를 웹 검색에 통합할 때 다음과 같은 패턴이 나타납니다:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. 직접 검색 제공자 통합</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    Client[MCP Client] --&gt; |MCP Request| Server[MCP Server]
+
+    Server --&gt; |API Call| SearchAPI[Search API]
+
+    SearchAPI --&gt; |Results| Server
+
+    Server --&gt; |MCP Response| Client
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 패턴에서는 MCP 서버가 하나 이상의 검색 API와 직접 인터페이스하며, MCP 요청을 API별 호출로 변환하고 결과를 MCP 응답 형식으로 포맷합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. 컨텍스트 보존을 통한 연합 검색</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    Client[MCP Client] --&gt; |MCP Request| Federation[MCP Federation Layer]
+
+    Federation --&gt; |MCP Request 1| Search1[Search Provider 1]
+
+    Federation --&gt; |MCP Request 2| Search2[Search Provider 2]
+
+    Federation --&gt; |MCP Request 3| Search3[Search Provider 3]
+
+    Search1 --&gt; |MCP Response 1| Federation
+
+    Search2 --&gt; |MCP Response 2| Federation
+
+    Search3 --&gt; |MCP Response 3| Federation
+
+    Federation --&gt; |Aggregated MCP Response| Client
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 패턴은 여러 MCP 호환 검색 제공자에 검색 쿼리를 분산시키며, 각 제공자는 서로 다른 콘텐츠 유형이나 검색 기능에 특화될 수 있고, 통합된 컨텍스트를 유지합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. 컨텍스트 강화 검색 체인</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    Client[MCP Client] --&gt; |Query + Context| Server[MCP Server]
+
+    Server --&gt; |1. Query Analysis| NLP[NLP Service]
+
+    NLP --&gt; |Enhanced Query| Server
+
+    Server --&gt; |2. Search Execution| Search[Search Engine]
+
+    Search --&gt; |Raw Results| Server
+
+    Server --&gt; |3. Result Processing| Enhancement[Result Enhancement]
+
+    Enhancement --&gt; |Enhanced Results| Server
+
+    Server --&gt; |Final Results + Updated Context| Client
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 패턴은 검색 프로세스를 여러 단계로 나누고 각 단계에서 컨텍스트를 풍부하게 하여 점진적으로 더 관련성 높은 결과를 도출합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">검색 컨텍스트 구성 요소</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 기반 웹 검색에서 컨텍스트는 일반적으로 다음을 포함합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>쿼리 기록</strong>: 세션 내 이전 검색 쿼리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>사용자 선호도</strong>: 언어, 지역, 안전 검색 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상호작용 기록</strong>: 클릭한 결과, 결과에 머문 시간</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>검색 매개변수</strong>: 필터, 정렬 순서 등 검색 수정자</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>도메인 지식</strong>: 검색과 관련된 주제별 컨텍스트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>시간적 컨텍스트</strong>: 시간 기반 관련성 요소</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>출처 선호도</strong>: 신뢰하거나 선호하는 정보 출처</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">사용 사례 및 응용</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연구 및 정보 수집</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 연구 워크플로우를 다음과 같이 향상시킵니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">검색 세션 전반에 걸친 연구 컨텍스트 보존</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">더 정교하고 컨텍스트에 맞는 쿼리 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다중 출처 검색 연합 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">검색 결과에서 지식 추출 촉진</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">실시간 뉴스 및 트렌드 모니터링</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 기반 검색은 뉴스 모니터링에 다음과 같은 이점을 제공합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">거의 실시간으로 떠오르는 뉴스 발견</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">관련 정보의 컨텍스트 필터링</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">여러 출처에 걸친 주제 및 엔터티 추적</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자 컨텍스트 기반 개인화된 뉴스 알림</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">AI 보조 브라우징 및 연구</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 AI 보조 브라우징에 새로운 가능성을 만듭니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">현재 브라우저 활동에 기반한 컨텍스트 검색 제안</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LLM 기반 어시스턴트와 웹 검색의 원활한 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">유지되는 컨텍스트로 다중 턴 검색 정제</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">향상된 사실 확인 및 정보 검증</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">미래 동향 및 혁신</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">웹 검색에서 MCP의 진화</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">앞으로 MCP는 다음을 다룰 것으로 기대됩니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>멀티모달 검색</strong>: 텍스트, 이미지, 오디오, 비디오 검색을 컨텍스트 보존과 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>분산 검색</strong>: 분산형 및 연합 검색 생태계 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>검색 프라이버시</strong>: 상황 인식 기반의 개인정보 보호 검색 메커니즘  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>쿼리 이해</strong>: 자연어 검색 쿼리의 심층 의미 분석  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">기술의 잠재적 발전 방향</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">미래의 MCP 검색을 형성할 신기술들:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>신경망 검색 아키텍처</strong>: MCP에 최적화된 임베딩 기반 검색 시스템  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>개인화된 검색 컨텍스트</strong>: 개별 사용자의 검색 패턴을 시간에 따라 학습  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>지식 그래프 통합</strong>: 도메인별 지식 그래프를 활용한 맥락 기반 검색 강화  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>교차 모달 컨텍스트</strong>: 다양한 검색 모달리티 간 컨텍스트 유지  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">실습 과제</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 1: 기본 MCP 검색 파이프라인 설정하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 과제에서는 다음을 배우게 됩니다:  </p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">기본 MCP 검색 환경 구성  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">웹 검색을 위한 컨텍스트 핸들러 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">검색 반복 과정에서 컨텍스트 보존 테스트 및 검증  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 2: MCP 검색을 활용한 연구 보조 도구 만들기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 기능을 갖춘 완전한 애플리케이션을 만드세요:  </p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자연어 연구 질문 처리  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">상황 인식 기반 웹 검색 수행  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">여러 출처의 정보 종합  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">체계적으로 정리된 연구 결과 제공  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 3: MCP를 이용한 다중 출처 검색 연합 구현</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">고급 과제로 다음 내용을 다룹니다:  </p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">여러 검색 엔진에 상황 인식 쿼리 분배  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">결과 순위 매기기 및 통합  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">검색 결과의 맥락 중복 제거  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">출처별 메타데이터 처리  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">Model Context Protocol Specification</a> - 공식 MCP 사양 및 상세 프로토콜 문서  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">Model Context Protocol Documentation</a> - 상세 튜토리얼 및 구현 가이드  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">MCP Python SDK</a> - MCP 프로토콜 공식 Python 구현체  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">MCP TypeScript SDK</a> - MCP 프로토콜 공식 TypeScript 구현체  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP Reference Servers</a> - MCP 서버 참조 구현체  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/overview">Bing Web Search API Documentation</a> - 마이크로소프트 웹 검색 API  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://developers.google.com/custom-search/v1/overview">Google Custom Search JSON API</a> - 구글 맞춤 검색 엔진  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://serpapi.com/search-api">SerpAPI Documentation</a> - 검색 엔진 결과 페이지 API  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.meilisearch.com/docs">Meilisearch Documentation</a> - 오픈소스 검색 엔진  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.elastic.co/guide/index.html">Elasticsearch Documentation</a> - 분산 검색 및 분석 엔진  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://python.langchain.com/docs/get_started/introduction">LangChain Documentation</a> - LLM 기반 애플리케이션 구축  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 성과</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈을 완료하면 다음을 할 수 있습니다:  </p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 웹 검색의 기본 개념과 도전 과제 이해  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Model Context Protocol(MCP)이 실시간 웹 검색 기능을 어떻게 향상시키는지 설명  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">인기 있는 프레임워크와 API를 사용해 MCP 기반 검색 솔루션 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP를 활용한 확장 가능하고 고성능 검색 아키텍처 설계 및 배포  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">의미 기반 검색, 연구 보조, AI 보조 브라우징 등 다양한 사용 사례에 MCP 개념 적용  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 기반 검색 기술의 최신 동향과 미래 혁신 평가  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">신뢰 및 안전 고려사항</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 기반 웹 검색 솔루션을 구현할 때 MCP 사양에서 제시하는 다음 중요한 원칙을 기억하세요:  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>사용자 동의 및 통제</strong>: 사용자는 모든 데이터 접근 및 작업에 대해 명확히 동의하고 이해해야 합니다. 특히 외부 데이터 소스에 접근하는 웹 검색 구현에서 중요합니다.  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>데이터 프라이버시</strong>: 민감한 정보가 포함될 수 있는 검색 쿼리와 결과를 적절히 처리하고, 사용자 데이터를 보호하기 위한 접근 제어를 구현해야 합니다.  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>도구 안전성</strong>: 검색 도구는 임의 코드 실행을 통해 보안 위험이 될 수 있으므로 적절한 권한 부여와 검증을 수행해야 합니다. 도구 동작 설명은 신뢰할 수 있는 서버에서 제공된 경우가 아니면 신뢰하지 않아야 합니다.  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>명확한 문서화</strong>: MCP 사양의 구현 지침에 따라 MCP 기반 검색 구현의 기능, 한계, 보안 고려사항에 대해 명확한 문서를 제공해야 합니다.  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>견고한 동의 절차</strong>: 외부 웹 리소스와 상호작용하는 도구 사용 전, 각 도구가 수행하는 작업을 명확히 설명하는 견고한 동의 및 권한 부여 절차를 구축해야 합니다.  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 보안 및 신뢰 관련 자세한 내용은 <a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/specification/2025-03-26#security-and-trust-%26-safety">공식 문서</a>를 참고하세요.  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-security-entra/README.md" target="_blank">5.12 Entra ID Authentication for Model Context Protocol Servers</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m05_09-510-realtime-streaming.html">&larr; 5.10 Realtime Streaming</a></span>
+  <span><a href="m05_11-512--entra-id-authentication-for-model-c.html">5.12  Entra ID Authentication for Model Context Protocol Servers &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

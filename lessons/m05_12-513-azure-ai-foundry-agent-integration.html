@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.13 Azure AI Foundry Agent Integration - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.13 Azure AI Foundry Agent Integration</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Model Context Protocol (MCP) Integration with Azure AI Foundry</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This guide demonstrates how to integrate Model Context Protocol (MCP) servers with Azure AI Foundry agents, enabling powerful tool orchestration and enterprise AI capabilities.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol (MCP) is an open standard that enables AI applications to securely connect to external data sources and tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When integrated with Azure AI Foundry, MCP allows agents to access and interact with various external services, APIs, and data sources in a standardized way.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This integration combines the flexibility of MCP's tool ecosystem with Azure AI Foundry's robust agent framework, providing enterprise-grade AI solutions with extensive customization capabilities.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Note:</strong> If you want to use MCP in Azure AI Foundry Agent Service, currently only the following regions are supported: westus, westus2, uaenorth, southindia and switzerlandnorth</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this guide, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the Model Context Protocol and its benefits</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set up MCP servers for use with Azure AI Foundry agents</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create and configure agents with MCP tool integration</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement practical examples using real MCP servers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handle tool responses and citations in agent conversations</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Prerequisites</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before starting, ensure you have:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">An Azure subscription with AI Foundry access</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Python 3.10+ or .NET 8.0+</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Azure CLI installed and configured</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Appropriate permissions to create AI resources</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What is Model Context Protocol (MCP)?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol is a standardized way for AI applications to connect to external data sources and tools. Key benefits include:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Standardized Integration</strong>: Consistent interface across different tools and services</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Security</strong>: Secure authentication and authorization mechanisms</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Flexibility</strong>: Support for various data sources, APIs, and custom tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Extensibility</strong>: Easy to add new capabilities and integrations</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Setting Up MCP with Azure AI Foundry</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Environment Configuration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Choose your preferred development environment:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="#python-implementation">Python Implementation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="#net-implementation">.NET Implementation</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Python Implementation</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*<strong>Note</strong>* You can run this <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration/mcp_support_python.ipynb" target="_blank">notebook</a></p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Install Required Packages</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+pip install azure-ai-projects -U
+
+pip install azure-ai-agents==1.1.0b4 -U
+
+pip install azure-identity -U
+
+pip install mcp==1.11.0 -U
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Import Dependencies</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import os, time
+
+from azure.ai.projects import AIProjectClient
+
+from azure.identity import DefaultAzureCredential
+
+from azure.ai.agents.models import McpTool, RequiredMcpToolCall, SubmitToolApprovalAction, ToolApproval
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Configure MCP Settings</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_server_url = os.environ.get(&quot;MCP_SERVER_URL&quot;, &quot;https://learn.microsoft.com/api/mcp&quot;)
+
+mcp_server_label = os.environ.get(&quot;MCP_SERVER_LABEL&quot;, &quot;mslearn&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. Initialize Project Client</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+project_client = AIProjectClient(
+
+    endpoint=&quot;https://your-project-endpoint.services.ai.azure.com/api/projects/your-project&quot;,
+
+    credential=DefaultAzureCredential(),
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">5. Create MCP Tool</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_tool = McpTool(
+
+    server_label=mcp_server_label,
+
+    server_url=mcp_server_url,
+
+    allowed_tools=[],  # Optional: specify allowed tools
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">6. Complete Python Example</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+with project_client:
+
+    agents_client = project_client.agents
+
+
+
+    # Create a new agent with MCP tools
+
+    agent = agents_client.create_agent(
+
+        model=&quot;Your AOAI Model Deployment&quot;,
+
+        name=&quot;my-mcp-agent&quot;,
+
+        instructions=&quot;You are a helpful agent that can use MCP tools to assist users. Use the available MCP tools to answer questions and perform tasks.&quot;,
+
+        tools=mcp_tool.definitions,
+
+    )
+
+    print(f&quot;Created agent, ID: {agent.id}&quot;)
+
+    print(f&quot;MCP Server: {mcp_tool.server_label} at {mcp_tool.server_url}&quot;)
+
+
+
+    # Create thread for communication
+
+    thread = agents_client.threads.create()
+
+    print(f&quot;Created thread, ID: {thread.id}&quot;)
+
+
+
+    # Create message to thread
+
+    message = agents_client.messages.create(
+
+        thread_id=thread.id,
+
+        role=&quot;user&quot;,
+
+        content=&quot;What&#x27;s difference between Azure OpenAI and OpenAI?&quot;,
+
+    )
+
+    print(f&quot;Created message, ID: {message.id}&quot;)
+
+
+
+    # Handle tool approvals and run agent
+
+    mcp_tool.update_headers(&quot;SuperSecret&quot;, &quot;123456&quot;)
+
+    run = agents_client.runs.create(thread_id=thread.id, agent_id=agent.id, tool_resources=mcp_tool.resources)
+
+    print(f&quot;Created run, ID: {run.id}&quot;)
+
+
+
+    while run.status in [&quot;queued&quot;, &quot;in_progress&quot;, &quot;requires_action&quot;]:
+
+        time.sleep(1)
+
+        run = agents_client.runs.get(thread_id=thread.id, run_id=run.id)
+
+
+
+        if run.status == &quot;requires_action&quot; and isinstance(run.required_action, SubmitToolApprovalAction):
+
+            tool_calls = run.required_action.submit_tool_approval.tool_calls
+
+            if not tool_calls:
+
+                print(&quot;No tool calls provided - cancelling run&quot;)
+
+                agents_client.runs.cancel(thread_id=thread.id, run_id=run.id)
+
+                break
+
+
+
+            tool_approvals = []
+
+            for tool_call in tool_calls:
+
+                if isinstance(tool_call, RequiredMcpToolCall):
+
+                    try:
+
+                        print(f&quot;Approving tool call: {tool_call}&quot;)
+
+                        tool_approvals.append(
+
+                            ToolApproval(
+
+                                tool_call_id=tool_call.id,
+
+                                approve=True,
+
+                                headers=mcp_tool.headers,
+
+                            )
+
+                        )
+
+                    except Exception as e:
+
+                        print(f&quot;Error approving tool_call {tool_call.id}: {e}&quot;)
+
+
+
+            if tool_approvals:
+
+                agents_client.runs.submit_tool_outputs(
+
+                    thread_id=thread.id, run_id=run.id, tool_approvals=tool_approvals
+
+                )
+
+
+
+        print(f&quot;Current run status: {run.status}&quot;)
+
+
+
+    print(f&quot;Run completed with status: {run.status}&quot;)
+
+
+
+    # Display conversation
+
+    messages = agents_client.messages.list(thread_id=thread.id)
+
+    print(&quot;\nConversation:&quot;)
+
+    print(&quot;-&quot; * 50)
+
+    for msg in messages:
+
+        if msg.text_messages:
+
+            last_text = msg.text_messages[-1]
+
+            print(f&quot;{msg.role.upper()}: {last_text.text.value}&quot;)
+
+            print(&quot;-&quot; * 50)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">.NET Implementation</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*<strong>Note</strong>* You can run this <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration/mcp_support_dotnet.ipynb" target="_blank">notebook</a></p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Install Required Packages</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+#r &quot;nuget: Azure.AI.Agents.Persistent, 1.1.0-beta.4&quot;
+
+#r &quot;nuget: Azure.Identity, 1.14.2&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Import Dependencies</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+using Azure.AI.Agents.Persistent;
+
+using Azure.Identity;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Configure Settings</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+var projectEndpoint = &quot;https://your-project-endpoint.services.ai.azure.com/api/projects/your-project&quot;;
+
+var modelDeploymentName = &quot;Your AOAI Model Deployment&quot;;
+
+var mcpServerUrl = &quot;https://learn.microsoft.com/api/mcp&quot;;
+
+var mcpServerLabel = &quot;mslearn&quot;;
+
+PersistentAgentsClient agentClient = new(projectEndpoint, new DefaultAzureCredential());
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. Create MCP Tool Definition</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+MCPToolDefinition mcpTool = new(mcpServerLabel, mcpServerUrl);
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">5. Create Agent with MCP Tools</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+PersistentAgent agent = await agentClient.Administration.CreateAgentAsync(
+
+   model: modelDeploymentName,
+
+   name: &quot;my-learn-agent&quot;,
+
+   instructions: &quot;You are a helpful agent that can use MCP tools to assist users. Use the available MCP tools to answer questions and perform tasks.&quot;,
+
+   tools: [mcpTool]
+
+   );
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">6. Complete .NET Example</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Create thread and message
+
+PersistentAgentThread thread = await agentClient.Threads.CreateThreadAsync();
+
+
+
+PersistentThreadMessage message = await agentClient.Messages.CreateMessageAsync(
+
+    thread.Id,
+
+    MessageRole.User,
+
+    &quot;What&#x27;s difference between Azure OpenAI and OpenAI?&quot;);
+
+
+
+// Configure tool resources with headers
+
+MCPToolResource mcpToolResource = new(mcpServerLabel);
+
+mcpToolResource.UpdateHeader(&quot;SuperSecret&quot;, &quot;123456&quot;);
+
+ToolResources toolResources = mcpToolResource.ToToolResources();
+
+
+
+// Create and handle run
+
+ThreadRun run = await agentClient.Runs.CreateRunAsync(thread, agent, toolResources);
+
+
+
+while (run.Status == RunStatus.Queued || run.Status == RunStatus.InProgress || run.Status == RunStatus.RequiresAction)
+
+{
+
+    await Task.Delay(TimeSpan.FromMilliseconds(1000));
+
+    run = await agentClient.Runs.GetRunAsync(thread.Id, run.Id);
+
+
+
+    if (run.Status == RunStatus.RequiresAction &amp;&amp; run.RequiredAction is SubmitToolApprovalAction toolApprovalAction)
+
+    {
+
+        var toolApprovals = new List&lt;ToolApproval&gt;();
+
+        foreach (var toolCall in toolApprovalAction.SubmitToolApproval.ToolCalls)
+
+        {
+
+            if (toolCall is RequiredMcpToolCall mcpToolCall)
+
+            {
+
+                Console.WriteLine($&quot;Approving MCP tool call: {mcpToolCall.Name}&quot;);
+
+                toolApprovals.Add(new ToolApproval(mcpToolCall.Id, approve: true)
+
+                {
+
+                    Headers = { [&quot;SuperSecret&quot;] = &quot;123456&quot; }
+
+                });
+
+            }
+
+        }
+
+
+
+        if (toolApprovals.Count &gt; 0)
+
+        {
+
+            run = await agentClient.Runs.SubmitToolOutputsToRunAsync(thread.Id, run.Id, toolApprovals: toolApprovals);
+
+        }
+
+    }
+
+}
+
+
+
+// Display messages
+
+using Azure;
+
+
+
+AsyncPageable&lt;PersistentThreadMessage&gt; messages = agentClient.Messages.GetMessagesAsync(
+
+    threadId: thread.Id,
+
+    order: ListSortOrder.Ascending
+
+);
+
+
+
+await foreach (PersistentThreadMessage threadMessage in messages)
+
+{
+
+    Console.Write($&quot;{threadMessage.CreatedAt:yyyy-MM-dd HH:mm:ss} - {threadMessage.Role,10}: &quot;);
+
+    foreach (MessageContent contentItem in threadMessage.ContentItems)
+
+    {
+
+        if (contentItem is MessageTextContent textItem)
+
+        {
+
+            Console.Write(textItem.Text);
+
+        }
+
+        else if (contentItem is MessageImageFileContent imageFileItem)
+
+        {
+
+            Console.Write($&quot;&lt;image from ID: {imageFileItem.FileId}&gt;&quot;);
+
+        }
+
+        Console.WriteLine();
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP Tool Configuration Options</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When configuring MCP tools for your agent, you can specify several important parameters:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_tool = McpTool(
+
+    server_label=&quot;unique_server_name&quot;,      # Identifier for the MCP server
+
+    server_url=&quot;https://api.example.com/mcp&quot;, # MCP server endpoint
+
+    allowed_tools=[],                       # Optional: specify allowed tools
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">.NET Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+MCPToolDefinition mcpTool = new(
+
+    &quot;unique_server_name&quot;,                   // Server label
+
+    &quot;https://api.example.com/mcp&quot;          // MCP server URL
+
+);
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Authentication and Headers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Both implementations support custom headers for authentication:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python</h4>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_tool.update_headers(&quot;SuperSecret&quot;, &quot;123456&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">.NET</h4>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+MCPToolResource mcpToolResource = new(mcpServerLabel);
+
+mcpToolResource.UpdateHeader(&quot;SuperSecret&quot;, &quot;123456&quot;);
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Troubleshooting Common Issues</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Connection Issues</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Verify MCP server URL is accessible</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Check authentication credentials</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensure network connectivity</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Tool Call Failures</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Review tool arguments and formatting</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Check server-specific requirements</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement proper error handling</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Performance Issues</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Optimize tool call frequency</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement caching where appropriate</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Monitor server response times</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Next Steps</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To further enhance your MCP integration:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Explore Custom MCP Servers</strong>: Build your own MCP servers for proprietary data sources</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Implement Advanced Security</strong>: Add OAuth2 or custom authentication mechanisms</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Monitor and Analytics</strong>: Implement logging and monitoring for tool usage</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Scale Your Solution</strong>: Consider load balancing and distributed MCP server architectures</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/">Azure AI Foundry Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/agents/how-to/tools/model-context-protocol-samples">Model Context Protocol Samples</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/agents/">Azure AI Foundry Agents Overview</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">MCP Specification</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Support</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For additional support and questions:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Review the <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/">Azure AI Foundry documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Check the <a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">MCP community resources</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next </h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-contextengineering/README.md" target="_blank">5.14 MCP Context Engineering</a></li></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Model Context Protocol (MCP)와 Azure AI Foundry 통합</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 가이드는 Model Context Protocol (MCP) 서버를 Azure AI Foundry 에이전트와 통합하여 강력한 도구 오케스트레이션과 엔터프라이즈 AI 기능을 구현하는 방법을 보여줍니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">소개</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol (MCP)은 AI 애플리케이션이 외부 데이터 소스와 도구에 안전하게 연결할 수 있도록 하는 오픈 표준입니다. Azure AI Foundry와 통합하면 MCP를 통해 에이전트가 다양한 외부 서비스, API 및 데이터 소스에 표준화된 방식으로 접근하고 상호작용할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 통합은 MCP의 도구 생태계의 유연성과 Azure AI Foundry의 견고한 에이전트 프레임워크를 결합하여 광범위한 맞춤화가 가능한 엔터프라이즈급 AI 솔루션을 제공합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Note:</strong> Azure AI Foundry Agent Service에서 MCP를 사용하려면 현재 다음 지역만 지원됩니다: westus, westus2, uaenorth, southindia, switzerlandnorth</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 가이드를 완료하면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Model Context Protocol과 그 이점 이해하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Azure AI Foundry 에이전트와 함께 사용할 MCP 서버 설정하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 도구 통합으로 에이전트 생성 및 구성하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실제 MCP 서버를 활용한 실용적인 예제 구현하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">에이전트 대화에서 도구 응답과 인용 처리하기</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">사전 준비 사항</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">시작하기 전에 다음을 준비하세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Foundry에 액세스할 수 있는 Azure 구독</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Python 3.10 이상 또는 .NET 8.0 이상</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">설치 및 구성된 Azure CLI</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI 리소스 생성 권한</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Model Context Protocol (MCP)란?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol은 AI 애플리케이션이 외부 데이터 소스와 도구에 연결할 수 있도록 표준화된 방법입니다. 주요 이점은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>표준화된 통합</strong>: 다양한 도구와 서비스에 일관된 인터페이스 제공</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>보안</strong>: 안전한 인증 및 권한 부여 메커니즘</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>유연성</strong>: 다양한 데이터 소스, API, 맞춤형 도구 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>확장성</strong>: 새로운 기능과 통합을 쉽게 추가 가능</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Azure AI Foundry와 MCP 설정하기</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">환경 구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">선호하는 개발 환경을 선택하세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration" target="_blank">Python 구현</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration" target="_blank">.NET 구현</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Python 구현</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*<strong>Note</strong>* 이 <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration/mcp_support_python.ipynb" target="_blank">노트북</a>을 실행할 수 있습니다</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 필요한 패키지 설치</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+pip install azure-ai-projects -U
+
+pip install azure-ai-agents==1.1.0b4 -U
+
+pip install azure-identity -U
+
+pip install mcp==1.11.0 -U
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 의존성 가져오기</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import os, time
+
+from azure.ai.projects import AIProjectClient
+
+from azure.identity import DefaultAzureCredential
+
+from azure.ai.agents.models import McpTool, RequiredMcpToolCall, SubmitToolApprovalAction, ToolApproval
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. MCP 설정 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_server_url = os.environ.get(&quot;MCP_SERVER_URL&quot;, &quot;https://learn.microsoft.com/api/mcp&quot;)
+
+mcp_server_label = os.environ.get(&quot;MCP_SERVER_LABEL&quot;, &quot;mslearn&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. 프로젝트 클라이언트 초기화</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+project_client = AIProjectClient(
+
+    endpoint=&quot;https://your-project-endpoint.services.ai.azure.com/api/projects/your-project&quot;,
+
+    credential=DefaultAzureCredential(),
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">5. MCP 도구 생성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_tool = McpTool(
+
+    server_label=mcp_server_label,
+
+    server_url=mcp_server_url,
+
+    allowed_tools=[],  # Optional: specify allowed tools
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">6. 완성된 Python 예제</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+with project_client:
+
+    agents_client = project_client.agents
+
+
+
+    # Create a new agent with MCP tools
+
+    agent = agents_client.create_agent(
+
+        model=&quot;Your AOAI Model Deployment&quot;,
+
+        name=&quot;my-mcp-agent&quot;,
+
+        instructions=&quot;You are a helpful agent that can use MCP tools to assist users. Use the available MCP tools to answer questions and perform tasks.&quot;,
+
+        tools=mcp_tool.definitions,
+
+    )
+
+    print(f&quot;Created agent, ID: {agent.id}&quot;)
+
+    print(f&quot;MCP Server: {mcp_tool.server_label} at {mcp_tool.server_url}&quot;)
+
+
+
+    # Create thread for communication
+
+    thread = agents_client.threads.create()
+
+    print(f&quot;Created thread, ID: {thread.id}&quot;)
+
+
+
+    # Create message to thread
+
+    message = agents_client.messages.create(
+
+        thread_id=thread.id,
+
+        role=&quot;user&quot;,
+
+        content=&quot;What&#x27;s difference between Azure OpenAI and OpenAI?&quot;,
+
+    )
+
+    print(f&quot;Created message, ID: {message.id}&quot;)
+
+
+
+    # Handle tool approvals and run agent
+
+    mcp_tool.update_headers(&quot;SuperSecret&quot;, &quot;123456&quot;)
+
+    run = agents_client.runs.create(thread_id=thread.id, agent_id=agent.id, tool_resources=mcp_tool.resources)
+
+    print(f&quot;Created run, ID: {run.id}&quot;)
+
+
+
+    while run.status in [&quot;queued&quot;, &quot;in_progress&quot;, &quot;requires_action&quot;]:
+
+        time.sleep(1)
+
+        run = agents_client.runs.get(thread_id=thread.id, run_id=run.id)
+
+
+
+        if run.status == &quot;requires_action&quot; and isinstance(run.required_action, SubmitToolApprovalAction):
+
+            tool_calls = run.required_action.submit_tool_approval.tool_calls
+
+            if not tool_calls:
+
+                print(&quot;No tool calls provided - cancelling run&quot;)
+
+                agents_client.runs.cancel(thread_id=thread.id, run_id=run.id)
+
+                break
+
+
+
+            tool_approvals = []
+
+            for tool_call in tool_calls:
+
+                if isinstance(tool_call, RequiredMcpToolCall):
+
+                    try:
+
+                        print(f&quot;Approving tool call: {tool_call}&quot;)
+
+                        tool_approvals.append(
+
+                            ToolApproval(
+
+                                tool_call_id=tool_call.id,
+
+                                approve=True,
+
+                                headers=mcp_tool.headers,
+
+                            )
+
+                        )
+
+                    except Exception as e:
+
+                        print(f&quot;Error approving tool_call {tool_call.id}: {e}&quot;)
+
+
+
+            if tool_approvals:
+
+                agents_client.runs.submit_tool_outputs(
+
+                    thread_id=thread.id, run_id=run.id, tool_approvals=tool_approvals
+
+                )
+
+
+
+        print(f&quot;Current run status: {run.status}&quot;)
+
+
+
+    print(f&quot;Run completed with status: {run.status}&quot;)
+
+
+
+    # Display conversation
+
+    messages = agents_client.messages.list(thread_id=thread.id)
+
+    print(&quot;\nConversation:&quot;)
+
+    print(&quot;-&quot; * 50)
+
+    for msg in messages:
+
+        if msg.text_messages:
+
+            last_text = msg.text_messages[-1]
+
+            print(f&quot;{msg.role.upper()}: {last_text.text.value}&quot;)
+
+            print(&quot;-&quot; * 50)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">.NET 구현</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*<strong>Note</strong>* 이 <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration/mcp_support_dotnet.ipynb" target="_blank">노트북</a>을 실행할 수 있습니다</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 필요한 패키지 설치</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+#r &quot;nuget: Azure.AI.Agents.Persistent, 1.1.0-beta.4&quot;
+
+#r &quot;nuget: Azure.Identity, 1.14.2&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 의존성 가져오기</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+using Azure.AI.Agents.Persistent;
+
+using Azure.Identity;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. 설정 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+var projectEndpoint = &quot;https://your-project-endpoint.services.ai.azure.com/api/projects/your-project&quot;;
+
+var modelDeploymentName = &quot;Your AOAI Model Deployment&quot;;
+
+var mcpServerUrl = &quot;https://learn.microsoft.com/api/mcp&quot;;
+
+var mcpServerLabel = &quot;mslearn&quot;;
+
+PersistentAgentsClient agentClient = new(projectEndpoint, new DefaultAzureCredential());
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. MCP 도구 정의 생성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+MCPToolDefinition mcpTool = new(mcpServerLabel, mcpServerUrl);
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">5. MCP 도구를 포함한 에이전트 생성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+PersistentAgent agent = await agentClient.Administration.CreateAgentAsync(
+
+   model: modelDeploymentName,
+
+   name: &quot;my-learn-agent&quot;,
+
+   instructions: &quot;You are a helpful agent that can use MCP tools to assist users. Use the available MCP tools to answer questions and perform tasks.&quot;,
+
+   tools: [mcpTool]
+
+   );
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">6. 완성된 .NET 예제</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Create thread and message
+
+PersistentAgentThread thread = await agentClient.Threads.CreateThreadAsync();
+
+
+
+PersistentThreadMessage message = await agentClient.Messages.CreateMessageAsync(
+
+    thread.Id,
+
+    MessageRole.User,
+
+    &quot;What&#x27;s difference between Azure OpenAI and OpenAI?&quot;);
+
+
+
+// Configure tool resources with headers
+
+MCPToolResource mcpToolResource = new(mcpServerLabel);
+
+mcpToolResource.UpdateHeader(&quot;SuperSecret&quot;, &quot;123456&quot;);
+
+ToolResources toolResources = mcpToolResource.ToToolResources();
+
+
+
+// Create and handle run
+
+ThreadRun run = await agentClient.Runs.CreateRunAsync(thread, agent, toolResources);
+
+
+
+while (run.Status == RunStatus.Queued || run.Status == RunStatus.InProgress || run.Status == RunStatus.RequiresAction)
+
+{
+
+    await Task.Delay(TimeSpan.FromMilliseconds(1000));
+
+    run = await agentClient.Runs.GetRunAsync(thread.Id, run.Id);
+
+
+
+    if (run.Status == RunStatus.RequiresAction &amp;&amp; run.RequiredAction is SubmitToolApprovalAction toolApprovalAction)
+
+    {
+
+        var toolApprovals = new List&lt;ToolApproval&gt;();
+
+        foreach (var toolCall in toolApprovalAction.SubmitToolApproval.ToolCalls)
+
+        {
+
+            if (toolCall is RequiredMcpToolCall mcpToolCall)
+
+            {
+
+                Console.WriteLine($&quot;Approving MCP tool call: {mcpToolCall.Name}&quot;);
+
+                toolApprovals.Add(new ToolApproval(mcpToolCall.Id, approve: true)
+
+                {
+
+                    Headers = { [&quot;SuperSecret&quot;] = &quot;123456&quot; }
+
+                });
+
+            }
+
+        }
+
+
+
+        if (toolApprovals.Count &gt; 0)
+
+        {
+
+            run = await agentClient.Runs.SubmitToolOutputsToRunAsync(thread.Id, run.Id, toolApprovals: toolApprovals);
+
+        }
+
+    }
+
+}
+
+
+
+// Display messages
+
+using Azure;
+
+
+
+AsyncPageable&lt;PersistentThreadMessage&gt; messages = agentClient.Messages.GetMessagesAsync(
+
+    threadId: thread.Id,
+
+    order: ListSortOrder.Ascending
+
+);
+
+
+
+await foreach (PersistentThreadMessage threadMessage in messages)
+
+{
+
+    Console.Write($&quot;{threadMessage.CreatedAt:yyyy-MM-dd HH:mm:ss} - {threadMessage.Role,10}: &quot;);
+
+    foreach (MessageContent contentItem in threadMessage.ContentItems)
+
+    {
+
+        if (contentItem is MessageTextContent textItem)
+
+        {
+
+            Console.Write(textItem.Text);
+
+        }
+
+        else if (contentItem is MessageImageFileContent imageFileItem)
+
+        {
+
+            Console.Write($&quot;&lt;image from ID: {imageFileItem.FileId}&gt;&quot;);
+
+        }
+
+        Console.WriteLine();
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 도구 구성 옵션</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">에이전트용 MCP 도구를 구성할 때 다음과 같은 중요한 매개변수를 지정할 수 있습니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_tool = McpTool(
+
+    server_label=&quot;unique_server_name&quot;,      # Identifier for the MCP server
+
+    server_url=&quot;https://api.example.com/mcp&quot;, # MCP server endpoint
+
+    allowed_tools=[],                       # Optional: specify allowed tools
+
+)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">.NET 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+MCPToolDefinition mcpTool = new(
+
+    &quot;unique_server_name&quot;,                   // Server label
+
+    &quot;https://api.example.com/mcp&quot;          // MCP server URL
+
+);
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">인증 및 헤더</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">두 구현 모두 인증을 위한 맞춤 헤더를 지원합니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python</h4>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_tool.update_headers(&quot;SuperSecret&quot;, &quot;123456&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">.NET</h4>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+MCPToolResource mcpToolResource = new(mcpServerLabel);
+
+mcpToolResource.UpdateHeader(&quot;SuperSecret&quot;, &quot;123456&quot;);
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">자주 발생하는 문제 해결</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 연결 문제</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버 URL이 접근 가능한지 확인하세요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">인증 자격 증명을 점검하세요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">네트워크 연결 상태를 확인하세요</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 도구 호출 실패</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">도구 인수와 형식을 검토하세요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버별 요구사항을 확인하세요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">적절한 오류 처리를 구현하세요</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. 성능 문제</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">도구 호출 빈도를 최적화하세요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">적절한 캐싱을 적용하세요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버 응답 시간을 모니터링하세요</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 통합을 더욱 향상시키려면:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>맞춤 MCP 서버 탐색</strong>: 독자적인 데이터 소스를 위한 MCP 서버 구축</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>고급 보안 구현</strong>: OAuth2 또는 맞춤 인증 메커니즘 추가</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>모니터링 및 분석</strong>: 도구 사용에 대한 로깅 및 모니터링 구현</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>솔루션 확장</strong>: 부하 분산 및 분산 MCP 서버 아키텍처 고려</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/">Azure AI Foundry 문서</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/agents/how-to/tools/model-context-protocol-samples">Model Context Protocol 샘플</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/agents/">Azure AI Foundry 에이전트 개요</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">MCP 사양</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">지원</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">추가 지원 및 문의 사항은 다음을 참고하세요:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/ai-foundry/">Azure AI Foundry 문서</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">MCP 커뮤니티 자료</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 내용</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-contextengineering/README.md" target="_blank">5.14 MCP Context Engineering</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 자료로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m05_11-512--entra-id-authentication-for-model-c.html">&larr; 5.12  Entra ID Authentication for Model Context Protocol Servers</a></span>
+  <span><a href="m05_13-514-context-engineering.html">5.14 Context Engineering &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

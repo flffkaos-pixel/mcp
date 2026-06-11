@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>🚀 Module 1: AI Toolkit Fundamentals - AI Toolkit - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 10: AI Toolkit</span> &rsaquo; 🚀 Module 1: AI Toolkit Fundamentals</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">🚀 Module 1: AI Toolkit Fundamentals</h2>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this module, you will be able to:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Install and configure AI Toolkit for Visual Studio Code</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Navigate the Model Catalog and understand different model sources</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Use the Playground for model testing and experimentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Create custom AI agents using Agent Builder</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Compare model performance across different providers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Apply best practices for prompt engineering</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧠 Introduction to AI Toolkit (AITK)</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <strong>AI Toolkit for Visual Studio Code</strong> is Microsoft's flagship extension that transforms VS Code into a comprehensive AI development environment.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It bridges the gap between AI research and practical application development, making generative AI accessible to developers of all skill levels.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌟 Key Capabilities</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Feature | Description | Use Case |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|---------|-------------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>🗂️ Model Catalog</strong> | Access 100+ models from GitHub, ONNX, OpenAI, Anthropic, Google | Model discovery and selection |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>🔌 BYOM Support</strong> | Integrate your own models (local/remote) | Custom model deployment |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>🎮 Interactive Playground</strong> | Real-time model testing with chat interface | Rapid prototyping and testing |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>📎 Multi-Modal Support</strong> | Handle text, images, and attachments | Complex AI applications |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>⚡ Batch Processing</strong> | Run multiple prompts simultaneously | Efficient testing workflows |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>📊 Model Evaluation</strong> | Built-in metrics (F1, relevance, similarity, coherence) | Performance assessment |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 Why AI Toolkit Matters</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🚀 Accelerated Development</strong>: From idea to prototype in minutes</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🔄 Unified Workflow</strong>: One interface for multiple AI providers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🧪 Easy Experimentation</strong>: Compare models without complex setup</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>📈 Production Ready</strong>: Seamless transition from prototype to deployment</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ Prerequisites & Setup</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📦 Install AI Toolkit Extension</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Step 1: Access Extensions Marketplace</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Open Visual Studio Code</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Navigate to the Extensions view (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Ctrl+Shift+X</code> or <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Cmd+Shift+X</code>)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Search for "AI Toolkit"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Step 2: Choose Your Version</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🟢 Release</strong>: Recommended for production use</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🔶 Pre-release</strong>: Early access to cutting-edge features</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Step 3: Install and Activate</strong></p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">✅ Verification Checklist</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] AI Toolkit icon appears in the VS Code sidebar</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Extension is enabled and activated</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] No installation errors in the output panel</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 Hands-on Exercise 1: Exploring GitHub Models</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Objective</strong>: Master the Model Catalog and test your first AI model</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📊 Step 1: Navigate the Model Catalog</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Catalog is your gateway to the AI ecosystem. It aggregates models from multiple providers, making it easy to discover and compare options.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔍 Navigation Guide:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Click on <strong>MODELS - Catalog</strong> in the AI Toolkit sidebar</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>💡 Pro Tip</strong>: Look for models with specific capabilities that match your use case (e.g., code generation, creative writing, analysis).</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>⚠️ Note</strong>: GitHub-hosted models (i.e.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">GitHub Models) are free to use but are subject to rate limits on requests and tokens.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If you want to access non-GitHub models (that is, external models hosted via Azure AI or other endpoints), you'll need to supply the appropriate API key or authentication.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🚀 Step 2: Add and Configure Your First Model</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Model Selection Strategy:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>GPT-4.1</strong>: Best for complex reasoning and analysis</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Phi-4-mini</strong>: Lightweight, fast responses for simple tasks</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 Configuration Process:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select <strong>OpenAI GPT-4.1</strong> from the catalog</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Click <strong>Add to My Models</strong> - this registers the model for use</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Choose <strong>Try in Playground</strong> to launch the testing environment</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Wait for model initialization (first-time setup may take a moment)</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>⚙️ Understanding Model Parameters:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Temperature</strong>: Controls creativity (0 = deterministic, 1 = creative)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Max Tokens</strong>: Maximum response length</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Top-p</strong>: Nucleus sampling for response diversity</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 Step 3: Master the Playground Interface</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Playground is your AI experimentation lab. Here's how to maximize its potential:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎨 Prompt Engineering Best Practices:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Be Specific</strong>: Clear, detailed instructions yield better results</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Provide Context</strong>: Include relevant background information</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Use Examples</strong>: Show the model what you want with examples</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Iterate</strong>: Refine prompts based on initial results</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🧪 Testing Scenarios:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Example 1: Code Generation
+
+&quot;Write a Python function that calculates the factorial of a number using recursion. Include error handling and docstrings.&quot;
+
+
+
+# Example 2: Creative Writing
+
+&quot;Write a professional email to a client explaining a project delay, maintaining a positive tone while being transparent about challenges.&quot;
+
+
+
+# Example 3: Data Analysis
+
+&quot;Analyze this sales data and provide insights: [paste your data]. Focus on trends, anomalies, and actionable recommendations.&quot;
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏆 Challenge Exercise: Model Performance Comparison</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Goal</strong>: Compare different models using identical prompts to understand their strengths</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📋 Instructions:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Add <strong>Phi-4-mini</strong> to your workspace</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Use the same prompt for both GPT-4.1 and Phi-4-mini</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Compare response quality, speed, and accuracy</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Document your findings in the results section</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>💡 Key Insights to Discover:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">When to use LLM vs SLM</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Cost vs. performance trade-offs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Specialized capabilities of different models</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🤖 Hands-on Exercise 2: Building Custom Agents with Agent Builder</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Objective</strong>: Create specialized AI agents tailored for specific tasks and workflows</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏗️ Step 1: Understanding Agent Builder</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Agent Builder is where AI Toolkit truly shines. It allows you to create purpose-built AI assistants that combine the power of large language models with custom instructions, specific parameters, and specialized knowledge.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🧠 Agent Architecture Components:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Core Model</strong>: The foundation LLM (GPT-4, Groks, Phi, etc.)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>System Prompt</strong>: Defines agent personality and behavior</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Parameters</strong>: Fine-tuned settings for optimal performance</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Tools Integration</strong>: Connect to external APIs and MCP services</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Memory</strong>: Conversation context and session persistence</li>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">⚙️ Step 2: Agent Configuration Deep Dive</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎨 Creating Effective System Prompts:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Template Structure:
+
+## Role Definition
+
+You are a [specific role] with expertise in [domain].
+
+
+
+## Capabilities
+
+- List specific abilities
+
+- Define scope of knowledge
+
+- Clarify limitations
+
+
+
+## Behavior Guidelines
+
+- Response style (formal, casual, technical)
+
+- Output format preferences
+
+- Error handling approach
+
+
+
+## Examples
+
+Provide 2-3 examples of ideal interactions
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*Of course, you can also use Generate System Prompt to use AI to help you generate and optimize prompts*</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 Parameter Optimization:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Parameter | Recommended Range | Use Case |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|------------------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Temperature</strong> | 0.1-0.3 | Technical/factual responses |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Temperature</strong> | 0.7-0.9 | Creative/brainstorming tasks |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Max Tokens</strong> | 500-1000 | Concise responses |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Max Tokens</strong> | 2000-4000 | Detailed explanations |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🐍 Step 3: Practical Exercise - Python Programming Agent</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Mission</strong>: Create a specialized Python coding assistant</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📋 Configuration Steps:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Model Selection</strong>: Choose <strong>Claude 3.5 Sonnet</strong> (excellent for code)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>System Prompt Design</strong>:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Programming Expert Agent
+
+
+
+## Role
+
+You are a senior Python developer with 10+ years of experience. You excel at writing clean, efficient, and well-documented Python code.
+
+
+
+## Capabilities
+
+- Write production-ready Python code
+
+- Debug complex issues
+
+- Explain code concepts clearly
+
+- Suggest best practices and optimizations
+
+- Provide complete working examples
+
+
+
+## Response Format
+
+- Always include docstrings
+
+- Add inline comments for complex logic
+
+- Suggest testing approaches
+
+- Mention relevant libraries when applicable
+
+
+
+## Code Quality Standards
+
+- Follow PEP 8 style guidelines
+
+- Use type hints where appropriate
+
+- Handle exceptions gracefully
+
+- Write readable, maintainable code
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Parameter Configuration</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Temperature: 0.2 (for consistent, reliable code)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Max Tokens: 2000 (detailed explanations)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Top-p: 0.9 (balanced creativity)</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🧪 Step 4: Testing Your Python Agent</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Test Scenarios:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Basic Function</strong>: "Create a function to find prime numbers"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Complex Algorithm</strong>: "Implement a binary search tree with insert, delete, and search methods"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Real-world Problem</strong>: "Build a web scraper that handles rate limiting and retries"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Debugging</strong>: "Fix this code [paste buggy code]"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🏆 Success Criteria:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Code runs without errors</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Includes proper documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Follows Python best practices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Provides clear explanations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Suggests improvements</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎓 Module 1 Wrap-Up & Next Steps</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📊 Knowledge Check</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Test your understanding:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Can you explain the difference between models in the catalog?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Have you successfully created and tested a custom agent?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Do you understand how to optimize parameters for different use cases?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Can you design effective system prompts?</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📚 Additional Resources</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>AI Toolkit Documentation</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/vscode-ai-toolkit">Official Microsoft Docs</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Prompt Engineering Guide</strong>: <a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/guides/prompt-engineering">Best Practices</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Models in AI Toolkit</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/vscode-ai-toolkit/blob/main/doc/models.md">Models in Develpment</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 Congratulations!</strong> You've mastered the fundamentals of AI Toolkit and are ready to build more advanced AI applications!</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔜 Continue to Next Module</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Ready for more advanced capabilities? Continue to <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab2/README.md" target="_blank">Module 2: MCP with AI Toolkit Fundamentals</a></strong> where you'll learn how to:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Connect your agents to external tools using Model Context Protocol (MCP)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Build browser automation agents with Playwright</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integrate MCP servers with your AI Toolkit agents</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Supercharge your agents with external data and capabilities</li>
+
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">🚀 모듈 1: AI Toolkit 기초</h2>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈을 마치면 다음을 할 수 있습니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Visual Studio Code용 AI Toolkit 설치 및 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 모델 카탈로그 탐색 및 다양한 모델 소스 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Playground를 사용한 모델 테스트 및 실험</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Agent Builder를 이용한 맞춤형 AI 에이전트 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 다양한 제공업체의 모델 성능 비교</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 프롬프트 엔지니어링 모범 사례 적용</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧠 AI Toolkit (AITK) 소개</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Visual Studio Code용 AI Toolkit</strong>은 마이크로소프트의 대표 확장 기능으로, VS Code를 종합적인 AI 개발 환경으로 바꿔줍니다. AI 연구와 실제 애플리케이션 개발 간의 간극을 메우며, 모든 수준의 개발자가 생성형 AI를 쉽게 활용할 수 있도록 돕습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌟 주요 기능</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 기능 | 설명 | 활용 사례 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|---------|-------------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>🗂️ 모델 카탈로그</strong> | GitHub, ONNX, OpenAI, Anthropic, Google 등 100개 이상의 모델 접근 | 모델 탐색 및 선택 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>🔌 BYOM 지원</strong> | 자체 모델(로컬/원격) 통합 | 맞춤형 모델 배포 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>🎮 인터랙티브 플레이그라운드</strong> | 채팅 인터페이스를 통한 실시간 모델 테스트 | 빠른 프로토타이핑 및 테스트 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>📎 멀티모달 지원</strong> | 텍스트, 이미지, 첨부파일 처리 | 복합 AI 애플리케이션 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>⚡ 배치 처리</strong> | 여러 프롬프트 동시 실행 | 효율적인 테스트 워크플로우 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>📊 모델 평가</strong> | 내장 지표(F1, 관련성, 유사성, 일관성) | 성능 평가 |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 AI Toolkit이 중요한 이유</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🚀 개발 가속화</strong>: 아이디어에서 프로토타입까지 몇 분 만에</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🔄 통합 워크플로우</strong>: 여러 AI 제공업체를 한 인터페이스에서</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🧪 간편한 실험</strong>: 복잡한 설정 없이 모델 비교 가능</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>📈 프로덕션 준비 완료</strong>: 프로토타입에서 배포까지 원활한 전환</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ 사전 준비 및 설정</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📦 AI Toolkit 확장 설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>1단계: 확장 마켓플레이스 접속</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Visual Studio Code 실행</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 확장 뷰 열기 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Ctrl+Shift+X</code> 또는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Cmd+Shift+X</code>)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. "AI Toolkit" 검색</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>2단계: 버전 선택</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🟢 정식 버전</strong>: 프로덕션 사용 권장</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🔶 프리릴리스</strong>: 최신 기능 조기 체험 가능</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>3단계: 설치 및 활성화</strong></p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">✅ 확인 체크리스트</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] VS Code 사이드바에 AI Toolkit 아이콘 표시</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 확장 기능이 활성화되어 있음</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 출력 패널에 설치 오류 없음</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 실습 1: GitHub 모델 탐색</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목표</strong>: 모델 카탈로그를 익히고 첫 AI 모델 테스트하기</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📊 1단계: 모델 카탈로그 탐색</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모델 카탈로그는 AI 생태계로 가는 관문입니다. 여러 제공업체의 모델을 한데 모아 쉽게 탐색하고 비교할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔍 탐색 가이드:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">AI Toolkit 사이드바에서 <strong>MODELS - Catalog</strong> 클릭</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>💡 팁</strong>: 코드 생성, 창의적 글쓰기, 분석 등 사용 사례에 맞는 특정 기능을 가진 모델을 찾아보세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>⚠️ 주의</strong>: GitHub에 호스팅된 모델(GitHub Models)은 무료로 사용할 수 있지만 요청 및 토큰에 제한이 있습니다. Azure AI나 다른 엔드포인트를 통해 호스팅된 비-GitHub 모델에 접근하려면 적절한 API 키나 인증이 필요합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🚀 2단계: 첫 모델 추가 및 설정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>모델 선택 전략:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>GPT-4.1</strong>: 복잡한 추론과 분석에 최적</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Phi-4-mini</strong>: 가벼우며 간단한 작업에 빠른 응답 제공</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 설정 절차:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 카탈로그에서 <strong>OpenAI GPT-4.1</strong> 선택</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Add to My Models</strong> 클릭하여 모델 등록</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Try in Playground</strong> 선택해 테스트 환경 실행</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 모델 초기화 대기 (첫 실행 시 시간이 걸릴 수 있음)</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>⚙️ 모델 파라미터 이해하기:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Temperature</strong>: 창의성 조절 (0 = 결정적, 1 = 창의적)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Max Tokens</strong>: 최대 응답 길이</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Top-p</strong>: 응답 다양성을 위한 핵심 샘플링</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 3단계: 플레이그라운드 인터페이스 마스터하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">플레이그라운드는 AI 실험실입니다. 최대한 활용하는 방법은 다음과 같습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎨 프롬프트 엔지니어링 모범 사례:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>구체적으로 작성</strong>: 명확하고 자세한 지시가 더 좋은 결과를 만듭니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>맥락 제공</strong>: 관련 배경 정보를 포함하세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>예시 사용</strong>: 원하는 바를 예시로 보여주세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>반복 개선</strong>: 초기 결과를 바탕으로 프롬프트를 다듬으세요</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🧪 테스트 시나리오:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Example 1: Code Generation
+
+&quot;Write a Python function that calculates the factorial of a number using recursion. Include error handling and docstrings.&quot;
+
+
+
+# Example 2: Creative Writing
+
+&quot;Write a professional email to a client explaining a project delay, maintaining a positive tone while being transparent about challenges.&quot;
+
+
+
+# Example 3: Data Analysis
+
+&quot;Analyze this sales data and provide insights: [paste your data]. Focus on trends, anomalies, and actionable recommendations.&quot;
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏆 도전 과제: 모델 성능 비교</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목표</strong>: 동일한 프롬프트로 여러 모델을 비교해 강점을 파악하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📋 지침:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 작업 공간에 <strong>Phi-4-mini</strong> 추가</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. GPT-4.1과 Phi-4-mini에 동일한 프롬프트 사용</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 응답 품질, 속도, 정확도 비교</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 결과 섹션에 발견 내용 기록</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>💡 알아야 할 핵심 인사이트:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LLM과 SLM 사용 시기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비용과 성능 간 균형</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모델별 특화 기능</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🤖 실습 2: Agent Builder로 맞춤형 에이전트 만들기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목표</strong>: 특정 작업과 워크플로우에 맞춘 전문 AI 에이전트 생성</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏗️ 1단계: Agent Builder 이해하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Agent Builder는 AI Toolkit의 핵심 기능입니다. 대형 언어 모델의 힘을 맞춤형 지시, 특정 파라미터, 전문 지식과 결합해 목적에 맞는 AI 비서를 만들 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🧠 에이전트 아키텍처 구성요소:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Core Model</strong>: 기본 LLM (GPT-4, Groks, Phi 등)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>System Prompt</strong>: 에이전트 성격과 행동 정의</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Parameters</strong>: 최적 성능을 위한 세부 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Tools Integration</strong>: 외부 API 및 MCP 서비스 연결</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Memory</strong>: 대화 맥락과 세션 유지</li>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">⚙️ 2단계: 에이전트 설정 심화</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎨 효과적인 시스템 프롬프트 작성:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Template Structure:
+
+## Role Definition
+
+You are a [specific role] with expertise in [domain].
+
+
+
+## Capabilities
+
+- List specific abilities
+
+- Define scope of knowledge
+
+- Clarify limitations
+
+
+
+## Behavior Guidelines
+
+- Response style (formal, casual, technical)
+
+- Output format preferences
+
+- Error handling approach
+
+
+
+## Examples
+
+Provide 2-3 examples of ideal interactions
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*물론 Generate System Prompt 기능을 사용해 AI가 프롬프트 생성과 최적화를 도와줄 수도 있습니다*</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 파라미터 최적화:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 파라미터 | 권장 범위 | 활용 사례 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|------------------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Temperature</strong> | 0.1-0.3 | 기술적/사실적 응답 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Temperature</strong> | 0.7-0.9 | 창의적/브레인스토밍 작업 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Max Tokens</strong> | 500-1000 | 간결한 응답 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Max Tokens</strong> | 2000-4000 | 상세한 설명 |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🐍 3단계: 실습 - 파이썬 프로그래밍 에이전트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 미션</strong>: 전문적인 파이썬 코딩 어시스턴트 만들기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📋 설정 단계:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>모델 선택</strong>: <strong>Claude 3.5 Sonnet</strong> 선택 (코드 작업에 탁월)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>시스템 프롬프트 설계</strong>:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Programming Expert Agent
+
+
+
+## Role
+
+You are a senior Python developer with 10+ years of experience. You excel at writing clean, efficient, and well-documented Python code.
+
+
+
+## Capabilities
+
+- Write production-ready Python code
+
+- Debug complex issues
+
+- Explain code concepts clearly
+
+- Suggest best practices and optimizations
+
+- Provide complete working examples
+
+
+
+## Response Format
+
+- Always include docstrings
+
+- Add inline comments for complex logic
+
+- Suggest testing approaches
+
+- Mention relevant libraries when applicable
+
+
+
+## Code Quality Standards
+
+- Follow PEP 8 style guidelines
+
+- Use type hints where appropriate
+
+- Handle exceptions gracefully
+
+- Write readable, maintainable code
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>파라미터 설정</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Temperature: 0.2 (일관되고 신뢰할 수 있는 코드)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Max Tokens: 2000 (상세한 설명)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Top-p: 0.9 (균형 잡힌 창의성)</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🧪 4단계: 파이썬 에이전트 테스트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>테스트 시나리오:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>기본 기능</strong>: "소수 찾기 함수 작성"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>복잡한 알고리즘</strong>: "삽입, 삭제, 검색 메서드를 포함한 이진 탐색 트리 구현"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>실제 문제</strong>: "요청 제한과 재시도를 처리하는 웹 스크래퍼 만들기"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>디버깅</strong>: "이 코드를 수정해 주세요 [버그 있는 코드 붙여넣기]"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🏆 성공 기준:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 오류 없이 코드 실행</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 적절한 문서화 포함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 파이썬 모범 사례 준수</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 명확한 설명 제공</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 개선 사항 제안</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎓 모듈 1 정리 및 다음 단계</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📊 지식 점검</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이해도를 확인해 보세요:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 카탈로그 내 모델 간 차이를 설명할 수 있나요?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 맞춤형 에이전트를 성공적으로 생성하고 테스트했나요?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 다양한 사용 사례에 맞게 파라미터를 최적화할 수 있나요?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 효과적인 시스템 프롬프트를 설계할 수 있나요?</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📚 추가 자료</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>AI Toolkit 문서</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/vscode-ai-toolkit">공식 Microsoft Docs</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>프롬프트 엔지니어링 가이드</strong>: <a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/guides/prompt-engineering">모범 사례</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>AI Toolkit 내 모델</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/vscode-ai-toolkit/blob/main/doc/models.md">개발 중인 모델</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 축하합니다!</strong> AI Toolkit의 기본기를 마스터했으며, 더 고급 AI 애플리케이션을 만들 준비가 되었습니다!</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔜 다음 모듈로 계속하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">더 고급 기능을 배우고 싶다면 <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab2/README.md" target="_blank">모듈 2: MCP with AI Toolkit Fundamentals</a></strong> 로 이동하세요. 여기서 다음을 배우게 됩니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Model Context Protocol (MCP)을 사용해 에이전트를 외부 도구에 연결하는 방법</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Playwright로 브라우저 자동화 에이전트 구축</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Toolkit 에이전트와 MCP 서버 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">외부 데이터와 기능으로 에이전트 강화하기</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span></span>
+  <span><a href="m10_02-module-2-mcp-with-ai-toolkit-fundamental.html">🌐 Module 2: MCP with AI Toolkit Fundamentals &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

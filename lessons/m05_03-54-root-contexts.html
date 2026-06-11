@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.4 Root Contexts - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.4 Root Contexts</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP Root Contexts</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Root contexts are a fundamental concept in the Model Context Protocol that provide a persistent layer for maintaining conversation history and shared state across multiple requests and sessions.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this lesson, we will explore how to create, manage, and utilize root contexts in MCP. </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the purpose and structure of root contexts</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create and manage root contexts using MCP client libraries</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement root contexts in .NET, Java, JavaScript, and Python applications</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Utilize root contexts for multi-turn conversations and state management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement best practices for root context management</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Understanding Root Contexts</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Root contexts serve as containers that hold the history and state for a series of related interactions. They enable:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Conversation Persistence</strong>: Maintaining coherent multi-turn conversations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Memory Management</strong>: Storing and retrieving information across interactions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>State Management</strong>: Tracking progress in complex workflows</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Context Sharing</strong>: Allowing multiple clients to access the same conversation state</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In MCP, root contexts have these key characteristics:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Each root context has a unique identifier.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">They can contain conversation history, user preferences, and other metadata.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">They can be created, accessed, and archived as needed.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">They support fine-grained access control and permissions.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Root Context Lifecycle</h3>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart TD
+
+    A[Create Root Context] --&gt; B[Initialize with Metadata]
+
+    B --&gt; C[Send Requests with Context ID]
+
+    C --&gt; D[Update Context with Results]
+
+    D --&gt; C
+
+    D --&gt; E[Archive Context When Complete]
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Working with Root Contexts</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's an example of how to create and manage root contexts. </p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">C# Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .NET Example: Root Context Management
+
+using Microsoft.Mcp.Client;
+
+using System;
+
+using System.Threading.Tasks;
+
+using System.Collections.Generic;
+
+
+
+public class RootContextExample
+
+{
+
+    private readonly IMcpClient _client;
+
+    private readonly IRootContextManager _contextManager;
+
+    
+
+    public RootContextExample(IMcpClient client, IRootContextManager contextManager)
+
+    {
+
+        _client = client;
+
+        _contextManager = contextManager;
+
+    }
+
+    
+
+    public async Task DemonstrateRootContextAsync()
+
+    {
+
+        // 1. Create a new root context
+
+        var contextResult = await _contextManager.CreateRootContextAsync(new RootContextCreateOptions
+
+        {
+
+            Name = &quot;Customer Support Session&quot;,
+
+            Metadata = new Dictionary&lt;string, string&gt;
+
+            {
+
+                [&quot;CustomerName&quot;] = &quot;Acme Corporation&quot;,
+
+                [&quot;PriorityLevel&quot;] = &quot;High&quot;,
+
+                [&quot;Domain&quot;] = &quot;Cloud Services&quot;
+
+            }
+
+        });
+
+        
+
+        string contextId = contextResult.ContextId;
+
+        Console.WriteLine($&quot;Created root context with ID: {contextId}&quot;);
+
+        
+
+        // 2. First interaction using the context
+
+        var response1 = await _client.SendPromptAsync(
+
+            &quot;I&#x27;m having issues scaling my web service deployment in the cloud.&quot;, 
+
+            new SendPromptOptions { RootContextId = contextId }
+
+        );
+
+        
+
+        Console.WriteLine($&quot;First response: {response1.GeneratedText}&quot;);
+
+        
+
+        // Second interaction - the model will have access to the previous conversation
+
+        var response2 = await _client.SendPromptAsync(
+
+            &quot;Yes, we&#x27;re using containerized deployments with Kubernetes.&quot;, 
+
+            new SendPromptOptions { RootContextId = contextId }
+
+        );
+
+        
+
+        Console.WriteLine($&quot;Second response: {response2.GeneratedText}&quot;);
+
+        
+
+        // 3. Add metadata to the context based on conversation
+
+        await _contextManager.UpdateContextMetadataAsync(contextId, new Dictionary&lt;string, string&gt;
+
+        {
+
+            [&quot;TechnicalEnvironment&quot;] = &quot;Kubernetes&quot;,
+
+            [&quot;IssueType&quot;] = &quot;Scaling&quot;
+
+        });
+
+        
+
+        // 4. Get context information
+
+        var contextInfo = await _contextManager.GetRootContextInfoAsync(contextId);
+
+        
+
+        Console.WriteLine(&quot;Context Information:&quot;);
+
+        Console.WriteLine($&quot;- Name: {contextInfo.Name}&quot;);
+
+        Console.WriteLine($&quot;- Created: {contextInfo.CreatedAt}&quot;);
+
+        Console.WriteLine($&quot;- Messages: {contextInfo.MessageCount}&quot;);
+
+        
+
+        // 5. When the conversation is complete, archive the context
+
+        await _contextManager.ArchiveRootContextAsync(contextId);
+
+        Console.WriteLine($&quot;Archived context {contextId}&quot;);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Created a root context for a customer support session.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Sent multiple messages within that context, allowing the model to maintain state.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Updated the context with relevant metadata based on the conversation.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Retrieved context information to understand the conversation history.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Archived the context when the conversation was complete.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Example: Root Context Implementation for financial analysis</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this example, we will create a root context for a financial analysis session, demonstrating how to maintain state across multiple interactions.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Java Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Java Example: Root Context Implementation
+
+package com.example.mcp.contexts;
+
+
+
+import com.mcp.client.McpClient;
+
+import com.mcp.client.ContextManager;
+
+import com.mcp.models.RootContext;
+
+import com.mcp.models.McpResponse;
+
+
+
+import java.util.HashMap;
+
+import java.util.Map;
+
+import java.util.UUID;
+
+
+
+public class RootContextsDemo {
+
+    private final McpClient client;
+
+    private final ContextManager contextManager;
+
+    
+
+    public RootContextsDemo(String serverUrl) {
+
+        this.client = new McpClient.Builder()
+
+            .setServerUrl(serverUrl)
+
+            .build();
+
+            
+
+        this.contextManager = new ContextManager(client);
+
+    }
+
+    
+
+    public void demonstrateRootContext() throws Exception {
+
+        // Create context metadata
+
+        Map&lt;String, String&gt; metadata = new HashMap&lt;&gt;();
+
+        metadata.put(&quot;projectName&quot;, &quot;Financial Analysis&quot;);
+
+        metadata.put(&quot;userRole&quot;, &quot;Financial Analyst&quot;);
+
+        metadata.put(&quot;dataSource&quot;, &quot;Q1 2025 Financial Reports&quot;);
+
+        
+
+        // 1. Create a new root context
+
+        RootContext context = contextManager.createRootContext(&quot;Financial Analysis Session&quot;, metadata);
+
+        String contextId = context.getId();
+
+        
+
+        System.out.println(&quot;Created context: &quot; + contextId);
+
+        
+
+        // 2. First interaction
+
+        McpResponse response1 = client.sendPrompt(
+
+            &quot;Analyze the trends in Q1 financial data for our technology division&quot;,
+
+            contextId
+
+        );
+
+        
+
+        System.out.println(&quot;First response: &quot; + response1.getGeneratedText());
+
+        
+
+        // 3. Update context with important information gained from response
+
+        contextManager.addContextMetadata(contextId, 
+
+            Map.of(&quot;identifiedTrend&quot;, &quot;Increasing cloud infrastructure costs&quot;));
+
+        
+
+        // Second interaction - using the same context
+
+        McpResponse response2 = client.sendPrompt(
+
+            &quot;What&#x27;s driving the increase in cloud infrastructure costs?&quot;,
+
+            contextId
+
+        );
+
+        
+
+        System.out.println(&quot;Second response: &quot; + response2.getGeneratedText());
+
+        
+
+        // 4. Generate a summary of the analysis session
+
+        McpResponse summaryResponse = client.sendPrompt(
+
+            &quot;Summarize our analysis of the technology division financials in 3-5 key points&quot;,
+
+            contextId
+
+        );
+
+        
+
+        // Store the summary in context metadata
+
+        contextManager.addContextMetadata(contextId, 
+
+            Map.of(&quot;analysisSummary&quot;, summaryResponse.getGeneratedText()));
+
+            
+
+        // Get updated context information
+
+        RootContext updatedContext = contextManager.getRootContext(contextId);
+
+        
+
+        System.out.println(&quot;Context Information:&quot;);
+
+        System.out.println(&quot;- Created: &quot; + updatedContext.getCreatedAt());
+
+        System.out.println(&quot;- Last Updated: &quot; + updatedContext.getLastUpdatedAt());
+
+        System.out.println(&quot;- Analysis Summary: &quot; + 
+
+            updatedContext.getMetadata().get(&quot;analysisSummary&quot;));
+
+            
+
+        // 5. Archive context when done
+
+        contextManager.archiveContext(contextId);
+
+        System.out.println(&quot;Context archived&quot;);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Created a root context for a financial analysis session.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Sent multiple messages within that context, allowing the model to maintain state.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Updated the context with relevant metadata based on the conversation.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Generated a summary of the analysis session and stored it in the context metadata.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Archived the context when the conversation was complete.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Example: Root Context Management</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Managing root contexts effectively is crucial for maintaining conversation history and state. Below is an example of how to implement root context management.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">JavaScript Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Managing MCP Root Contexts
+
+const { McpClient, RootContextManager } = require(&#x27;@mcp/client&#x27;);
+
+
+
+class ContextSession {
+
+  constructor(serverUrl, apiKey = null) {
+
+    // Initialize the MCP client
+
+    this.client = new McpClient({
+
+      serverUrl,
+
+      apiKey
+
+    });
+
+    
+
+    // Initialize context manager
+
+    this.contextManager = new RootContextManager(this.client);
+
+  }
+
+  
+
+  /**
+
+   * Create a new conversation context
+
+   * @param {string} sessionName - Name of the conversation session
+
+   * @param {Object} metadata - Additional metadata for the context
+
+   * @returns {Promise&lt;string&gt;} - Context ID
+
+   */
+
+  async createConversationContext(sessionName, metadata = {}) {
+
+    try {
+
+      const contextResult = await this.contextManager.createRootContext({
+
+        name: sessionName,
+
+        metadata: {
+
+          ...metadata,
+
+          createdAt: new Date().toISOString(),
+
+          status: &#x27;active&#x27;
+
+        }
+
+      });
+
+      
+
+      console.log(`Created root context &#x27;${sessionName}&#x27; with ID: ${contextResult.id}`);
+
+      return contextResult.id;
+
+    } catch (error) {
+
+      console.error(&#x27;Error creating root context:&#x27;, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Send a message in an existing context
+
+   * @param {string} contextId - The root context ID
+
+   * @param {string} message - The user&#x27;s message
+
+   * @param {Object} options - Additional options
+
+   * @returns {Promise&lt;Object&gt;} - Response data
+
+   */
+
+  async sendMessage(contextId, message, options = {}) {
+
+    try {
+
+      // Send the message using the specified context
+
+      const response = await this.client.sendPrompt(message, {
+
+        rootContextId: contextId,
+
+        temperature: options.temperature || 0.7,
+
+        allowedTools: options.allowedTools || []
+
+      });
+
+      
+
+      // Optionally store important insights from the conversation
+
+      if (options.storeInsights) {
+
+        await this.storeConversationInsights(contextId, message, response.generatedText);
+
+      }
+
+      
+
+      return {
+
+        message: response.generatedText,
+
+        toolCalls: response.toolCalls || [],
+
+        contextId
+
+      };
+
+    } catch (error) {
+
+      console.error(`Error sending message in context ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Store important insights from a conversation
+
+   * @param {string} contextId - The root context ID
+
+   * @param {string} userMessage - User&#x27;s message
+
+   * @param {string} aiResponse - AI&#x27;s response
+
+   */
+
+  async storeConversationInsights(contextId, userMessage, aiResponse) {
+
+    try {
+
+      // Extract potential insights (in a real app, this would be more sophisticated)
+
+      const combinedText = userMessage + &quot;\n&quot; + aiResponse;
+
+      
+
+      // Simple heuristic to identify potential insights
+
+      const insightWords = [&quot;important&quot;, &quot;key point&quot;, &quot;remember&quot;, &quot;significant&quot;, &quot;crucial&quot;];
+
+      
+
+      const potentialInsights = combinedText
+
+        .split(&quot;.&quot;)
+
+        .filter(sentence =&gt; 
+
+          insightWords.some(word =&gt; sentence.toLowerCase().includes(word))
+
+        )
+
+        .map(sentence =&gt; sentence.trim())
+
+        .filter(sentence =&gt; sentence.length &gt; 10);
+
+      
+
+      // Store insights in context metadata
+
+      if (potentialInsights.length &gt; 0) {
+
+        const insights = {};
+
+        potentialInsights.forEach((insight, index) =&gt; {
+
+          insights[`insight_${Date.now()}_${index}`] = insight;
+
+        });
+
+        
+
+        await this.contextManager.updateContextMetadata(contextId, insights);
+
+        console.log(`Stored ${potentialInsights.length} insights in context ${contextId}`);
+
+      }
+
+    } catch (error) {
+
+      console.warn(&#x27;Error storing conversation insights:&#x27;, error);
+
+      // Non-critical error, so just log warning
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Get summary information about a context
+
+   * @param {string} contextId - The root context ID
+
+   * @returns {Promise&lt;Object&gt;} - Context information
+
+   */
+
+  async getContextInfo(contextId) {
+
+    try {
+
+      const contextInfo = await this.contextManager.getContextInfo(contextId);
+
+      
+
+      return {
+
+        id: contextInfo.id,
+
+        name: contextInfo.name,
+
+        created: new Date(contextInfo.createdAt).toLocaleString(),
+
+        lastUpdated: new Date(contextInfo.lastUpdatedAt).toLocaleString(),
+
+        messageCount: contextInfo.messageCount,
+
+        metadata: contextInfo.metadata,
+
+        status: contextInfo.status
+
+      };
+
+    } catch (error) {
+
+      console.error(`Error getting context info for ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Generate a summary of the conversation in a context
+
+   * @param {string} contextId - The root context ID
+
+   * @returns {Promise&lt;string&gt;} - Generated summary
+
+   */
+
+  async generateContextSummary(contextId) {
+
+    try {
+
+      // Ask the model to generate a summary of the conversation so far
+
+      const response = await this.client.sendPrompt(
+
+        &quot;Please summarize our conversation so far in 3-4 sentences, highlighting the main points discussed.&quot;,
+
+        { rootContextId: contextId, temperature: 0.3 }
+
+      );
+
+      
+
+      // Store the summary in context metadata
+
+      await this.contextManager.updateContextMetadata(contextId, {
+
+        conversationSummary: response.generatedText,
+
+        summarizedAt: new Date().toISOString()
+
+      });
+
+      
+
+      return response.generatedText;
+
+    } catch (error) {
+
+      console.error(`Error generating context summary for ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Archive a context when it&#x27;s no longer needed
+
+   * @param {string} contextId - The root context ID
+
+   * @returns {Promise&lt;Object&gt;} - Result of the archive operation
+
+   */
+
+  async archiveContext(contextId) {
+
+    try {
+
+      // Generate a final summary before archiving
+
+      const summary = await this.generateContextSummary(contextId);
+
+      
+
+      // Archive the context
+
+      await this.contextManager.archiveContext(contextId);
+
+      
+
+      return {
+
+        status: &quot;archived&quot;,
+
+        contextId,
+
+        summary
+
+      };
+
+    } catch (error) {
+
+      console.error(`Error archiving context ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+}
+
+
+
+// Example usage
+
+async function demonstrateContextSession() {
+
+  const session = new ContextSession(&#x27;https://mcp-server-example.com&#x27;);
+
+  
+
+  try {
+
+    // 1. Create a new context for a product support conversation
+
+    const contextId = await session.createConversationContext(
+
+      &#x27;Product Support - Database Performance&#x27;,
+
+      {
+
+        customer: &#x27;Globex Corporation&#x27;,
+
+        product: &#x27;Enterprise Database&#x27;,
+
+        severity: &#x27;Medium&#x27;,
+
+        supportAgent: &#x27;AI Assistant&#x27;
+
+      }
+
+    );
+
+    
+
+    // 2. First message in the conversation
+
+    const response1 = await session.sendMessage(
+
+      contextId,
+
+      &quot;I&#x27;m experiencing slow query performance on our database cluster after the latest update.&quot;,
+
+      { storeInsights: true }
+
+    );
+
+    console.log(&#x27;Response 1:&#x27;, response1.message);
+
+    
+
+    // Follow-up message in the same context
+
+    const response2 = await session.sendMessage(
+
+      contextId,
+
+      &quot;Yes, we&#x27;ve already checked the indexes and they seem to be properly configured.&quot;,
+
+      { storeInsights: true }
+
+    );
+
+    console.log(&#x27;Response 2:&#x27;, response2.message);
+
+    
+
+    // 3. Get information about the context
+
+    const contextInfo = await session.getContextInfo(contextId);
+
+    console.log(&#x27;Context Information:&#x27;, contextInfo);
+
+    
+
+    // 4. Generate and display conversation summary
+
+    const summary = await session.generateContextSummary(contextId);
+
+    console.log(&#x27;Conversation Summary:&#x27;, summary);
+
+    
+
+    // 5. Archive the context when done
+
+    const archiveResult = await session.archiveContext(contextId);
+
+    console.log(&#x27;Archive Result:&#x27;, archiveResult);
+
+    
+
+    // 6. Handle any errors gracefully
+
+  } catch (error) {
+
+    console.error(&#x27;Error in context session demonstration:&#x27;, error);
+
+  }
+
+}
+
+
+
+demonstrateContextSession();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Created a root context for a product support conversation with the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">createConversationContext</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this case, the context is about database performance issues.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Sent multiple messages within that context, allowing the model to maintain state with the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sendMessage</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The messages being sent are about slow query performance and index configuration.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Updated the context with relevant metadata based on the conversation.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Generated a summary of the conversation and stored it in the context metadata with the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">generateContextSummary</code>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Archived the context when the conversation was complete with the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">archiveContext</code>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Handled errors gracefully to ensure robustness.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Root Context for Multi-Turn Assistance</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this example, we will create a root context for a multi-turn assistance session, demonstrating how to maintain state across multiple interactions.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Example: Root Context for Multi-Turn Assistance
+
+import asyncio
+
+from datetime import datetime
+
+from mcp_client import McpClient, RootContextManager
+
+
+
+class AssistantSession:
+
+    def __init__(self, server_url, api_key=None):
+
+        self.client = McpClient(server_url=server_url, api_key=api_key)
+
+        self.context_manager = RootContextManager(self.client)
+
+    
+
+    async def create_session(self, name, user_info=None):
+
+        &quot;&quot;&quot;Create a new root context for an assistant session&quot;&quot;&quot;
+
+        metadata = {
+
+            &quot;session_type&quot;: &quot;assistant&quot;,
+
+            &quot;created_at&quot;: datetime.now().isoformat(),
+
+        }
+
+        
+
+        # Add user information if provided
+
+        if user_info:
+
+            metadata.update({f&quot;user_{k}&quot;: v for k, v in user_info.items()})
+
+            
+
+        # Create the root context
+
+        context = await self.context_manager.create_root_context(name, metadata)
+
+        return context.id
+
+    
+
+    async def send_message(self, context_id, message, tools=None):
+
+        &quot;&quot;&quot;Send a message within a root context&quot;&quot;&quot;
+
+        # Create options with context ID
+
+        options = {
+
+            &quot;root_context_id&quot;: context_id
+
+        }
+
+        
+
+        # Add tools if specified
+
+        if tools:
+
+            options[&quot;allowed_tools&quot;] = tools
+
+        
+
+        # Send the prompt within the context
+
+        response = await self.client.send_prompt(message, options)
+
+        
+
+        # Update context metadata with conversation progress
+
+        await self.context_manager.update_context_metadata(
+
+            context_id,
+
+            {
+
+                f&quot;message_{datetime.now().timestamp()}&quot;: message[:50] + &quot;...&quot;,
+
+                &quot;last_interaction&quot;: datetime.now().isoformat()
+
+            }
+
+        )
+
+        
+
+        return response
+
+    
+
+    async def get_conversation_history(self, context_id):
+
+        &quot;&quot;&quot;Retrieve conversation history from a context&quot;&quot;&quot;
+
+        context_info = await self.context_manager.get_context_info(context_id)
+
+        messages = await self.client.get_context_messages(context_id)
+
+        
+
+        return {
+
+            &quot;context_info&quot;: context_info,
+
+            &quot;messages&quot;: messages
+
+        }
+
+    
+
+    async def end_session(self, context_id):
+
+        &quot;&quot;&quot;End an assistant session by archiving the context&quot;&quot;&quot;
+
+        # Generate a summary prompt first
+
+        summary_response = await self.client.send_prompt(
+
+            &quot;Please summarize our conversation and any key points or decisions made.&quot;,
+
+            {&quot;root_context_id&quot;: context_id}
+
+        )
+
+        
+
+        # Store summary in metadata
+
+        await self.context_manager.update_context_metadata(
+
+            context_id,
+
+            {
+
+                &quot;summary&quot;: summary_response.generated_text,
+
+                &quot;ended_at&quot;: datetime.now().isoformat(),
+
+                &quot;status&quot;: &quot;completed&quot;
+
+            }
+
+        )
+
+        
+
+        # Archive the context
+
+        await self.context_manager.archive_context(context_id)
+
+        
+
+        return {
+
+            &quot;status&quot;: &quot;completed&quot;,
+
+            &quot;summary&quot;: summary_response.generated_text
+
+        }
+
+
+
+# Example usage
+
+async def demo_assistant_session():
+
+    assistant = AssistantSession(&quot;https://mcp-server-example.com&quot;)
+
+    
+
+    # 1. Create session
+
+    context_id = await assistant.create_session(
+
+        &quot;Technical Support Session&quot;,
+
+        {&quot;name&quot;: &quot;Alex&quot;, &quot;technical_level&quot;: &quot;advanced&quot;, &quot;product&quot;: &quot;Cloud Services&quot;}
+
+    )
+
+    print(f&quot;Created session with context ID: {context_id}&quot;)
+
+    
+
+    # 2. First interaction
+
+    response1 = await assistant.send_message(
+
+        context_id, 
+
+        &quot;I&#x27;m having trouble with the auto-scaling feature in your cloud platform.&quot;,
+
+        [&quot;documentation_search&quot;, &quot;diagnostic_tool&quot;]
+
+    )
+
+    print(f&quot;Response 1: {response1.generated_text}&quot;)
+
+    
+
+    # Second interaction in the same context
+
+    response2 = await assistant.send_message(
+
+        context_id,
+
+        &quot;Yes, I&#x27;ve already checked the configuration settings you mentioned, but it&#x27;s still not working.&quot;
+
+    )
+
+    print(f&quot;Response 2: {response2.generated_text}&quot;)
+
+    
+
+    # 3. Get history
+
+    history = await assistant.get_conversation_history(context_id)
+
+    print(f&quot;Session has {len(history[&#x27;messages&#x27;])} messages&quot;)
+
+    
+
+    # 4. End session
+
+    end_result = await assistant.end_session(context_id)
+
+    print(f&quot;Session ended with summary: {end_result[&#x27;summary&#x27;]}&quot;)
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(demo_assistant_session())
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Created a root context for a technical support session with the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">create_session</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The context includes user information such as name and technical level.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Sent multiple messages within that context, allowing the model to maintain state with the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">send_message</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The messages being sent are about issues with the auto-scaling feature.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Retrieved conversation history using the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">get_conversation_history</code>, which provides context information and messages.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Ended the session by archiving the context and generating a summary with the function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">end_session</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The summary captures key points from the conversation.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Root Context Best Practices</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here are some best practices for managing root contexts effectively:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Create Focused Contexts</strong>: Create separate root contexts for different conversation purposes or domains to maintain clarity.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Set Expiration Policies</strong>: Implement policies to archive or delete old contexts to manage storage and comply with data retention policies.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Store Relevant Metadata</strong>: Use context metadata to store important information about the conversation that might be useful later.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Use Context IDs Consistently</strong>: Once a context is created, use its ID consistently for all related requests to maintain continuity.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Generate Summaries</strong>: When a context grows large, consider generating summaries to capture essential information while managing context size.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement Access Control</strong>: For multi-user systems, implement proper access controls to ensure privacy and security of conversation contexts.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Handle Context Limitations</strong>: Be aware of context size limitations and implement strategies for handling very long conversations.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Archive When Complete</strong>: Archive contexts when conversations are complete to free resources while preserving the conversation history.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-routing/README.md" target="_blank">5.5 Routing</a></li></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP 루트 컨텍스트</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">루트 컨텍스트는 Model Context Protocol에서 기본 개념으로, 여러 요청과 세션에 걸쳐 대화 기록과 공유 상태를 지속적으로 유지할 수 있는 계층을 제공합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">소개</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이번 강의에서는 MCP에서 루트 컨텍스트를 생성, 관리 및 활용하는 방법을 살펴봅니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 강의를 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">루트 컨텍스트의 목적과 구조 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 클라이언트 라이브러리를 사용해 루트 컨텍스트 생성 및 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">.NET, Java, JavaScript, Python 애플리케이션에서 루트 컨텍스트 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다중 턴 대화 및 상태 관리를 위한 루트 컨텍스트 활용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">루트 컨텍스트 관리에 대한 모범 사례 적용</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">루트 컨텍스트 이해하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">루트 컨텍스트는 관련된 일련의 상호작용에 대한 기록과 상태를 담는 컨테이너 역할을 합니다. 이를 통해 다음이 가능합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>대화 지속성</strong>: 일관된 다중 턴 대화 유지</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>메모리 관리</strong>: 상호작용 간 정보 저장 및 조회</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상태 관리</strong>: 복잡한 워크플로우 진행 상황 추적</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨텍스트 공유</strong>: 여러 클라이언트가 동일한 대화 상태에 접근 가능</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP에서 루트 컨텍스트는 다음과 같은 주요 특징을 가집니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">각 루트 컨텍스트는 고유 식별자를 가집니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">대화 기록, 사용자 선호도, 기타 메타데이터를 포함할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">필요에 따라 생성, 접근, 보관할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">세밀한 접근 제어 및 권한을 지원합니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">루트 컨텍스트 수명 주기</h3>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart TD
+
+    A[Create Root Context] --&gt; B[Initialize with Metadata]
+
+    B --&gt; C[Send Requests with Context ID]
+
+    C --&gt; D[Update Context with Results]
+
+    D --&gt; C
+
+    D --&gt; E[Archive Context When Complete]
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">루트 컨텍스트 작업하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음은 루트 컨텍스트를 생성하고 관리하는 예시입니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">C# 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .NET Example: Root Context Management
+
+using Microsoft.Mcp.Client;
+
+using System;
+
+using System.Threading.Tasks;
+
+using System.Collections.Generic;
+
+
+
+public class RootContextExample
+
+{
+
+    private readonly IMcpClient _client;
+
+    private readonly IRootContextManager _contextManager;
+
+    
+
+    public RootContextExample(IMcpClient client, IRootContextManager contextManager)
+
+    {
+
+        _client = client;
+
+        _contextManager = contextManager;
+
+    }
+
+    
+
+    public async Task DemonstrateRootContextAsync()
+
+    {
+
+        // 1. Create a new root context
+
+        var contextResult = await _contextManager.CreateRootContextAsync(new RootContextCreateOptions
+
+        {
+
+            Name = &quot;Customer Support Session&quot;,
+
+            Metadata = new Dictionary&lt;string, string&gt;
+
+            {
+
+                [&quot;CustomerName&quot;] = &quot;Acme Corporation&quot;,
+
+                [&quot;PriorityLevel&quot;] = &quot;High&quot;,
+
+                [&quot;Domain&quot;] = &quot;Cloud Services&quot;
+
+            }
+
+        });
+
+        
+
+        string contextId = contextResult.ContextId;
+
+        Console.WriteLine($&quot;Created root context with ID: {contextId}&quot;);
+
+        
+
+        // 2. First interaction using the context
+
+        var response1 = await _client.SendPromptAsync(
+
+            &quot;I&#x27;m having issues scaling my web service deployment in the cloud.&quot;, 
+
+            new SendPromptOptions { RootContextId = contextId }
+
+        );
+
+        
+
+        Console.WriteLine($&quot;First response: {response1.GeneratedText}&quot;);
+
+        
+
+        // Second interaction - the model will have access to the previous conversation
+
+        var response2 = await _client.SendPromptAsync(
+
+            &quot;Yes, we&#x27;re using containerized deployments with Kubernetes.&quot;, 
+
+            new SendPromptOptions { RootContextId = contextId }
+
+        );
+
+        
+
+        Console.WriteLine($&quot;Second response: {response2.GeneratedText}&quot;);
+
+        
+
+        // 3. Add metadata to the context based on conversation
+
+        await _contextManager.UpdateContextMetadataAsync(contextId, new Dictionary&lt;string, string&gt;
+
+        {
+
+            [&quot;TechnicalEnvironment&quot;] = &quot;Kubernetes&quot;,
+
+            [&quot;IssueType&quot;] = &quot;Scaling&quot;
+
+        });
+
+        
+
+        // 4. Get context information
+
+        var contextInfo = await _contextManager.GetRootContextInfoAsync(contextId);
+
+        
+
+        Console.WriteLine(&quot;Context Information:&quot;);
+
+        Console.WriteLine($&quot;- Name: {contextInfo.Name}&quot;);
+
+        Console.WriteLine($&quot;- Created: {contextInfo.CreatedAt}&quot;);
+
+        Console.WriteLine($&quot;- Messages: {contextInfo.MessageCount}&quot;);
+
+        
+
+        // 5. When the conversation is complete, archive the context
+
+        await _contextManager.ArchiveRootContextAsync(contextId);
+
+        Console.WriteLine($&quot;Archived context {contextId}&quot;);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 고객 지원 세션을 위한 루트 컨텍스트를 생성했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 해당 컨텍스트 내에서 여러 메시지를 보내 모델이 상태를 유지하도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 대화에 기반해 관련 메타데이터로 컨텍스트를 업데이트했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 대화 기록을 이해하기 위해 컨텍스트 정보를 조회했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 대화가 완료되면 컨텍스트를 보관했습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">예시: 금융 분석을 위한 루트 컨텍스트 구현</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이번 예시에서는 금융 분석 세션을 위한 루트 컨텍스트를 생성하고, 여러 상호작용에 걸쳐 상태를 유지하는 방법을 보여줍니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Java 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Java Example: Root Context Implementation
+
+package com.example.mcp.contexts;
+
+
+
+import com.mcp.client.McpClient;
+
+import com.mcp.client.ContextManager;
+
+import com.mcp.models.RootContext;
+
+import com.mcp.models.McpResponse;
+
+
+
+import java.util.HashMap;
+
+import java.util.Map;
+
+import java.util.UUID;
+
+
+
+public class RootContextsDemo {
+
+    private final McpClient client;
+
+    private final ContextManager contextManager;
+
+    
+
+    public RootContextsDemo(String serverUrl) {
+
+        this.client = new McpClient.Builder()
+
+            .setServerUrl(serverUrl)
+
+            .build();
+
+            
+
+        this.contextManager = new ContextManager(client);
+
+    }
+
+    
+
+    public void demonstrateRootContext() throws Exception {
+
+        // Create context metadata
+
+        Map&lt;String, String&gt; metadata = new HashMap&lt;&gt;();
+
+        metadata.put(&quot;projectName&quot;, &quot;Financial Analysis&quot;);
+
+        metadata.put(&quot;userRole&quot;, &quot;Financial Analyst&quot;);
+
+        metadata.put(&quot;dataSource&quot;, &quot;Q1 2025 Financial Reports&quot;);
+
+        
+
+        // 1. Create a new root context
+
+        RootContext context = contextManager.createRootContext(&quot;Financial Analysis Session&quot;, metadata);
+
+        String contextId = context.getId();
+
+        
+
+        System.out.println(&quot;Created context: &quot; + contextId);
+
+        
+
+        // 2. First interaction
+
+        McpResponse response1 = client.sendPrompt(
+
+            &quot;Analyze the trends in Q1 financial data for our technology division&quot;,
+
+            contextId
+
+        );
+
+        
+
+        System.out.println(&quot;First response: &quot; + response1.getGeneratedText());
+
+        
+
+        // 3. Update context with important information gained from response
+
+        contextManager.addContextMetadata(contextId, 
+
+            Map.of(&quot;identifiedTrend&quot;, &quot;Increasing cloud infrastructure costs&quot;));
+
+        
+
+        // Second interaction - using the same context
+
+        McpResponse response2 = client.sendPrompt(
+
+            &quot;What&#x27;s driving the increase in cloud infrastructure costs?&quot;,
+
+            contextId
+
+        );
+
+        
+
+        System.out.println(&quot;Second response: &quot; + response2.getGeneratedText());
+
+        
+
+        // 4. Generate a summary of the analysis session
+
+        McpResponse summaryResponse = client.sendPrompt(
+
+            &quot;Summarize our analysis of the technology division financials in 3-5 key points&quot;,
+
+            contextId
+
+        );
+
+        
+
+        // Store the summary in context metadata
+
+        contextManager.addContextMetadata(contextId, 
+
+            Map.of(&quot;analysisSummary&quot;, summaryResponse.getGeneratedText()));
+
+            
+
+        // Get updated context information
+
+        RootContext updatedContext = contextManager.getRootContext(contextId);
+
+        
+
+        System.out.println(&quot;Context Information:&quot;);
+
+        System.out.println(&quot;- Created: &quot; + updatedContext.getCreatedAt());
+
+        System.out.println(&quot;- Last Updated: &quot; + updatedContext.getLastUpdatedAt());
+
+        System.out.println(&quot;- Analysis Summary: &quot; + 
+
+            updatedContext.getMetadata().get(&quot;analysisSummary&quot;));
+
+            
+
+        // 5. Archive context when done
+
+        contextManager.archiveContext(contextId);
+
+        System.out.println(&quot;Context archived&quot;);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 금융 분석 세션을 위한 루트 컨텍스트를 생성했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 해당 컨텍스트 내에서 여러 메시지를 보내 모델이 상태를 유지하도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 대화에 기반해 관련 메타데이터로 컨텍스트를 업데이트했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 분석 세션 요약을 생성하여 컨텍스트 메타데이터에 저장했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 대화가 완료되면 컨텍스트를 보관했습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">예시: 루트 컨텍스트 관리</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">루트 컨텍스트를 효과적으로 관리하는 것은 대화 기록과 상태 유지를 위해 매우 중요합니다. 아래는 루트 컨텍스트 관리를 구현하는 예시입니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">JavaScript 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Managing MCP Root Contexts
+
+const { McpClient, RootContextManager } = require(&#x27;@mcp/client&#x27;);
+
+
+
+class ContextSession {
+
+  constructor(serverUrl, apiKey = null) {
+
+    // Initialize the MCP client
+
+    this.client = new McpClient({
+
+      serverUrl,
+
+      apiKey
+
+    });
+
+    
+
+    // Initialize context manager
+
+    this.contextManager = new RootContextManager(this.client);
+
+  }
+
+  
+
+  /**
+
+   * Create a new conversation context
+
+   * @param {string} sessionName - Name of the conversation session
+
+   * @param {Object} metadata - Additional metadata for the context
+
+   * @returns {Promise&lt;string&gt;} - Context ID
+
+   */
+
+  async createConversationContext(sessionName, metadata = {}) {
+
+    try {
+
+      const contextResult = await this.contextManager.createRootContext({
+
+        name: sessionName,
+
+        metadata: {
+
+          ...metadata,
+
+          createdAt: new Date().toISOString(),
+
+          status: &#x27;active&#x27;
+
+        }
+
+      });
+
+      
+
+      console.log(`Created root context &#x27;${sessionName}&#x27; with ID: ${contextResult.id}`);
+
+      return contextResult.id;
+
+    } catch (error) {
+
+      console.error(&#x27;Error creating root context:&#x27;, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Send a message in an existing context
+
+   * @param {string} contextId - The root context ID
+
+   * @param {string} message - The user&#x27;s message
+
+   * @param {Object} options - Additional options
+
+   * @returns {Promise&lt;Object&gt;} - Response data
+
+   */
+
+  async sendMessage(contextId, message, options = {}) {
+
+    try {
+
+      // Send the message using the specified context
+
+      const response = await this.client.sendPrompt(message, {
+
+        rootContextId: contextId,
+
+        temperature: options.temperature || 0.7,
+
+        allowedTools: options.allowedTools || []
+
+      });
+
+      
+
+      // Optionally store important insights from the conversation
+
+      if (options.storeInsights) {
+
+        await this.storeConversationInsights(contextId, message, response.generatedText);
+
+      }
+
+      
+
+      return {
+
+        message: response.generatedText,
+
+        toolCalls: response.toolCalls || [],
+
+        contextId
+
+      };
+
+    } catch (error) {
+
+      console.error(`Error sending message in context ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Store important insights from a conversation
+
+   * @param {string} contextId - The root context ID
+
+   * @param {string} userMessage - User&#x27;s message
+
+   * @param {string} aiResponse - AI&#x27;s response
+
+   */
+
+  async storeConversationInsights(contextId, userMessage, aiResponse) {
+
+    try {
+
+      // Extract potential insights (in a real app, this would be more sophisticated)
+
+      const combinedText = userMessage + &quot;\n&quot; + aiResponse;
+
+      
+
+      // Simple heuristic to identify potential insights
+
+      const insightWords = [&quot;important&quot;, &quot;key point&quot;, &quot;remember&quot;, &quot;significant&quot;, &quot;crucial&quot;];
+
+      
+
+      const potentialInsights = combinedText
+
+        .split(&quot;.&quot;)
+
+        .filter(sentence =&gt; 
+
+          insightWords.some(word =&gt; sentence.toLowerCase().includes(word))
+
+        )
+
+        .map(sentence =&gt; sentence.trim())
+
+        .filter(sentence =&gt; sentence.length &gt; 10);
+
+      
+
+      // Store insights in context metadata
+
+      if (potentialInsights.length &gt; 0) {
+
+        const insights = {};
+
+        potentialInsights.forEach((insight, index) =&gt; {
+
+          insights[`insight_${Date.now()}_${index}`] = insight;
+
+        });
+
+        
+
+        await this.contextManager.updateContextMetadata(contextId, insights);
+
+        console.log(`Stored ${potentialInsights.length} insights in context ${contextId}`);
+
+      }
+
+    } catch (error) {
+
+      console.warn(&#x27;Error storing conversation insights:&#x27;, error);
+
+      // Non-critical error, so just log warning
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Get summary information about a context
+
+   * @param {string} contextId - The root context ID
+
+   * @returns {Promise&lt;Object&gt;} - Context information
+
+   */
+
+  async getContextInfo(contextId) {
+
+    try {
+
+      const contextInfo = await this.contextManager.getContextInfo(contextId);
+
+      
+
+      return {
+
+        id: contextInfo.id,
+
+        name: contextInfo.name,
+
+        created: new Date(contextInfo.createdAt).toLocaleString(),
+
+        lastUpdated: new Date(contextInfo.lastUpdatedAt).toLocaleString(),
+
+        messageCount: contextInfo.messageCount,
+
+        metadata: contextInfo.metadata,
+
+        status: contextInfo.status
+
+      };
+
+    } catch (error) {
+
+      console.error(`Error getting context info for ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Generate a summary of the conversation in a context
+
+   * @param {string} contextId - The root context ID
+
+   * @returns {Promise&lt;string&gt;} - Generated summary
+
+   */
+
+  async generateContextSummary(contextId) {
+
+    try {
+
+      // Ask the model to generate a summary of the conversation so far
+
+      const response = await this.client.sendPrompt(
+
+        &quot;Please summarize our conversation so far in 3-4 sentences, highlighting the main points discussed.&quot;,
+
+        { rootContextId: contextId, temperature: 0.3 }
+
+      );
+
+      
+
+      // Store the summary in context metadata
+
+      await this.contextManager.updateContextMetadata(contextId, {
+
+        conversationSummary: response.generatedText,
+
+        summarizedAt: new Date().toISOString()
+
+      });
+
+      
+
+      return response.generatedText;
+
+    } catch (error) {
+
+      console.error(`Error generating context summary for ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+  
+
+  /**
+
+   * Archive a context when it&#x27;s no longer needed
+
+   * @param {string} contextId - The root context ID
+
+   * @returns {Promise&lt;Object&gt;} - Result of the archive operation
+
+   */
+
+  async archiveContext(contextId) {
+
+    try {
+
+      // Generate a final summary before archiving
+
+      const summary = await this.generateContextSummary(contextId);
+
+      
+
+      // Archive the context
+
+      await this.contextManager.archiveContext(contextId);
+
+      
+
+      return {
+
+        status: &quot;archived&quot;,
+
+        contextId,
+
+        summary
+
+      };
+
+    } catch (error) {
+
+      console.error(`Error archiving context ${contextId}:`, error);
+
+      throw error;
+
+    }
+
+  }
+
+}
+
+
+
+// Example usage
+
+async function demonstrateContextSession() {
+
+  const session = new ContextSession(&#x27;https://mcp-server-example.com&#x27;);
+
+  
+
+  try {
+
+    // 1. Create a new context for a product support conversation
+
+    const contextId = await session.createConversationContext(
+
+      &#x27;Product Support - Database Performance&#x27;,
+
+      {
+
+        customer: &#x27;Globex Corporation&#x27;,
+
+        product: &#x27;Enterprise Database&#x27;,
+
+        severity: &#x27;Medium&#x27;,
+
+        supportAgent: &#x27;AI Assistant&#x27;
+
+      }
+
+    );
+
+    
+
+    // 2. First message in the conversation
+
+    const response1 = await session.sendMessage(
+
+      contextId,
+
+      &quot;I&#x27;m experiencing slow query performance on our database cluster after the latest update.&quot;,
+
+      { storeInsights: true }
+
+    );
+
+    console.log(&#x27;Response 1:&#x27;, response1.message);
+
+    
+
+    // Follow-up message in the same context
+
+    const response2 = await session.sendMessage(
+
+      contextId,
+
+      &quot;Yes, we&#x27;ve already checked the indexes and they seem to be properly configured.&quot;,
+
+      { storeInsights: true }
+
+    );
+
+    console.log(&#x27;Response 2:&#x27;, response2.message);
+
+    
+
+    // 3. Get information about the context
+
+    const contextInfo = await session.getContextInfo(contextId);
+
+    console.log(&#x27;Context Information:&#x27;, contextInfo);
+
+    
+
+    // 4. Generate and display conversation summary
+
+    const summary = await session.generateContextSummary(contextId);
+
+    console.log(&#x27;Conversation Summary:&#x27;, summary);
+
+    
+
+    // 5. Archive the context when done
+
+    const archiveResult = await session.archiveContext(contextId);
+
+    console.log(&#x27;Archive Result:&#x27;, archiveResult);
+
+    
+
+    // 6. Handle any errors gracefully
+
+  } catch (error) {
+
+    console.error(&#x27;Error in context session demonstration:&#x27;, error);
+
+  }
+
+}
+
+
+
+demonstrateContextSession();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">createConversationContext</code> 함수를 사용해 데이터베이스 성능 문제에 관한 제품 지원 대화를 위한 루트 컨텍스트를 생성했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sendMessage</code> 함수를 통해 느린 쿼리 성능과 인덱스 구성에 관한 여러 메시지를 보내 모델이 상태를 유지하도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 대화에 기반해 관련 메타데이터로 컨텍스트를 업데이트했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">generateContextSummary</code> 함수를 사용해 대화 요약을 생성하고 컨텍스트 메타데이터에 저장했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 대화가 완료되면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">archiveContext</code> 함수를 통해 컨텍스트를 보관했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. 오류를 적절히 처리하여 안정성을 확보했습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다중 턴 지원을 위한 루트 컨텍스트</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이번 예시에서는 다중 턴 지원 세션을 위한 루트 컨텍스트를 생성하고, 여러 상호작용에 걸쳐 상태를 유지하는 방법을 보여줍니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Example: Root Context for Multi-Turn Assistance
+
+import asyncio
+
+from datetime import datetime
+
+from mcp_client import McpClient, RootContextManager
+
+
+
+class AssistantSession:
+
+    def __init__(self, server_url, api_key=None):
+
+        self.client = McpClient(server_url=server_url, api_key=api_key)
+
+        self.context_manager = RootContextManager(self.client)
+
+    
+
+    async def create_session(self, name, user_info=None):
+
+        &quot;&quot;&quot;Create a new root context for an assistant session&quot;&quot;&quot;
+
+        metadata = {
+
+            &quot;session_type&quot;: &quot;assistant&quot;,
+
+            &quot;created_at&quot;: datetime.now().isoformat(),
+
+        }
+
+        
+
+        # Add user information if provided
+
+        if user_info:
+
+            metadata.update({f&quot;user_{k}&quot;: v for k, v in user_info.items()})
+
+            
+
+        # Create the root context
+
+        context = await self.context_manager.create_root_context(name, metadata)
+
+        return context.id
+
+    
+
+    async def send_message(self, context_id, message, tools=None):
+
+        &quot;&quot;&quot;Send a message within a root context&quot;&quot;&quot;
+
+        # Create options with context ID
+
+        options = {
+
+            &quot;root_context_id&quot;: context_id
+
+        }
+
+        
+
+        # Add tools if specified
+
+        if tools:
+
+            options[&quot;allowed_tools&quot;] = tools
+
+        
+
+        # Send the prompt within the context
+
+        response = await self.client.send_prompt(message, options)
+
+        
+
+        # Update context metadata with conversation progress
+
+        await self.context_manager.update_context_metadata(
+
+            context_id,
+
+            {
+
+                f&quot;message_{datetime.now().timestamp()}&quot;: message[:50] + &quot;...&quot;,
+
+                &quot;last_interaction&quot;: datetime.now().isoformat()
+
+            }
+
+        )
+
+        
+
+        return response
+
+    
+
+    async def get_conversation_history(self, context_id):
+
+        &quot;&quot;&quot;Retrieve conversation history from a context&quot;&quot;&quot;
+
+        context_info = await self.context_manager.get_context_info(context_id)
+
+        messages = await self.client.get_context_messages(context_id)
+
+        
+
+        return {
+
+            &quot;context_info&quot;: context_info,
+
+            &quot;messages&quot;: messages
+
+        }
+
+    
+
+    async def end_session(self, context_id):
+
+        &quot;&quot;&quot;End an assistant session by archiving the context&quot;&quot;&quot;
+
+        # Generate a summary prompt first
+
+        summary_response = await self.client.send_prompt(
+
+            &quot;Please summarize our conversation and any key points or decisions made.&quot;,
+
+            {&quot;root_context_id&quot;: context_id}
+
+        )
+
+        
+
+        # Store summary in metadata
+
+        await self.context_manager.update_context_metadata(
+
+            context_id,
+
+            {
+
+                &quot;summary&quot;: summary_response.generated_text,
+
+                &quot;ended_at&quot;: datetime.now().isoformat(),
+
+                &quot;status&quot;: &quot;completed&quot;
+
+            }
+
+        )
+
+        
+
+        # Archive the context
+
+        await self.context_manager.archive_context(context_id)
+
+        
+
+        return {
+
+            &quot;status&quot;: &quot;completed&quot;,
+
+            &quot;summary&quot;: summary_response.generated_text
+
+        }
+
+
+
+# Example usage
+
+async def demo_assistant_session():
+
+    assistant = AssistantSession(&quot;https://mcp-server-example.com&quot;)
+
+    
+
+    # 1. Create session
+
+    context_id = await assistant.create_session(
+
+        &quot;Technical Support Session&quot;,
+
+        {&quot;name&quot;: &quot;Alex&quot;, &quot;technical_level&quot;: &quot;advanced&quot;, &quot;product&quot;: &quot;Cloud Services&quot;}
+
+    )
+
+    print(f&quot;Created session with context ID: {context_id}&quot;)
+
+    
+
+    # 2. First interaction
+
+    response1 = await assistant.send_message(
+
+        context_id, 
+
+        &quot;I&#x27;m having trouble with the auto-scaling feature in your cloud platform.&quot;,
+
+        [&quot;documentation_search&quot;, &quot;diagnostic_tool&quot;]
+
+    )
+
+    print(f&quot;Response 1: {response1.generated_text}&quot;)
+
+    
+
+    # Second interaction in the same context
+
+    response2 = await assistant.send_message(
+
+        context_id,
+
+        &quot;Yes, I&#x27;ve already checked the configuration settings you mentioned, but it&#x27;s still not working.&quot;
+
+    )
+
+    print(f&quot;Response 2: {response2.generated_text}&quot;)
+
+    
+
+    # 3. Get history
+
+    history = await assistant.get_conversation_history(context_id)
+
+    print(f&quot;Session has {len(history[&#x27;messages&#x27;])} messages&quot;)
+
+    
+
+    # 4. End session
+
+    end_result = await assistant.end_session(context_id)
+
+    print(f&quot;Session ended with summary: {end_result[&#x27;summary&#x27;]}&quot;)
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(demo_assistant_session())
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">create_session</code> 함수를 사용해 이름과 기술 수준 같은 사용자 정보를 포함한 기술 지원 세션용 루트 컨텍스트를 생성했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">send_message</code> 함수를 통해 자동 확장 기능 문제에 관한 여러 메시지를 보내 모델이 상태를 유지하도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">get_conversation_history</code> 함수를 사용해 대화 기록과 메시지 등 컨텍스트 정보를 조회했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">end_session</code> 함수를 통해 컨텍스트를 보관하고 대화 요약을 생성해 주요 내용을 캡처하며 세션을 종료했습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">루트 컨텍스트 모범 사례</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">루트 컨텍스트를 효과적으로 관리하기 위한 모범 사례는 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>목적에 맞는 컨텍스트 생성</strong>: 명확성을 위해 대화 목적이나 도메인별로 별도의 루트 컨텍스트를 만드세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>만료 정책 설정</strong>: 저장 공간 관리와 데이터 보존 정책 준수를 위해 오래된 컨텍스트를 보관하거나 삭제하는 정책을 구현하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>관련 메타데이터 저장</strong>: 나중에 유용할 수 있는 중요한 대화 정보를 컨텍스트 메타데이터에 저장하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨텍스트 ID 일관성 유지</strong>: 컨텍스트가 생성되면 관련 요청에 대해 해당 ID를 일관되게 사용해 연속성을 유지하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>요약 생성</strong>: 컨텍스트가 커질 경우 핵심 정보를 담은 요약을 생성해 컨텍스트 크기를 관리하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>접근 제어 구현</strong>: 다중 사용자 시스템에서는 대화 컨텍스트의 프라이버시와 보안을 위해 적절한 접근 제어를 적용하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨텍스트 한계 관리</strong>: 컨텍스트 크기 제한을 인지하고 매우 긴 대화를 처리할 전략을 마련하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>완료 시 보관</strong>: 대화가 끝나면 컨텍스트를 보관해 리소스를 확보하면서 대화 기록을 보존하세요.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-routing/README.md" target="_blank">5.5 Routing</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 자료로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m05_02-52-multi-modal-sample.html">&larr; 5.2 Multi modal sample</a></span>
+  <span><a href="m05_04-55-routing.html">5.5 Routing &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.5 Routing - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.5 Routing</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Routing in Model Context Protocol</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Routing is essential for directing requests to the appropriate models, tools, or services within an MCP ecosystem.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Routing in the Model Context Protocol (MCP) involves directing requests to the most suitable models or services based on various criteria such as content type, user context, and system load.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This ensures efficient processing and optimal resource utilization.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the principles of routing in MCP.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement content-based routing to direct requests to specialized services.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply intelligent load balancing strategies to optimize resource utilization.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement dynamic tool routing based on request context.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Content-Based Routing</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Content-based routing directs requests to specialized services based on the content of the request.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For example, requests related to code generation can be routed to a specialized code model, while creative writing requests can be sent to a creative writing model.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's look at an example implementation in different programming languages.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><details></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><summary>.NET</summary></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .NET Example: Content-based routing in MCP
+
+public class ContentBasedRouter
+
+{
+
+    private readonly Dictionary&lt;string, McpClient&gt; _specializedClients;
+
+    private readonly RoutingClassifier _classifier;
+
+    
+
+    public ContentBasedRouter()
+
+    {
+
+        // Initialize specialized clients for different domains
+
+        _specializedClients = new Dictionary&lt;string, McpClient&gt;
+
+        {
+
+            [&quot;code&quot;] = new McpClient(&quot;https://code-specialized-mcp.com&quot;),
+
+            [&quot;creative&quot;] = new McpClient(&quot;https://creative-specialized-mcp.com&quot;),
+
+            [&quot;scientific&quot;] = new McpClient(&quot;https://scientific-specialized-mcp.com&quot;),
+
+            [&quot;general&quot;] = new McpClient(&quot;https://general-mcp.com&quot;)
+
+        };
+
+        
+
+        // Initialize content classifier
+
+        _classifier = new RoutingClassifier();
+
+    }
+
+    
+
+    public async Task&lt;McpResponse&gt; RouteAndProcessAsync(string prompt, IDictionary&lt;string, object&gt; parameters = null)
+
+    {
+
+        // Classify the prompt to determine the best specialized service
+
+        string category = await _classifier.ClassifyPromptAsync(prompt);
+
+        
+
+        // Get the appropriate client or fall back to general
+
+        var client = _specializedClients.ContainsKey(category) 
+
+            ? _specializedClients[category] 
+
+            : _specializedClients[&quot;general&quot;];
+
+            
+
+        Console.WriteLine($&quot;Routing request to {category} specialized service&quot;);
+
+        
+
+        // Send request to the selected service
+
+        return await client.SendPromptAsync(prompt, parameters);
+
+    }
+
+    
+
+    // Simple classifier for routing decisions
+
+    private class RoutingClassifier
+
+    {
+
+        public Task&lt;string&gt; ClassifyPromptAsync(string prompt)
+
+        {
+
+            prompt = prompt.ToLowerInvariant();
+
+            
+
+            if (prompt.Contains(&quot;code&quot;) || prompt.Contains(&quot;function&quot;) || 
+
+                prompt.Contains(&quot;program&quot;) || prompt.Contains(&quot;algorithm&quot;))
+
+            {
+
+                return Task.FromResult(&quot;code&quot;);
+
+            }
+
+            
+
+            if (prompt.Contains(&quot;story&quot;) || prompt.Contains(&quot;creative&quot;) || 
+
+                prompt.Contains(&quot;imagine&quot;) || prompt.Contains(&quot;design&quot;))
+
+            {
+
+                return Task.FromResult(&quot;creative&quot;);
+
+            }
+
+            
+
+            if (prompt.Contains(&quot;science&quot;) || prompt.Contains(&quot;research&quot;) || 
+
+                prompt.Contains(&quot;analyze&quot;) || prompt.Contains(&quot;study&quot;))
+
+            {
+
+                return Task.FromResult(&quot;scientific&quot;);
+
+            }
+
+            
+
+            return Task.FromResult(&quot;general&quot;);
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ContentBasedRouter</code> class that routes requests based on the content of the prompt.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Initialized specialized clients for different domains (code, creative, scientific, general).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented a simple classifier that determines the category of the prompt and routes it to the appropriate specialized service.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used a fallback mechanism to route requests to a general service if no specialized service is available.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented asynchronous processing to handle requests efficiently.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used a dictionary to map content categories to specialized MCP clients.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented a simple classifier that analyzes the prompt and returns the appropriate category.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used the specialized client to send the request and receive a response.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handled cases where the prompt does not match any specialized category by routing to a general service.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"></details></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Intelligent Load Balancing</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Load balancing optimizes resource utilization and ensures high availability for MCP services. There are different ways to implement load balancing, such as round-robin, weighted response time, or content-aware strategies.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's look at below example implementation that uses the following strategies:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Round Robin</strong>: Distributes requests evenly across available servers.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Weighted Response Time</strong>: Routes requests to servers based on their average response time.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Content-Aware</strong>: Routes requests to specialized servers based on the content of the request.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><details></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><summary>Java</summary></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Java Example: Intelligent load balancing for MCP servers
+
+public class McpLoadBalancer {
+
+    private final List&lt;McpServerNode&gt; serverNodes;
+
+    private final LoadBalancingStrategy strategy;
+
+    
+
+    public McpLoadBalancer(List&lt;McpServerNode&gt; nodes, LoadBalancingStrategy strategy) {
+
+        this.serverNodes = new ArrayList&lt;&gt;(nodes);
+
+        this.strategy = strategy;
+
+    }
+
+    
+
+    public McpResponse processRequest(McpRequest request) {
+
+        // Select the best server based on strategy
+
+        McpServerNode selectedNode = strategy.selectNode(serverNodes, request);
+
+        
+
+        try {
+
+            // Route the request to the selected node
+
+            return selectedNode.processRequest(request);
+
+        } catch (Exception e) {
+
+            // Handle failure - implement retry or fallback logic
+
+            System.err.println(&quot;Error processing request on node &quot; + selectedNode.getId() + &quot;: &quot; + e.getMessage());
+
+            
+
+            // Mark node as potentially unhealthy
+
+            selectedNode.recordFailure();
+
+            
+
+            // Try next best node as fallback
+
+            List&lt;McpServerNode&gt; remainingNodes = new ArrayList&lt;&gt;(serverNodes);
+
+            remainingNodes.remove(selectedNode);
+
+            
+
+            if (!remainingNodes.isEmpty()) {
+
+                McpServerNode fallbackNode = strategy.selectNode(remainingNodes, request);
+
+                return fallbackNode.processRequest(request);
+
+            } else {
+
+                throw new RuntimeException(&quot;All MCP server nodes failed to process the request&quot;);
+
+            }
+
+        }
+
+    }
+
+    
+
+    // Node health check task
+
+    public void startHealthChecks(Duration interval) {
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        scheduler.scheduleAtFixedRate(() -&gt; {
+
+            for (McpServerNode node : serverNodes) {
+
+                try {
+
+                    boolean isHealthy = node.checkHealth();
+
+                    System.out.println(&quot;Node &quot; + node.getId() + &quot; health status: &quot; + 
+
+                                      (isHealthy ? &quot;HEALTHY&quot; : &quot;UNHEALTHY&quot;));
+
+                } catch (Exception e) {
+
+                    System.err.println(&quot;Health check failed for node &quot; + node.getId());
+
+                    node.setHealthy(false);
+
+                }
+
+            }
+
+        }, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
+
+    }
+
+    
+
+    // Interface for load balancing strategies
+
+    public interface LoadBalancingStrategy {
+
+        McpServerNode selectNode(List&lt;McpServerNode&gt; nodes, McpRequest request);
+
+    }
+
+    
+
+    // Round-robin strategy
+
+    public static class RoundRobinStrategy implements LoadBalancingStrategy {
+
+        private AtomicInteger counter = new AtomicInteger(0);
+
+        
+
+        @Override
+
+        public McpServerNode selectNode(List&lt;McpServerNode&gt; nodes, McpRequest request) {
+
+            List&lt;McpServerNode&gt; healthyNodes = nodes.stream()
+
+                .filter(McpServerNode::isHealthy)
+
+                .collect(Collectors.toList());
+
+            
+
+            if (healthyNodes.isEmpty()) {
+
+                throw new RuntimeException(&quot;No healthy nodes available&quot;);
+
+            }
+
+            
+
+            int index = counter.getAndIncrement() % healthyNodes.size();
+
+            return healthyNodes.get(index);
+
+        }
+
+    }
+
+    
+
+    // Weighted response time strategy
+
+    public static class ResponseTimeStrategy implements LoadBalancingStrategy {
+
+        @Override
+
+        public McpServerNode selectNode(List&lt;McpServerNode&gt; nodes, McpRequest request) {
+
+            return nodes.stream()
+
+                .filter(McpServerNode::isHealthy)
+
+                .min(Comparator.comparing(McpServerNode::getAverageResponseTime))
+
+                .orElseThrow(() -&gt; new RuntimeException(&quot;No healthy nodes available&quot;));
+
+        }
+
+    }
+
+    
+
+    // Content-aware strategy
+
+    public static class ContentAwareStrategy implements LoadBalancingStrategy {
+
+        @Override
+
+        public McpServerNode selectNode(List&lt;McpServerNode&gt; nodes, McpRequest request) {
+
+            // Determine request characteristics
+
+            boolean isCodeRequest = request.getPrompt().contains(&quot;code&quot;) || 
+
+                                   request.getAllowedTools().contains(&quot;codeInterpreter&quot;);
+
+            
+
+            boolean isCreativeRequest = request.getPrompt().contains(&quot;creative&quot;) || 
+
+                                       request.getPrompt().contains(&quot;story&quot;);
+
+            
+
+            // Find specialized nodes
+
+            Optional&lt;McpServerNode&gt; specializedNode = nodes.stream()
+
+                .filter(McpServerNode::isHealthy)
+
+                .filter(node -&gt; {
+
+                    if (isCodeRequest &amp;&amp; node.getSpecialization().equals(&quot;code&quot;)) {
+
+                        return true;
+
+                    }
+
+                    if (isCreativeRequest &amp;&amp; node.getSpecialization().equals(&quot;creative&quot;)) {
+
+                        return true;
+
+                    }
+
+                    return false;
+
+                })
+
+                .findFirst();
+
+            
+
+            // Return specialized node or least loaded node
+
+            return specializedNode.orElse(
+
+                nodes.stream()
+
+                    .filter(McpServerNode::isHealthy)
+
+                    .min(Comparator.comparing(McpServerNode::getCurrentLoad))
+
+                    .orElseThrow(() -&gt; new RuntimeException(&quot;No healthy nodes available&quot;))
+
+            );
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpLoadBalancer</code> class that manages a list of MCP server nodes and routes requests based on the selected load balancing strategy.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented different load balancing strategies: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">RoundRobinStrategy</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ResponseTimeStrategy</code>, and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ContentAwareStrategy</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ScheduledExecutorService</code> to periodically check the health of server nodes.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented a health check mechanism that marks nodes as healthy or unhealthy based on their response to health checks.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handled request processing with error handling and fallback logic to ensure high availability.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpServerNode</code> class to represent individual MCP server nodes, including their health status, average response time, and current load.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpRequest</code> class to encapsulate request details such as the prompt and allowed tools.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used Java Streams to filter and select nodes based on health status and specialization.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"></details></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Dynamic Tool Routing</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Tool routing ensures that tool calls are directed to the most appropriate service based on context.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For example, a weather tool call may need to be routed to a regional endpoint based on the user's location, or a calculator tool may need to use a specific version of the API.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's have a look at an example implementation that demonstrates dynamic tool routing based on request analysis, regional endpoints, and versioning support.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><details></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><summary>Python</summary></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Example: Dynamic tool routing based on request analysis
+
+class McpToolRouter:
+
+    def __init__(self):
+
+        # Register available tool endpoints
+
+        self.tool_endpoints = {
+
+            &quot;weatherTool&quot;: &quot;https://weather-service.example.com/api&quot;,
+
+            &quot;calculatorTool&quot;: &quot;https://calculator-service.example.com/compute&quot;,
+
+            &quot;databaseTool&quot;: &quot;https://database-service.example.com/query&quot;,
+
+            &quot;searchTool&quot;: &quot;https://search-service.example.com/search&quot;
+
+        }
+
+        
+
+        # Regional endpoints for global distribution
+
+        self.regional_endpoints = {
+
+            &quot;us&quot;: {
+
+                &quot;weatherTool&quot;: &quot;https://us-west.weather-service.example.com/api&quot;,
+
+                &quot;searchTool&quot;: &quot;https://us.search-service.example.com/search&quot;
+
+            },
+
+            &quot;europe&quot;: {
+
+                &quot;weatherTool&quot;: &quot;https://eu.weather-service.example.com/api&quot;,
+
+                &quot;searchTool&quot;: &quot;https://eu.search-service.example.com/search&quot;
+
+            },
+
+            &quot;asia&quot;: {
+
+                &quot;weatherTool&quot;: &quot;https://asia.weather-service.example.com/api&quot;,
+
+                &quot;searchTool&quot;: &quot;https://asia.search-service.example.com/search&quot;
+
+            }
+
+        }
+
+        
+
+        # Tool versioning support
+
+        self.tool_versions = {
+
+            &quot;weatherTool&quot;: {
+
+                &quot;default&quot;: &quot;v2&quot;,
+
+                &quot;v1&quot;: &quot;https://weather-service.example.com/api/v1&quot;,
+
+                &quot;v2&quot;: &quot;https://weather-service.example.com/api/v2&quot;,
+
+                &quot;beta&quot;: &quot;https://weather-service.example.com/api/beta&quot;
+
+            }
+
+        }
+
+    
+
+    async def route_tool_request(self, tool_name, parameters, user_context=None):
+
+        &quot;&quot;&quot;Route a tool request to the appropriate endpoint based on context&quot;&quot;&quot;
+
+        endpoint = self._select_endpoint(tool_name, parameters, user_context)
+
+        
+
+        if not endpoint:
+
+            raise ValueError(f&quot;No endpoint available for tool: {tool_name}&quot;)
+
+        
+
+        # Perform the actual request to the selected endpoint
+
+        return await self._execute_tool_request(endpoint, tool_name, parameters)
+
+    
+
+    def _select_endpoint(self, tool_name, parameters, user_context=None):
+
+        &quot;&quot;&quot;Select the most appropriate endpoint based on context&quot;&quot;&quot;
+
+        # Base endpoint from registry
+
+        if tool_name not in self.tool_endpoints:
+
+            return None
+
+            
+
+        base_endpoint = self.tool_endpoints[tool_name]
+
+        
+
+        # Check if we need to use a specific tool version
+
+        if tool_name in self.tool_versions:
+
+            version_info = self.tool_versions[tool_name]
+
+            
+
+            # Use specified version or default
+
+            requested_version = parameters.get(&quot;_version&quot;, version_info[&quot;default&quot;])
+
+            if requested_version in version_info:
+
+                base_endpoint = version_info[requested_version]
+
+        
+
+        # Check for regional routing if user region is known
+
+        if user_context and &quot;region&quot; in user_context:
+
+            user_region = user_context[&quot;region&quot;]
+
+            
+
+            if user_region in self.regional_endpoints:
+
+                regional_tools = self.regional_endpoints[user_region]
+
+                
+
+                if tool_name in regional_tools:
+
+                    # Use region-specific endpoint
+
+                    return regional_tools[tool_name]
+
+        
+
+        # Check for data residency requirements
+
+        if user_context and &quot;data_residency&quot; in user_context:
+
+            # This would implement logic to ensure data remains in specified jurisdiction
+
+            pass
+
+        
+
+        # Check for latency-based routing
+
+        if user_context and &quot;latency_sensitive&quot; in user_context and user_context[&quot;latency_sensitive&quot;]:
+
+            # This would implement logic to select lowest-latency endpoint
+
+            pass
+
+            
+
+        return base_endpoint
+
+        
+
+    async def _execute_tool_request(self, endpoint, tool_name, parameters):
+
+        &quot;&quot;&quot;Execute the actual tool request to the selected endpoint&quot;&quot;&quot;
+
+        try:
+
+            async with aiohttp.ClientSession() as session:
+
+                async with session.post(
+
+                    endpoint,
+
+                    json={&quot;toolName&quot;: tool_name, &quot;parameters&quot;: parameters},
+
+                    headers={&quot;Content-Type&quot;: &quot;application/json&quot;}
+
+                ) as response:
+
+                    if response.status == 200:
+
+                        result = await response.json()
+
+                        return result
+
+                    else:
+
+                        error_text = await response.text()
+
+                        raise Exception(f&quot;Tool execution failed: {error_text}&quot;)
+
+        except Exception as e:
+
+            # Implement retry logic or fallback strategy
+
+            print(f&quot;Error executing tool {tool_name} at {endpoint}: {str(e)}&quot;)
+
+            raise
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpToolRouter</code> class that manages tool routing based on request analysis, regional endpoints, and versioning support.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Registered available tool endpoints and regional endpoints for global distribution.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented dynamic routing logic that selects the appropriate endpoint based on user context, such as region and data residency requirements.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented versioning support for tools, allowing users to specify which version of a tool they want to use.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used asynchronous HTTP requests to execute tool calls and handle responses.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"></details></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Sampling and Routing Architecture in MCP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Sampling is a critical component of the Model Context Protocol (MCP) that allows for efficient request processing and routing.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It involves analyzing incoming requests to determine the most appropriate model or service to handle them, based on various criteria such as content type, user context, and system load.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Sampling and routing can be combined to create a robust architecture that optimizes resource utilization and ensures high availability.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The sampling process can be used to classify requests, while routing directs them to the appropriate models or services.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The diagram below illustrates how sampling and routing work together in a comprehensive MCP architecture:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart TB
+
+    Client([MCP Client])
+
+    
+
+    subgraph &quot;Request Processing&quot;
+
+        Router{Request Router}
+
+        Analyzer[Content Analyzer]
+
+        Sampler[Sampling Configurator]
+
+    end
+
+    
+
+    subgraph &quot;Server Selection&quot;
+
+        LoadBalancer{Load Balancer}
+
+        ModelSelector[Model Selector]
+
+        ServerPool[(Server Pool)]
+
+    end
+
+    
+
+    subgraph &quot;Model Processing&quot;
+
+        ModelA[Specialized Model A]
+
+        ModelB[Specialized Model B]
+
+        ModelC[General Model]
+
+    end
+
+    
+
+    subgraph &quot;Tool Execution&quot;
+
+        ToolRouter{Tool Router}
+
+        ToolRegistryA[(Primary Tools)]
+
+        ToolRegistryB[(Regional Tools)]
+
+    end
+
+    
+
+    Client --&gt;|Request| Router
+
+    Router --&gt;|Analyze| Analyzer
+
+    Analyzer --&gt;|Configure| Sampler
+
+    Router --&gt;|Route Request| LoadBalancer
+
+    LoadBalancer --&gt; ServerPool
+
+    ServerPool --&gt; ModelSelector
+
+    ModelSelector --&gt; ModelA
+
+    ModelSelector --&gt; ModelB
+
+    ModelSelector --&gt; ModelC
+
+    
+
+    ModelA --&gt;|Tool Calls| ToolRouter
+
+    ModelB --&gt;|Tool Calls| ToolRouter
+
+    ModelC --&gt;|Tool Calls| ToolRouter
+
+    
+
+    ToolRouter --&gt; ToolRegistryA
+
+    ToolRouter --&gt; ToolRegistryB
+
+    
+
+    ToolRegistryA --&gt;|Results| ModelA
+
+    ToolRegistryA --&gt;|Results| ModelB
+
+    ToolRegistryA --&gt;|Results| ModelC
+
+    ToolRegistryB --&gt;|Results| ModelA
+
+    ToolRegistryB --&gt;|Results| ModelB
+
+    ToolRegistryB --&gt;|Results| ModelC
+
+    
+
+    ModelA --&gt;|Response| Client
+
+    ModelB --&gt;|Response| Client
+
+    ModelC --&gt;|Response| Client
+
+    
+
+    style Client fill:#d5e8f9,stroke:#333
+
+    style Router fill:#f9d5e5,stroke:#333
+
+    style LoadBalancer fill:#f9d5e5,stroke:#333
+
+    style ToolRouter fill:#f9d5e5,stroke:#333
+
+    style ModelA fill:#c2f0c2,stroke:#333
+
+    style ModelB fill:#c2f0c2,stroke:#333
+
+    style ModelC fill:#c2f0c2,stroke:#333
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling/README.md" target="_blank">5.6 Sampling</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP의 샘플링 및 라우팅 아키텍처</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">샘플링은 Model Context Protocol(MCP)의 핵심 요소로, 효율적인 요청 처리와 라우팅을 가능하게 합니다. 이는 들어오는 요청을 분석하여 콘텐츠 유형, 사용자 컨텍스트, 시스템 부하 등 다양한 기준에 따라 가장 적합한 모델이나 서비스로 처리하도록 결정하는 과정을 포함합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">샘플링과 라우팅을 결합하면 자원 활용을 최적화하고 높은 가용성을 보장하는 견고한 아키텍처를 만들 수 있습니다. 샘플링 과정은 요청을 분류하는 데 사용되며, 라우팅은 이를 적절한 모델이나 서비스로 전달합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">아래 다이어그램은 샘플링과 라우팅이 어떻게 함께 작동하는지 MCP의 종합적인 아키텍처를 보여줍니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart TB
+
+    Client([MCP Client])
+
+    
+
+    subgraph &quot;Request Processing&quot;
+
+        Router{Request Router}
+
+        Analyzer[Content Analyzer]
+
+        Sampler[Sampling Configurator]
+
+    end
+
+    
+
+    subgraph &quot;Server Selection&quot;
+
+        LoadBalancer{Load Balancer}
+
+        ModelSelector[Model Selector]
+
+        ServerPool[(Server Pool)]
+
+    end
+
+    
+
+    subgraph &quot;Model Processing&quot;
+
+        ModelA[Specialized Model A]
+
+        ModelB[Specialized Model B]
+
+        ModelC[General Model]
+
+    end
+
+    
+
+    subgraph &quot;Tool Execution&quot;
+
+        ToolRouter{Tool Router}
+
+        ToolRegistryA[(Primary Tools)]
+
+        ToolRegistryB[(Regional Tools)]
+
+    end
+
+    
+
+    Client --&gt;|Request| Router
+
+    Router --&gt;|Analyze| Analyzer
+
+    Analyzer --&gt;|Configure| Sampler
+
+    Router --&gt;|Route Request| LoadBalancer
+
+    LoadBalancer --&gt; ServerPool
+
+    ServerPool --&gt; ModelSelector
+
+    ModelSelector --&gt; ModelA
+
+    ModelSelector --&gt; ModelB
+
+    ModelSelector --&gt; ModelC
+
+    
+
+    ModelA --&gt;|Tool Calls| ToolRouter
+
+    ModelB --&gt;|Tool Calls| ToolRouter
+
+    ModelC --&gt;|Tool Calls| ToolRouter
+
+    
+
+    ToolRouter --&gt; ToolRegistryA
+
+    ToolRouter --&gt; ToolRegistryB
+
+    
+
+    ToolRegistryA --&gt;|Results| ModelA
+
+    ToolRegistryA --&gt;|Results| ModelB
+
+    ToolRegistryA --&gt;|Results| ModelC
+
+    ToolRegistryB --&gt;|Results| ModelA
+
+    ToolRegistryB --&gt;|Results| ModelB
+
+    ToolRegistryB --&gt;|Results| ModelC
+
+    
+
+    ModelA --&gt;|Response| Client
+
+    ModelB --&gt;|Response| Client
+
+    ModelC --&gt;|Response| Client
+
+    
+
+    style Client fill:#d5e8f9,stroke:#333
+
+    style Router fill:#f9d5e5,stroke:#333
+
+    style LoadBalancer fill:#f9d5e5,stroke:#333
+
+    style ToolRouter fill:#f9d5e5,stroke:#333
+
+    style ModelA fill:#c2f0c2,stroke:#333
+
+    style ModelB fill:#c2f0c2,stroke:#333
+
+    style ModelC fill:#c2f0c2,stroke:#333
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling/README.md" target="_blank">5.6 샘플링</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m05_03-54-root-contexts.html">&larr; 5.4 Root Contexts</a></span>
+  <span><a href="m05_05-56-sampling.html">5.6 Sampling &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

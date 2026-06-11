@@ -1,0 +1,2617 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.16 Protocol Features Deep Dive - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.16 Protocol Features Deep Dive</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP Protocol Features Deep Dive</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This guide explores advanced MCP protocol features that go beyond basic tool and resource handling. Understanding these features helps you build more robust, user-friendly, and production-ready MCP servers.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Features Covered</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Progress Notifications</strong> - Report progress for long-running operations</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Request Cancellation</strong> - Allow clients to cancel in-flight requests</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Resource Templates</strong> - Dynamic resource URIs with parameters</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Server Lifecycle Events</strong> - Proper initialization and shutdown</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Logging Control</strong> - Server-side logging configuration</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>Error Handling Patterns</strong> - Consistent error responses</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">1. Progress Notifications</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For operations that take time (data processing, file downloads, API calls), progress notifications keep users informed.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">How It Works</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    participant Client
+
+    participant Server
+
+    
+
+    Client-&gt;&gt;Server: tools/call (long operation)
+
+    Server--&gt;&gt;Client: notification: progress 10%
+
+    Server--&gt;&gt;Client: notification: progress 50%
+
+    Server--&gt;&gt;Client: notification: progress 90%
+
+    Server-&gt;&gt;Client: result (complete)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server, NotificationOptions
+
+from mcp.types import ProgressNotification
+
+import asyncio
+
+
+
+app = Server(&quot;progress-server&quot;)
+
+
+
+@app.tool()
+
+async def process_large_file(file_path: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Process a large file with progress updates.&quot;&quot;&quot;
+
+    
+
+    # Get file size for progress calculation
+
+    file_size = os.path.getsize(file_path)
+
+    processed = 0
+
+    
+
+    with open(file_path, &#x27;rb&#x27;) as f:
+
+        while chunk := f.read(8192):
+
+            # Process chunk
+
+            await process_chunk(chunk)
+
+            processed += len(chunk)
+
+            
+
+            # Send progress notification
+
+            progress = (processed / file_size) * 100
+
+            await ctx.send_notification(
+
+                ProgressNotification(
+
+                    progressToken=ctx.request_id,
+
+                    progress=progress,
+
+                    total=100,
+
+                    message=f&quot;Processing: {progress:.1f}%&quot;
+
+                )
+
+            )
+
+    
+
+    return f&quot;Processed {file_size} bytes&quot;
+
+
+
+@app.tool()
+
+async def batch_operation(items: list[str], ctx) -&gt; str:
+
+    &quot;&quot;&quot;Process multiple items with progress.&quot;&quot;&quot;
+
+    
+
+    results = []
+
+    total = len(items)
+
+    
+
+    for i, item in enumerate(items):
+
+        result = await process_item(item)
+
+        results.append(result)
+
+        
+
+        # Report progress after each item
+
+        await ctx.send_notification(
+
+            ProgressNotification(
+
+                progressToken=ctx.request_id,
+
+                progress=i + 1,
+
+                total=total,
+
+                message=f&quot;Processed {i + 1}/{total}: {item}&quot;
+
+            )
+
+        )
+
+    
+
+    return f&quot;Completed {total} items&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+
+
+
+server.setRequestHandler(CallToolSchema, async (request, extra) =&gt; {
+
+  const { name, arguments: args } = request.params;
+
+  
+
+  if (name === &quot;process_data&quot;) {
+
+    const items = args.items as string[];
+
+    const results = [];
+
+    
+
+    for (let i = 0; i &lt; items.length; i++) {
+
+      const result = await processItem(items[i]);
+
+      results.push(result);
+
+      
+
+      // Send progress notification
+
+      await extra.sendNotification({
+
+        method: &quot;notifications/progress&quot;,
+
+        params: {
+
+          progressToken: request.id,
+
+          progress: i + 1,
+
+          total: items.length,
+
+          message: `Processing item ${i + 1}/${items.length}`
+
+        }
+
+      });
+
+    }
+
+    
+
+    return { content: [{ type: &quot;text&quot;, text: JSON.stringify(results) }] };
+
+  }
+
+});
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Client Handling (Python)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def handle_progress(notification):
+
+    &quot;&quot;&quot;Handle progress notifications from server.&quot;&quot;&quot;
+
+    params = notification.params
+
+    print(f&quot;Progress: {params.progress}/{params.total} - {params.message}&quot;)
+
+
+
+# Register handler
+
+session.on_notification(&quot;notifications/progress&quot;, handle_progress)
+
+
+
+# Call tool (progress updates will arrive via handler)
+
+result = await session.call_tool(&quot;process_large_file&quot;, {&quot;file_path&quot;: &quot;/data/large.csv&quot;})
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">2. Request Cancellation</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Allow clients to cancel requests that are no longer needed or taking too long.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import CancelledError
+
+import asyncio
+
+
+
+app = Server(&quot;cancellable-server&quot;)
+
+
+
+@app.tool()
+
+async def long_running_search(query: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Search that can be cancelled.&quot;&quot;&quot;
+
+    
+
+    results = []
+
+    
+
+    try:
+
+        for page in range(100):  # Search through many pages
+
+            # Check if cancellation was requested
+
+            if ctx.is_cancelled:
+
+                raise CancelledError(&quot;Search cancelled by user&quot;)
+
+            
+
+            # Simulate page search
+
+            page_results = await search_page(query, page)
+
+            results.extend(page_results)
+
+            
+
+            # Small delay allows cancellation checks
+
+            await asyncio.sleep(0.1)
+
+            
+
+    except CancelledError:
+
+        # Return partial results
+
+        return f&quot;Cancelled. Found {len(results)} results before cancellation.&quot;
+
+    
+
+    return f&quot;Found {len(results)} total results&quot;
+
+
+
+@app.tool()
+
+async def download_file(url: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Download with cancellation support.&quot;&quot;&quot;
+
+    
+
+    async with aiohttp.ClientSession() as session:
+
+        async with session.get(url) as response:
+
+            total_size = int(response.headers.get(&#x27;content-length&#x27;, 0))
+
+            downloaded = 0
+
+            chunks = []
+
+            
+
+            async for chunk in response.content.iter_chunked(8192):
+
+                if ctx.is_cancelled:
+
+                    return f&quot;Download cancelled at {downloaded}/{total_size} bytes&quot;
+
+                
+
+                chunks.append(chunk)
+
+                downloaded += len(chunk)
+
+            
+
+            return f&quot;Downloaded {downloaded} bytes&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Implementing Cancellation Context</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class CancellableContext:
+
+    &quot;&quot;&quot;Context object that tracks cancellation state.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, request_id: str):
+
+        self.request_id = request_id
+
+        self._cancelled = asyncio.Event()
+
+        self._cancel_reason = None
+
+    
+
+    @property
+
+    def is_cancelled(self) -&gt; bool:
+
+        return self._cancelled.is_set()
+
+    
+
+    def cancel(self, reason: str = &quot;Cancelled&quot;):
+
+        self._cancel_reason = reason
+
+        self._cancelled.set()
+
+    
+
+    async def check_cancelled(self):
+
+        &quot;&quot;&quot;Raise if cancelled, otherwise continue.&quot;&quot;&quot;
+
+        if self.is_cancelled:
+
+            raise CancelledError(self._cancel_reason)
+
+    
+
+    async def sleep_or_cancel(self, seconds: float):
+
+        &quot;&quot;&quot;Sleep that can be interrupted by cancellation.&quot;&quot;&quot;
+
+        try:
+
+            await asyncio.wait_for(
+
+                self._cancelled.wait(),
+
+                timeout=seconds
+
+            )
+
+            raise CancelledError(self._cancel_reason)
+
+        except asyncio.TimeoutError:
+
+            pass  # Normal timeout, continue
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Client-Side Cancellation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+
+
+async def search_with_timeout(session, query, timeout=30):
+
+    &quot;&quot;&quot;Search with automatic cancellation on timeout.&quot;&quot;&quot;
+
+    
+
+    task = asyncio.create_task(
+
+        session.call_tool(&quot;long_running_search&quot;, {&quot;query&quot;: query})
+
+    )
+
+    
+
+    try:
+
+        result = await asyncio.wait_for(task, timeout=timeout)
+
+        return result
+
+    except asyncio.TimeoutError:
+
+        # Request cancellation
+
+        await session.send_notification({
+
+            &quot;method&quot;: &quot;notifications/cancelled&quot;,
+
+            &quot;params&quot;: {&quot;requestId&quot;: task.request_id, &quot;reason&quot;: &quot;Timeout&quot;}
+
+        })
+
+        return &quot;Search timed out&quot;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">3. Resource Templates</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Resource templates allow dynamic URI construction with parameters, useful for APIs and databases.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Defining Templates</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import ResourceTemplate
+
+
+
+app = Server(&quot;template-server&quot;)
+
+
+
+@app.list_resource_templates()
+
+async def list_templates() -&gt; list[ResourceTemplate]:
+
+    &quot;&quot;&quot;Return available resource templates.&quot;&quot;&quot;
+
+    return [
+
+        ResourceTemplate(
+
+            uriTemplate=&quot;db://users/{user_id}&quot;,
+
+            name=&quot;User Profile&quot;,
+
+            description=&quot;Fetch user profile by ID&quot;,
+
+            mimeType=&quot;application/json&quot;
+
+        ),
+
+        ResourceTemplate(
+
+            uriTemplate=&quot;api://weather/{city}/{date}&quot;,
+
+            name=&quot;Weather Data&quot;,
+
+            description=&quot;Historical weather for city and date&quot;,
+
+            mimeType=&quot;application/json&quot;
+
+        ),
+
+        ResourceTemplate(
+
+            uriTemplate=&quot;file://{path}&quot;,
+
+            name=&quot;File Content&quot;,
+
+            description=&quot;Read file at given path&quot;,
+
+            mimeType=&quot;text/plain&quot;
+
+        )
+
+    ]
+
+
+
+@app.read_resource()
+
+async def read_resource(uri: str) -&gt; str:
+
+    &quot;&quot;&quot;Read resource, expanding template parameters.&quot;&quot;&quot;
+
+    
+
+    # Parse the URI to extract parameters
+
+    if uri.startswith(&quot;db://users/&quot;):
+
+        user_id = uri.split(&quot;/&quot;)[-1]
+
+        return await fetch_user(user_id)
+
+    
+
+    elif uri.startswith(&quot;api://weather/&quot;):
+
+        parts = uri.replace(&quot;api://weather/&quot;, &quot;&quot;).split(&quot;/&quot;)
+
+        city, date = parts[0], parts[1]
+
+        return await fetch_weather(city, date)
+
+    
+
+    elif uri.startswith(&quot;file://&quot;):
+
+        path = uri.replace(&quot;file://&quot;, &quot;&quot;)
+
+        return await read_file(path)
+
+    
+
+    raise ValueError(f&quot;Unknown resource URI: {uri}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+server.setRequestHandler(ListResourceTemplatesSchema, async () =&gt; {
+
+  return {
+
+    resourceTemplates: [
+
+      {
+
+        uriTemplate: &quot;github://repos/{owner}/{repo}/issues/{issue_number}&quot;,
+
+        name: &quot;GitHub Issue&quot;,
+
+        description: &quot;Fetch a specific GitHub issue&quot;,
+
+        mimeType: &quot;application/json&quot;
+
+      },
+
+      {
+
+        uriTemplate: &quot;db://tables/{table}/rows/{id}&quot;,
+
+        name: &quot;Database Row&quot;,
+
+        description: &quot;Fetch a row from a database table&quot;,
+
+        mimeType: &quot;application/json&quot;
+
+      }
+
+    ]
+
+  };
+
+});
+
+
+
+server.setRequestHandler(ReadResourceSchema, async (request) =&gt; {
+
+  const uri = request.params.uri;
+
+  
+
+  // Parse GitHub issue URI
+
+  const githubMatch = uri.match(/^github:\/\/repos\/([^/]+)\/([^/]+)\/issues\/(\d+)$/);
+
+  if (githubMatch) {
+
+    const [_, owner, repo, issueNumber] = githubMatch;
+
+    const issue = await fetchGitHubIssue(owner, repo, parseInt(issueNumber));
+
+    return {
+
+      contents: [{
+
+        uri,
+
+        mimeType: &quot;application/json&quot;,
+
+        text: JSON.stringify(issue, null, 2)
+
+      }]
+
+    };
+
+  }
+
+  
+
+  throw new Error(`Unknown resource URI: ${uri}`);
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">4. Server Lifecycle Events</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Proper initialization and shutdown handling ensures clean resource management.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Lifecycle Management</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from contextlib import asynccontextmanager
+
+
+
+app = Server(&quot;lifecycle-server&quot;)
+
+
+
+# Shared state
+
+db_connection = None
+
+cache = None
+
+
+
+@asynccontextmanager
+
+async def lifespan(server: Server):
+
+    &quot;&quot;&quot;Manage server lifecycle.&quot;&quot;&quot;
+
+    global db_connection, cache
+
+    
+
+    # Startup
+
+    print(&quot;🚀 Server starting...&quot;)
+
+    db_connection = await create_database_connection()
+
+    cache = await create_cache_client()
+
+    print(&quot;✅ Resources initialized&quot;)
+
+    
+
+    yield  # Server runs here
+
+    
+
+    # Shutdown
+
+    print(&quot;🛑 Server shutting down...&quot;)
+
+    await db_connection.close()
+
+    await cache.close()
+
+    print(&quot;✅ Resources cleaned up&quot;)
+
+
+
+app = Server(&quot;lifecycle-server&quot;, lifespan=lifespan)
+
+
+
+@app.tool()
+
+async def query_database(sql: str) -&gt; str:
+
+    &quot;&quot;&quot;Use the shared database connection.&quot;&quot;&quot;
+
+    result = await db_connection.execute(sql)
+
+    return str(result)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript Lifecycle</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+
+
+
+class ManagedServer {
+
+  private server: Server;
+
+  private dbConnection: DatabaseConnection | null = null;
+
+  
+
+  constructor() {
+
+    this.server = new Server({
+
+      name: &quot;lifecycle-server&quot;,
+
+      version: &quot;1.0.0&quot;
+
+    });
+
+    
+
+    this.setupHandlers();
+
+  }
+
+  
+
+  async start() {
+
+    // Initialize resources
+
+    console.log(&quot;🚀 Server starting...&quot;);
+
+    this.dbConnection = await createDatabaseConnection();
+
+    console.log(&quot;✅ Database connected&quot;);
+
+    
+
+    // Start server
+
+    await this.server.connect(transport);
+
+  }
+
+  
+
+  async stop() {
+
+    // Cleanup resources
+
+    console.log(&quot;🛑 Server shutting down...&quot;);
+
+    if (this.dbConnection) {
+
+      await this.dbConnection.close();
+
+    }
+
+    await this.server.close();
+
+    console.log(&quot;✅ Cleanup complete&quot;);
+
+  }
+
+  
+
+  private setupHandlers() {
+
+    this.server.setRequestHandler(CallToolSchema, async (request) =&gt; {
+
+      // Use this.dbConnection safely
+
+      // ...
+
+    });
+
+  }
+
+}
+
+
+
+// Usage with graceful shutdown
+
+const server = new ManagedServer();
+
+
+
+process.on(&#x27;SIGINT&#x27;, async () =&gt; {
+
+  await server.stop();
+
+  process.exit(0);
+
+});
+
+
+
+await server.start();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">5. Logging Control</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP supports server-side logging levels that clients can control.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Implementing Logging Levels</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import LoggingLevel
+
+import logging
+
+
+
+app = Server(&quot;logging-server&quot;)
+
+
+
+# Map MCP levels to Python logging levels
+
+LEVEL_MAP = {
+
+    LoggingLevel.DEBUG: logging.DEBUG,
+
+    LoggingLevel.INFO: logging.INFO,
+
+    LoggingLevel.WARNING: logging.WARNING,
+
+    LoggingLevel.ERROR: logging.ERROR,
+
+}
+
+
+
+logger = logging.getLogger(&quot;mcp-server&quot;)
+
+
+
+@app.set_logging_level()
+
+async def set_logging_level(level: LoggingLevel) -&gt; None:
+
+    &quot;&quot;&quot;Handle client request to change logging level.&quot;&quot;&quot;
+
+    python_level = LEVEL_MAP.get(level, logging.INFO)
+
+    logger.setLevel(python_level)
+
+    logger.info(f&quot;Logging level set to {level}&quot;)
+
+
+
+@app.tool()
+
+async def debug_operation(data: str) -&gt; str:
+
+    &quot;&quot;&quot;Tool with various logging levels.&quot;&quot;&quot;
+
+    logger.debug(f&quot;Processing data: {data}&quot;)
+
+    
+
+    try:
+
+        result = process(data)
+
+        logger.info(f&quot;Successfully processed: {result}&quot;)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Processing failed: {e}&quot;)
+
+        raise
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Sending Log Messages to Client</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@app.tool()
+
+async def complex_operation(input: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Operation that logs to client.&quot;&quot;&quot;
+
+    
+
+    # Send log notification to client
+
+    await ctx.send_log(
+
+        level=&quot;info&quot;,
+
+        message=f&quot;Starting complex operation with input: {input}&quot;
+
+    )
+
+    
+
+    # Do work...
+
+    result = await do_work(input)
+
+    
+
+    await ctx.send_log(
+
+        level=&quot;debug&quot;,
+
+        message=f&quot;Operation complete, result size: {len(result)}&quot;
+
+    )
+
+    
+
+    return result
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">6. Error Handling Patterns</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Consistent error handling improves debugging and user experience.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP Error Codes</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.types import McpError, ErrorCode
+
+
+
+class ToolError(McpError):
+
+    &quot;&quot;&quot;Base class for tool errors.&quot;&quot;&quot;
+
+    pass
+
+
+
+class ValidationError(ToolError):
+
+    &quot;&quot;&quot;Invalid input parameters.&quot;&quot;&quot;
+
+    def __init__(self, message: str):
+
+        super().__init__(ErrorCode.INVALID_PARAMS, message)
+
+
+
+class NotFoundError(ToolError):
+
+    &quot;&quot;&quot;Requested resource not found.&quot;&quot;&quot;
+
+    def __init__(self, resource: str):
+
+        super().__init__(ErrorCode.INVALID_REQUEST, f&quot;Not found: {resource}&quot;)
+
+
+
+class PermissionError(ToolError):
+
+    &quot;&quot;&quot;Access denied.&quot;&quot;&quot;
+
+    def __init__(self, action: str):
+
+        super().__init__(ErrorCode.INVALID_REQUEST, f&quot;Permission denied: {action}&quot;)
+
+
+
+class InternalError(ToolError):
+
+    &quot;&quot;&quot;Internal server error.&quot;&quot;&quot;
+
+    def __init__(self, message: str):
+
+        super().__init__(ErrorCode.INTERNAL_ERROR, message)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Structured Error Responses</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@app.tool()
+
+async def safe_operation(input: str) -&gt; str:
+
+    &quot;&quot;&quot;Tool with comprehensive error handling.&quot;&quot;&quot;
+
+    
+
+    # Validate input
+
+    if not input:
+
+        raise ValidationError(&quot;Input cannot be empty&quot;)
+
+    
+
+    if len(input) &gt; 10000:
+
+        raise ValidationError(f&quot;Input too large: {len(input)} chars (max 10000)&quot;)
+
+    
+
+    try:
+
+        # Check permissions
+
+        if not await check_permission(input):
+
+            raise PermissionError(f&quot;read {input}&quot;)
+
+        
+
+        # Perform operation
+
+        result = await perform_operation(input)
+
+        
+
+        if result is None:
+
+            raise NotFoundError(input)
+
+        
+
+        return result
+
+        
+
+    except ConnectionError as e:
+
+        raise InternalError(f&quot;Database connection failed: {e}&quot;)
+
+    except TimeoutError as e:
+
+        raise InternalError(f&quot;Operation timed out: {e}&quot;)
+
+    except Exception as e:
+
+        # Log unexpected errors
+
+        logger.exception(f&quot;Unexpected error in safe_operation&quot;)
+
+        raise InternalError(f&quot;Unexpected error: {type(e).__name__}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Error Handling in TypeScript</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { McpError, ErrorCode } from &quot;@modelcontextprotocol/sdk/types.js&quot;;
+
+
+
+function validateInput(data: unknown): asserts data is ValidInput {
+
+  if (typeof data !== &quot;object&quot; || data === null) {
+
+    throw new McpError(
+
+      ErrorCode.InvalidParams,
+
+      &quot;Input must be an object&quot;
+
+    );
+
+  }
+
+  // More validation...
+
+}
+
+
+
+server.setRequestHandler(CallToolSchema, async (request) =&gt; {
+
+  try {
+
+    validateInput(request.params.arguments);
+
+    
+
+    const result = await performOperation(request.params.arguments);
+
+    
+
+    return {
+
+      content: [{ type: &quot;text&quot;, text: JSON.stringify(result) }]
+
+    };
+
+    
+
+  } catch (error) {
+
+    if (error instanceof McpError) {
+
+      throw error;  // Already an MCP error
+
+    }
+
+    
+
+    // Convert other errors
+
+    if (error instanceof NotFoundError) {
+
+      throw new McpError(ErrorCode.InvalidRequest, error.message);
+
+    }
+
+    
+
+    // Unknown error
+
+    console.error(&quot;Unexpected error:&quot;, error);
+
+    throw new McpError(
+
+      ErrorCode.InternalError,
+
+      &quot;An unexpected error occurred&quot;
+
+    );
+
+  }
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Experimental Features (MCP 2025-11-25)</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These features are marked as experimental in the specification:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Tasks (Long-Running Operations)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Tasks allow tracking long-running operations with state
+
+@app.task()
+
+async def training_task(model_id: str, data_path: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Long-running ML training task.&quot;&quot;&quot;
+
+    
+
+    # Report task started
+
+    await ctx.report_status(&quot;running&quot;, &quot;Initializing training...&quot;)
+
+    
+
+    # Training loop
+
+    for epoch in range(100):
+
+        await train_epoch(model_id, data_path, epoch)
+
+        await ctx.report_status(
+
+            &quot;running&quot;,
+
+            f&quot;Training epoch {epoch + 1}/100&quot;,
+
+            progress=epoch + 1,
+
+            total=100
+
+        )
+
+    
+
+    await ctx.report_status(&quot;completed&quot;, &quot;Training finished&quot;)
+
+    return f&quot;Model {model_id} trained successfully&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Tool Annotations</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Annotations provide metadata about tool behavior
+
+@app.tool(
+
+    annotations={
+
+        &quot;destructive&quot;: False,      # Does not modify data
+
+        &quot;idempotent&quot;: True,        # Safe to retry
+
+        &quot;timeout_seconds&quot;: 30,     # Expected max duration
+
+        &quot;requires_approval&quot;: False # No user approval needed
+
+    }
+
+)
+
+async def safe_query(query: str) -&gt; str:
+
+    &quot;&quot;&quot;A read-only database query tool.&quot;&quot;&quot;
+
+    return await execute_read_query(query)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/08-BestPractices/README.md" target="_blank">Module 8 - Best Practices</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-contextengineering/README.md" target="_blank">5.14 - Context Engineering</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">MCP Specification Changelog</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP Specification 2025-11-25</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.jsonrpc.org/specification#error_object">JSON-RPC 2.0 Error Codes</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk/tree/main/examples">Python SDK Examples</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk/tree/main/examples">TypeScript SDK Examples</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP 프로토콜 기능 심층 분석</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 가이드는 기본 도구 및 리소스 처리 이상의 고급 MCP 프로토콜 기능을 탐구합니다. 이러한 기능을 이해하면 보다 견고하고 사용자 친화적이며 생산 준비가 된 MCP 서버를 구축하는 데 도움이 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다루는 기능</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>진행 알림</strong> - 장시간 실행되는 작업의 진행 상황 보고</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>요청 취소</strong> - 클라이언트가 진행 중인 요청을 취소할 수 있도록 허용</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>리소스 템플릿</strong> - 매개변수가 있는 동적 리소스 URI</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>서버 라이프사이클 이벤트</strong> - 적절한 초기화 및 종료</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>로깅 제어</strong> - 서버 측 로깅 구성</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>오류 처리 패턴</strong> - 일관된 오류 응답</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">1. 진행 알림</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">시간이 걸리는 작업(데이터 처리, 파일 다운로드, API 호출 등)의 경우, 진행 알림은 사용자가 상황을 알 수 있도록 도와줍니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">작동 방식</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    participant Client
+
+    participant Server
+
+    
+
+    Client-&gt;&gt;Server: tools/call (긴 작업)
+
+    Server--&gt;&gt;Client: 알림: 진행률 10%
+
+    Server--&gt;&gt;Client: 알림: 진행률 50%
+
+    Server--&gt;&gt;Client: 알림: 진행률 90%
+
+    Server-&gt;&gt;Client: 결과 (완료)
+
+</code></pre>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server, NotificationOptions
+
+from mcp.types import ProgressNotification
+
+import asyncio
+
+
+
+app = Server(&quot;progress-server&quot;)
+
+
+
+@app.tool()
+
+async def process_large_file(file_path: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Process a large file with progress updates.&quot;&quot;&quot;
+
+    
+
+    # 진행 상황 계산을 위한 파일 크기 가져오기
+
+    file_size = os.path.getsize(file_path)
+
+    processed = 0
+
+    
+
+    with open(file_path, &#x27;rb&#x27;) as f:
+
+        while chunk := f.read(8192):
+
+            # 청크 처리
+
+            await process_chunk(chunk)
+
+            processed += len(chunk)
+
+            
+
+            # 진행 상황 알림 보내기
+
+            progress = (processed / file_size) * 100
+
+            await ctx.send_notification(
+
+                ProgressNotification(
+
+                    progressToken=ctx.request_id,
+
+                    progress=progress,
+
+                    total=100,
+
+                    message=f&quot;Processing: {progress:.1f}%&quot;
+
+                )
+
+            )
+
+    
+
+    return f&quot;Processed {file_size} bytes&quot;
+
+
+
+@app.tool()
+
+async def batch_operation(items: list[str], ctx) -&gt; str:
+
+    &quot;&quot;&quot;Process multiple items with progress.&quot;&quot;&quot;
+
+    
+
+    results = []
+
+    total = len(items)
+
+    
+
+    for i, item in enumerate(items):
+
+        result = await process_item(item)
+
+        results.append(result)
+
+        
+
+        # 각 항목 후 진행 상황 보고하기
+
+        await ctx.send_notification(
+
+            ProgressNotification(
+
+                progressToken=ctx.request_id,
+
+                progress=i + 1,
+
+                total=total,
+
+                message=f&quot;Processed {i + 1}/{total}: {item}&quot;
+
+            )
+
+        )
+
+    
+
+    return f&quot;Completed {total} items&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+
+
+
+server.setRequestHandler(CallToolSchema, async (request, extra) =&gt; {
+
+  const { name, arguments: args } = request.params;
+
+  
+
+  if (name === &quot;process_data&quot;) {
+
+    const items = args.items as string[];
+
+    const results = [];
+
+    
+
+    for (let i = 0; i &lt; items.length; i++) {
+
+      const result = await processItem(items[i]);
+
+      results.push(result);
+
+      
+
+      // 진행 알림 보내기
+
+      await extra.sendNotification({
+
+        method: &quot;notifications/progress&quot;,
+
+        params: {
+
+          progressToken: request.id,
+
+          progress: i + 1,
+
+          total: items.length,
+
+          message: `Processing item ${i + 1}/${items.length}`
+
+        }
+
+      });
+
+    }
+
+    
+
+    return { content: [{ type: &quot;text&quot;, text: JSON.stringify(results) }] };
+
+  }
+
+});
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">클라이언트 처리 (Python)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def handle_progress(notification):
+
+    &quot;&quot;&quot;Handle progress notifications from server.&quot;&quot;&quot;
+
+    params = notification.params
+
+    print(f&quot;Progress: {params.progress}/{params.total} - {params.message}&quot;)
+
+
+
+# 핸들러 등록
+
+session.on_notification(&quot;notifications/progress&quot;, handle_progress)
+
+
+
+# 도구 호출 (진행 상황 업데이트는 핸들러를 통해 도착합니다)
+
+result = await session.call_tool(&quot;process_large_file&quot;, {&quot;file_path&quot;: &quot;/data/large.csv&quot;})
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">2. 요청 취소</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">더 이상 필요하지 않거나 너무 오래 걸리는 요청을 클라이언트가 취소할 수 있도록 허용합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import CancelledError
+
+import asyncio
+
+
+
+app = Server(&quot;cancellable-server&quot;)
+
+
+
+@app.tool()
+
+async def long_running_search(query: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Search that can be cancelled.&quot;&quot;&quot;
+
+    
+
+    results = []
+
+    
+
+    try:
+
+        for page in range(100):  # 여러 페이지를 검색합니다
+
+            # 취소 요청이 있었는지 확인합니다
+
+            if ctx.is_cancelled:
+
+                raise CancelledError(&quot;Search cancelled by user&quot;)
+
+            
+
+            # 페이지 검색을 시뮬레이션합니다
+
+            page_results = await search_page(query, page)
+
+            results.extend(page_results)
+
+            
+
+            # 짧은 지연으로 취소 확인이 가능합니다
+
+            await asyncio.sleep(0.1)
+
+            
+
+    except CancelledError:
+
+        # 부분 결과를 반환합니다
+
+        return f&quot;Cancelled. Found {len(results)} results before cancellation.&quot;
+
+    
+
+    return f&quot;Found {len(results)} total results&quot;
+
+
+
+@app.tool()
+
+async def download_file(url: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Download with cancellation support.&quot;&quot;&quot;
+
+    
+
+    async with aiohttp.ClientSession() as session:
+
+        async with session.get(url) as response:
+
+            total_size = int(response.headers.get(&#x27;content-length&#x27;, 0))
+
+            downloaded = 0
+
+            chunks = []
+
+            
+
+            async for chunk in response.content.iter_chunked(8192):
+
+                if ctx.is_cancelled:
+
+                    return f&quot;Download cancelled at {downloaded}/{total_size} bytes&quot;
+
+                
+
+                chunks.append(chunk)
+
+                downloaded += len(chunk)
+
+            
+
+            return f&quot;Downloaded {downloaded} bytes&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">취소 컨텍스트 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class CancellableContext:
+
+    &quot;&quot;&quot;Context object that tracks cancellation state.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, request_id: str):
+
+        self.request_id = request_id
+
+        self._cancelled = asyncio.Event()
+
+        self._cancel_reason = None
+
+    
+
+    @property
+
+    def is_cancelled(self) -&gt; bool:
+
+        return self._cancelled.is_set()
+
+    
+
+    def cancel(self, reason: str = &quot;Cancelled&quot;):
+
+        self._cancel_reason = reason
+
+        self._cancelled.set()
+
+    
+
+    async def check_cancelled(self):
+
+        &quot;&quot;&quot;Raise if cancelled, otherwise continue.&quot;&quot;&quot;
+
+        if self.is_cancelled:
+
+            raise CancelledError(self._cancel_reason)
+
+    
+
+    async def sleep_or_cancel(self, seconds: float):
+
+        &quot;&quot;&quot;Sleep that can be interrupted by cancellation.&quot;&quot;&quot;
+
+        try:
+
+            await asyncio.wait_for(
+
+                self._cancelled.wait(),
+
+                timeout=seconds
+
+            )
+
+            raise CancelledError(self._cancel_reason)
+
+        except asyncio.TimeoutError:
+
+            pass  # 정상 시간 초과, 계속 진행
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">클라이언트 측 취소</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+
+
+async def search_with_timeout(session, query, timeout=30):
+
+    &quot;&quot;&quot;Search with automatic cancellation on timeout.&quot;&quot;&quot;
+
+    
+
+    task = asyncio.create_task(
+
+        session.call_tool(&quot;long_running_search&quot;, {&quot;query&quot;: query})
+
+    )
+
+    
+
+    try:
+
+        result = await asyncio.wait_for(task, timeout=timeout)
+
+        return result
+
+    except asyncio.TimeoutError:
+
+        # 요청 취소
+
+        await session.send_notification({
+
+            &quot;method&quot;: &quot;notifications/cancelled&quot;,
+
+            &quot;params&quot;: {&quot;requestId&quot;: task.request_id, &quot;reason&quot;: &quot;Timeout&quot;}
+
+        })
+
+        return &quot;Search timed out&quot;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">3. 리소스 템플릿</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">리소스 템플릿은 매개변수를 사용한 동적 URI 구성이 가능하며, API 및 데이터베이스에 유용합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">템플릿 정의</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import ResourceTemplate
+
+
+
+app = Server(&quot;template-server&quot;)
+
+
+
+@app.list_resource_templates()
+
+async def list_templates() -&gt; list[ResourceTemplate]:
+
+    &quot;&quot;&quot;Return available resource templates.&quot;&quot;&quot;
+
+    return [
+
+        ResourceTemplate(
+
+            uriTemplate=&quot;db://users/{user_id}&quot;,
+
+            name=&quot;User Profile&quot;,
+
+            description=&quot;Fetch user profile by ID&quot;,
+
+            mimeType=&quot;application/json&quot;
+
+        ),
+
+        ResourceTemplate(
+
+            uriTemplate=&quot;api://weather/{city}/{date}&quot;,
+
+            name=&quot;Weather Data&quot;,
+
+            description=&quot;Historical weather for city and date&quot;,
+
+            mimeType=&quot;application/json&quot;
+
+        ),
+
+        ResourceTemplate(
+
+            uriTemplate=&quot;file://{path}&quot;,
+
+            name=&quot;File Content&quot;,
+
+            description=&quot;Read file at given path&quot;,
+
+            mimeType=&quot;text/plain&quot;
+
+        )
+
+    ]
+
+
+
+@app.read_resource()
+
+async def read_resource(uri: str) -&gt; str:
+
+    &quot;&quot;&quot;Read resource, expanding template parameters.&quot;&quot;&quot;
+
+    
+
+    # URI를 구문 분석하여 매개변수를 추출합니다
+
+    if uri.startswith(&quot;db://users/&quot;):
+
+        user_id = uri.split(&quot;/&quot;)[-1]
+
+        return await fetch_user(user_id)
+
+    
+
+    elif uri.startswith(&quot;api://weather/&quot;):
+
+        parts = uri.replace(&quot;api://weather/&quot;, &quot;&quot;).split(&quot;/&quot;)
+
+        city, date = parts[0], parts[1]
+
+        return await fetch_weather(city, date)
+
+    
+
+    elif uri.startswith(&quot;file://&quot;):
+
+        path = uri.replace(&quot;file://&quot;, &quot;&quot;)
+
+        return await read_file(path)
+
+    
+
+    raise ValueError(f&quot;Unknown resource URI: {uri}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+server.setRequestHandler(ListResourceTemplatesSchema, async () =&gt; {
+
+  return {
+
+    resourceTemplates: [
+
+      {
+
+        uriTemplate: &quot;github://repos/{owner}/{repo}/issues/{issue_number}&quot;,
+
+        name: &quot;GitHub Issue&quot;,
+
+        description: &quot;Fetch a specific GitHub issue&quot;,
+
+        mimeType: &quot;application/json&quot;
+
+      },
+
+      {
+
+        uriTemplate: &quot;db://tables/{table}/rows/{id}&quot;,
+
+        name: &quot;Database Row&quot;,
+
+        description: &quot;Fetch a row from a database table&quot;,
+
+        mimeType: &quot;application/json&quot;
+
+      }
+
+    ]
+
+  };
+
+});
+
+
+
+server.setRequestHandler(ReadResourceSchema, async (request) =&gt; {
+
+  const uri = request.params.uri;
+
+  
+
+  // GitHub 이슈 URI 파싱하기
+
+  const githubMatch = uri.match(/^github:\/\/repos\/([^/]+)\/([^/]+)\/issues\/(\d+)$/);
+
+  if (githubMatch) {
+
+    const [_, owner, repo, issueNumber] = githubMatch;
+
+    const issue = await fetchGitHubIssue(owner, repo, parseInt(issueNumber));
+
+    return {
+
+      contents: [{
+
+        uri,
+
+        mimeType: &quot;application/json&quot;,
+
+        text: JSON.stringify(issue, null, 2)
+
+      }]
+
+    };
+
+  }
+
+  
+
+  throw new Error(`Unknown resource URI: ${uri}`);
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">4. 서버 라이프사이클 이벤트</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">적절한 초기화 및 종료 처리는 리소스 관리를 깨끗하게 유지합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 라이프사이클 관리</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from contextlib import asynccontextmanager
+
+
+
+app = Server(&quot;lifecycle-server&quot;)
+
+
+
+# 공유 상태
+
+db_connection = None
+
+cache = None
+
+
+
+@asynccontextmanager
+
+async def lifespan(server: Server):
+
+    &quot;&quot;&quot;Manage server lifecycle.&quot;&quot;&quot;
+
+    global db_connection, cache
+
+    
+
+    # 시작
+
+    print(&quot;🚀 Server starting...&quot;)
+
+    db_connection = await create_database_connection()
+
+    cache = await create_cache_client()
+
+    print(&quot;✅ Resources initialized&quot;)
+
+    
+
+    yield  # 서버가 여기서 실행됩니다
+
+    
+
+    # 종료
+
+    print(&quot;🛑 Server shutting down...&quot;)
+
+    await db_connection.close()
+
+    await cache.close()
+
+    print(&quot;✅ Resources cleaned up&quot;)
+
+
+
+app = Server(&quot;lifecycle-server&quot;, lifespan=lifespan)
+
+
+
+@app.tool()
+
+async def query_database(sql: str) -&gt; str:
+
+    &quot;&quot;&quot;Use the shared database connection.&quot;&quot;&quot;
+
+    result = await db_connection.execute(sql)
+
+    return str(result)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript 라이프사이클</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+
+
+
+class ManagedServer {
+
+  private server: Server;
+
+  private dbConnection: DatabaseConnection | null = null;
+
+  
+
+  constructor() {
+
+    this.server = new Server({
+
+      name: &quot;lifecycle-server&quot;,
+
+      version: &quot;1.0.0&quot;
+
+    });
+
+    
+
+    this.setupHandlers();
+
+  }
+
+  
+
+  async start() {
+
+    // 리소스 초기화
+
+    console.log(&quot;🚀 Server starting...&quot;);
+
+    this.dbConnection = await createDatabaseConnection();
+
+    console.log(&quot;✅ Database connected&quot;);
+
+    
+
+    // 서버 시작
+
+    await this.server.connect(transport);
+
+  }
+
+  
+
+  async stop() {
+
+    // 리소스 정리
+
+    console.log(&quot;🛑 Server shutting down...&quot;);
+
+    if (this.dbConnection) {
+
+      await this.dbConnection.close();
+
+    }
+
+    await this.server.close();
+
+    console.log(&quot;✅ Cleanup complete&quot;);
+
+  }
+
+  
+
+  private setupHandlers() {
+
+    this.server.setRequestHandler(CallToolSchema, async (request) =&gt; {
+
+      // this.dbConnection을 안전하게 사용
+
+      // ...
+
+    });
+
+  }
+
+}
+
+
+
+// 정상 종료와 함께 사용하기
+
+const server = new ManagedServer();
+
+
+
+process.on(&#x27;SIGINT&#x27;, async () =&gt; {
+
+  await server.stop();
+
+  process.exit(0);
+
+});
+
+
+
+await server.start();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">5. 로깅 제어</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 클라이언트가 제어할 수 있는 서버 측 로깅 레벨을 지원합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">로깅 레벨 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.server import Server
+
+from mcp.types import LoggingLevel
+
+import logging
+
+
+
+app = Server(&quot;logging-server&quot;)
+
+
+
+# MCP 레벨을 Python 로깅 레벨에 매핑하기
+
+LEVEL_MAP = {
+
+    LoggingLevel.DEBUG: logging.DEBUG,
+
+    LoggingLevel.INFO: logging.INFO,
+
+    LoggingLevel.WARNING: logging.WARNING,
+
+    LoggingLevel.ERROR: logging.ERROR,
+
+}
+
+
+
+logger = logging.getLogger(&quot;mcp-server&quot;)
+
+
+
+@app.set_logging_level()
+
+async def set_logging_level(level: LoggingLevel) -&gt; None:
+
+    &quot;&quot;&quot;Handle client request to change logging level.&quot;&quot;&quot;
+
+    python_level = LEVEL_MAP.get(level, logging.INFO)
+
+    logger.setLevel(python_level)
+
+    logger.info(f&quot;Logging level set to {level}&quot;)
+
+
+
+@app.tool()
+
+async def debug_operation(data: str) -&gt; str:
+
+    &quot;&quot;&quot;Tool with various logging levels.&quot;&quot;&quot;
+
+    logger.debug(f&quot;Processing data: {data}&quot;)
+
+    
+
+    try:
+
+        result = process(data)
+
+        logger.info(f&quot;Successfully processed: {result}&quot;)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Processing failed: {e}&quot;)
+
+        raise
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">클라이언트로 로그 메시지 전송</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@app.tool()
+
+async def complex_operation(input: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Operation that logs to client.&quot;&quot;&quot;
+
+    
+
+    # 클라이언트에게 로그 알림 전송
+
+    await ctx.send_log(
+
+        level=&quot;info&quot;,
+
+        message=f&quot;Starting complex operation with input: {input}&quot;
+
+    )
+
+    
+
+    # 작업 수행 중...
+
+    result = await do_work(input)
+
+    
+
+    await ctx.send_log(
+
+        level=&quot;debug&quot;,
+
+        message=f&quot;Operation complete, result size: {len(result)}&quot;
+
+    )
+
+    
+
+    return result
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">6. 오류 처리 패턴</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">일관된 오류 처리는 디버깅과 사용자 경험을 개선합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP 오류 코드</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp.types import McpError, ErrorCode
+
+
+
+class ToolError(McpError):
+
+    &quot;&quot;&quot;Base class for tool errors.&quot;&quot;&quot;
+
+    pass
+
+
+
+class ValidationError(ToolError):
+
+    &quot;&quot;&quot;Invalid input parameters.&quot;&quot;&quot;
+
+    def __init__(self, message: str):
+
+        super().__init__(ErrorCode.INVALID_PARAMS, message)
+
+
+
+class NotFoundError(ToolError):
+
+    &quot;&quot;&quot;Requested resource not found.&quot;&quot;&quot;
+
+    def __init__(self, resource: str):
+
+        super().__init__(ErrorCode.INVALID_REQUEST, f&quot;Not found: {resource}&quot;)
+
+
+
+class PermissionError(ToolError):
+
+    &quot;&quot;&quot;Access denied.&quot;&quot;&quot;
+
+    def __init__(self, action: str):
+
+        super().__init__(ErrorCode.INVALID_REQUEST, f&quot;Permission denied: {action}&quot;)
+
+
+
+class InternalError(ToolError):
+
+    &quot;&quot;&quot;Internal server error.&quot;&quot;&quot;
+
+    def __init__(self, message: str):
+
+        super().__init__(ErrorCode.INTERNAL_ERROR, message)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구조화된 오류 응답</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@app.tool()
+
+async def safe_operation(input: str) -&gt; str:
+
+    &quot;&quot;&quot;Tool with comprehensive error handling.&quot;&quot;&quot;
+
+    
+
+    # 입력 값 유효성 검사
+
+    if not input:
+
+        raise ValidationError(&quot;Input cannot be empty&quot;)
+
+    
+
+    if len(input) &gt; 10000:
+
+        raise ValidationError(f&quot;Input too large: {len(input)} chars (max 10000)&quot;)
+
+    
+
+    try:
+
+        # 권한 확인
+
+        if not await check_permission(input):
+
+            raise PermissionError(f&quot;read {input}&quot;)
+
+        
+
+        # 작업 수행
+
+        result = await perform_operation(input)
+
+        
+
+        if result is None:
+
+            raise NotFoundError(input)
+
+        
+
+        return result
+
+        
+
+    except ConnectionError as e:
+
+        raise InternalError(f&quot;Database connection failed: {e}&quot;)
+
+    except TimeoutError as e:
+
+        raise InternalError(f&quot;Operation timed out: {e}&quot;)
+
+    except Exception as e:
+
+        # 예상치 못한 오류 기록
+
+        logger.exception(f&quot;Unexpected error in safe_operation&quot;)
+
+        raise InternalError(f&quot;Unexpected error: {type(e).__name__}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">TypeScript의 오류 처리</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { McpError, ErrorCode } from &quot;@modelcontextprotocol/sdk/types.js&quot;;
+
+
+
+function validateInput(data: unknown): asserts data is ValidInput {
+
+  if (typeof data !== &quot;object&quot; || data === null) {
+
+    throw new McpError(
+
+      ErrorCode.InvalidParams,
+
+      &quot;Input must be an object&quot;
+
+    );
+
+  }
+
+  // 더 많은 검증...
+
+}
+
+
+
+server.setRequestHandler(CallToolSchema, async (request) =&gt; {
+
+  try {
+
+    validateInput(request.params.arguments);
+
+    
+
+    const result = await performOperation(request.params.arguments);
+
+    
+
+    return {
+
+      content: [{ type: &quot;text&quot;, text: JSON.stringify(result) }]
+
+    };
+
+    
+
+  } catch (error) {
+
+    if (error instanceof McpError) {
+
+      throw error;  // 이미 MCP 오류입니다
+
+    }
+
+    
+
+    // 다른 오류 변환
+
+    if (error instanceof NotFoundError) {
+
+      throw new McpError(ErrorCode.InvalidRequest, error.message);
+
+    }
+
+    
+
+    // 알 수 없는 오류
+
+    console.error(&quot;Unexpected error:&quot;, error);
+
+    throw new McpError(
+
+      ErrorCode.InternalError,
+
+      &quot;An unexpected error occurred&quot;
+
+    );
+
+  }
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">실험적 기능 (MCP 2025-11-25)</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이러한 기능은 명세서에서 실험적 기능으로 표시됩니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">작업 (장시간 실행 작업)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 작업은 상태가 있는 장기 실행 작업을 추적할 수 있게 해줍니다
+
+@app.task()
+
+async def training_task(model_id: str, data_path: str, ctx) -&gt; str:
+
+    &quot;&quot;&quot;Long-running ML training task.&quot;&quot;&quot;
+
+    
+
+    # 작업 시작 보고
+
+    await ctx.report_status(&quot;running&quot;, &quot;Initializing training...&quot;)
+
+    
+
+    # 훈련 루프
+
+    for epoch in range(100):
+
+        await train_epoch(model_id, data_path, epoch)
+
+        await ctx.report_status(
+
+            &quot;running&quot;,
+
+            f&quot;Training epoch {epoch + 1}/100&quot;,
+
+            progress=epoch + 1,
+
+            total=100
+
+        )
+
+    
+
+    await ctx.report_status(&quot;completed&quot;, &quot;Training finished&quot;)
+
+    return f&quot;Model {model_id} trained successfully&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">도구 주석</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 주석은 도구 동작에 대한 메타데이터를 제공합니다
+
+@app.tool(
+
+    annotations={
+
+        &quot;destructive&quot;: False,      # 데이터를 수정하지 않습니다
+
+        &quot;idempotent&quot;: True,        # 재시도해도 안전합니다
+
+        &quot;timeout_seconds&quot;: 30,     # 예상 최대 소요 시간
+
+        &quot;requires_approval&quot;: False # 사용자 승인 불필요
+
+    }
+
+)
+
+async def safe_query(query: str) -&gt; str:
+
+    &quot;&quot;&quot;A read-only database query tool.&quot;&quot;&quot;
+
+    return await execute_read_query(query)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/08-BestPractices/README.md" target="_blank">모듈 8 - 모범 사례</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-contextengineering/README.md" target="_blank">5.14 - 컨텍스트 엔지니어링</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/">MCP 명세 변경 로그</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP 명세 2025-11-25</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.jsonrpc.org/specification#error_object">JSON-RPC 2.0 오류 코드</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk/tree/main/examples">Python SDK 예제</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk/tree/main/examples">TypeScript SDK 예제</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확성이 있을 수 있음을 양지해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인한 오해나 잘못된 해석에 대해 당사는 책임지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m05_14-515-mcp-custom-transport.html">&larr; 5.15 MCP Custom Transport</a></span>
+  <span><a href="m05_16-517-adversarial-multi-agent-reasoning.html">5.17 Adversarial Multi-Agent Reasoning &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

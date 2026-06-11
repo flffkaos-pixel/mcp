@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>06 Http Streaming - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 06 Http Streaming</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">HTTPS Streaming with Model Context Protocol (MCP)</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This chapter provides a comprehensive guide to implementing secure, scalable, and real-time streaming with the Model Context Protocol (MCP) using HTTPS.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It covers the motivation for streaming, the available transport mechanisms, how to implement streamable HTTP in MCP, security best practices, migration from SSE, and practical guidance for building your own streaming MCP applications.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Transport Mechanisms and Streaming in MCP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This section explores the different transport mechanisms available in MCP and their role in enabling streaming capabilities for real-time communication between clients and servers.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">What is a Transport Mechanism?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A transport mechanism defines how data is exchanged between the client and server. MCP supports multiple transport types to suit different environments and requirements:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>stdio</strong>: Standard input/output, suitable for local and CLI-based tools. Simple but not suitable for web or cloud.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>SSE (Server-Sent Events)</strong>: Allows servers to push real-time updates to clients over HTTP. Good for web UIs, but limited in scalability and flexibility. As of MCP Specification 2025-06-18, the standalone SSE (Server-Sent Events) transport has been deprecated and replaced by "Streamable HTTP" transport.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Streamable HTTP</strong>: Modern HTTP-based streaming transport, supporting notifications and better scalability. Recommended for most production and cloud scenarios.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Comparison Table</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Have a look at the comparison table below to understand the differences between these transport mechanisms:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Transport         | Real-time Updates | Streaming | Scalability | Use Case                |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-------------------|------------------|-----------|-------------|-------------------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| stdio             | No               | No        | Low         | Local CLI tools         |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| SSE               | Yes              | Yes       | Medium      | Web, real-time updates  |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Streamable HTTP   | Yes              | Yes       | High        | Cloud, multi-client     |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>Tip:</strong> Choosing the right transport impacts performance, scalability, and user experience. <strong>Streamable HTTP</strong> is recommended for modern, scalable, and cloud-ready applications.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Note the transports stdio and SSE that you were shown in the previous chapters and how streamable HTTP is the transport covered in this chapter.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Streaming: Concepts and Motivation</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Understanding the fundamental concepts and motivations behind streaming is essential for implementing effective real-time communication systems.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Streaming</strong> is a technique in network programming that allows data to be sent and received in small, manageable chunks or as a sequence of events, rather than waiting for an entire response to be ready. This is especially useful for:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Large files or datasets.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Real-time updates (e.g., chat, progress bars).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Long-running computations where you want to keep the user informed.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's what you need to know about streaming at high level:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Data is delivered progressively, not all at once.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The client can process data as it arrives.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Reduces perceived latency and improves user experience.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Why use streaming?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The reasons for using streaming are the following:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Users get feedback immediately, not just at the end</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enables real-time applications and responsive UIs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">More efficient use of network and compute resources</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Simple Example: HTTP Streaming Server & Client</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's a simple example of how streaming can be implemented:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Server (Python, using FastAPI and StreamingResponse):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from fastapi import FastAPI
+
+from fastapi.responses import StreamingResponse
+
+import time
+
+
+
+app = FastAPI()
+
+
+
+async def event_stream():
+
+    for i in range(1, 6):
+
+        yield f&quot;data: Message {i}\n\n&quot;
+
+        time.sleep(1)
+
+
+
+@app.get(&quot;/stream&quot;)
+
+def stream():
+
+    return StreamingResponse(event_stream(), media_type=&quot;text/event-stream&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Client (Python, using requests):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import requests
+
+
+
+with requests.get(&quot;http://localhost:8000/stream&quot;, stream=True) as r:
+
+    for line in r.iter_lines():
+
+        if line:
+
+            print(line.decode())
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This example demonstrates a server sending a series of messages to the client as they become available, rather than waiting for all messages to be ready.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>How it works:</strong></p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The server yields each message as it is ready.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The client receives and prints each chunk as it arrives.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Requirements:</strong></p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The server must use a streaming response (e.g., <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">StreamingResponse</code> in FastAPI).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The client must process the response as a stream (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stream=True</code> in requests).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Content-Type is usually <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">text/event-stream</code> or <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">application/octet-stream</code>.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Server (Java, using Spring Boot and Server-Sent Events):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@RestController
+
+public class CalculatorController {
+
+
+
+    @GetMapping(value = &quot;/calculate&quot;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+
+    public Flux&lt;ServerSentEvent&lt;String&gt;&gt; calculate(@RequestParam double a,
+
+                                                   @RequestParam double b,
+
+                                                   @RequestParam String op) {
+
+        
+
+        double result;
+
+        switch (op) {
+
+            case &quot;add&quot;: result = a + b; break;
+
+            case &quot;sub&quot;: result = a - b; break;
+
+            case &quot;mul&quot;: result = a * b; break;
+
+            case &quot;div&quot;: result = b != 0 ? a / b : Double.NaN; break;
+
+            default: result = Double.NaN;
+
+        }
+
+
+
+        return Flux.&lt;ServerSentEvent&lt;String&gt;&gt;just(
+
+                    ServerSentEvent.&lt;String&gt;builder()
+
+                        .event(&quot;info&quot;)
+
+                        .data(&quot;Calculating: &quot; + a + &quot; &quot; + op + &quot; &quot; + b)
+
+                        .build(),
+
+                    ServerSentEvent.&lt;String&gt;builder()
+
+                        .event(&quot;result&quot;)
+
+                        .data(String.valueOf(result))
+
+                        .build()
+
+                )
+
+                .delayElements(Duration.ofSeconds(1));
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Client (Java, using Spring WebFlux WebClient):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@SpringBootApplication
+
+public class CalculatorClientApplication implements CommandLineRunner {
+
+
+
+    private final WebClient client = WebClient.builder()
+
+            .baseUrl(&quot;http://localhost:8080&quot;)
+
+            .build();
+
+
+
+    @Override
+
+    public void run(String... args) {
+
+        client.get()
+
+                .uri(uriBuilder -&gt; uriBuilder
+
+                        .path(&quot;/calculate&quot;)
+
+                        .queryParam(&quot;a&quot;, 7)
+
+                        .queryParam(&quot;b&quot;, 5)
+
+                        .queryParam(&quot;op&quot;, &quot;mul&quot;)
+
+                        .build())
+
+                .accept(MediaType.TEXT_EVENT_STREAM)
+
+                .retrieve()
+
+                .bodyToFlux(String.class)
+
+                .doOnNext(System.out::println)
+
+                .blockLast();
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Java Implementation Notes:</strong></p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Uses Spring Boot's reactive stack with <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Flux</code> for streaming</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ServerSentEvent</code> provides structured event streaming with event types</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">WebClient</code> with <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">bodyToFlux()</code> enables reactive streaming consumption</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">delayElements()</code> simulates processing time between events</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Events can have types (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">info</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">result</code>) for better client handling</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Comparison: Classic Streaming vs MCP Streaming</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The differences between how streaming works in a "classical" manner versus how it works in MCP can be depicted like so:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Feature                | Classic HTTP Streaming         | MCP Streaming (Notifications)      |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|------------------------|-------------------------------|-------------------------------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Main response          | Chunked                       | Single, at end                      |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Progress updates       | Sent as data chunks           | Sent as notifications               |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Client requirements    | Must process stream           | Must implement message handler      |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Use case               | Large files, AI token streams | Progress, logs, real-time feedback  |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Key Differences Observed</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Additionally, here are some key differences:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Communication Pattern:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Classic HTTP streaming: Uses simple chunked transfer encoding to send data in chunks</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP streaming: Uses a structured notification system with JSON-RPC protocol</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Message Format:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Classic HTTP: Plain text chunks with newlines</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP: Structured LoggingMessageNotification objects with metadata</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Client Implementation:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Classic HTTP: Simple client that processes streaming responses</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP: More sophisticated client with a message handler to process different types of messages</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Progress Updates:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Classic HTTP: The progress is part of the main response stream</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP: Progress is sent via separate notification messages while the main response comes at the end</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Recommendations</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There are some things we recommend when it comes to choosing between implementing classical streaming (as an endpoint we showed you above using <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/stream</code>) versus choosing streaming via MCP.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>For simple streaming needs:</strong> Classic HTTP streaming is simpler to implement and sufficient for basic streaming needs.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>For complex, interactive applications:</strong> MCP streaming provides a more structured approach with richer metadata and separation between notifications and final results.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>For AI applications:</strong> MCP's notification system is particularly useful for long-running AI tasks where you want to keep users informed of progress.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Streaming in MCP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Ok, so you've seen some recommendations and comparisons so far on the difference between classical streaming and streaming in MCP. Let's get into detail exactly how you can leverage streaming in MCP.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Understanding how streaming works within the MCP framework is essential for building responsive applications that provide real-time feedback to users during long-running operations.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In MCP, streaming is not about sending the main response in chunks, but about sending <strong>notifications</strong> to the client while a tool is processing a request. These notifications can include progress updates, logs, or other events.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">How it works</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The main result is still sent as a single response. However, notifications can be sent as separate messages during processing and thereby update the client in real time. The client must be able to handle and display these notifications.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What is a Notification?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We said "Notification", what does that mean in the context of MCP?</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A notification is a message sent from the server to the client to inform about progress, status, or other events during a long-running operation. Notifications improve transparency and user experience.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For example, a client is supposed to send a notification once the initial handshake with the server has been made.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A notification looks like so as a JSON message:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  jsonrpc: &quot;2.0&quot;;
+
+  method: string;
+
+  params?: {
+
+    [key: string]: unknown;
+
+  };
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Notifications belongs to a topic in MCP referred to as <a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/specification/draft/server/utilities/logging">"Logging"</a>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To get logging to work, the server needs to enable it as feature/capability like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;capabilities&quot;: {
+
+    &quot;logging&quot;: {}
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!NOTE]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> Depending on the SDK used, logging might be enabled by default, or you might need to explicitly enable it in your server configuration.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There different types of notifications:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Level     | Description                    | Example Use Case                |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|-------------------------------|---------------------------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| debug     | Detailed debugging information | Function entry/exit points      |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| info      | General informational messages | Operation progress updates      |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| notice    | Normal but significant events  | Configuration changes           |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| warning   | Warning conditions             | Deprecated feature usage        |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| error     | Error conditions               | Operation failures              |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| critical  | Critical conditions            | System component failures       |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| alert     | Action must be taken immediately | Data corruption detected      |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| emergency | System is unusable             | Complete system failure         |</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Implementing Notifications in MCP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To implement notifications in MCP, you need to set up both the server and client sides to handle real-time updates. This allows your application to provide immediate feedback to users during long-running operations.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Server-side: Sending Notifications</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's start with the server side.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In MCP, you define tools that can send notifications while processing requests.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The server uses the context object (usually <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx</code>) to send messages to the client.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool(description=&quot;A tool that sends progress notifications&quot;)
+
+async def process_files(message: str, ctx: Context) -&gt; TextContent:
+
+    await ctx.info(&quot;Processing file 1/3...&quot;)
+
+    await ctx.info(&quot;Processing file 2/3...&quot;)
+
+    await ctx.info(&quot;Processing file 3/3...&quot;)
+
+    return TextContent(type=&quot;text&quot;, text=f&quot;Done: {message}&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding example, the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">process_files</code> tool sends three notifications to the client as it processes each file.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.info()</code> method is used to send informational messages.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Additionally, to enable notifications, ensure your server uses a streaming transport (like <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamable-http</code>) and your client implements a message handler to process notifications.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's how you can set up the server to use the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamable-http</code> transport:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp.run(transport=&quot;streamable-http&quot;)
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+[Tool(&quot;A tool that sends progress notifications&quot;)]
+
+public async Task&lt;TextContent&gt; ProcessFiles(string message, ToolContext ctx)
+
+{
+
+    await ctx.Info(&quot;Processing file 1/3...&quot;);
+
+    await ctx.Info(&quot;Processing file 2/3...&quot;);
+
+    await ctx.Info(&quot;Processing file 3/3...&quot;);
+
+    return new TextContent
+
+    {
+
+        Type = &quot;text&quot;,
+
+        Text = $&quot;Done: {message}&quot;
+
+    };
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this .NET example, the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ProcessFiles</code> tool is decorated with the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Tool</code> attribute and sends three notifications to the client as it processes each file.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.Info()</code> method is used to send informational messages.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To enable notifications in your .NET MCP server, ensure you're using a streaming transport:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+var builder = McpBuilder.Create();
+
+await builder
+
+    .UseStreamableHttp() // Enable streamable HTTP transport
+
+    .Build()
+
+    .RunAsync();
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Client-side: Receiving Notifications</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The client must implement a message handler to process and display notifications as they arrive.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def message_handler(message):
+
+    if isinstance(message, types.ServerNotification):
+
+        print(&quot;NOTIFICATION:&quot;, message)
+
+    else:
+
+        print(&quot;SERVER MESSAGE:&quot;, message)
+
+
+
+async with ClientSession(
+
+   read_stream, 
+
+   write_stream,
+
+   logging_callback=logging_collector,
+
+   message_handler=message_handler,
+
+) as session:
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">message_handler</code> function checks if the incoming message is a notification.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If it is, it prints the notification; otherwise, it processes it as a regular server message.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Also note how the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ClientSession</code> is initialized with the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">message_handler</code> to handle incoming notifications.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Define a message handler
+
+void MessageHandler(IJsonRpcMessage message)
+
+{
+
+    if (message is ServerNotification notification)
+
+    {
+
+        Console.WriteLine($&quot;NOTIFICATION: {notification}&quot;);
+
+    }
+
+    else
+
+    {
+
+        Console.WriteLine($&quot;SERVER MESSAGE: {message}&quot;);
+
+    }
+
+}
+
+
+
+// Create and use a client session with the message handler
+
+var clientOptions = new ClientSessionOptions
+
+{
+
+    MessageHandler = MessageHandler,
+
+    LoggingCallback = (level, message) =&gt; Console.WriteLine($&quot;[{level}] {message}&quot;)
+
+};
+
+
+
+using var client = new ClientSession(readStream, writeStream, clientOptions);
+
+await client.InitializeAsync();
+
+
+
+// Now the client will process notifications through the MessageHandler
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this .NET example, the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">MessageHandler</code> function checks if the incoming message is a notification.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If it is, it prints the notification; otherwise, it processes it as a regular server message.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ClientSession</code> is initialized with the message handler via the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ClientSessionOptions</code>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To enable notifications, ensure your server uses a streaming transport (like <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamable-http</code>) and your client implements a message handler to process notifications.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Progress Notifications & Scenarios</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This section explains the concept of progress notifications in MCP, why they matter, and how to implement them using Streamable HTTP. You'll also find a practical assignment to reinforce your understanding.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Progress notifications are real-time messages sent from the server to the client during long-running operations.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Instead of waiting for the entire process to finish, the server keeps the client updated about the current status.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This improves transparency, user experience, and makes debugging easier.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Example:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+&quot;Processing document 1/10&quot;
+
+&quot;Processing document 2/10&quot;
+
+...
+
+&quot;Processing complete!&quot;
+
+
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Why Use Progress Notifications?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Progress notifications are essential for several reasons:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Better user experience:</strong> Users see updates as work progresses, not just at the end.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Real-time feedback:</strong> Clients can display progress bars or logs, making the app feel responsive.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Easier debugging and monitoring:</strong> Developers and users can see where a process might be slow or stuck.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">How to Implement Progress Notifications</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's how you can implement progress notifications in MCP:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>On the server:</strong> Use <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.info()</code> or <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.log()</code> to send notifications as each item is processed. This sends a message to the client before the main result is ready.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>On the client:</strong> Implement a message handler that listens for and displays notifications as they arrive. This handler distinguishes between notifications and the final result.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Server Example:</strong></p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool(description=&quot;A tool that sends progress notifications&quot;)
+
+async def process_files(message: str, ctx: Context) -&gt; TextContent:
+
+    for i in range(1, 11):
+
+        await ctx.info(f&quot;Processing document {i}/10&quot;)
+
+    await ctx.info(&quot;Processing complete!&quot;)
+
+    return TextContent(type=&quot;text&quot;, text=f&quot;Done: {message}&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Client Example:</strong></p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def message_handler(message):
+
+    if isinstance(message, types.ServerNotification):
+
+        print(&quot;NOTIFICATION:&quot;, message)
+
+    else:
+
+        print(&quot;SERVER MESSAGE:&quot;, message)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Security Considerations</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When implementing MCP servers with HTTP-based transports, security becomes a paramount concern that requires careful attention to multiple attack vectors and protection mechanisms.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Overview</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Security is critical when exposing MCP servers over HTTP. Streamable HTTP introduces new attack surfaces and requires careful configuration.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Key Points</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Origin Header Validation</strong>: Always validate the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Origin</code> header to prevent DNS rebinding attacks.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Localhost Binding</strong>: For local development, bind servers to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">localhost</code> to avoid exposing them to the public internet.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Authentication</strong>: Implement authentication (e.g., API keys, OAuth) for production deployments.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>CORS</strong>: Configure Cross-Origin Resource Sharing (CORS) policies to restrict access.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>HTTPS</strong>: Use HTTPS in production to encrypt traffic.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Best Practices</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Never trust incoming requests without validation.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Log and monitor all access and errors.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Regularly update dependencies to patch security vulnerabilities.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenges</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Balancing security with ease of development</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensuring compatibility with various client environments</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Upgrading from SSE to Streamable HTTP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For applications currently using Server-Sent Events (SSE), migrating to Streamable HTTP provides enhanced capabilities and better long-term sustainability for your MCP implementations.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Why Upgrade?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There are two compelling reasons to upgrade from SSE to Streamable HTTP:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Streamable HTTP offers better scalability, compatibility, and richer notification support than SSE.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">It is the recommended transport for new MCP applications.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Migration Steps</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's how you can migrate from SSE to Streamable HTTP in your MCP applications:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Update server code</strong> to use <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">transport="streamable-http"</code> in <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">mcp.run()</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Update client code</strong> to use <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamablehttp_client</code> instead of SSE client.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement a message handler</strong> in the client to process notifications.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Test for compatibility</strong> with existing tools and workflows.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Maintaining Compatibility</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It's recommended to maintain compatibility with existing SSE clients during the migration process. Here are some strategies:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">You can support both SSE and Streamable HTTP by running both transports on different endpoints.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Gradually migrate clients to the new transport.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenges</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Ensure you address the following challenges during migration:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensuring all clients are updated</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handling differences in notification delivery</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Security Considerations</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Security should be a top priority when implementing any server, especially when using HTTP-based transports like Streamable HTTP in MCP. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When implementing MCP servers with HTTP-based transports, security becomes a paramount concern that requires careful attention to multiple attack vectors and protection mechanisms.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Overview</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Security is critical when exposing MCP servers over HTTP. Streamable HTTP introduces new attack surfaces and requires careful configuration.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here are some key security considerations:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Origin Header Validation</strong>: Always validate the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Origin</code> header to prevent DNS rebinding attacks.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Localhost Binding</strong>: For local development, bind servers to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">localhost</code> to avoid exposing them to the public internet.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Authentication</strong>: Implement authentication (e.g., API keys, OAuth) for production deployments.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>CORS</strong>: Configure Cross-Origin Resource Sharing (CORS) policies to restrict access.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>HTTPS</strong>: Use HTTPS in production to encrypt traffic.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Best Practices</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Additionally, here are some best practices to follow when implementing security in your MCP streaming server:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Never trust incoming requests without validation.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Log and monitor all access and errors.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Regularly update dependencies to patch security vulnerabilities.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenges</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You will face some challenges when implementing security in MCP streaming servers:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Balancing security with ease of development</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensuring compatibility with various client environments</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Assignment: Build Your Own Streaming MCP App</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Scenario:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Build an MCP server and client where the server processes a list of items (e.g., files or documents) and sends a notification for each item processed. The client should display each notification as it arrives.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Steps:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Implement a server tool that processes a list and sends notifications for each item.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Implement a client with a message handler to display notifications in real time.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Test your implementation by running both server and client, and observe the notifications.</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Further Reading & What Next?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To continue your journey with MCP streaming and expand your knowledge, this section provides additional resources and suggested next steps for building more advanced applications.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Further Reading</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/aspnet/core/fundamentals/http-requests?view=aspnetcore-8.0&WT.mc_id=%3Fwt.mc_id%3DMVP_452430#streaming">Microsoft: Introduction to HTTP Streaming</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/application-gateway/for-containers/server-sent-events?tabs=server-sent-events-gateway-api&WT.mc_id=%3Fwt.mc_id%3DMVP_452430">Microsoft: Server-Sent Events (SSE)</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/aspnet/core/security/cors?view=aspnetcore-8.0&WT.mc_id=%3Fwt.mc_id%3DMVP_452430">Microsoft: CORS in ASP.NET Core</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://requests.readthedocs.io/en/latest/user/advanced/#streaming-requests">Python requests: Streaming Requests</a></li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">What Next?</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Try building more advanced MCP tools that use streaming for real-time analytics, chat, or collaborative editing.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explore integrating MCP streaming with frontend frameworks (React, Vue, etc.) for live UI updates.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/07-aitk/README.md" target="_blank">Utilising AI Toolkit for VSCode</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">HTTPS 스트리밍과 모델 컨텍스트 프로토콜(MCP)</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 장에서는 HTTPS를 사용하여 모델 컨텍스트 프로토콜(MCP)로 보안성, 확장성 및 실시간 스트리밍을 구현하는 포괄적인 가이드를 제공합니다. 스트리밍의 동기, 사용 가능한 전송 메커니즘, MCP에서 스트림 가능한 HTTP를 구현하는 방법, 보안 모범 사례, SSE에서의 마이그레이션, 그리고 스트리밍 MCP 애플리케이션을 구축하는 실용적인 지침을 다룹니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP의 전송 메커니즘과 스트리밍</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 섹션에서는 MCP에서 사용할 수 있는 다양한 전송 메커니즘과 이들이 클라이언트와 서버 간 실시간 통신을 가능하게 하는 스트리밍 기능에서 어떤 역할을 하는지 살펴봅니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">전송 메커니즘이란 무엇인가?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전송 메커니즘은 클라이언트와 서버 간 데이터가 교환되는 방식을 정의합니다. MCP는 다양한 환경과 요구 사항에 맞춰 여러 전송 유형을 지원합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>stdio</strong>: 표준 입력/출력으로, 로컬 및 CLI 기반 도구에 적합합니다. 단순하지만 웹이나 클라우드에는 적합하지 않습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>SSE (Server-Sent Events)</strong>: 서버가 HTTP를 통해 클라이언트에 실시간 업데이트를 푸시할 수 있게 합니다. 웹 UI에 적합하지만 확장성과 유연성에 제한이 있습니다. MCP 규격 2025-06-18 기준으로 독립적인 SSE 전송은 더 이상 사용되지 않으며 "Streamable HTTP" 전송으로 대체되었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Streamable HTTP</strong>: 알림과 더 나은 확장성을 지원하는 최신 HTTP 기반 스트리밍 전송 방식입니다. 대부분의 프로덕션 및 클라우드 환경에서 권장됩니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">비교 표</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">아래 비교 표를 보면 이러한 전송 메커니즘 간의 차이점을 이해할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 전송 타입         | 실시간 업데이트 | 스트리밍 | 확장성      | 사용 사례                  |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-------------------|----------------|---------|------------|---------------------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| stdio             | 아니오          | 아니오  | 낮음        | 로컬 CLI 도구             |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| SSE               | 예             | 예      | 중간        | 웹, 실시간 업데이트        |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Streamable HTTP   | 예             | 예      | 높음        | 클라우드, 다중 클라이언트 |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>팁:</strong> 적절한 전송 방식을 선택하는 것은 성능, 확장성, 사용자 경험에 중요한 영향을 미칩니다. <strong>Streamable HTTP</strong>는 최신의 확장 가능하고 클라우드 대응 애플리케이션에 권장됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이전 장에서 소개한 stdio 및 SSE 전송과 달리, 이 장에서는 Streamable HTTP 전송에 대해 다룹니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">스트리밍: 개념과 동기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">스트리밍의 기본 개념과 동기를 이해하는 것은 효과적인 실시간 통신 시스템을 구현하는 데 필수적입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>스트리밍</strong>은 네트워크 프로그래밍에서 전체 응답이 준비될 때까지 기다리지 않고 데이터가 작고 관리 가능한 청크로 또는 이벤트 시퀀스로 전송되고 수신될 수 있게 하는 기술입니다. 특히 다음과 같은 경우에 유용합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">대용량 파일 또는 데이터셋.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 업데이트(예: 채팅, 진행 표시줄).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자에게 진행 상황을 알려야 하는 장시간 실행되는 계산.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">스트리밍에 대해 알아야 할 주요 사항은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">데이터가 한꺼번에가 아니라 점진적으로 전달됩니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트는 도착하는 데이터를 즉시 처리할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">지각 대기 시간이 줄어들어 사용자 경험이 향상됩니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">왜 스트리밍을 사용하는가?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">스트리밍 사용 이유는 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자가 작업이 끝날 때까지 기다리지 않고 즉시 피드백을 받음</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 애플리케이션과 반응형 UI를 가능하게 함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">네트워크와 컴퓨팅 자원의 효율적 사용</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">간단한 예: HTTP 스트리밍 서버 및 클라이언트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음은 스트리밍이 어떻게 구현될 수 있는지에 대한 간단한 예입니다:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>서버 (Python, FastAPI 및 StreamingResponse 사용):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from fastapi import FastAPI
+
+from fastapi.responses import StreamingResponse
+
+import time
+
+
+
+app = FastAPI()
+
+
+
+async def event_stream():
+
+    for i in range(1, 6):
+
+        yield f&quot;data: Message {i}\n\n&quot;
+
+        time.sleep(1)
+
+
+
+@app.get(&quot;/stream&quot;)
+
+def stream():
+
+    return StreamingResponse(event_stream(), media_type=&quot;text/event-stream&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>클라이언트 (Python, requests 사용):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import requests
+
+
+
+with requests.get(&quot;http://localhost:8000/stream&quot;, stream=True) as r:
+
+    for line in r.iter_lines():
+
+        if line:
+
+            print(line.decode())
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 예는 모든 메시지가 준비될 때까지 기다리지 않고, 서버가 준비되는 대로 일련의 메시지를 클라이언트에 전송하는 방식을 보여줍니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>작동 방식:</strong></p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버는 각 메시지가 준비될 때마다 이를 yield합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트는 도착하는 각 청크를 수신하고 출력합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>요구 사항:</strong></p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버는 스트리밍 응답(e.g., FastAPI의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">StreamingResponse</code>)을 사용해야 합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트는 스트림으로 응답을 처리해야 합니다(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">requests</code>의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stream=True</code>).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Content-Type은 보통 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">text/event-stream</code> 또는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">application/octet-stream</code>입니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>서버 (Java, Spring Boot 및 Server-Sent Events 사용):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@RestController
+
+public class CalculatorController {
+
+
+
+    @GetMapping(value = &quot;/calculate&quot;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+
+    public Flux&lt;ServerSentEvent&lt;String&gt;&gt; calculate(@RequestParam double a,
+
+                                                   @RequestParam double b,
+
+                                                   @RequestParam String op) {
+
+        
+
+        double result;
+
+        switch (op) {
+
+            case &quot;add&quot;: result = a + b; break;
+
+            case &quot;sub&quot;: result = a - b; break;
+
+            case &quot;mul&quot;: result = a * b; break;
+
+            case &quot;div&quot;: result = b != 0 ? a / b : Double.NaN; break;
+
+            default: result = Double.NaN;
+
+        }
+
+
+
+        return Flux.&lt;ServerSentEvent&lt;String&gt;&gt;just(
+
+                    ServerSentEvent.&lt;String&gt;builder()
+
+                        .event(&quot;info&quot;)
+
+                        .data(&quot;Calculating: &quot; + a + &quot; &quot; + op + &quot; &quot; + b)
+
+                        .build(),
+
+                    ServerSentEvent.&lt;String&gt;builder()
+
+                        .event(&quot;result&quot;)
+
+                        .data(String.valueOf(result))
+
+                        .build()
+
+                )
+
+                .delayElements(Duration.ofSeconds(1));
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>클라이언트 (Java, Spring WebFlux WebClient 사용):</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@SpringBootApplication
+
+public class CalculatorClientApplication implements CommandLineRunner {
+
+
+
+    private final WebClient client = WebClient.builder()
+
+            .baseUrl(&quot;http://localhost:8080&quot;)
+
+            .build();
+
+
+
+    @Override
+
+    public void run(String... args) {
+
+        client.get()
+
+                .uri(uriBuilder -&gt; uriBuilder
+
+                        .path(&quot;/calculate&quot;)
+
+                        .queryParam(&quot;a&quot;, 7)
+
+                        .queryParam(&quot;b&quot;, 5)
+
+                        .queryParam(&quot;op&quot;, &quot;mul&quot;)
+
+                        .build())
+
+                .accept(MediaType.TEXT_EVENT_STREAM)
+
+                .retrieve()
+
+                .bodyToFlux(String.class)
+
+                .doOnNext(System.out::println)
+
+                .blockLast();
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Java 구현 주석:</strong></p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">반응형 스택 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Flux</code>)을 활용하여 스트리밍</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ServerSentEvent</code> 는 이벤트 타입을 갖는 구조화된 이벤트 스트리밍 제공</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">WebClient</code>의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">bodyToFlux()</code>를 통해 반응형 스트리밍 소비 가능</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">delayElements()</code>로 이벤트 간 처리 시간 시뮬레이션</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이벤트별 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">info</code> 및 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">result</code> 타입 부여하여 클라이언트 처리 개선</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">비교: 클래식 스트리밍 vs MCP 스트리밍</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클래식 방식의 스트리밍과 MCP 스트리밍이 어떻게 다른지 다음 표에서 확인할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 특징                  | 클래식 HTTP 스트리밍             | MCP 스트리밍 (알림)                 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|------------------------|-------------------------------|-------------------------------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 주요 응답              | 청크 단위로 전송               | 단일 응답, 끝에 전달                 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 진행 상황 업데이트     | 데이터 청크로 전송             | 알림으로 전송                       |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 클라이언트 요구 사항   | 스트림 처리 필요               | 메시지 핸들러 구현 필요              |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 사용 사례              | 대용량 파일, AI 토큰 스트림   | 진행 상황, 로그, 실시간 피드백       |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">관찰된 주요 차이점</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">추가로 주요 차이점은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>통신 패턴:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 클래식 HTTP 스트리밍: 간단한 청크 전송 인코딩 사용</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP 스트리밍: JSON-RPC 프로토콜 기반 구조화된 알림 시스템 사용</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>메시지 형식:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 클래식 HTTP: 줄바꿈 포함한 텍스트 청크</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP: 메타데이터가 포함된 구조화된 LoggingMessageNotification 객체</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>클라이언트 구현:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 클래식 HTTP: 스트리밍 응답을 처리하는 단순 클라이언트</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP: 메시지 핸들러를 구현하여 다양한 메시지 유형 처리</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>진행 상황 업데이트:</strong></li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 클래식 HTTP: 진행 상황이 주요 응답 스트림의 일부</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - MCP: 주요 응답은 끝에 전송되고 진행 상황은 별도 알림 메시지로 전송</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">권장 사항</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클래식 스트리밍(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/stream</code> 엔드포인트) 구현과 MCP 스트리밍 구현 간 선택 시 다음 사항들을 권장합니다.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>간단한 스트리밍 요구:</strong> 클래식 HTTP 스트리밍이 구현이 간단하며 기본적인 스트리밍에 충분합니다.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>복잡하고 상호작용이 필요한 애플리케이션:</strong> MCP 스트리밍은 더 풍부한 메타데이터와 알림과 최종 결과의 분리를 제공하는 구조적 접근법입니다.</li>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>AI 애플리케이션용:</strong> 장시간 실행되는 AI 작업에서 진행 상황을 사용자에게 알리기 위해 MCP 알림 시스템이 특히 유용합니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP에서의 스트리밍</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제까지 클래식 스트리밍과 MCP 스트리밍 차이에 대해 권장 사항과 비교를 보셨습니다. 이제 MCP에서 스트리밍을 어떻게 활용할 수 있는지 자세히 살펴봅시다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 프레임워크 내 스트리밍이 어떻게 작동하는지 이해하는 것은 장시간 실행 작업 중 사용자에게 실시간 피드백을 제공하는 반응형 애플리케이션을 구축하는 데 중요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP에서 스트리밍은 주요 응답을 청크로 나누어 보내는 것이 아니라, 툴이 요청을 처리하는 동안 <strong>알림(notification)</strong> 을 클라이언트로 전송하는 것입니다. 이 알림에는 진행 상황 업데이트, 로그, 기타 이벤트가 포함될 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">작동 방식</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">주요 결과는 여전히 단일 응답으로 전송됩니다. 그러나 처리 중에 알림이 별도의 메시지로 전송되어 클라이언트에 실시간으로 업데이트할 수 있습니다. 클라이언트는 이 알림을 수신하고 표시할 수 있어야 합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">알림(Notification)이란?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">"알림"이란 무엇인가라고 했는데, MCP 맥락에서 이를 정의하면?</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">알림은 서버에서 클라이언트로 보내는 메시지로서, 장시간 실행 작업 중 진행 상황, 상태 또는 기타 이벤트를 알리기 위해 전송됩니다. 알림은 투명성과 사용자 경험을 개선합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예를 들어, 클라이언트는 서버와의 초기 핸드셰이크가 완료되면 알림을 보내야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">알림은 JSON 메시지 형태로 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  jsonrpc: &quot;2.0&quot;;
+
+  method: string;
+
+  params?: {
+
+    [key: string]: unknown;
+
+  };
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">알림은 MCP 내 <a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/specification/draft/server/utilities/logging">"Logging"</a> 토픽에 속합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">로깅 기능을 작동시키려면 서버는 다음과 같이 기능/역량으로 활성화해야 합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;capabilities&quot;: {
+
+    &quot;logging&quot;: {}
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!NOTE]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 사용 중인 SDK에 따라 로깅이 기본적으로 활성화되어 있거나 서버 설정에서 명시적으로 활성화해야 할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">알림에는 여러 유형이 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 레벨     | 설명                          | 예제 사용 사례                 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|-------------------------------|--------------------------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| debug     | 상세 디버깅 정보               | 함수 진입/종료 지점             |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| info      | 일반 정보 메시지              | 작업 진행 상황 업데이트         |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| notice    | 일반적이지만 중요한 이벤트    | 설정 변경                     |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| warning   | 경고 상황                    | 사용 중단된 기능 사용             |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| error     | 오류 상황                    | 작업 실패                     |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| critical  | 치명적인 상황                | 시스템 구성 요소 실패            |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| alert     | 즉각적 조치 필요              | 데이터 손상 탐지                |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| emergency | 시스템 사용 불가             | 전체 시스템 장애               |</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP에서 알림 구현</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP에서 알림을 구현하려면 서버와 클라이언트 양쪽에서 실시간 업데이트를 처리하도록 설정해야 합니다. 이를 통해 장시간 실행 작업 중 즉각적인 피드백을 사용자에게 제공할 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">서버 측: 알림 전송</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">먼저 서버 측부터 시작합시다. MCP에서는 요청 처리 중 알림을 보낼 수 있는 툴을 정의합니다. 서버는 컨텍스트 객체(보통 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx</code>)를 사용하여 클라이언트에 메시지를 전송합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool(description=&quot;A tool that sends progress notifications&quot;)
+
+async def process_files(message: str, ctx: Context) -&gt; TextContent:
+
+    await ctx.info(&quot;Processing file 1/3...&quot;)
+
+    await ctx.info(&quot;Processing file 2/3...&quot;)
+
+    await ctx.info(&quot;Processing file 3/3...&quot;)
+
+    return TextContent(type=&quot;text&quot;, text=f&quot;Done: {message}&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 예제에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">process_files</code> 툴은 각 파일을 처리할 때 클라이언트에 세 번의 알림을 보냅니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.info()</code> 메서드는 정보 메시지 전송에 사용됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">또한 알림을 활성화하려면 서버가 스트리밍 전송(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamable-http</code> 등)을 사용하고 클라이언트가 알림을 처리할 메시지 핸들러를 구현해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamable-http</code> 전송을 사용하는 방법은 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp.run(transport=&quot;streamable-http&quot;)
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+[Tool(&quot;A tool that sends progress notifications&quot;)]
+
+public async Task&lt;TextContent&gt; ProcessFiles(string message, ToolContext ctx)
+
+{
+
+    await ctx.Info(&quot;Processing file 1/3...&quot;);
+
+    await ctx.Info(&quot;Processing file 2/3...&quot;);
+
+    await ctx.Info(&quot;Processing file 3/3...&quot;);
+
+    return new TextContent
+
+    {
+
+        Type = &quot;text&quot;,
+
+        Text = $&quot;Done: {message}&quot;
+
+    };
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 .NET 예제에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ProcessFiles</code> 툴은 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Tool</code> 어트리뷰트가 적용되어 있으며 각 파일 처리 시 클라이언트에 세 번 알림을 보냅니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.Info()</code> 메서드는 정보 메시지 전송에 이용됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">.NET MCP 서버에서 알림을 활성화하려면 스트리밍 전송이 사용되고 있는지 확인하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+var builder = McpBuilder.Create();
+
+await builder
+
+    .UseStreamableHttp() // Enable streamable HTTP transport
+
+    .Build()
+
+    .RunAsync();
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">클라이언트 측: 알림 수신</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트는 메시지 핸들러를 구현해야 하며, 도착하는 알림을 처리하고 표시할 수 있어야 합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def message_handler(message):
+
+    if isinstance(message, types.ServerNotification):
+
+        print(&quot;NOTIFICATION:&quot;, message)
+
+    else:
+
+        print(&quot;SERVER MESSAGE:&quot;, message)
+
+
+
+async with ClientSession(
+
+   read_stream, 
+
+   write_stream,
+
+   logging_callback=logging_collector,
+
+   message_handler=message_handler,
+
+) as session:
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">message_handler</code> 함수는 들어오는 메시지가 알림인지 확인합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">알림이면 출력하며, 아니면 일반 서버 메시지로 처리합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">또한 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ClientSession</code>은 도착하는 알림을 처리하기 위해 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">message_handler</code>로 초기화됩니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Define a message handler
+
+void MessageHandler(IJsonRpcMessage message)
+
+{
+
+    if (message is ServerNotification notification)
+
+    {
+
+        Console.WriteLine($&quot;NOTIFICATION: {notification}&quot;);
+
+    }
+
+    else
+
+    {
+
+        Console.WriteLine($&quot;SERVER MESSAGE: {message}&quot;);
+
+    }
+
+}
+
+
+
+// Create and use a client session with the message handler
+
+var clientOptions = new ClientSessionOptions
+
+{
+
+    MessageHandler = MessageHandler,
+
+    LoggingCallback = (level, message) =&gt; Console.WriteLine($&quot;[{level}] {message}&quot;)
+
+};
+
+
+
+using var client = new ClientSession(readStream, writeStream, clientOptions);
+
+await client.InitializeAsync();
+
+
+
+// Now the client will process notifications through the MessageHandler
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 .NET 예제에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">MessageHandler</code> 함수는 들어오는 메시지가 알림인지 체크합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">알림이면 출력하고, 아니면 일반 서버 메시지로 처리합니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ClientSession</code>은 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ClientSessionOptions</code>를 통해 메시지 핸들러로 초기화됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">알림 활성화를 위해 서버가 스트리밍 전송(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamable-http</code> 등)을 사용하고 클라이언트가 알림 메시지 핸들러를 구현하는지 확인하세요.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">진행 알림 및 시나리오</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 섹션에서는 MCP에서 진행 알림의 개념과 중요성, 그리고 Streamable HTTP를 통해 이를 구현하는 방법을 설명합니다. 또한 이해를 돕기 위한 실용적인 과제도 포함되어 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">진행 알림(progress notifications)은 장시간 작업 중 서버에서 클라이언트로 실시간으로 보내는 메시지입니다. 전체 프로세스가 끝날 때까지 기다리지 않고 서버가 현재 상태를 계속해서 알립니다. 이는 투명성, 사용자 경험을 높이고 디버깅도 용이하게 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>예시:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+&quot;Processing document 1/10&quot;
+
+&quot;Processing document 2/10&quot;
+
+...
+
+&quot;Processing complete!&quot;
+
+
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">왜 진행 알림을 사용하는가?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">진행 알림이 중요한 이유는 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>더 나은 사용자 경험:</strong> 사용자가 작업 진행 상황을 실시간으로 볼 수 있음.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>실시간 피드백:</strong> 클라이언트는 진행 막대나 로그를 표시하며 앱을 반응형으로 느끼게 함.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>디버깅 및 모니터링 용이:</strong> 개발자와 사용자가 작업이 느리거나 멈춘 위치를 쉽게 확인 가능.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">진행 알림 구현 방법</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP에서 진행 알림을 구현하는 방법은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>서버 측:</strong> <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.info()</code> 또는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ctx.log()</code>를 사용해 각 아이템 처리 시 알림을 전송. 이는 주요 결과가 준비되기 전에 클라이언트에 메시지를 보냅니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>클라이언트 측:</strong> 알림 도착을 듣고 표시하는 메시지 핸들러를 구현. 핸들러는 알림과 최종 결과를 구분합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>서버 예제:</strong></p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool(description=&quot;A tool that sends progress notifications&quot;)
+
+async def process_files(message: str, ctx: Context) -&gt; TextContent:
+
+    for i in range(1, 11):
+
+        await ctx.info(f&quot;Processing document {i}/10&quot;)
+
+    await ctx.info(&quot;Processing complete!&quot;)
+
+    return TextContent(type=&quot;text&quot;, text=f&quot;Done: {message}&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>클라이언트 예제:</strong></p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async def message_handler(message):
+
+    if isinstance(message, types.ServerNotification):
+
+        print(&quot;NOTIFICATION:&quot;, message)
+
+    else:
+
+        print(&quot;SERVER MESSAGE:&quot;, message)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">보안 고려 사항</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">HTTP 기반 전송을 사용하는 MCP 서버를 구현할 때 보안은 다양한 공격 지점과 보호 메커니즘에 세심한 주의가 필요한 매우 중요한 문제입니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">개요</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버를 HTTP로 노출할 때 보안은 필수적입니다. Streamable HTTP는 새로운 공격 표면을 도입하여 신중한 구성이 요구됩니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">핵심 사항</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Origin 헤더 검증:</strong> DNS 리바인딩 공격을 방지하기 위해 항상 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Origin</code> 헤더를 검증하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>로컬호스트 바인딩:</strong> 로컬 개발 시 서버를 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">localhost</code>에 바인딩하여 공개 인터넷 노출을 방지하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>인증:</strong> 프로덕션 배포에선 인증(API 키, OAuth 등)을 구현하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>CORS:</strong> 교차 출처 리소스 공유 정책을 설정해 접근을 제한하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>HTTPS:</strong> 프로덕션에서는 HTTPS를 사용해 트래픽 암호화를 보장하세요.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">모범 사례</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">검증 없이 들어오는 요청을 신뢰하지 마세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모든 접근 및 오류를 로깅하고 모니터링하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보안 취약점 패치를 위해 의존성을 정기적으로 업데이트하세요.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">도전과제</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보안과 개발의 용이성의 균형 맞추기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 클라이언트 환경과의 호환성 보장</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">SSE에서 Streamable HTTP로 업그레이드하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">현재 Server-Sent Events(SSE)를 사용하는 애플리케이션의 경우, Streamable HTTP로 마이그레이션하면 향상된 기능과 MCP 구현의 장기적 유지 가능성을 제공합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">업그레이드가 필요한 이유</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">SSE에서 Streamable HTTP로 업그레이드해야 하는 두 가지 설득력 있는 이유가 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Streamable HTTP는 SSE보다 뛰어난 확장성, 호환성, 그리고 풍부한 알림 지원을 제공합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">새로운 MCP 애플리케이션에 권장되는 전송 방식입니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">마이그레이션 단계</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 애플리케이션에서 SSE에서 Streamable HTTP로 마이그레이션하는 방법은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버 코드를 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">mcp.run()</code>에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">transport="streamable-http"</code>로 업데이트합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트 코드를 SSE 클라이언트 대신 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">streamablehttp_client</code>를 사용하도록 업데이트합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트에서 알림을 처리할 메시지 핸들러를 구현합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">기존 도구 및 워크플로와의 호환성을 테스트합니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">호환성 유지</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">마이그레이션 과정에서 기존 SSE 클라이언트와의 호환성을 유지하는 것이 권장됩니다. 다음과 같은 전략이 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서로 다른 엔드포인트에서 두 전송 방식을 동시에 실행하여 SSE와 Streamable HTTP를 모두 지원할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트를 점진적으로 새 전송 방식으로 마이그레이션합니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">마이그레이션 시 다음 과제를 반드시 해결해야 합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모든 클라이언트가 업데이트되었는지 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">알림 전달 방식의 차이 처리</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">보안 고려사항</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">어떤 서버를 구현하든, 특히 MCP의 Streamable HTTP 같은 HTTP 기반 전송을 사용할 때 보안은 최우선 과제여야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">HTTP 기반 전송을 사용하는 MCP 서버를 구현할 때는 여러 공격 벡터와 보호 메커니즘에 세심한 주의를 기울여야 합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">개요</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버를 HTTP를 통해 노출할 때 보안은 매우 중요합니다. Streamable HTTP는 새로운 공격 지점을 제공하며 신중한 구성과 관리가 필요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">주요 보안 고려사항은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Origin 헤더 검증</strong>: DNS 리바인딩 공격을 방지하기 위해 항상 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Origin</code> 헤더를 검증합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>로컬호스트 바인딩</strong>: 로컬 개발 시 서버를 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">localhost</code>에 바인딩하여 공개 인터넷에 노출되지 않도록 합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>인증</strong>: 운영 환경에서는 API 키, OAuth 같은 인증을 구현합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>CORS</strong>: 접근을 제한하기 위해 교차 출처 리소스 공유(CORS) 정책을 구성합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>HTTPS</strong>: 운영 환경에서는 트래픽 암호화를 위해 HTTPS를 사용합니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">모범 사례</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 스트리밍 서버에서 보안을 구현할 때 따를 모범 사례는 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">검증 없이 들어오는 요청을 신뢰하지 마세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모든 접근과 오류를 로깅하고 모니터링하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보안 취약점 패치를 위해 의존성을 정기적으로 업데이트하세요.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 스트리밍 서버 보안 구현 중에는 다음과 같은 과제를 직면합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보안과 개발 편의성 간의 균형 맞추기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 클라이언트 환경과의 호환성 보장</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제: 직접 나만의 스트리밍 MCP 애플리케이션 만들기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>시나리오:</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버가 아이템 목록(예: 파일 또는 문서)을 처리하고 처리된 각 아이템에 대해 알림을 전송하는 MCP 서버와 클라이언트를 만드세요. 클라이언트는 도착하는 각 알림을 실시간으로 표시해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>단계:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 목록을 처리하고 각 항목에 대해 알림을 보내는 서버 도구를 구현하세요.  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 알림을 실시간으로 표시할 메시지 핸들러가 있는 클라이언트를 구현하세요.  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 서버와 클라이언트를 함께 실행하여 구현을 테스트하고 알림이 잘 표시되는지 확인하세요.  </p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 학습 및 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 스트리밍을 계속 사용하고 지식을 확장하기 위해 이 섹션에서는 추가 리소스와 더 고급 애플리케이션을 만들기 위한 권장 다음 단계를 제공합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">추가 학습</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/aspnet/core/fundamentals/http-requests?view=aspnetcore-8.0&WT.mc_id=%3Fwt.mc_id%3DMVP_452430#streaming">Microsoft: HTTP 스트리밍 소개</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/application-gateway/for-containers/server-sent-events?tabs=server-sent-events-gateway-api&WT.mc_id=%3Fwt.mc_id%3DMVP_452430">Microsoft: Server-Sent Events (SSE)</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/aspnet/core/security/cors?view=aspnetcore-8.0&WT.mc_id=%3Fwt.mc_id%3DMVP_452430">Microsoft: ASP.NET Core에서 CORS</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://requests.readthedocs.io/en/latest/user/advanced/#streaming-requests">Python requests: 스트리밍 요청</a></li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">다음 단계</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 분석, 채팅, 협업 편집에 스트리밍을 사용하는 더 고급 MCP 도구를 만들어보세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 스트리밍을 프론트엔드 프레임워크(React, Vue 등)와 통합하여 실시간 UI 업데이트를 구현해보세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/07-aitk/README.md" target="_blank">VSCode용 AI 툴킷 활용하기</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 기하기 위해 노력하고 있으나, 자동 번역은 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어본이 권위 있는 자료로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문가의 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m03_05-05-stdio-server.html">&larr; 05 Stdio Server</a></span>
+  <span><a href="m03_07-07-aitk.html">07 Aitk &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,4133 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>12 - Best Practices and Optimization - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 12 - Best Practices and Optimization</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Best Practices and Optimization</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This capstone lab consolidates best practices, optimization techniques, and production guidelines for building robust, scalable, and secure MCP servers with database integration.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll learn from real-world experience and industry standards to ensure your implementation is production-ready.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Building a successful MCP server is more than just getting the code to work.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab covers the essential practices that separate proof-of-concept implementations from production-ready systems that can scale, perform reliably, and maintain security standards.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These best practices are derived from real-world deployments, community feedback, and lessons learned from enterprise implementations.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Apply</strong> performance optimization techniques for MCP servers and databases</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> comprehensive security hardening measures</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Design</strong> scalable architecture patterns for production environments</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Establish</strong> monitoring, maintenance, and operational procedures</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Optimize</strong> costs while maintaining performance and reliability</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Contribute</strong> to the MCP community and ecosystem</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 Performance Optimization</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Database Performance</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Connection Pool Optimization</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Optimized connection pool configuration
+
+POOL_CONFIG = {
+
+    # Size configuration
+
+    &quot;min_size&quot;: max(2, cpu_count()),           # At least 2, scale with CPU
+
+    &quot;max_size&quot;: min(20, cpu_count() * 4),     # Cap at reasonable maximum
+
+    
+
+    # Timing configuration
+
+    &quot;max_inactive_connection_lifetime&quot;: 300,   # 5 minutes
+
+    &quot;command_timeout&quot;: 30,                     # 30 seconds
+
+    &quot;max_queries&quot;: 50000,                      # Rotate connections
+
+    
+
+    # PostgreSQL settings
+
+    &quot;server_settings&quot;: {
+
+        &quot;application_name&quot;: &quot;mcp-server-prod&quot;,
+
+        &quot;jit&quot;: &quot;off&quot;,                          # Disable for consistency
+
+        &quot;work_mem&quot;: &quot;8MB&quot;,                     # Optimize for queries
+
+        &quot;shared_preload_libraries&quot;: &quot;pg_stat_statements&quot;,
+
+        &quot;log_statement&quot;: &quot;mod&quot;,                # Log modifications only
+
+        &quot;log_min_duration_statement&quot;: &quot;1s&quot;,   # Log slow queries
+
+    }
+
+}
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Query Optimization Patterns</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class QueryOptimizer:
+
+    &quot;&quot;&quot;Database query optimization utilities.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.query_cache = {}
+
+        self.slow_query_threshold = 1.0  # seconds
+
+        
+
+    async def execute_optimized_query(
+
+        self, 
+
+        query: str, 
+
+        params: tuple = None,
+
+        cache_key: str = None,
+
+        cache_ttl: int = 300
+
+    ):
+
+        &quot;&quot;&quot;Execute query with optimization and caching.&quot;&quot;&quot;
+
+        
+
+        # Check cache first
+
+        if cache_key and cache_key in self.query_cache:
+
+            cache_entry = self.query_cache[cache_key]
+
+            if time.time() - cache_entry[&#x27;timestamp&#x27;] &lt; cache_ttl:
+
+                return cache_entry[&#x27;result&#x27;]
+
+        
+
+        # Execute with monitoring
+
+        start_time = time.time()
+
+        
+
+        try:
+
+            async with db_provider.get_connection() as conn:
+
+                # Optimize query execution
+
+                await conn.execute(&quot;SET enable_seqscan = off&quot;)  # Prefer indexes
+
+                await conn.execute(&quot;SET work_mem = &#x27;16MB&#x27;&quot;)     # More memory for this query
+
+                
+
+                result = await conn.fetch(query, *params if params else ())
+
+                
+
+                duration = time.time() - start_time
+
+                
+
+                # Log slow queries
+
+                if duration &gt; self.slow_query_threshold:
+
+                    logger.warning(f&quot;Slow query detected: {duration:.2f}s&quot;, extra={
+
+                        &quot;query&quot;: query[:200],
+
+                        &quot;duration&quot;: duration,
+
+                        &quot;params_count&quot;: len(params) if params else 0
+
+                    })
+
+                
+
+                # Cache successful results
+
+                if cache_key and len(result) &lt; 1000:  # Don&#x27;t cache large results
+
+                    self.query_cache[cache_key] = {
+
+                        &#x27;result&#x27;: result,
+
+                        &#x27;timestamp&#x27;: time.time()
+
+                    }
+
+                
+
+                return result
+
+                
+
+        except Exception as e:
+
+            logger.error(f&quot;Query optimization failed: {e}&quot;)
+
+            raise
+
+
+
+# Index recommendations
+
+RECOMMENDED_INDEXES = [
+
+    # Core business indexes
+
+    &quot;CREATE INDEX CONCURRENTLY idx_orders_store_date ON retail.orders (store_id, order_date DESC);&quot;,
+
+    &quot;CREATE INDEX CONCURRENTLY idx_order_items_product ON retail.order_items (product_id);&quot;,
+
+    &quot;CREATE INDEX CONCURRENTLY idx_customers_store_email ON retail.customers (store_id, email);&quot;,
+
+    
+
+    # Analytics indexes
+
+    &quot;CREATE INDEX CONCURRENTLY idx_orders_date_amount ON retail.orders (order_date, total_amount);&quot;,
+
+    &quot;CREATE INDEX CONCURRENTLY idx_products_category_price ON retail.products (category_id, unit_price);&quot;,
+
+    
+
+    # Vector search optimization
+
+    &quot;CREATE INDEX CONCURRENTLY idx_embeddings_vector ON retail.product_description_embeddings USING ivfflat (description_embedding vector_cosine_ops) WITH (lists = 100);&quot;,
+
+]
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Application Performance</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Async Programming Best Practices</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+from asyncio import Semaphore
+
+from typing import List, Any
+
+
+
+class AsyncOptimizer:
+
+    &quot;&quot;&quot;Async operation optimization patterns.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, max_concurrent: int = 10):
+
+        self.semaphore = Semaphore(max_concurrent)
+
+        self.circuit_breaker = CircuitBreaker()
+
+    
+
+    async def batch_process(
+
+        self, 
+
+        items: List[Any], 
+
+        process_func: callable,
+
+        batch_size: int = 100
+
+    ):
+
+        &quot;&quot;&quot;Process items in optimized batches.&quot;&quot;&quot;
+
+        
+
+        async def process_batch(batch):
+
+            async with self.semaphore:
+
+                return await asyncio.gather(
+
+                    *[process_func(item) for item in batch],
+
+                    return_exceptions=True
+
+                )
+
+        
+
+        # Process in batches to avoid overwhelming the system
+
+        results = []
+
+        for i in range(0, len(items), batch_size):
+
+            batch = items[i:i + batch_size]
+
+            batch_results = await process_batch(batch)
+
+            results.extend(batch_results)
+
+            
+
+            # Small delay between batches to prevent resource exhaustion
+
+            if i + batch_size &lt; len(items):
+
+                await asyncio.sleep(0.1)
+
+        
+
+        return results
+
+    
+
+    @circuit_breaker_decorator
+
+    async def resilient_operation(self, operation: callable, *args, **kwargs):
+
+        &quot;&quot;&quot;Execute operation with circuit breaker protection.&quot;&quot;&quot;
+
+        return await operation(*args, **kwargs)
+
+
+
+# Circuit breaker implementation
+
+class CircuitBreaker:
+
+    &quot;&quot;&quot;Circuit breaker for external service calls.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, failure_threshold: int = 5, recovery_timeout: int = 60):
+
+        self.failure_threshold = failure_threshold
+
+        self.recovery_timeout = recovery_timeout
+
+        self.failure_count = 0
+
+        self.last_failure_time = None
+
+        self.state = &quot;CLOSED&quot;  # CLOSED, OPEN, HALF_OPEN
+
+    
+
+    async def call(self, func, *args, **kwargs):
+
+        &quot;&quot;&quot;Execute function with circuit breaker protection.&quot;&quot;&quot;
+
+        
+
+        if self.state == &quot;OPEN&quot;:
+
+            if time.time() - self.last_failure_time &gt; self.recovery_timeout:
+
+                self.state = &quot;HALF_OPEN&quot;
+
+            else:
+
+                raise Exception(&quot;Circuit breaker is OPEN&quot;)
+
+        
+
+        try:
+
+            result = await func(*args, **kwargs)
+
+            
+
+            # Reset on success
+
+            if self.state == &quot;HALF_OPEN&quot;:
+
+                self.state = &quot;CLOSED&quot;
+
+                self.failure_count = 0
+
+            
+
+            return result
+
+            
+
+        except Exception as e:
+
+            self.failure_count += 1
+
+            self.last_failure_time = time.time()
+
+            
+
+            if self.failure_count &gt;= self.failure_threshold:
+
+                self.state = &quot;OPEN&quot;
+
+            
+
+            raise
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Caching Strategies</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import redis
+
+import pickle
+
+from typing import Union, Optional
+
+
+
+class SmartCache:
+
+    &quot;&quot;&quot;Multi-level caching system.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, redis_url: Optional[str] = None):
+
+        self.memory_cache = {}
+
+        self.redis_client = redis.Redis.from_url(redis_url) if redis_url else None
+
+        self.max_memory_items = 1000
+
+    
+
+    async def get(self, key: str) -&gt; Optional[Any]:
+
+        &quot;&quot;&quot;Get from cache with fallback levels.&quot;&quot;&quot;
+
+        
+
+        # Level 1: Memory cache
+
+        if key in self.memory_cache:
+
+            return self.memory_cache[key][&#x27;value&#x27;]
+
+        
+
+        # Level 2: Redis cache
+
+        if self.redis_client:
+
+            try:
+
+                cached_data = self.redis_client.get(key)
+
+                if cached_data:
+
+                    value = pickle.loads(cached_data)
+
+                    
+
+                    # Promote to memory cache
+
+                    self._set_memory_cache(key, value)
+
+                    return value
+
+            except Exception as e:
+
+                logger.warning(f&quot;Redis cache error: {e}&quot;)
+
+        
+
+        return None
+
+    
+
+    async def set(
+
+        self, 
+
+        key: str, 
+
+        value: Any, 
+
+        ttl: int = 300,
+
+        cache_level: str = &quot;both&quot;
+
+    ):
+
+        &quot;&quot;&quot;Set cache value at specified levels.&quot;&quot;&quot;
+
+        
+
+        if cache_level in [&quot;memory&quot;, &quot;both&quot;]:
+
+            self._set_memory_cache(key, value, ttl)
+
+        
+
+        if cache_level in [&quot;redis&quot;, &quot;both&quot;] and self.redis_client:
+
+            try:
+
+                self.redis_client.setex(
+
+                    key, 
+
+                    ttl, 
+
+                    pickle.dumps(value)
+
+                )
+
+            except Exception as e:
+
+                logger.warning(f&quot;Redis set error: {e}&quot;)
+
+    
+
+    def _set_memory_cache(self, key: str, value: Any, ttl: int = 300):
+
+        &quot;&quot;&quot;Set value in memory cache with LRU eviction.&quot;&quot;&quot;
+
+        
+
+        # Implement LRU eviction
+
+        if len(self.memory_cache) &gt;= self.max_memory_items:
+
+            oldest_key = min(
+
+                self.memory_cache.keys(),
+
+                key=lambda k: self.memory_cache[k][&#x27;timestamp&#x27;]
+
+            )
+
+            del self.memory_cache[oldest_key]
+
+        
+
+        self.memory_cache[key] = {
+
+            &#x27;value&#x27;: value,
+
+            &#x27;timestamp&#x27;: time.time(),
+
+            &#x27;ttl&#x27;: ttl
+
+        }
+
+
+
+# Cache key generation
+
+def generate_cache_key(query: str, user_context: str, params: dict = None) -&gt; str:
+
+    &quot;&quot;&quot;Generate consistent cache keys.&quot;&quot;&quot;
+
+    key_components = [
+
+        query.strip().lower(),
+
+        user_context,
+
+        json.dumps(params, sort_keys=True) if params else &quot;&quot;
+
+    ]
+
+    
+
+    key_string = &quot;|&quot;.join(key_components)
+
+    return hashlib.sha256(key_string.encode()).hexdigest()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔒 Security Hardening</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Authentication and Authorization</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from azure.identity import DefaultAzureCredential, ClientSecretCredential
+
+from azure.keyvault.secrets import SecretClient
+
+import jwt
+
+from typing import Dict, List
+
+
+
+class SecurityManager:
+
+    &quot;&quot;&quot;Comprehensive security management.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.key_vault_client = self._setup_key_vault()
+
+        self.token_blacklist = set()
+
+        
+
+    def _setup_key_vault(self) -&gt; SecretClient:
+
+        &quot;&quot;&quot;Initialize Azure Key Vault client.&quot;&quot;&quot;
+
+        credential = DefaultAzureCredential()
+
+        vault_url = os.getenv(&quot;AZURE_KEY_VAULT_URL&quot;)
+
+        
+
+        if vault_url:
+
+            return SecretClient(vault_url=vault_url, credential=credential)
+
+        return None
+
+    
+
+    async def validate_request(self, request_headers: Dict[str, str]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Comprehensive request validation.&quot;&quot;&quot;
+
+        
+
+        # Extract and validate authentication
+
+        auth_token = request_headers.get(&quot;authorization&quot;, &quot;&quot;).replace(&quot;Bearer &quot;, &quot;&quot;)
+
+        if not auth_token:
+
+            raise AuthenticationError(&quot;Missing authentication token&quot;)
+
+        
+
+        # Validate token
+
+        user_context = await self._validate_token(auth_token)
+
+        
+
+        # Check rate limiting
+
+        await self._check_rate_limit(user_context[&quot;user_id&quot;])
+
+        
+
+        # Validate RLS context
+
+        rls_user_id = request_headers.get(&quot;x-rls-user-id&quot;)
+
+        if not self._validate_rls_access(user_context, rls_user_id):
+
+            raise AuthorizationError(&quot;Invalid RLS context for user&quot;)
+
+        
+
+        return {
+
+            &quot;user_id&quot;: user_context[&quot;user_id&quot;],
+
+            &quot;roles&quot;: user_context[&quot;roles&quot;],
+
+            &quot;rls_user_id&quot;: rls_user_id,
+
+            &quot;permissions&quot;: user_context[&quot;permissions&quot;]
+
+        }
+
+    
+
+    async def _validate_token(self, token: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Validate JWT token.&quot;&quot;&quot;
+
+        
+
+        if token in self.token_blacklist:
+
+            raise AuthenticationError(&quot;Token has been revoked&quot;)
+
+        
+
+        try:
+
+            # Get public key from Key Vault or cache
+
+            public_key = await self._get_public_key()
+
+            
+
+            # Decode and validate token
+
+            payload = jwt.decode(
+
+                token, 
+
+                public_key, 
+
+                algorithms=[&quot;RS256&quot;],
+
+                audience=&quot;mcp-server&quot;,
+
+                issuer=&quot;zava-auth&quot;
+
+            )
+
+            
+
+            return {
+
+                &quot;user_id&quot;: payload[&quot;sub&quot;],
+
+                &quot;roles&quot;: payload.get(&quot;roles&quot;, []),
+
+                &quot;permissions&quot;: payload.get(&quot;permissions&quot;, []),
+
+                &quot;expires_at&quot;: payload[&quot;exp&quot;]
+
+            }
+
+            
+
+        except jwt.InvalidTokenError as e:
+
+            raise AuthenticationError(f&quot;Invalid token: {e}&quot;)
+
+    
+
+    def _validate_rls_access(self, user_context: Dict, rls_user_id: str) -&gt; bool:
+
+        &quot;&quot;&quot;Validate RLS context access.&quot;&quot;&quot;
+
+        
+
+        # Super admins can access any context
+
+        if &quot;super_admin&quot; in user_context[&quot;roles&quot;]:
+
+            return True
+
+        
+
+        # Store managers can only access their own store
+
+        if &quot;store_manager&quot; in user_context[&quot;roles&quot;]:
+
+            allowed_stores = user_context.get(&quot;allowed_stores&quot;, [])
+
+            return rls_user_id in allowed_stores
+
+        
+
+        # Regional managers can access multiple stores
+
+        if &quot;regional_manager&quot; in user_context[&quot;roles&quot;]:
+
+            allowed_regions = user_context.get(&quot;allowed_regions&quot;, [])
+
+            return self._check_store_in_regions(rls_user_id, allowed_regions)
+
+        
+
+        return False
+
+
+
+# Input validation and sanitization
+
+class InputValidator:
+
+    &quot;&quot;&quot;SQL injection prevention and input validation.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    def validate_sql_query(query: str) -&gt; bool:
+
+        &quot;&quot;&quot;Validate SQL query for safety.&quot;&quot;&quot;
+
+        
+
+        # Forbidden patterns
+
+        forbidden_patterns = [
+
+            r&quot;;\s*(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE)\s+&quot;,
+
+            r&quot;--.*&quot;,
+
+            r&quot;/\*.*\*/&quot;,
+
+            r&quot;xp_cmdshell&quot;,
+
+            r&quot;sp_executesql&quot;,
+
+            r&quot;EXEC\s*\(&quot;,
+
+        ]
+
+        
+
+        query_upper = query.upper()
+
+        
+
+        for pattern in forbidden_patterns:
+
+            if re.search(pattern, query_upper, re.IGNORECASE):
+
+                logger.warning(f&quot;Blocked potentially dangerous query: {pattern}&quot;)
+
+                return False
+
+        
+
+        # Only allow SELECT statements
+
+        if not query_upper.strip().startswith(&quot;SELECT&quot;):
+
+            return False
+
+        
+
+        return True
+
+    
+
+    @staticmethod
+
+    def sanitize_table_name(table_name: str) -&gt; str:
+
+        &quot;&quot;&quot;Sanitize table name input.&quot;&quot;&quot;
+
+        
+
+        # Only allow alphanumeric, underscore, and dot
+
+        if not re.match(r&quot;^[a-zA-Z0-9_.]+$&quot;, table_name):
+
+            raise ValueError(&quot;Invalid table name format&quot;)
+
+        
+
+        # Validate against allowed tables
+
+        if table_name not in VALID_TABLES:
+
+            raise ValueError(f&quot;Table {table_name} not allowed&quot;)
+
+        
+
+        return table_name
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Data Protection</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from cryptography.fernet import Fernet
+
+import hashlib
+
+
+
+class DataProtection:
+
+    &quot;&quot;&quot;Data encryption and protection utilities.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.encryption_key = self._get_encryption_key()
+
+        self.cipher_suite = Fernet(self.encryption_key)
+
+    
+
+    def _get_encryption_key(self) -&gt; bytes:
+
+        &quot;&quot;&quot;Get encryption key from secure storage.&quot;&quot;&quot;
+
+        
+
+        # In production, get from Azure Key Vault
+
+        key_vault_secret = os.getenv(&quot;ENCRYPTION_KEY_SECRET_NAME&quot;)
+
+        if key_vault_secret and self.key_vault_client:
+
+            secret = self.key_vault_client.get_secret(key_vault_secret)
+
+            return secret.value.encode()
+
+        
+
+        # Fallback for development (not for production!)
+
+        dev_key = os.getenv(&quot;DEV_ENCRYPTION_KEY&quot;)
+
+        if dev_key:
+
+            return dev_key.encode()
+
+        
+
+        raise ValueError(&quot;No encryption key available&quot;)
+
+    
+
+    def encrypt_sensitive_data(self, data: str) -&gt; str:
+
+        &quot;&quot;&quot;Encrypt sensitive data.&quot;&quot;&quot;
+
+        return self.cipher_suite.encrypt(data.encode()).decode()
+
+    
+
+    def decrypt_sensitive_data(self, encrypted_data: str) -&gt; str:
+
+        &quot;&quot;&quot;Decrypt sensitive data.&quot;&quot;&quot;
+
+        return self.cipher_suite.decrypt(encrypted_data.encode()).decode()
+
+    
+
+    @staticmethod
+
+    def hash_password(password: str, salt: str = None) -&gt; tuple:
+
+        &quot;&quot;&quot;Hash password with salt.&quot;&quot;&quot;
+
+        if not salt:
+
+            salt = os.urandom(32).hex()
+
+        
+
+        password_hash = hashlib.pbkdf2_hmac(
+
+            &#x27;sha256&#x27;,
+
+            password.encode(),
+
+            salt.encode(),
+
+            100000  # iterations
+
+        ).hex()
+
+        
+
+        return password_hash, salt
+
+    
+
+    @staticmethod
+
+    def mask_sensitive_logs(log_data: dict) -&gt; dict:
+
+        &quot;&quot;&quot;Mask sensitive information in logs.&quot;&quot;&quot;
+
+        
+
+        sensitive_fields = [
+
+            &#x27;password&#x27;, &#x27;token&#x27;, &#x27;secret&#x27;, &#x27;key&#x27;, &#x27;authorization&#x27;,
+
+            &#x27;x-api-key&#x27;, &#x27;client_secret&#x27;, &#x27;connection_string&#x27;
+
+        ]
+
+        
+
+        masked_data = log_data.copy()
+
+        
+
+        for field in sensitive_fields:
+
+            if field in masked_data:
+
+                value = str(masked_data[field])
+
+                if len(value) &gt; 4:
+
+                    masked_data[field] = value[:2] + &quot;*&quot; * (len(value) - 4) + value[-2:]
+
+                else:
+
+                    masked_data[field] = &quot;***&quot;
+
+        
+
+        return masked_data
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 Production Deployment Guidelines</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Infrastructure as Code</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# azure-pipelines.yml
+
+trigger:
+
+  branches:
+
+    include:
+
+      - main
+
+      - release/*
+
+
+
+variables:
+
+  - group: mcp-server-secrets
+
+  - name: imageRepository
+
+    value: &#x27;zava-mcp-server&#x27;
+
+  - name: containerRegistry
+
+    value: &#x27;zavamcpregistry.azurecr.io&#x27;
+
+
+
+stages:
+
+- stage: Build
+
+  displayName: Build and Test
+
+  jobs:
+
+  - job: Build
+
+    displayName: Build
+
+    pool:
+
+      vmImage: ubuntu-latest
+
+    
+
+    steps:
+
+    - task: UsePythonVersion@0
+
+      inputs:
+
+        versionSpec: &#x27;3.11&#x27;
+
+        displayName: &#x27;Use Python 3.11&#x27;
+
+    
+
+    - script: |
+
+        python -m pip install --upgrade pip
+
+        pip install -r requirements.lock.txt
+
+        pip install pytest pytest-cov
+
+      displayName: &#x27;Install dependencies&#x27;
+
+    
+
+    - script: |
+
+        pytest tests/ --cov=mcp_server --cov-report=xml
+
+      displayName: &#x27;Run tests with coverage&#x27;
+
+    
+
+    - task: PublishCodeCoverageResults@1
+
+      inputs:
+
+        codeCoverageTool: Cobertura
+
+        summaryFileLocation: &#x27;coverage.xml&#x27;
+
+    
+
+    - task: Docker@2
+
+      displayName: Build Docker image
+
+      inputs:
+
+        command: build
+
+        repository: $(imageRepository)
+
+        dockerfile: Dockerfile
+
+        tags: |
+
+          $(Build.BuildId)
+
+          latest
+
+
+
+- stage: Deploy
+
+  displayName: Deploy to Production
+
+  dependsOn: Build
+
+  condition: and(succeeded(), eq(variables[&#x27;Build.SourceBranch&#x27;], &#x27;refs/heads/main&#x27;))
+
+  
+
+  jobs:
+
+  - deployment: DeployProduction
+
+    displayName: Deploy to Production
+
+    environment: &#x27;production&#x27;
+
+    pool:
+
+      vmImage: ubuntu-latest
+
+    
+
+    strategy:
+
+      runOnce:
+
+        deploy:
+
+          steps:
+
+          - task: AzureContainerApps@1
+
+            inputs:
+
+              azureSubscription: $(azureServiceConnection)
+
+              containerAppName: &#x27;zava-mcp-server&#x27;
+
+              resourceGroup: &#x27;$(resourceGroupName)&#x27;
+
+              imageToDeploy: &#x27;$(containerRegistry)/$(imageRepository):$(Build.BuildId)&#x27;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Container Optimization</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Multi-stage Dockerfile for production
+
+FROM python:3.11-slim as builder
+
+
+
+# Install build dependencies
+
+RUN apt-get update &amp;&amp; apt-get install -y \
+
+    gcc \
+
+    g++ \
+
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+
+
+# Create virtual environment
+
+RUN python -m venv /opt/venv
+
+ENV PATH=&quot;/opt/venv/bin:$PATH&quot;
+
+
+
+# Copy requirements and install Python dependencies
+
+COPY requirements.lock.txt .
+
+RUN pip install --no-cache-dir --upgrade pip &amp;&amp; \
+
+    pip install --no-cache-dir -r requirements.lock.txt
+
+
+
+# Production stage
+
+FROM python:3.11-slim as production
+
+
+
+# Create non-root user
+
+RUN groupadd -r mcpserver &amp;&amp; useradd -r -g mcpserver mcpserver
+
+
+
+# Copy virtual environment from builder
+
+COPY --from=builder /opt/venv /opt/venv
+
+ENV PATH=&quot;/opt/venv/bin:$PATH&quot;
+
+
+
+# Set working directory
+
+WORKDIR /app
+
+
+
+# Copy application code
+
+COPY mcp_server/ ./mcp_server/
+
+COPY --chown=mcpserver:mcpserver . .
+
+
+
+# Set security configurations
+
+RUN chmod -R 755 /app &amp;&amp; \
+
+    chown -R mcpserver:mcpserver /app
+
+
+
+# Switch to non-root user
+
+USER mcpserver
+
+
+
+# Health check
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+
+    CMD curl -f http://localhost:8000/health || exit 1
+
+
+
+# Expose port
+
+EXPOSE 8000
+
+
+
+# Start application
+
+CMD [&quot;python&quot;, &quot;-m&quot;, &quot;mcp_server.sales_analysis&quot;]
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Environment Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Production configuration management
+
+class ProductionConfig:
+
+    &quot;&quot;&quot;Production-specific configuration.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.validate_production_requirements()
+
+        self.setup_logging()
+
+        self.configure_security()
+
+    
+
+    def validate_production_requirements(self):
+
+        &quot;&quot;&quot;Validate all required production settings.&quot;&quot;&quot;
+
+        
+
+        required_settings = [
+
+            &quot;AZURE_CLIENT_ID&quot;,
+
+            &quot;AZURE_CLIENT_SECRET&quot;, 
+
+            &quot;AZURE_TENANT_ID&quot;,
+
+            &quot;PROJECT_ENDPOINT&quot;,
+
+            &quot;AZURE_OPENAI_ENDPOINT&quot;,
+
+            &quot;POSTGRES_HOST&quot;,
+
+            &quot;POSTGRES_PASSWORD&quot;,
+
+            &quot;APPLICATIONINSIGHTS_CONNECTION_STRING&quot;
+
+        ]
+
+        
+
+        missing_settings = [
+
+            setting for setting in required_settings 
+
+            if not os.getenv(setting)
+
+        ]
+
+        
+
+        if missing_settings:
+
+            raise EnvironmentError(
+
+                f&quot;Missing required production settings: {missing_settings}&quot;
+
+            )
+
+    
+
+    def setup_logging(self):
+
+        &quot;&quot;&quot;Configure production logging.&quot;&quot;&quot;
+
+        
+
+        logging.basicConfig(
+
+            level=logging.INFO,
+
+            format=&#x27;%(asctime)s - %(name)s - %(levelname)s - %(message)s&#x27;,
+
+            handlers=[
+
+                logging.StreamHandler(sys.stdout),
+
+                logging.handlers.RotatingFileHandler(
+
+                    &#x27;/var/log/mcp-server.log&#x27;,
+
+                    maxBytes=50*1024*1024,  # 50MB
+
+                    backupCount=5
+
+                )
+
+            ]
+
+        )
+
+        
+
+        # Set third-party loggers to WARNING
+
+        logging.getLogger(&#x27;azure&#x27;).setLevel(logging.WARNING)
+
+        logging.getLogger(&#x27;urllib3&#x27;).setLevel(logging.WARNING)
+
+    
+
+    def configure_security(self):
+
+        &quot;&quot;&quot;Configure production security settings.&quot;&quot;&quot;
+
+        
+
+        # Disable debug mode
+
+        os.environ[&#x27;DEBUG&#x27;] = &#x27;False&#x27;
+
+        
+
+        # Set secure headers
+
+        os.environ[&#x27;SECURE_SSL_REDIRECT&#x27;] = &#x27;True&#x27;
+
+        os.environ[&#x27;SECURE_HSTS_SECONDS&#x27;] = &#x27;31536000&#x27;
+
+        os.environ[&#x27;SECURE_CONTENT_TYPE_NOSNIFF&#x27;] = &#x27;True&#x27;
+
+        os.environ[&#x27;SECURE_BROWSER_XSS_FILTER&#x27;] = &#x27;True&#x27;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">💰 Cost Optimization</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Resource Management</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class CostOptimizer:
+
+    &quot;&quot;&quot;Cost optimization strategies.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.metrics_collector = MetricsCollector()
+
+        self.auto_scaler = AutoScaler()
+
+    
+
+    async def optimize_database_connections(self):
+
+        &quot;&quot;&quot;Dynamically adjust connection pool based on load.&quot;&quot;&quot;
+
+        
+
+        current_load = await self.metrics_collector.get_current_load()
+
+        
+
+        if current_load &lt; 0.3:  # Low load
+
+            target_pool_size = max(2, int(current_load * 10))
+
+        elif current_load &lt; 0.7:  # Medium load
+
+            target_pool_size = max(5, int(current_load * 15))
+
+        else:  # High load
+
+            target_pool_size = min(20, int(current_load * 25))
+
+        
+
+        await db_provider.adjust_pool_size(target_pool_size)
+
+        
+
+        logger.info(f&quot;Adjusted pool size to {target_pool_size} for load {current_load}&quot;)
+
+    
+
+    async def implement_smart_caching(self):
+
+        &quot;&quot;&quot;Implement intelligent caching to reduce compute costs.&quot;&quot;&quot;
+
+        
+
+        # Cache expensive operations
+
+        expensive_queries = await self.identify_expensive_queries()
+
+        
+
+        for query in expensive_queries:
+
+            cache_key = self.generate_cache_key(query)
+
+            ttl = self.calculate_optimal_ttl(query)
+
+            
+
+            await smart_cache.set(cache_key, None, ttl=ttl)
+
+    
+
+    def calculate_azure_costs(self) -&gt; Dict[str, float]:
+
+        &quot;&quot;&quot;Calculate estimated Azure resource costs.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;container_apps&quot;: self.estimate_container_costs(),
+
+            &quot;postgresql&quot;: self.estimate_database_costs(),
+
+            &quot;openai&quot;: self.estimate_ai_costs(),
+
+            &quot;application_insights&quot;: self.estimate_monitoring_costs(),
+
+            &quot;storage&quot;: self.estimate_storage_costs()
+
+        }
+
+
+
+# Auto-scaling configuration
+
+class AutoScaler:
+
+    &quot;&quot;&quot;Automatic scaling based on metrics.&quot;&quot;&quot;
+
+    
+
+    async def scale_decision(self) -&gt; str:
+
+        &quot;&quot;&quot;Determine scaling action based on metrics.&quot;&quot;&quot;
+
+        
+
+        metrics = await self.collect_scaling_metrics()
+
+        
+
+        # CPU-based scaling
+
+        if metrics[&#x27;cpu_usage&#x27;] &gt; 80:
+
+            return &quot;scale_up&quot;
+
+        elif metrics[&#x27;cpu_usage&#x27;] &lt; 20 and metrics[&#x27;instance_count&#x27;] &gt; 1:
+
+            return &quot;scale_down&quot;
+
+        
+
+        # Memory-based scaling
+
+        if metrics[&#x27;memory_usage&#x27;] &gt; 85:
+
+            return &quot;scale_up&quot;
+
+        
+
+        # Request queue scaling
+
+        if metrics[&#x27;queue_length&#x27;] &gt; 100:
+
+            return &quot;scale_up&quot;
+
+        elif metrics[&#x27;queue_length&#x27;] &lt; 10 and metrics[&#x27;instance_count&#x27;] &gt; 1:
+
+            return &quot;scale_down&quot;
+
+        
+
+        return &quot;no_action&quot;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 Maintenance and Operations</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Health Monitoring</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class OperationalHealth:
+
+    &quot;&quot;&quot;Comprehensive operational health monitoring.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.alert_manager = AlertManager()
+
+        self.health_checks = {}
+
+        
+
+    async def comprehensive_health_check(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Perform comprehensive system health check.&quot;&quot;&quot;
+
+        
+
+        health_report = {
+
+            &quot;timestamp&quot;: datetime.utcnow().isoformat(),
+
+            &quot;overall_status&quot;: &quot;healthy&quot;,
+
+            &quot;components&quot;: {}
+
+        }
+
+        
+
+        # Database health
+
+        db_health = await self.check_database_health()
+
+        health_report[&quot;components&quot;][&quot;database&quot;] = db_health
+
+        
+
+        # External services health
+
+        ai_health = await self.check_ai_service_health()
+
+        health_report[&quot;components&quot;][&quot;ai_service&quot;] = ai_health
+
+        
+
+        # System resources
+
+        system_health = await self.check_system_resources()
+
+        health_report[&quot;components&quot;][&quot;system&quot;] = system_health
+
+        
+
+        # Application metrics
+
+        app_health = await self.check_application_health()
+
+        health_report[&quot;components&quot;][&quot;application&quot;] = app_health
+
+        
+
+        # Determine overall status
+
+        failed_components = [
+
+            name for name, status in health_report[&quot;components&quot;].items()
+
+            if status.get(&quot;status&quot;) != &quot;healthy&quot;
+
+        ]
+
+        
+
+        if failed_components:
+
+            health_report[&quot;overall_status&quot;] = &quot;unhealthy&quot;
+
+            health_report[&quot;failed_components&quot;] = failed_components
+
+            
+
+            # Trigger alerts
+
+            await self.alert_manager.send_alert(
+
+                severity=&quot;high&quot;,
+
+                message=f&quot;Health check failed for: {failed_components}&quot;,
+
+                details=health_report
+
+            )
+
+        
+
+        return health_report
+
+    
+
+    async def check_database_health(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Check database connectivity and performance.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            start_time = time.time()
+
+            
+
+            async with db_provider.get_connection() as conn:
+
+                # Basic connectivity
+
+                await conn.fetchval(&quot;SELECT 1&quot;)
+
+                
+
+                # Check slow queries
+
+                slow_queries = await conn.fetch(&quot;&quot;&quot;
+
+                    SELECT query, mean_exec_time, calls 
+
+                    FROM pg_stat_statements 
+
+                    WHERE mean_exec_time &gt; 1000 
+
+                    ORDER BY mean_exec_time DESC 
+
+                    LIMIT 5
+
+                &quot;&quot;&quot;)
+
+                
+
+                # Check connection count
+
+                connection_count = await conn.fetchval(&quot;&quot;&quot;
+
+                    SELECT count(*) FROM pg_stat_activity 
+
+                    WHERE state = &#x27;active&#x27;
+
+                &quot;&quot;&quot;)
+
+                
+
+                response_time = time.time() - start_time
+
+                
+
+                return {
+
+                    &quot;status&quot;: &quot;healthy&quot;,
+
+                    &quot;response_time_ms&quot;: response_time * 1000,
+
+                    &quot;active_connections&quot;: connection_count,
+
+                    &quot;slow_queries_count&quot;: len(slow_queries),
+
+                    &quot;pool_size&quot;: db_provider.connection_pool.get_size()
+
+                }
+
+                
+
+        except Exception as e:
+
+            return {
+
+                &quot;status&quot;: &quot;unhealthy&quot;,
+
+                &quot;error&quot;: str(e),
+
+                &quot;last_check&quot;: datetime.utcnow().isoformat()
+
+            }
+
+
+
+# Automated backup and recovery
+
+class BackupManager:
+
+    &quot;&quot;&quot;Database backup and recovery management.&quot;&quot;&quot;
+
+    
+
+    async def create_backup(self, backup_type: str = &quot;full&quot;) -&gt; str:
+
+        &quot;&quot;&quot;Create database backup.&quot;&quot;&quot;
+
+        
+
+        timestamp = datetime.utcnow().strftime(&quot;%Y%m%d_%H%M%S&quot;)
+
+        backup_name = f&quot;zava_backup_{backup_type}_{timestamp}&quot;
+
+        
+
+        if backup_type == &quot;full&quot;:
+
+            await self.create_full_backup(backup_name)
+
+        elif backup_type == &quot;incremental&quot;:
+
+            await self.create_incremental_backup(backup_name)
+
+        
+
+        # Upload to Azure Blob Storage
+
+        await self.upload_backup_to_azure(backup_name)
+
+        
+
+        return backup_name
+
+    
+
+    async def schedule_automated_backups(self):
+
+        &quot;&quot;&quot;Schedule regular automated backups.&quot;&quot;&quot;
+
+        
+
+        # Daily full backup at 2 AM UTC
+
+        schedule.every().day.at(&quot;02:00&quot;).do(
+
+            lambda: asyncio.create_task(self.create_backup(&quot;full&quot;))
+
+        )
+
+        
+
+        # Hourly incremental backups
+
+        schedule.every().hour.do(
+
+            lambda: asyncio.create_task(self.create_backup(&quot;incremental&quot;))
+
+        )
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🌍 Community Contributions</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Open Source Best Practices</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Contributing to MCP Database Integration
+
+
+
+## Development Guidelines
+
+
+
+### Code Quality Standards
+
+- Follow PEP 8 for Python code style
+
+- Maintain test coverage above 90%
+
+- Use type hints throughout the codebase
+
+- Write comprehensive docstrings
+
+
+
+### Testing Requirements
+
+- Unit tests for all new functionality
+
+- Integration tests for database operations
+
+- Performance benchmarks for critical paths
+
+- Security tests for authentication/authorization
+
+
+
+### Documentation Standards
+
+- Update README.md for any new features
+
+- Add inline code documentation
+
+- Create examples for new tools or patterns
+
+- Maintain API documentation
+
+
+
+## Security Considerations
+
+
+
+### Reporting Security Issues
+
+- Report security vulnerabilities privately
+
+- Use encrypted communication channels
+
+- Provide detailed reproduction steps
+
+- Include potential impact assessment
+
+
+
+### Security Review Process
+
+- All PRs undergo security review
+
+- Static analysis tools required to pass
+
+- Dependency vulnerability scanning
+
+- Manual security testing for critical changes
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Community Engagement</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class CommunityContributor:
+
+    &quot;&quot;&quot;Tools for community engagement and contribution.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    def generate_contribution_guide():
+
+        &quot;&quot;&quot;Generate personalized contribution guide.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;getting_started&quot;: {
+
+                &quot;setup&quot;: &quot;Follow setup guide in Lab 03&quot;,
+
+                &quot;first_contribution&quot;: &quot;Start with documentation improvements&quot;,
+
+                &quot;testing&quot;: &quot;Run full test suite before submitting PR&quot;
+
+            },
+
+            
+
+            &quot;contribution_areas&quot;: {
+
+                &quot;documentation&quot;: &quot;Improve learning labs and examples&quot;,
+
+                &quot;testing&quot;: &quot;Add test cases and improve coverage&quot;,
+
+                &quot;features&quot;: &quot;Implement new MCP tools and capabilities&quot;,
+
+                &quot;performance&quot;: &quot;Optimize queries and caching&quot;,
+
+                &quot;security&quot;: &quot;Enhance security measures and validation&quot;
+
+            },
+
+            
+
+            &quot;community_resources&quot;: {
+
+                &quot;discord&quot;: &quot;https://discord.com/invite/ByRwuEEgH4&quot;,
+
+                &quot;discussions&quot;: &quot;GitHub Discussions for Q&amp;A&quot;,
+
+                &quot;issues&quot;: &quot;GitHub Issues for bug reports&quot;,
+
+                &quot;examples&quot;: &quot;Share your implementation examples&quot;
+
+            }
+
+        }
+
+    
+
+    @staticmethod
+
+    def validate_contribution(pr_data: Dict) -&gt; Dict[str, bool]:
+
+        &quot;&quot;&quot;Validate contribution meets standards.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;has_tests&quot;: &quot;test&quot; in pr_data.get(&quot;files_changed&quot;, []),
+
+            &quot;has_documentation&quot;: &quot;README&quot; in str(pr_data.get(&quot;files_changed&quot;, [])),
+
+            &quot;follows_conventions&quot;: True,  # Would implement actual checks
+
+            &quot;security_reviewed&quot;: pr_data.get(&quot;security_review&quot;, False),
+
+            &quot;performance_tested&quot;: pr_data.get(&quot;benchmark_results&quot;, False)
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this comprehensive learning path, you should have mastered:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Performance Optimization</strong>: Database tuning, async patterns, and caching strategies  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Security Hardening</strong>: Authentication, authorization, and data protection  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Production Deployment</strong>: Infrastructure as code and container optimization  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Cost Management</strong>: Resource optimization and intelligent scaling  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Operational Excellence</strong>: Monitoring, maintenance, and automation  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Community Engagement</strong>: Contributing to the MCP ecosystem  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏆 Certification and Next Steps</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Practical Assessment</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Complete this final project to demonstrate your mastery:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Build a Production-Ready MCP Server</strong> that includes:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Multi-tenant retail analytics with RLS</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Semantic search with Azure OpenAI</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Comprehensive security implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Production deployment on Azure</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Monitoring and alerting setup</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Documentation and testing</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Advanced Learning Paths</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue your MCP journey with:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP Architecture Patterns</strong>: Advanced server architectures</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Multi-Model Integration</strong>: Combining different AI models</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Enterprise Scale</strong>: Large-scale MCP deployments</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Custom Tool Development</strong>: Building specialized MCP tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP Ecosystem</strong>: Contributing to the broader community</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Community Recognition</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Share your achievement:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>GitHub Portfolio</strong>: Showcase your implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Community Contributions</strong>: Submit improvements or examples</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Speaking Opportunities</strong>: Present at meetups or conferences</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Mentoring</strong>: Help other developers learn MCP</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Advanced Topics</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/performance-tips.html">PostgreSQL Performance Tuning</a> - Database optimization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/container-apps/overview">Azure Container Apps Best Practices</a> - Production deployment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio-dev.html">Python Async Best Practices</a> - Async programming</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Security Resources</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-project-top-ten/">OWASP Top 10</a> - Security vulnerabilities</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/security/">Azure Security Best Practices</a> - Cloud security</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://python.org/dev/security/">Python Security Guidelines</a> - Secure coding</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Community</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://discord.com/invite/ByRwuEEgH4">MCP Community Discord</a> - Live discussions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/MCP-Server-and-PostgreSQL-Sample-Retail/discussions">GitHub Discussions</a> - Q&A and sharing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://stackoverflow.com/questions/tagged/model-context-protocol">Stack Overflow</a> - Technical questions</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 Congratulations!</strong> You've completed the comprehensive MCP Database Integration learning path. You now have the knowledge and skills to build production-ready MCP servers that bridge AI assistants with real-world data systems.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Ready to contribute?</strong> Join our community and help others learn MCP by sharing your experiences, contributing code improvements, or creating additional learning resources.</p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">모범 사례 및 최적화</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 종합 실습은 데이터베이스 통합을 통해 강력하고 확장 가능하며 안전한 MCP 서버를 구축하기 위한 모범 사례, 최적화 기술 및 프로덕션 가이드라인을 통합합니다. 실무 경험과 업계 표준을 통해 구현이 프로덕션 준비 상태가 되도록 학습합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">성공적인 MCP 서버를 구축하는 것은 단순히 코드가 작동하도록 만드는 것 이상입니다. 이 실습에서는 개념 증명 구현과 확장 가능하고 신뢰할 수 있으며 보안 표준을 유지하는 프로덕션 준비 시스템을 구분하는 필수적인 관행을 다룹니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이러한 모범 사례는 실무 배포, 커뮤니티 피드백, 기업 구현에서 얻은 교훈을 바탕으로 합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>적용</strong>: MCP 서버와 데이터베이스의 성능 최적화 기술  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구현</strong>: 포괄적인 보안 강화 조치  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>설계</strong>: 프로덕션 환경을 위한 확장 가능한 아키텍처 패턴  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>수립</strong>: 모니터링, 유지보수 및 운영 절차  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>최적화</strong>: 성능과 신뢰성을 유지하면서 비용 절감  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>기여</strong>: MCP 커뮤니티와 생태계에 공헌  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 성능 최적화</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">데이터베이스 성능</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">연결 풀 최적화</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Optimized connection pool configuration
+
+POOL_CONFIG = {
+
+    # Size configuration
+
+    &quot;min_size&quot;: max(2, cpu_count()),           # At least 2, scale with CPU
+
+    &quot;max_size&quot;: min(20, cpu_count() * 4),     # Cap at reasonable maximum
+
+    
+
+    # Timing configuration
+
+    &quot;max_inactive_connection_lifetime&quot;: 300,   # 5 minutes
+
+    &quot;command_timeout&quot;: 30,                     # 30 seconds
+
+    &quot;max_queries&quot;: 50000,                      # Rotate connections
+
+    
+
+    # PostgreSQL settings
+
+    &quot;server_settings&quot;: {
+
+        &quot;application_name&quot;: &quot;mcp-server-prod&quot;,
+
+        &quot;jit&quot;: &quot;off&quot;,                          # Disable for consistency
+
+        &quot;work_mem&quot;: &quot;8MB&quot;,                     # Optimize for queries
+
+        &quot;shared_preload_libraries&quot;: &quot;pg_stat_statements&quot;,
+
+        &quot;log_statement&quot;: &quot;mod&quot;,                # Log modifications only
+
+        &quot;log_min_duration_statement&quot;: &quot;1s&quot;,   # Log slow queries
+
+    }
+
+}
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">쿼리 최적화 패턴</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class QueryOptimizer:
+
+    &quot;&quot;&quot;Database query optimization utilities.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.query_cache = {}
+
+        self.slow_query_threshold = 1.0  # seconds
+
+        
+
+    async def execute_optimized_query(
+
+        self, 
+
+        query: str, 
+
+        params: tuple = None,
+
+        cache_key: str = None,
+
+        cache_ttl: int = 300
+
+    ):
+
+        &quot;&quot;&quot;Execute query with optimization and caching.&quot;&quot;&quot;
+
+        
+
+        # Check cache first
+
+        if cache_key and cache_key in self.query_cache:
+
+            cache_entry = self.query_cache[cache_key]
+
+            if time.time() - cache_entry[&#x27;timestamp&#x27;] &lt; cache_ttl:
+
+                return cache_entry[&#x27;result&#x27;]
+
+        
+
+        # Execute with monitoring
+
+        start_time = time.time()
+
+        
+
+        try:
+
+            async with db_provider.get_connection() as conn:
+
+                # Optimize query execution
+
+                await conn.execute(&quot;SET enable_seqscan = off&quot;)  # Prefer indexes
+
+                await conn.execute(&quot;SET work_mem = &#x27;16MB&#x27;&quot;)     # More memory for this query
+
+                
+
+                result = await conn.fetch(query, *params if params else ())
+
+                
+
+                duration = time.time() - start_time
+
+                
+
+                # Log slow queries
+
+                if duration &gt; self.slow_query_threshold:
+
+                    logger.warning(f&quot;Slow query detected: {duration:.2f}s&quot;, extra={
+
+                        &quot;query&quot;: query[:200],
+
+                        &quot;duration&quot;: duration,
+
+                        &quot;params_count&quot;: len(params) if params else 0
+
+                    })
+
+                
+
+                # Cache successful results
+
+                if cache_key and len(result) &lt; 1000:  # Don&#x27;t cache large results
+
+                    self.query_cache[cache_key] = {
+
+                        &#x27;result&#x27;: result,
+
+                        &#x27;timestamp&#x27;: time.time()
+
+                    }
+
+                
+
+                return result
+
+                
+
+        except Exception as e:
+
+            logger.error(f&quot;Query optimization failed: {e}&quot;)
+
+            raise
+
+
+
+# Index recommendations
+
+RECOMMENDED_INDEXES = [
+
+    # Core business indexes
+
+    &quot;CREATE INDEX CONCURRENTLY idx_orders_store_date ON retail.orders (store_id, order_date DESC);&quot;,
+
+    &quot;CREATE INDEX CONCURRENTLY idx_order_items_product ON retail.order_items (product_id);&quot;,
+
+    &quot;CREATE INDEX CONCURRENTLY idx_customers_store_email ON retail.customers (store_id, email);&quot;,
+
+    
+
+    # Analytics indexes
+
+    &quot;CREATE INDEX CONCURRENTLY idx_orders_date_amount ON retail.orders (order_date, total_amount);&quot;,
+
+    &quot;CREATE INDEX CONCURRENTLY idx_products_category_price ON retail.products (category_id, unit_price);&quot;,
+
+    
+
+    # Vector search optimization
+
+    &quot;CREATE INDEX CONCURRENTLY idx_embeddings_vector ON retail.product_description_embeddings USING ivfflat (description_embedding vector_cosine_ops) WITH (lists = 100);&quot;,
+
+]
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">애플리케이션 성능</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">비동기 프로그래밍 모범 사례</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+from asyncio import Semaphore
+
+from typing import List, Any
+
+
+
+class AsyncOptimizer:
+
+    &quot;&quot;&quot;Async operation optimization patterns.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, max_concurrent: int = 10):
+
+        self.semaphore = Semaphore(max_concurrent)
+
+        self.circuit_breaker = CircuitBreaker()
+
+    
+
+    async def batch_process(
+
+        self, 
+
+        items: List[Any], 
+
+        process_func: callable,
+
+        batch_size: int = 100
+
+    ):
+
+        &quot;&quot;&quot;Process items in optimized batches.&quot;&quot;&quot;
+
+        
+
+        async def process_batch(batch):
+
+            async with self.semaphore:
+
+                return await asyncio.gather(
+
+                    *[process_func(item) for item in batch],
+
+                    return_exceptions=True
+
+                )
+
+        
+
+        # Process in batches to avoid overwhelming the system
+
+        results = []
+
+        for i in range(0, len(items), batch_size):
+
+            batch = items[i:i + batch_size]
+
+            batch_results = await process_batch(batch)
+
+            results.extend(batch_results)
+
+            
+
+            # Small delay between batches to prevent resource exhaustion
+
+            if i + batch_size &lt; len(items):
+
+                await asyncio.sleep(0.1)
+
+        
+
+        return results
+
+    
+
+    @circuit_breaker_decorator
+
+    async def resilient_operation(self, operation: callable, *args, **kwargs):
+
+        &quot;&quot;&quot;Execute operation with circuit breaker protection.&quot;&quot;&quot;
+
+        return await operation(*args, **kwargs)
+
+
+
+# Circuit breaker implementation
+
+class CircuitBreaker:
+
+    &quot;&quot;&quot;Circuit breaker for external service calls.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, failure_threshold: int = 5, recovery_timeout: int = 60):
+
+        self.failure_threshold = failure_threshold
+
+        self.recovery_timeout = recovery_timeout
+
+        self.failure_count = 0
+
+        self.last_failure_time = None
+
+        self.state = &quot;CLOSED&quot;  # CLOSED, OPEN, HALF_OPEN
+
+    
+
+    async def call(self, func, *args, **kwargs):
+
+        &quot;&quot;&quot;Execute function with circuit breaker protection.&quot;&quot;&quot;
+
+        
+
+        if self.state == &quot;OPEN&quot;:
+
+            if time.time() - self.last_failure_time &gt; self.recovery_timeout:
+
+                self.state = &quot;HALF_OPEN&quot;
+
+            else:
+
+                raise Exception(&quot;Circuit breaker is OPEN&quot;)
+
+        
+
+        try:
+
+            result = await func(*args, **kwargs)
+
+            
+
+            # Reset on success
+
+            if self.state == &quot;HALF_OPEN&quot;:
+
+                self.state = &quot;CLOSED&quot;
+
+                self.failure_count = 0
+
+            
+
+            return result
+
+            
+
+        except Exception as e:
+
+            self.failure_count += 1
+
+            self.last_failure_time = time.time()
+
+            
+
+            if self.failure_count &gt;= self.failure_threshold:
+
+                self.state = &quot;OPEN&quot;
+
+            
+
+            raise
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">캐싱 전략</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import redis
+
+import pickle
+
+from typing import Union, Optional
+
+
+
+class SmartCache:
+
+    &quot;&quot;&quot;Multi-level caching system.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, redis_url: Optional[str] = None):
+
+        self.memory_cache = {}
+
+        self.redis_client = redis.Redis.from_url(redis_url) if redis_url else None
+
+        self.max_memory_items = 1000
+
+    
+
+    async def get(self, key: str) -&gt; Optional[Any]:
+
+        &quot;&quot;&quot;Get from cache with fallback levels.&quot;&quot;&quot;
+
+        
+
+        # Level 1: Memory cache
+
+        if key in self.memory_cache:
+
+            return self.memory_cache[key][&#x27;value&#x27;]
+
+        
+
+        # Level 2: Redis cache
+
+        if self.redis_client:
+
+            try:
+
+                cached_data = self.redis_client.get(key)
+
+                if cached_data:
+
+                    value = pickle.loads(cached_data)
+
+                    
+
+                    # Promote to memory cache
+
+                    self._set_memory_cache(key, value)
+
+                    return value
+
+            except Exception as e:
+
+                logger.warning(f&quot;Redis cache error: {e}&quot;)
+
+        
+
+        return None
+
+    
+
+    async def set(
+
+        self, 
+
+        key: str, 
+
+        value: Any, 
+
+        ttl: int = 300,
+
+        cache_level: str = &quot;both&quot;
+
+    ):
+
+        &quot;&quot;&quot;Set cache value at specified levels.&quot;&quot;&quot;
+
+        
+
+        if cache_level in [&quot;memory&quot;, &quot;both&quot;]:
+
+            self._set_memory_cache(key, value, ttl)
+
+        
+
+        if cache_level in [&quot;redis&quot;, &quot;both&quot;] and self.redis_client:
+
+            try:
+
+                self.redis_client.setex(
+
+                    key, 
+
+                    ttl, 
+
+                    pickle.dumps(value)
+
+                )
+
+            except Exception as e:
+
+                logger.warning(f&quot;Redis set error: {e}&quot;)
+
+    
+
+    def _set_memory_cache(self, key: str, value: Any, ttl: int = 300):
+
+        &quot;&quot;&quot;Set value in memory cache with LRU eviction.&quot;&quot;&quot;
+
+        
+
+        # Implement LRU eviction
+
+        if len(self.memory_cache) &gt;= self.max_memory_items:
+
+            oldest_key = min(
+
+                self.memory_cache.keys(),
+
+                key=lambda k: self.memory_cache[k][&#x27;timestamp&#x27;]
+
+            )
+
+            del self.memory_cache[oldest_key]
+
+        
+
+        self.memory_cache[key] = {
+
+            &#x27;value&#x27;: value,
+
+            &#x27;timestamp&#x27;: time.time(),
+
+            &#x27;ttl&#x27;: ttl
+
+        }
+
+
+
+# Cache key generation
+
+def generate_cache_key(query: str, user_context: str, params: dict = None) -&gt; str:
+
+    &quot;&quot;&quot;Generate consistent cache keys.&quot;&quot;&quot;
+
+    key_components = [
+
+        query.strip().lower(),
+
+        user_context,
+
+        json.dumps(params, sort_keys=True) if params else &quot;&quot;
+
+    ]
+
+    
+
+    key_string = &quot;|&quot;.join(key_components)
+
+    return hashlib.sha256(key_string.encode()).hexdigest()
+
+</code></pre>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔒 보안 강화</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">인증 및 권한 부여</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from azure.identity import DefaultAzureCredential, ClientSecretCredential
+
+from azure.keyvault.secrets import SecretClient
+
+import jwt
+
+from typing import Dict, List
+
+
+
+class SecurityManager:
+
+    &quot;&quot;&quot;Comprehensive security management.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.key_vault_client = self._setup_key_vault()
+
+        self.token_blacklist = set()
+
+        
+
+    def _setup_key_vault(self) -&gt; SecretClient:
+
+        &quot;&quot;&quot;Initialize Azure Key Vault client.&quot;&quot;&quot;
+
+        credential = DefaultAzureCredential()
+
+        vault_url = os.getenv(&quot;AZURE_KEY_VAULT_URL&quot;)
+
+        
+
+        if vault_url:
+
+            return SecretClient(vault_url=vault_url, credential=credential)
+
+        return None
+
+    
+
+    async def validate_request(self, request_headers: Dict[str, str]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Comprehensive request validation.&quot;&quot;&quot;
+
+        
+
+        # Extract and validate authentication
+
+        auth_token = request_headers.get(&quot;authorization&quot;, &quot;&quot;).replace(&quot;Bearer &quot;, &quot;&quot;)
+
+        if not auth_token:
+
+            raise AuthenticationError(&quot;Missing authentication token&quot;)
+
+        
+
+        # Validate token
+
+        user_context = await self._validate_token(auth_token)
+
+        
+
+        # Check rate limiting
+
+        await self._check_rate_limit(user_context[&quot;user_id&quot;])
+
+        
+
+        # Validate RLS context
+
+        rls_user_id = request_headers.get(&quot;x-rls-user-id&quot;)
+
+        if not self._validate_rls_access(user_context, rls_user_id):
+
+            raise AuthorizationError(&quot;Invalid RLS context for user&quot;)
+
+        
+
+        return {
+
+            &quot;user_id&quot;: user_context[&quot;user_id&quot;],
+
+            &quot;roles&quot;: user_context[&quot;roles&quot;],
+
+            &quot;rls_user_id&quot;: rls_user_id,
+
+            &quot;permissions&quot;: user_context[&quot;permissions&quot;]
+
+        }
+
+    
+
+    async def _validate_token(self, token: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Validate JWT token.&quot;&quot;&quot;
+
+        
+
+        if token in self.token_blacklist:
+
+            raise AuthenticationError(&quot;Token has been revoked&quot;)
+
+        
+
+        try:
+
+            # Get public key from Key Vault or cache
+
+            public_key = await self._get_public_key()
+
+            
+
+            # Decode and validate token
+
+            payload = jwt.decode(
+
+                token, 
+
+                public_key, 
+
+                algorithms=[&quot;RS256&quot;],
+
+                audience=&quot;mcp-server&quot;,
+
+                issuer=&quot;zava-auth&quot;
+
+            )
+
+            
+
+            return {
+
+                &quot;user_id&quot;: payload[&quot;sub&quot;],
+
+                &quot;roles&quot;: payload.get(&quot;roles&quot;, []),
+
+                &quot;permissions&quot;: payload.get(&quot;permissions&quot;, []),
+
+                &quot;expires_at&quot;: payload[&quot;exp&quot;]
+
+            }
+
+            
+
+        except jwt.InvalidTokenError as e:
+
+            raise AuthenticationError(f&quot;Invalid token: {e}&quot;)
+
+    
+
+    def _validate_rls_access(self, user_context: Dict, rls_user_id: str) -&gt; bool:
+
+        &quot;&quot;&quot;Validate RLS context access.&quot;&quot;&quot;
+
+        
+
+        # Super admins can access any context
+
+        if &quot;super_admin&quot; in user_context[&quot;roles&quot;]:
+
+            return True
+
+        
+
+        # Store managers can only access their own store
+
+        if &quot;store_manager&quot; in user_context[&quot;roles&quot;]:
+
+            allowed_stores = user_context.get(&quot;allowed_stores&quot;, [])
+
+            return rls_user_id in allowed_stores
+
+        
+
+        # Regional managers can access multiple stores
+
+        if &quot;regional_manager&quot; in user_context[&quot;roles&quot;]:
+
+            allowed_regions = user_context.get(&quot;allowed_regions&quot;, [])
+
+            return self._check_store_in_regions(rls_user_id, allowed_regions)
+
+        
+
+        return False
+
+
+
+# Input validation and sanitization
+
+class InputValidator:
+
+    &quot;&quot;&quot;SQL injection prevention and input validation.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    def validate_sql_query(query: str) -&gt; bool:
+
+        &quot;&quot;&quot;Validate SQL query for safety.&quot;&quot;&quot;
+
+        
+
+        # Forbidden patterns
+
+        forbidden_patterns = [
+
+            r&quot;;\s*(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE)\s+&quot;,
+
+            r&quot;--.*&quot;,
+
+            r&quot;/\*.*\*/&quot;,
+
+            r&quot;xp_cmdshell&quot;,
+
+            r&quot;sp_executesql&quot;,
+
+            r&quot;EXEC\s*\(&quot;,
+
+        ]
+
+        
+
+        query_upper = query.upper()
+
+        
+
+        for pattern in forbidden_patterns:
+
+            if re.search(pattern, query_upper, re.IGNORECASE):
+
+                logger.warning(f&quot;Blocked potentially dangerous query: {pattern}&quot;)
+
+                return False
+
+        
+
+        # Only allow SELECT statements
+
+        if not query_upper.strip().startswith(&quot;SELECT&quot;):
+
+            return False
+
+        
+
+        return True
+
+    
+
+    @staticmethod
+
+    def sanitize_table_name(table_name: str) -&gt; str:
+
+        &quot;&quot;&quot;Sanitize table name input.&quot;&quot;&quot;
+
+        
+
+        # Only allow alphanumeric, underscore, and dot
+
+        if not re.match(r&quot;^[a-zA-Z0-9_.]+$&quot;, table_name):
+
+            raise ValueError(&quot;Invalid table name format&quot;)
+
+        
+
+        # Validate against allowed tables
+
+        if table_name not in VALID_TABLES:
+
+            raise ValueError(f&quot;Table {table_name} not allowed&quot;)
+
+        
+
+        return table_name
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">데이터 보호</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from cryptography.fernet import Fernet
+
+import hashlib
+
+
+
+class DataProtection:
+
+    &quot;&quot;&quot;Data encryption and protection utilities.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.encryption_key = self._get_encryption_key()
+
+        self.cipher_suite = Fernet(self.encryption_key)
+
+    
+
+    def _get_encryption_key(self) -&gt; bytes:
+
+        &quot;&quot;&quot;Get encryption key from secure storage.&quot;&quot;&quot;
+
+        
+
+        # In production, get from Azure Key Vault
+
+        key_vault_secret = os.getenv(&quot;ENCRYPTION_KEY_SECRET_NAME&quot;)
+
+        if key_vault_secret and self.key_vault_client:
+
+            secret = self.key_vault_client.get_secret(key_vault_secret)
+
+            return secret.value.encode()
+
+        
+
+        # Fallback for development (not for production!)
+
+        dev_key = os.getenv(&quot;DEV_ENCRYPTION_KEY&quot;)
+
+        if dev_key:
+
+            return dev_key.encode()
+
+        
+
+        raise ValueError(&quot;No encryption key available&quot;)
+
+    
+
+    def encrypt_sensitive_data(self, data: str) -&gt; str:
+
+        &quot;&quot;&quot;Encrypt sensitive data.&quot;&quot;&quot;
+
+        return self.cipher_suite.encrypt(data.encode()).decode()
+
+    
+
+    def decrypt_sensitive_data(self, encrypted_data: str) -&gt; str:
+
+        &quot;&quot;&quot;Decrypt sensitive data.&quot;&quot;&quot;
+
+        return self.cipher_suite.decrypt(encrypted_data.encode()).decode()
+
+    
+
+    @staticmethod
+
+    def hash_password(password: str, salt: str = None) -&gt; tuple:
+
+        &quot;&quot;&quot;Hash password with salt.&quot;&quot;&quot;
+
+        if not salt:
+
+            salt = os.urandom(32).hex()
+
+        
+
+        password_hash = hashlib.pbkdf2_hmac(
+
+            &#x27;sha256&#x27;,
+
+            password.encode(),
+
+            salt.encode(),
+
+            100000  # iterations
+
+        ).hex()
+
+        
+
+        return password_hash, salt
+
+    
+
+    @staticmethod
+
+    def mask_sensitive_logs(log_data: dict) -&gt; dict:
+
+        &quot;&quot;&quot;Mask sensitive information in logs.&quot;&quot;&quot;
+
+        
+
+        sensitive_fields = [
+
+            &#x27;password&#x27;, &#x27;token&#x27;, &#x27;secret&#x27;, &#x27;key&#x27;, &#x27;authorization&#x27;,
+
+            &#x27;x-api-key&#x27;, &#x27;client_secret&#x27;, &#x27;connection_string&#x27;
+
+        ]
+
+        
+
+        masked_data = log_data.copy()
+
+        
+
+        for field in sensitive_fields:
+
+            if field in masked_data:
+
+                value = str(masked_data[field])
+
+                if len(value) &gt; 4:
+
+                    masked_data[field] = value[:2] + &quot;*&quot; * (len(value) - 4) + value[-2:]
+
+                else:
+
+                    masked_data[field] = &quot;***&quot;
+
+        
+
+        return masked_data
+
+</code></pre>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 프로덕션 배포 가이드라인</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">코드로서의 인프라</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# azure-pipelines.yml
+
+trigger:
+
+  branches:
+
+    include:
+
+      - main
+
+      - release/*
+
+
+
+variables:
+
+  - group: mcp-server-secrets
+
+  - name: imageRepository
+
+    value: &#x27;zava-mcp-server&#x27;
+
+  - name: containerRegistry
+
+    value: &#x27;zavamcpregistry.azurecr.io&#x27;
+
+
+
+stages:
+
+- stage: Build
+
+  displayName: Build and Test
+
+  jobs:
+
+  - job: Build
+
+    displayName: Build
+
+    pool:
+
+      vmImage: ubuntu-latest
+
+    
+
+    steps:
+
+    - task: UsePythonVersion@0
+
+      inputs:
+
+        versionSpec: &#x27;3.11&#x27;
+
+        displayName: &#x27;Use Python 3.11&#x27;
+
+    
+
+    - script: |
+
+        python -m pip install --upgrade pip
+
+        pip install -r requirements.lock.txt
+
+        pip install pytest pytest-cov
+
+      displayName: &#x27;Install dependencies&#x27;
+
+    
+
+    - script: |
+
+        pytest tests/ --cov=mcp_server --cov-report=xml
+
+      displayName: &#x27;Run tests with coverage&#x27;
+
+    
+
+    - task: PublishCodeCoverageResults@1
+
+      inputs:
+
+        codeCoverageTool: Cobertura
+
+        summaryFileLocation: &#x27;coverage.xml&#x27;
+
+    
+
+    - task: Docker@2
+
+      displayName: Build Docker image
+
+      inputs:
+
+        command: build
+
+        repository: $(imageRepository)
+
+        dockerfile: Dockerfile
+
+        tags: |
+
+          $(Build.BuildId)
+
+          latest
+
+
+
+- stage: Deploy
+
+  displayName: Deploy to Production
+
+  dependsOn: Build
+
+  condition: and(succeeded(), eq(variables[&#x27;Build.SourceBranch&#x27;], &#x27;refs/heads/main&#x27;))
+
+  
+
+  jobs:
+
+  - deployment: DeployProduction
+
+    displayName: Deploy to Production
+
+    environment: &#x27;production&#x27;
+
+    pool:
+
+      vmImage: ubuntu-latest
+
+    
+
+    strategy:
+
+      runOnce:
+
+        deploy:
+
+          steps:
+
+          - task: AzureContainerApps@1
+
+            inputs:
+
+              azureSubscription: $(azureServiceConnection)
+
+              containerAppName: &#x27;zava-mcp-server&#x27;
+
+              resourceGroup: &#x27;$(resourceGroupName)&#x27;
+
+              imageToDeploy: &#x27;$(containerRegistry)/$(imageRepository):$(Build.BuildId)&#x27;
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">컨테이너 최적화</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Multi-stage Dockerfile for production
+
+FROM python:3.11-slim as builder
+
+
+
+# Install build dependencies
+
+RUN apt-get update &amp;&amp; apt-get install -y \
+
+    gcc \
+
+    g++ \
+
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+
+
+# Create virtual environment
+
+RUN python -m venv /opt/venv
+
+ENV PATH=&quot;/opt/venv/bin:$PATH&quot;
+
+
+
+# Copy requirements and install Python dependencies
+
+COPY requirements.lock.txt .
+
+RUN pip install --no-cache-dir --upgrade pip &amp;&amp; \
+
+    pip install --no-cache-dir -r requirements.lock.txt
+
+
+
+# Production stage
+
+FROM python:3.11-slim as production
+
+
+
+# Create non-root user
+
+RUN groupadd -r mcpserver &amp;&amp; useradd -r -g mcpserver mcpserver
+
+
+
+# Copy virtual environment from builder
+
+COPY --from=builder /opt/venv /opt/venv
+
+ENV PATH=&quot;/opt/venv/bin:$PATH&quot;
+
+
+
+# Set working directory
+
+WORKDIR /app
+
+
+
+# Copy application code
+
+COPY mcp_server/ ./mcp_server/
+
+COPY --chown=mcpserver:mcpserver . .
+
+
+
+# Set security configurations
+
+RUN chmod -R 755 /app &amp;&amp; \
+
+    chown -R mcpserver:mcpserver /app
+
+
+
+# Switch to non-root user
+
+USER mcpserver
+
+
+
+# Health check
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+
+    CMD curl -f http://localhost:8000/health || exit 1
+
+
+
+# Expose port
+
+EXPOSE 8000
+
+
+
+# Start application
+
+CMD [&quot;python&quot;, &quot;-m&quot;, &quot;mcp_server.sales_analysis&quot;]
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">환경 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Production configuration management
+
+class ProductionConfig:
+
+    &quot;&quot;&quot;Production-specific configuration.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.validate_production_requirements()
+
+        self.setup_logging()
+
+        self.configure_security()
+
+    
+
+    def validate_production_requirements(self):
+
+        &quot;&quot;&quot;Validate all required production settings.&quot;&quot;&quot;
+
+        
+
+        required_settings = [
+
+            &quot;AZURE_CLIENT_ID&quot;,
+
+            &quot;AZURE_CLIENT_SECRET&quot;, 
+
+            &quot;AZURE_TENANT_ID&quot;,
+
+            &quot;PROJECT_ENDPOINT&quot;,
+
+            &quot;AZURE_OPENAI_ENDPOINT&quot;,
+
+            &quot;POSTGRES_HOST&quot;,
+
+            &quot;POSTGRES_PASSWORD&quot;,
+
+            &quot;APPLICATIONINSIGHTS_CONNECTION_STRING&quot;
+
+        ]
+
+        
+
+        missing_settings = [
+
+            setting for setting in required_settings 
+
+            if not os.getenv(setting)
+
+        ]
+
+        
+
+        if missing_settings:
+
+            raise EnvironmentError(
+
+                f&quot;Missing required production settings: {missing_settings}&quot;
+
+            )
+
+    
+
+    def setup_logging(self):
+
+        &quot;&quot;&quot;Configure production logging.&quot;&quot;&quot;
+
+        
+
+        logging.basicConfig(
+
+            level=logging.INFO,
+
+            format=&#x27;%(asctime)s - %(name)s - %(levelname)s - %(message)s&#x27;,
+
+            handlers=[
+
+                logging.StreamHandler(sys.stdout),
+
+                logging.handlers.RotatingFileHandler(
+
+                    &#x27;/var/log/mcp-server.log&#x27;,
+
+                    maxBytes=50*1024*1024,  # 50MB
+
+                    backupCount=5
+
+                )
+
+            ]
+
+        )
+
+        
+
+        # Set third-party loggers to WARNING
+
+        logging.getLogger(&#x27;azure&#x27;).setLevel(logging.WARNING)
+
+        logging.getLogger(&#x27;urllib3&#x27;).setLevel(logging.WARNING)
+
+    
+
+    def configure_security(self):
+
+        &quot;&quot;&quot;Configure production security settings.&quot;&quot;&quot;
+
+        
+
+        # Disable debug mode
+
+        os.environ[&#x27;DEBUG&#x27;] = &#x27;False&#x27;
+
+        
+
+        # Set secure headers
+
+        os.environ[&#x27;SECURE_SSL_REDIRECT&#x27;] = &#x27;True&#x27;
+
+        os.environ[&#x27;SECURE_HSTS_SECONDS&#x27;] = &#x27;31536000&#x27;
+
+        os.environ[&#x27;SECURE_CONTENT_TYPE_NOSNIFF&#x27;] = &#x27;True&#x27;
+
+        os.environ[&#x27;SECURE_BROWSER_XSS_FILTER&#x27;] = &#x27;True&#x27;
+
+</code></pre>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">💰 비용 최적화</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">리소스 관리</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class CostOptimizer:
+
+    &quot;&quot;&quot;Cost optimization strategies.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.metrics_collector = MetricsCollector()
+
+        self.auto_scaler = AutoScaler()
+
+    
+
+    async def optimize_database_connections(self):
+
+        &quot;&quot;&quot;Dynamically adjust connection pool based on load.&quot;&quot;&quot;
+
+        
+
+        current_load = await self.metrics_collector.get_current_load()
+
+        
+
+        if current_load &lt; 0.3:  # Low load
+
+            target_pool_size = max(2, int(current_load * 10))
+
+        elif current_load &lt; 0.7:  # Medium load
+
+            target_pool_size = max(5, int(current_load * 15))
+
+        else:  # High load
+
+            target_pool_size = min(20, int(current_load * 25))
+
+        
+
+        await db_provider.adjust_pool_size(target_pool_size)
+
+        
+
+        logger.info(f&quot;Adjusted pool size to {target_pool_size} for load {current_load}&quot;)
+
+    
+
+    async def implement_smart_caching(self):
+
+        &quot;&quot;&quot;Implement intelligent caching to reduce compute costs.&quot;&quot;&quot;
+
+        
+
+        # Cache expensive operations
+
+        expensive_queries = await self.identify_expensive_queries()
+
+        
+
+        for query in expensive_queries:
+
+            cache_key = self.generate_cache_key(query)
+
+            ttl = self.calculate_optimal_ttl(query)
+
+            
+
+            await smart_cache.set(cache_key, None, ttl=ttl)
+
+    
+
+    def calculate_azure_costs(self) -&gt; Dict[str, float]:
+
+        &quot;&quot;&quot;Calculate estimated Azure resource costs.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;container_apps&quot;: self.estimate_container_costs(),
+
+            &quot;postgresql&quot;: self.estimate_database_costs(),
+
+            &quot;openai&quot;: self.estimate_ai_costs(),
+
+            &quot;application_insights&quot;: self.estimate_monitoring_costs(),
+
+            &quot;storage&quot;: self.estimate_storage_costs()
+
+        }
+
+
+
+# Auto-scaling configuration
+
+class AutoScaler:
+
+    &quot;&quot;&quot;Automatic scaling based on metrics.&quot;&quot;&quot;
+
+    
+
+    async def scale_decision(self) -&gt; str:
+
+        &quot;&quot;&quot;Determine scaling action based on metrics.&quot;&quot;&quot;
+
+        
+
+        metrics = await self.collect_scaling_metrics()
+
+        
+
+        # CPU-based scaling
+
+        if metrics[&#x27;cpu_usage&#x27;] &gt; 80:
+
+            return &quot;scale_up&quot;
+
+        elif metrics[&#x27;cpu_usage&#x27;] &lt; 20 and metrics[&#x27;instance_count&#x27;] &gt; 1:
+
+            return &quot;scale_down&quot;
+
+        
+
+        # Memory-based scaling
+
+        if metrics[&#x27;memory_usage&#x27;] &gt; 85:
+
+            return &quot;scale_up&quot;
+
+        
+
+        # Request queue scaling
+
+        if metrics[&#x27;queue_length&#x27;] &gt; 100:
+
+            return &quot;scale_up&quot;
+
+        elif metrics[&#x27;queue_length&#x27;] &lt; 10 and metrics[&#x27;instance_count&#x27;] &gt; 1:
+
+            return &quot;scale_down&quot;
+
+        
+
+        return &quot;no_action&quot;
+
+</code></pre>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 유지보수 및 운영</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">상태 모니터링</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class OperationalHealth:
+
+    &quot;&quot;&quot;Comprehensive operational health monitoring.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.alert_manager = AlertManager()
+
+        self.health_checks = {}
+
+        
+
+    async def comprehensive_health_check(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Perform comprehensive system health check.&quot;&quot;&quot;
+
+        
+
+        health_report = {
+
+            &quot;timestamp&quot;: datetime.utcnow().isoformat(),
+
+            &quot;overall_status&quot;: &quot;healthy&quot;,
+
+            &quot;components&quot;: {}
+
+        }
+
+        
+
+        # Database health
+
+        db_health = await self.check_database_health()
+
+        health_report[&quot;components&quot;][&quot;database&quot;] = db_health
+
+        
+
+        # External services health
+
+        ai_health = await self.check_ai_service_health()
+
+        health_report[&quot;components&quot;][&quot;ai_service&quot;] = ai_health
+
+        
+
+        # System resources
+
+        system_health = await self.check_system_resources()
+
+        health_report[&quot;components&quot;][&quot;system&quot;] = system_health
+
+        
+
+        # Application metrics
+
+        app_health = await self.check_application_health()
+
+        health_report[&quot;components&quot;][&quot;application&quot;] = app_health
+
+        
+
+        # Determine overall status
+
+        failed_components = [
+
+            name for name, status in health_report[&quot;components&quot;].items()
+
+            if status.get(&quot;status&quot;) != &quot;healthy&quot;
+
+        ]
+
+        
+
+        if failed_components:
+
+            health_report[&quot;overall_status&quot;] = &quot;unhealthy&quot;
+
+            health_report[&quot;failed_components&quot;] = failed_components
+
+            
+
+            # Trigger alerts
+
+            await self.alert_manager.send_alert(
+
+                severity=&quot;high&quot;,
+
+                message=f&quot;Health check failed for: {failed_components}&quot;,
+
+                details=health_report
+
+            )
+
+        
+
+        return health_report
+
+    
+
+    async def check_database_health(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Check database connectivity and performance.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            start_time = time.time()
+
+            
+
+            async with db_provider.get_connection() as conn:
+
+                # Basic connectivity
+
+                await conn.fetchval(&quot;SELECT 1&quot;)
+
+                
+
+                # Check slow queries
+
+                slow_queries = await conn.fetch(&quot;&quot;&quot;
+
+                    SELECT query, mean_exec_time, calls 
+
+                    FROM pg_stat_statements 
+
+                    WHERE mean_exec_time &gt; 1000 
+
+                    ORDER BY mean_exec_time DESC 
+
+                    LIMIT 5
+
+                &quot;&quot;&quot;)
+
+                
+
+                # Check connection count
+
+                connection_count = await conn.fetchval(&quot;&quot;&quot;
+
+                    SELECT count(*) FROM pg_stat_activity 
+
+                    WHERE state = &#x27;active&#x27;
+
+                &quot;&quot;&quot;)
+
+                
+
+                response_time = time.time() - start_time
+
+                
+
+                return {
+
+                    &quot;status&quot;: &quot;healthy&quot;,
+
+                    &quot;response_time_ms&quot;: response_time * 1000,
+
+                    &quot;active_connections&quot;: connection_count,
+
+                    &quot;slow_queries_count&quot;: len(slow_queries),
+
+                    &quot;pool_size&quot;: db_provider.connection_pool.get_size()
+
+                }
+
+                
+
+        except Exception as e:
+
+            return {
+
+                &quot;status&quot;: &quot;unhealthy&quot;,
+
+                &quot;error&quot;: str(e),
+
+                &quot;last_check&quot;: datetime.utcnow().isoformat()
+
+            }
+
+
+
+# Automated backup and recovery
+
+class BackupManager:
+
+    &quot;&quot;&quot;Database backup and recovery management.&quot;&quot;&quot;
+
+    
+
+    async def create_backup(self, backup_type: str = &quot;full&quot;) -&gt; str:
+
+        &quot;&quot;&quot;Create database backup.&quot;&quot;&quot;
+
+        
+
+        timestamp = datetime.utcnow().strftime(&quot;%Y%m%d_%H%M%S&quot;)
+
+        backup_name = f&quot;zava_backup_{backup_type}_{timestamp}&quot;
+
+        
+
+        if backup_type == &quot;full&quot;:
+
+            await self.create_full_backup(backup_name)
+
+        elif backup_type == &quot;incremental&quot;:
+
+            await self.create_incremental_backup(backup_name)
+
+        
+
+        # Upload to Azure Blob Storage
+
+        await self.upload_backup_to_azure(backup_name)
+
+        
+
+        return backup_name
+
+    
+
+    async def schedule_automated_backups(self):
+
+        &quot;&quot;&quot;Schedule regular automated backups.&quot;&quot;&quot;
+
+        
+
+        # Daily full backup at 2 AM UTC
+
+        schedule.every().day.at(&quot;02:00&quot;).do(
+
+            lambda: asyncio.create_task(self.create_backup(&quot;full&quot;))
+
+        )
+
+        
+
+        # Hourly incremental backups
+
+        schedule.every().hour.do(
+
+            lambda: asyncio.create_task(self.create_backup(&quot;incremental&quot;))
+
+        )
+
+</code></pre>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🌍 커뮤니티 기여</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">오픈 소스 모범 사례</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Contributing to MCP Database Integration
+
+
+
+## Development Guidelines
+
+
+
+### Code Quality Standards
+
+- Follow PEP 8 for Python code style
+
+- Maintain test coverage above 90%
+
+- Use type hints throughout the codebase
+
+- Write comprehensive docstrings
+
+
+
+### Testing Requirements
+
+- Unit tests for all new functionality
+
+- Integration tests for database operations
+
+- Performance benchmarks for critical paths
+
+- Security tests for authentication/authorization
+
+
+
+### Documentation Standards
+
+- Update README.md for any new features
+
+- Add inline code documentation
+
+- Create examples for new tools or patterns
+
+- Maintain API documentation
+
+
+
+## Security Considerations
+
+
+
+### Reporting Security Issues
+
+- Report security vulnerabilities privately
+
+- Use encrypted communication channels
+
+- Provide detailed reproduction steps
+
+- Include potential impact assessment
+
+
+
+### Security Review Process
+
+- All PRs undergo security review
+
+- Static analysis tools required to pass
+
+- Dependency vulnerability scanning
+
+- Manual security testing for critical changes
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">커뮤니티 참여</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class CommunityContributor:
+
+    &quot;&quot;&quot;Tools for community engagement and contribution.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    def generate_contribution_guide():
+
+        &quot;&quot;&quot;Generate personalized contribution guide.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;getting_started&quot;: {
+
+                &quot;setup&quot;: &quot;Follow setup guide in Lab 03&quot;,
+
+                &quot;first_contribution&quot;: &quot;Start with documentation improvements&quot;,
+
+                &quot;testing&quot;: &quot;Run full test suite before submitting PR&quot;
+
+            },
+
+            
+
+            &quot;contribution_areas&quot;: {
+
+                &quot;documentation&quot;: &quot;Improve learning labs and examples&quot;,
+
+                &quot;testing&quot;: &quot;Add test cases and improve coverage&quot;,
+
+                &quot;features&quot;: &quot;Implement new MCP tools and capabilities&quot;,
+
+                &quot;performance&quot;: &quot;Optimize queries and caching&quot;,
+
+                &quot;security&quot;: &quot;Enhance security measures and validation&quot;
+
+            },
+
+            
+
+            &quot;community_resources&quot;: {
+
+                &quot;discord&quot;: &quot;https://discord.com/invite/ByRwuEEgH4&quot;,
+
+                &quot;discussions&quot;: &quot;GitHub Discussions for Q&amp;A&quot;,
+
+                &quot;issues&quot;: &quot;GitHub Issues for bug reports&quot;,
+
+                &quot;examples&quot;: &quot;Share your implementation examples&quot;
+
+            }
+
+        }
+
+    
+
+    @staticmethod
+
+    def validate_contribution(pr_data: Dict) -&gt; Dict[str, bool]:
+
+        &quot;&quot;&quot;Validate contribution meets standards.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;has_tests&quot;: &quot;test&quot; in pr_data.get(&quot;files_changed&quot;, []),
+
+            &quot;has_documentation&quot;: &quot;README&quot; in str(pr_data.get(&quot;files_changed&quot;, [])),
+
+            &quot;follows_conventions&quot;: True,  # Would implement actual checks
+
+            &quot;security_reviewed&quot;: pr_data.get(&quot;security_review&quot;, False),
+
+            &quot;performance_tested&quot;: pr_data.get(&quot;benchmark_results&quot;, False)
+
+        }
+
+</code></pre>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 종합 학습 경로를 완료한 후, 다음을 숙달하게 됩니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>성능 최적화</strong>: 데이터베이스 튜닝, 비동기 패턴 및 캐싱 전략  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>보안 강화</strong>: 인증, 권한 부여 및 데이터 보호  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>프로덕션 배포</strong>: 코드로서의 인프라 및 컨테이너 최적화  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>비용 관리</strong>: 리소스 최적화 및 지능형 확장  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>운영 우수성</strong>: 모니터링, 유지보수 및 자동화  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>커뮤니티 참여</strong>: MCP 생태계에 기여  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏆 인증 및 다음 단계</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">실습 평가</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 프로젝트를 완료하여 숙련도를 입증하세요:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>프로덕션 준비 MCP 서버 구축</strong> 포함:  </p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] RLS를 활용한 멀티 테넌트 소매 분석  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Azure OpenAI를 활용한 시맨틱 검색  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 포괄적인 보안 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Azure에서의 프로덕션 배포  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 모니터링 및 경고 설정  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 문서화 및 테스트  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">고급 학습 경로</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 여정을 계속하세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP 아키텍처 패턴</strong>: 고급 서버 아키텍처  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>멀티 모델 통합</strong>: 다양한 AI 모델 결합  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>기업 규모</strong>: 대규모 MCP 배포  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>맞춤형 도구 개발</strong>: 전문 MCP 도구 구축  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP 생태계</strong>: 광범위한 커뮤니티에 기여  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">커뮤니티 인정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">성과를 공유하세요:  </p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>GitHub 포트폴리오</strong>: 구현 사례를 공개  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>커뮤니티 기여</strong>: 개선 사항 또는 예제 제출  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>발표 기회</strong>: 밋업 또는 컨퍼런스에서 발표  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>멘토링</strong>: 다른 개발자가 MCP를 배우도록 지원  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">고급 주제  </h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/performance-tips.html">PostgreSQL 성능 튜닝</a> - 데이터베이스 최적화  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/container-apps/overview">Azure 컨테이너 앱 모범 사례</a> - 프로덕션 배포  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio-dev.html">Python 비동기 모범 사례</a> - 비동기 프로그래밍  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">보안 자료  </h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-project-top-ten/">OWASP Top 10</a> - 보안 취약점  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/security/">Azure 보안 모범 사례</a> - 클라우드 보안  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://python.org/dev/security/">Python 보안 가이드라인</a> - 안전한 코딩  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">커뮤니티  </h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://discord.com/invite/ByRwuEEgH4">MCP 커뮤니티 Discord</a> - 실시간 토론  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/MCP-Server-and-PostgreSQL-Sample-Retail/discussions">GitHub Discussions</a> - Q&A 및 공유  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://stackoverflow.com/questions/tagged/model-context-protocol">Stack Overflow</a> - 기술 질문  </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 축하합니다!</strong> MCP 데이터베이스 통합 학습 경로를 완성했습니다. 이제 AI 어시스턴트와 실제 데이터 시스템을 연결하는 프로덕션 준비 MCP 서버를 구축할 수 있는 지식과 기술을 갖추게 되었습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>기여할 준비가 되셨나요?</strong> 커뮤니티에 참여하여 경험을 공유하거나 코드 개선에 기여하거나 추가 학습 자료를 만들어 다른 사람들이 MCP를 배우도록 도와주세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_12-11---monitoring-and-observability.html">&larr; 11 - Monitoring and Observability</a></span>
+  <span></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JavaScript Calculator - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; JavaScript Calculator</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Sample</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is a JavaScript sample for an MCP Server</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's what the calculator portion of it looks like:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Define calculator tools for each operation
+
+server.tool(
+
+  &quot;add&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; ({
+
+    content: [{ type: &quot;text&quot;, text: String(a + b) }]
+
+  })
+
+);
+
+
+
+server.tool(
+
+  &quot;subtract&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; ({
+
+    content: [{ type: &quot;text&quot;, text: String(a - b) }]
+
+  })
+
+);
+
+
+
+server.tool(
+
+  &quot;multiply&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; ({
+
+    content: [{ type: &quot;text&quot;, text: String(a * b) }]
+
+  })
+
+);
+
+
+
+server.tool(
+
+  &quot;divide&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; {
+
+    if (b === 0) {
+
+      return {
+
+        content: [{ type: &quot;text&quot;, text: &quot;Error: Cannot divide by zero&quot; }],
+
+        isError: true
+
+      };
+
+    }
+
+    return {
+
+      content: [{ type: &quot;text&quot;, text: String(a / b) }]
+
+    };
+
+  }
+
+);
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Install</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Run the following command:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm install
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Run</h3>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm start
+
+</code></pre></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">샘플</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이것은 MCP 서버용 JavaScript 샘플입니다</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">계산기 부분은 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Define calculator tools for each operation
+
+server.tool(
+
+  &quot;add&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; ({
+
+    content: [{ type: &quot;text&quot;, text: String(a + b) }]
+
+  })
+
+);
+
+
+
+server.tool(
+
+  &quot;subtract&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; ({
+
+    content: [{ type: &quot;text&quot;, text: String(a - b) }]
+
+  })
+
+);
+
+
+
+server.tool(
+
+  &quot;multiply&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; ({
+
+    content: [{ type: &quot;text&quot;, text: String(a * b) }]
+
+  })
+
+);
+
+
+
+server.tool(
+
+  &quot;divide&quot;,
+
+  {
+
+    a: z.number(),
+
+    b: z.number()
+
+  },
+
+  async ({ a, b }) =&gt; {
+
+    if (b === 0) {
+
+      return {
+
+        content: [{ type: &quot;text&quot;, text: &quot;Error: Cannot divide by zero&quot; }],
+
+        isError: true
+
+      };
+
+    }
+
+    return {
+
+      content: [{ type: &quot;text&quot;, text: String(a / b) }]
+
+    };
+
+  }
+
+);
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">설치</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 명령어를 실행하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm install
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">실행</h3>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm start
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m03_16-java-calculator.html">&larr; Java Calculator</a></span>
+  <span><a href="m03_18-typescript-calculator.html">TypeScript Calculator &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

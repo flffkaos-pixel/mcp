@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.1 Integration with Azure - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.1 Integration with Azure</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Enterprise Integration</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When building MCP Servers in an enterprise context, you often need to integrate with existing AI platforms and services.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This section covers how to integrate MCP with enterprise systems like Azure OpenAI and Microsoft AI Foundry, enabling advanced AI capabilities and tool orchestration.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this lesson, you'll learn how to integrate Model Context Protocol (MCP) with enterprise AI systems, focusing on Azure OpenAI and Microsoft AI Foundry.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These integrations allow you to leverage powerful AI models and tools while maintaining the flexibility and extensibility of MCP.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integrate MCP with Azure OpenAI to utilize its AI capabilities.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement MCP tool orchestration with Azure OpenAI.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Combine MCP with Microsoft AI Foundry for advanced AI agent capabilities.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Leverage Azure Machine Learning (ML) for executing ML pipelines and registering models as MCP tools.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Azure OpenAI Integration</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure OpenAI provides access to powerful AI models like GPT-4 and others. Integrating MCP with Azure OpenAI allows you to utilize these models while maintaining the flexibility of MCP's tool orchestration.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">C# Implementation</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this code snippet, we demonstrate how to integrate MCP with Azure OpenAI using the Azure OpenAI SDK.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .NET Azure OpenAI Integration
+
+using Microsoft.Mcp.Client;
+
+using Azure.AI.OpenAI;
+
+using Microsoft.Extensions.Configuration;
+
+using System.Threading.Tasks;
+
+
+
+namespace EnterpriseIntegration
+
+{
+
+    public class AzureOpenAiMcpClient
+
+    {
+
+        private readonly string _endpoint;
+
+        private readonly string _apiKey;
+
+        private readonly string _deploymentName;
+
+        
+
+        public AzureOpenAiMcpClient(IConfiguration config)
+
+        {
+
+            _endpoint = config[&quot;AzureOpenAI:Endpoint&quot;];
+
+            _apiKey = config[&quot;AzureOpenAI:ApiKey&quot;];
+
+            _deploymentName = config[&quot;AzureOpenAI:DeploymentName&quot;];
+
+        }
+
+        
+
+        public async Task&lt;string&gt; GetCompletionWithToolsAsync(string prompt, params string[] allowedTools)
+
+        {
+
+            // Create OpenAI client
+
+            var client = new OpenAIClient(new Uri(_endpoint), new AzureKeyCredential(_apiKey));
+
+            
+
+            // Create completion options with tools
+
+            var completionOptions = new ChatCompletionsOptions
+
+            {
+
+                DeploymentName = _deploymentName,
+
+                Messages = { new ChatMessage(ChatRole.User, prompt) },
+
+                Temperature = 0.7f,
+
+                MaxTokens = 800
+
+            };
+
+            
+
+            // Add tool definitions
+
+            foreach (var tool in allowedTools)
+
+            {
+
+                completionOptions.Tools.Add(new ChatCompletionsFunctionToolDefinition
+
+                {
+
+                    Name = tool,
+
+                    // In a real implementation, you&#x27;d add the tool schema here
+
+                });
+
+            }
+
+            
+
+            // Get completion response
+
+            var response = await client.GetChatCompletionsAsync(completionOptions);
+
+            
+
+            // Handle tool calls in the response
+
+            foreach (var toolCall in response.Value.Choices[0].Message.ToolCalls)
+
+            {
+
+                // Implementation to handle Azure OpenAI tool calls with MCP
+
+                // ...
+
+            }
+
+            
+
+            return response.Value.Choices[0].Message.Content;
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configured the Azure OpenAI client with the endpoint, deployment name and API key.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a method <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GetCompletionWithToolsAsync</code> to get completions with tool support.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handled tool calls in the response.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You're encouraged to implement the actual tool handling logic based on your specific MCP server setup.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Microsoft AI Foundry Integration</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure AI Foundry provides a platform for building and deploying AI agents. Integrating MCP with AI Foundry allows you to leverage its capabilities while maintaining the flexibility of MCP.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the below code, we develop an Agent integration that processes requests and handles tool calls using MCP.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Java Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Java AI Foundry Agent Integration
+
+package com.example.mcp.enterprise;
+
+
+
+import com.microsoft.aifoundry.AgentClient;
+
+import com.microsoft.aifoundry.AgentToolResponse;
+
+import com.microsoft.aifoundry.models.AgentRequest;
+
+import com.microsoft.aifoundry.models.AgentResponse;
+
+import com.mcp.client.McpClient;
+
+import com.mcp.tools.ToolRequest;
+
+import com.mcp.tools.ToolResponse;
+
+
+
+public class AIFoundryMcpBridge {
+
+    private final AgentClient agentClient;
+
+    private final McpClient mcpClient;
+
+    
+
+    public AIFoundryMcpBridge(String aiFoundryEndpoint, String mcpServerUrl) {
+
+        this.agentClient = new AgentClient(aiFoundryEndpoint);
+
+        this.mcpClient = new McpClient.Builder()
+
+            .setServerUrl(mcpServerUrl)
+
+            .build();
+
+    }
+
+    
+
+    public AgentResponse processAgentRequest(AgentRequest request) {
+
+        // Process the AI Foundry Agent request
+
+        AgentResponse initialResponse = agentClient.processRequest(request);
+
+        
+
+        // Check if the agent requested to use tools
+
+        if (initialResponse.getToolCalls() != null &amp;&amp; !initialResponse.getToolCalls().isEmpty()) {
+
+            // For each tool call, route it to the appropriate MCP tool
+
+            for (AgentToolCall toolCall : initialResponse.getToolCalls()) {
+
+                String toolName = toolCall.getName();
+
+                Map&lt;String, Object&gt; parameters = toolCall.getArguments();
+
+                
+
+                // Execute the tool using MCP
+
+                ToolResponse mcpResponse = mcpClient.executeTool(toolName, parameters);
+
+                
+
+                // Create tool response for AI Foundry
+
+                AgentToolResponse toolResponse = new AgentToolResponse(
+
+                    toolCall.getId(),
+
+                    mcpResponse.getResult()
+
+                );
+
+                
+
+                // Submit tool response back to the agent
+
+                initialResponse = agentClient.submitToolResponse(
+
+                    request.getConversationId(), 
+
+                    toolResponse
+
+                );
+
+            }
+
+        }
+
+        
+
+        return initialResponse;
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created an <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AIFoundryMcpBridge</code> class that integrates with both AI Foundry and MCP.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented a method <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">processAgentRequest</code> that processes an AI Foundry agent request.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Handled tool calls by executing them through the MCP client and submitting the results back to the AI Foundry agent.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Integrating MCP with Azure ML</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Integrating MCP with Azure Machine Learning (ML) allows you to leverage Azure's powerful ML capabilities while maintaining the flexibility of MCP.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This integration can be used to execute ML pipelines, register models as tools, and manage compute resources.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Implementation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Azure AI Integration
+
+from mcp_client import McpClient
+
+from azure.ai.ml import MLClient
+
+from azure.identity import DefaultAzureCredential
+
+from azure.ai.ml.entities import Environment, AmlCompute
+
+import os
+
+import asyncio
+
+
+
+class EnterpriseAiIntegration:
+
+    def __init__(self, mcp_server_url, subscription_id, resource_group, workspace_name):
+
+        # Set up MCP client
+
+        self.mcp_client = McpClient(server_url=mcp_server_url)
+
+        
+
+        # Set up Azure ML client
+
+        self.credential = DefaultAzureCredential()
+
+        self.ml_client = MLClient(
+
+            self.credential,
+
+            subscription_id,
+
+            resource_group,
+
+            workspace_name
+
+        )
+
+    
+
+    async def execute_ml_pipeline(self, pipeline_name, input_data):
+
+        &quot;&quot;&quot;Executes an ML pipeline in Azure ML&quot;&quot;&quot;
+
+        # First process the input data using MCP tools
+
+        processed_data = await self.mcp_client.execute_tool(
+
+            &quot;dataPreprocessor&quot;,
+
+            {
+
+                &quot;data&quot;: input_data,
+
+                &quot;operations&quot;: [&quot;normalize&quot;, &quot;clean&quot;, &quot;transform&quot;]
+
+            }
+
+        )
+
+        
+
+        # Submit the pipeline to Azure ML
+
+        pipeline_job = self.ml_client.jobs.create_or_update(
+
+            entity={
+
+                &quot;name&quot;: pipeline_name,
+
+                &quot;display_name&quot;: f&quot;MCP-triggered {pipeline_name}&quot;,
+
+                &quot;experiment_name&quot;: &quot;mcp-integration&quot;,
+
+                &quot;inputs&quot;: {
+
+                    &quot;processed_data&quot;: processed_data.result
+
+                }
+
+            }
+
+        )
+
+        
+
+        # Return job information
+
+        return {
+
+            &quot;job_id&quot;: pipeline_job.id,
+
+            &quot;status&quot;: pipeline_job.status,
+
+            &quot;creation_time&quot;: pipeline_job.creation_context.created_at
+
+        }
+
+    
+
+    async def register_ml_model_as_tool(self, model_name, model_version=&quot;latest&quot;):
+
+        &quot;&quot;&quot;Registers an Azure ML model as an MCP tool&quot;&quot;&quot;
+
+        # Get model details
+
+        if model_version == &quot;latest&quot;:
+
+            model = self.ml_client.models.get(name=model_name, label=&quot;latest&quot;)
+
+        else:
+
+            model = self.ml_client.models.get(name=model_name, version=model_version)
+
+        
+
+        # Create deployment environment
+
+        env = Environment(
+
+            name=&quot;mcp-model-env&quot;,
+
+            conda_file=&quot;./environments/inference-env.yml&quot;
+
+        )
+
+        
+
+        # Set up compute
+
+        compute = self.ml_client.compute.get(&quot;mcp-inference&quot;)
+
+        
+
+        # Deploy model as online endpoint
+
+        deployment = self.ml_client.online_deployments.create_or_update(
+
+            endpoint_name=f&quot;mcp-{model_name}&quot;,
+
+            deployment={
+
+                &quot;name&quot;: f&quot;mcp-{model_name}-deployment&quot;,
+
+                &quot;model&quot;: model.id,
+
+                &quot;environment&quot;: env,
+
+                &quot;compute&quot;: compute,
+
+                &quot;scale_settings&quot;: {
+
+                    &quot;scale_type&quot;: &quot;auto&quot;,
+
+                    &quot;min_instances&quot;: 1,
+
+                    &quot;max_instances&quot;: 3
+
+                }
+
+            }
+
+        )
+
+        
+
+        # Create MCP tool schema based on model schema
+
+        tool_schema = {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {},
+
+            &quot;required&quot;: []
+
+        }
+
+        
+
+        # Add input properties based on model schema
+
+        for input_name, input_spec in model.signature.inputs.items():
+
+            tool_schema[&quot;properties&quot;][input_name] = {
+
+                &quot;type&quot;: self._map_ml_type_to_json_type(input_spec.type)
+
+            }
+
+            tool_schema[&quot;required&quot;].append(input_name)
+
+        
+
+        # Register as MCP tool
+
+        # In a real implementation, you would create a tool that calls the endpoint
+
+        return {
+
+            &quot;model_name&quot;: model_name,
+
+            &quot;model_version&quot;: model.version,
+
+            &quot;endpoint&quot;: deployment.endpoint_uri,
+
+            &quot;tool_schema&quot;: tool_schema
+
+        }
+
+    
+
+    def _map_ml_type_to_json_type(self, ml_type):
+
+        &quot;&quot;&quot;Maps ML data types to JSON schema types&quot;&quot;&quot;
+
+        mapping = {
+
+            &quot;float&quot;: &quot;number&quot;,
+
+            &quot;int&quot;: &quot;integer&quot;,
+
+            &quot;bool&quot;: &quot;boolean&quot;,
+
+            &quot;str&quot;: &quot;string&quot;,
+
+            &quot;object&quot;: &quot;object&quot;,
+
+            &quot;array&quot;: &quot;array&quot;
+
+        }
+
+        return mapping.get(ml_type, &quot;string&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created an <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">EnterpriseAiIntegration</code> class that integrates MCP with Azure ML.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented an <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">execute_ml_pipeline</code> method that processes input data using MCP tools and submits an ML pipeline to Azure ML.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">register_ml_model_as_tool</code> method that registers an Azure ML model as an MCP tool, including creating the necessary deployment environment and compute resources.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Mapped Azure ML data types to JSON schema types for tool registration.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used asynchronous programming to handle potentially long-running operations like ML pipeline execution and model registration.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-multi-modality/README.md" target="_blank">5.2 Multi modality</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">엔터프라이즈 통합</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">엔터프라이즈 환경에서 MCP 서버를 구축할 때 기존 AI 플랫폼 및 서비스와 통합해야 하는 경우가 많습니다. 이 섹션에서는 Azure OpenAI 및 Microsoft AI Foundry와 같은 엔터프라이즈 시스템과 MCP를 통합하여 고급 AI 기능과 도구 오케스트레이션을 구현하는 방법을 다룹니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">소개</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 강의에서는 Model Context Protocol (MCP)을 엔터프라이즈 AI 시스템과 통합하는 방법을 배웁니다. 특히 Azure OpenAI와 Microsoft AI Foundry를 중심으로 설명합니다. 이러한 통합을 통해 강력한 AI 모델과 도구를 활용하면서 MCP의 유연성과 확장성을 유지할 수 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 강의를 마치면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP를 Azure OpenAI와 통합하여 AI 기능을 활용하기.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Azure OpenAI를 사용하여 MCP 도구 오케스트레이션 구현하기.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP와 Microsoft AI Foundry를 결합하여 고급 AI 에이전트 기능 활용하기.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Azure Machine Learning (ML)을 활용하여 ML 파이프라인을 실행하고 모델을 MCP 도구로 등록하기.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Azure OpenAI 통합</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure OpenAI는 GPT-4와 같은 강력한 AI 모델에 접근할 수 있는 기능을 제공합니다. MCP를 Azure OpenAI와 통합하면 이러한 모델을 활용하면서 MCP의 도구 오케스트레이션 유연성을 유지할 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">C# 구현</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 코드 스니펫은 Azure OpenAI SDK를 사용하여 MCP를 Azure OpenAI와 통합하는 방법을 보여줍니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .NET Azure OpenAI Integration
+
+using Microsoft.Mcp.Client;
+
+using Azure.AI.OpenAI;
+
+using Microsoft.Extensions.Configuration;
+
+using System.Threading.Tasks;
+
+
+
+namespace EnterpriseIntegration
+
+{
+
+    public class AzureOpenAiMcpClient
+
+    {
+
+        private readonly string _endpoint;
+
+        private readonly string _apiKey;
+
+        private readonly string _deploymentName;
+
+        
+
+        public AzureOpenAiMcpClient(IConfiguration config)
+
+        {
+
+            _endpoint = config[&quot;AzureOpenAI:Endpoint&quot;];
+
+            _apiKey = config[&quot;AzureOpenAI:ApiKey&quot;];
+
+            _deploymentName = config[&quot;AzureOpenAI:DeploymentName&quot;];
+
+        }
+
+        
+
+        public async Task&lt;string&gt; GetCompletionWithToolsAsync(string prompt, params string[] allowedTools)
+
+        {
+
+            // Create OpenAI client
+
+            var client = new OpenAIClient(new Uri(_endpoint), new AzureKeyCredential(_apiKey));
+
+            
+
+            // Create completion options with tools
+
+            var completionOptions = new ChatCompletionsOptions
+
+            {
+
+                DeploymentName = _deploymentName,
+
+                Messages = { new ChatMessage(ChatRole.User, prompt) },
+
+                Temperature = 0.7f,
+
+                MaxTokens = 800
+
+            };
+
+            
+
+            // Add tool definitions
+
+            foreach (var tool in allowedTools)
+
+            {
+
+                completionOptions.Tools.Add(new ChatCompletionsFunctionToolDefinition
+
+                {
+
+                    Name = tool,
+
+                    // In a real implementation, you&#x27;d add the tool schema here
+
+                });
+
+            }
+
+            
+
+            // Get completion response
+
+            var response = await client.GetChatCompletionsAsync(completionOptions);
+
+            
+
+            // Handle tool calls in the response
+
+            foreach (var toolCall in response.Value.Choices[0].Message.ToolCalls)
+
+            {
+
+                // Implementation to handle Azure OpenAI tool calls with MCP
+
+                // ...
+
+            }
+
+            
+
+            return response.Value.Choices[0].Message.Content;
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서 우리는 다음을 수행했습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">엔드포인트, 배포 이름, API 키를 사용하여 Azure OpenAI 클라이언트를 구성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">도구 지원을 포함한 결과를 가져오는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GetCompletionWithToolsAsync</code> 메서드를 생성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">응답에서 도구 호출을 처리했습니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">구체적인 MCP 서버 설정에 따라 실제 도구 처리 로직을 구현하는 것이 권장됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Microsoft AI Foundry 통합</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure AI Foundry는 AI 에이전트를 구축하고 배포할 수 있는 플랫폼을 제공합니다. MCP를 AI Foundry와 통합하면 MCP의 유연성을 유지하면서 Foundry의 기능을 활용할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">아래 코드에서는 MCP를 사용하여 요청을 처리하고 도구 호출을 처리하는 에이전트 통합을 개발합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Java 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Java AI Foundry Agent Integration
+
+package com.example.mcp.enterprise;
+
+
+
+import com.microsoft.aifoundry.AgentClient;
+
+import com.microsoft.aifoundry.AgentToolResponse;
+
+import com.microsoft.aifoundry.models.AgentRequest;
+
+import com.microsoft.aifoundry.models.AgentResponse;
+
+import com.mcp.client.McpClient;
+
+import com.mcp.tools.ToolRequest;
+
+import com.mcp.tools.ToolResponse;
+
+
+
+public class AIFoundryMcpBridge {
+
+    private final AgentClient agentClient;
+
+    private final McpClient mcpClient;
+
+    
+
+    public AIFoundryMcpBridge(String aiFoundryEndpoint, String mcpServerUrl) {
+
+        this.agentClient = new AgentClient(aiFoundryEndpoint);
+
+        this.mcpClient = new McpClient.Builder()
+
+            .setServerUrl(mcpServerUrl)
+
+            .build();
+
+    }
+
+    
+
+    public AgentResponse processAgentRequest(AgentRequest request) {
+
+        // Process the AI Foundry Agent request
+
+        AgentResponse initialResponse = agentClient.processRequest(request);
+
+        
+
+        // Check if the agent requested to use tools
+
+        if (initialResponse.getToolCalls() != null &amp;&amp; !initialResponse.getToolCalls().isEmpty()) {
+
+            // For each tool call, route it to the appropriate MCP tool
+
+            for (AgentToolCall toolCall : initialResponse.getToolCalls()) {
+
+                String toolName = toolCall.getName();
+
+                Map&lt;String, Object&gt; parameters = toolCall.getArguments();
+
+                
+
+                // Execute the tool using MCP
+
+                ToolResponse mcpResponse = mcpClient.executeTool(toolName, parameters);
+
+                
+
+                // Create tool response for AI Foundry
+
+                AgentToolResponse toolResponse = new AgentToolResponse(
+
+                    toolCall.getId(),
+
+                    mcpResponse.getResult()
+
+                );
+
+                
+
+                // Submit tool response back to the agent
+
+                initialResponse = agentClient.submitToolResponse(
+
+                    request.getConversationId(), 
+
+                    toolResponse
+
+                );
+
+            }
+
+        }
+
+        
+
+        return initialResponse;
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서 우리는 다음을 수행했습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Foundry와 MCP를 모두 통합하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AIFoundryMcpBridge</code> 클래스를 생성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI Foundry 에이전트 요청을 처리하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">processAgentRequest</code> 메서드를 구현했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 클라이언트를 통해 도구 호출을 실행하고 결과를 AI Foundry 에이전트에 다시 제출했습니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Azure ML과 MCP 통합</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP를 Azure Machine Learning (ML)과 통합하면 Azure의 강력한 ML 기능을 활용하면서 MCP의 유연성을 유지할 수 있습니다. 이 통합은 ML 파이프라인 실행, 모델을 도구로 등록, 컴퓨팅 리소스 관리에 사용될 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 구현</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Azure AI Integration
+
+from mcp_client import McpClient
+
+from azure.ai.ml import MLClient
+
+from azure.identity import DefaultAzureCredential
+
+from azure.ai.ml.entities import Environment, AmlCompute
+
+import os
+
+import asyncio
+
+
+
+class EnterpriseAiIntegration:
+
+    def __init__(self, mcp_server_url, subscription_id, resource_group, workspace_name):
+
+        # Set up MCP client
+
+        self.mcp_client = McpClient(server_url=mcp_server_url)
+
+        
+
+        # Set up Azure ML client
+
+        self.credential = DefaultAzureCredential()
+
+        self.ml_client = MLClient(
+
+            self.credential,
+
+            subscription_id,
+
+            resource_group,
+
+            workspace_name
+
+        )
+
+    
+
+    async def execute_ml_pipeline(self, pipeline_name, input_data):
+
+        &quot;&quot;&quot;Executes an ML pipeline in Azure ML&quot;&quot;&quot;
+
+        # First process the input data using MCP tools
+
+        processed_data = await self.mcp_client.execute_tool(
+
+            &quot;dataPreprocessor&quot;,
+
+            {
+
+                &quot;data&quot;: input_data,
+
+                &quot;operations&quot;: [&quot;normalize&quot;, &quot;clean&quot;, &quot;transform&quot;]
+
+            }
+
+        )
+
+        
+
+        # Submit the pipeline to Azure ML
+
+        pipeline_job = self.ml_client.jobs.create_or_update(
+
+            entity={
+
+                &quot;name&quot;: pipeline_name,
+
+                &quot;display_name&quot;: f&quot;MCP-triggered {pipeline_name}&quot;,
+
+                &quot;experiment_name&quot;: &quot;mcp-integration&quot;,
+
+                &quot;inputs&quot;: {
+
+                    &quot;processed_data&quot;: processed_data.result
+
+                }
+
+            }
+
+        )
+
+        
+
+        # Return job information
+
+        return {
+
+            &quot;job_id&quot;: pipeline_job.id,
+
+            &quot;status&quot;: pipeline_job.status,
+
+            &quot;creation_time&quot;: pipeline_job.creation_context.created_at
+
+        }
+
+    
+
+    async def register_ml_model_as_tool(self, model_name, model_version=&quot;latest&quot;):
+
+        &quot;&quot;&quot;Registers an Azure ML model as an MCP tool&quot;&quot;&quot;
+
+        # Get model details
+
+        if model_version == &quot;latest&quot;:
+
+            model = self.ml_client.models.get(name=model_name, label=&quot;latest&quot;)
+
+        else:
+
+            model = self.ml_client.models.get(name=model_name, version=model_version)
+
+        
+
+        # Create deployment environment
+
+        env = Environment(
+
+            name=&quot;mcp-model-env&quot;,
+
+            conda_file=&quot;./environments/inference-env.yml&quot;
+
+        )
+
+        
+
+        # Set up compute
+
+        compute = self.ml_client.compute.get(&quot;mcp-inference&quot;)
+
+        
+
+        # Deploy model as online endpoint
+
+        deployment = self.ml_client.online_deployments.create_or_update(
+
+            endpoint_name=f&quot;mcp-{model_name}&quot;,
+
+            deployment={
+
+                &quot;name&quot;: f&quot;mcp-{model_name}-deployment&quot;,
+
+                &quot;model&quot;: model.id,
+
+                &quot;environment&quot;: env,
+
+                &quot;compute&quot;: compute,
+
+                &quot;scale_settings&quot;: {
+
+                    &quot;scale_type&quot;: &quot;auto&quot;,
+
+                    &quot;min_instances&quot;: 1,
+
+                    &quot;max_instances&quot;: 3
+
+                }
+
+            }
+
+        )
+
+        
+
+        # Create MCP tool schema based on model schema
+
+        tool_schema = {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {},
+
+            &quot;required&quot;: []
+
+        }
+
+        
+
+        # Add input properties based on model schema
+
+        for input_name, input_spec in model.signature.inputs.items():
+
+            tool_schema[&quot;properties&quot;][input_name] = {
+
+                &quot;type&quot;: self._map_ml_type_to_json_type(input_spec.type)
+
+            }
+
+            tool_schema[&quot;required&quot;].append(input_name)
+
+        
+
+        # Register as MCP tool
+
+        # In a real implementation, you would create a tool that calls the endpoint
+
+        return {
+
+            &quot;model_name&quot;: model_name,
+
+            &quot;model_version&quot;: model.version,
+
+            &quot;endpoint&quot;: deployment.endpoint_uri,
+
+            &quot;tool_schema&quot;: tool_schema
+
+        }
+
+    
+
+    def _map_ml_type_to_json_type(self, ml_type):
+
+        &quot;&quot;&quot;Maps ML data types to JSON schema types&quot;&quot;&quot;
+
+        mapping = {
+
+            &quot;float&quot;: &quot;number&quot;,
+
+            &quot;int&quot;: &quot;integer&quot;,
+
+            &quot;bool&quot;: &quot;boolean&quot;,
+
+            &quot;str&quot;: &quot;string&quot;,
+
+            &quot;object&quot;: &quot;object&quot;,
+
+            &quot;array&quot;: &quot;array&quot;
+
+        }
+
+        return mapping.get(ml_type, &quot;string&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서 우리는 다음을 수행했습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP와 Azure ML을 통합하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">EnterpriseAiIntegration</code> 클래스를 생성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 도구를 사용하여 입력 데이터를 처리하고 Azure ML에 ML 파이프라인을 제출하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">execute_ml_pipeline</code> 메서드를 구현했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Azure ML 모델을 MCP 도구로 등록하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">register_ml_model_as_tool</code> 메서드를 구현했습니다. 여기에는 필요한 배포 환경 및 컴퓨팅 리소스 생성이 포함됩니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">도구 등록을 위해 Azure ML 데이터 유형을 JSON 스키마 유형으로 매핑했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">ML 파이프라인 실행 및 모델 등록과 같은 잠재적으로 오래 걸리는 작업을 처리하기 위해 비동기 프로그래밍을 사용했습니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-multi-modality/README.md" target="_blank">5.2 멀티 모달리티</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있지만, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전을 권위 있는 출처로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span></span>
+  <span><a href="m05_02-52-multi-modal-sample.html">5.2 Multi modal sample &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

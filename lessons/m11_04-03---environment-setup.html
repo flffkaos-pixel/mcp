@@ -1,0 +1,2730 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>03 - Environment Setup - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 03 - Environment Setup</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Environment Setup</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This hands-on lab guides you through setting up a complete development environment for building MCP servers with PostgreSQL integration.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll configure all necessary tools, deploy Azure resources, and validate your setup before proceeding with implementation.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A proper development environment is crucial for successful MCP server development. This lab provides step-by-step instructions for setting up Docker, Azure services, development tools, and validating that everything works correctly together.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you'll have a fully functional development environment ready for building the Zava Retail MCP server.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Install and configure</strong> all required development tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Deploy Azure resources</strong> needed for the MCP server</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Set up Docker containers</strong> for PostgreSQL and the MCP server</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Validate</strong> your environment setup with test connections</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Troubleshoot</strong> common setup issues and configuration problems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Understand</strong> the development workflow and file structure</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 Prerequisites Check</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before starting, ensure you have:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Required Knowledge</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Basic command line usage (Windows Command Prompt/PowerShell)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understanding of environment variables</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Familiarity with Git version control</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Basic Docker concepts (containers, images, volumes)</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">System Requirements</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Operating System</strong>: Windows 10/11, macOS, or Linux</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RAM</strong>: Minimum 8GB (16GB recommended)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Storage</strong>: At least 10GB free space</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Network</strong>: Internet connection for downloads and Azure deployment</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Account Requirements</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Azure Subscription</strong>: Free tier is sufficient</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>GitHub Account</strong>: For repository access</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Docker Hub Account</strong>: (Optional) For custom image publishing</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ Tool Installation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Install Docker Desktop</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Docker provides the containerized environment for our development setup.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows Installation</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Download Docker Desktop</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```cmd</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Visit https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Or use Windows Package Manager</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   winget install Docker.DockerDesktop</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Install and Configure</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Run the installer as Administrator</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Enable WSL 2 integration when prompted</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Restart your computer when installation completes</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Verify Installation</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```cmd</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker-compose --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS Installation</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Download and Install</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Download from https://desktop.docker.com/mac/stable/Docker.dmg</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Or use Homebrew</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   brew install --cask docker</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Start Docker Desktop</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Launch Docker Desktop from Applications</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Complete the initial setup wizard</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Verify Installation</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker-compose --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux Installation</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Install Docker Engine</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Ubuntu/Debian</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl -fsSL https://get.docker.com -o get-docker.sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo sh get-docker.sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo usermod -aG docker $USER</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Log out and back in for group changes to take effect</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Install Docker Compose</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo chmod +x /usr/local/bin/docker-compose</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Install Azure CLI</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Azure CLI enables Azure resource deployment and management.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows Installation</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Windows Package Manager
+
+winget install Microsoft.AzureCLI
+
+
+
+# Or download MSI from: https://aka.ms/installazurecliwindows
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS Installation</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Homebrew
+
+brew install azure-cli
+
+
+
+# Or using installer
+
+curl -L https://aka.ms/InstallAzureCli | bash
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux Installation</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ubuntu/Debian
+
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+
+
+# RHEL/CentOS
+
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+sudo dnf install azure-cli
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Verify and Authenticate</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check installation
+
+az version
+
+
+
+# Login to Azure
+
+az login
+
+
+
+# Set default subscription (if you have multiple)
+
+az account list --output table
+
+az account set --subscription &quot;Your-Subscription-Name&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Install Git</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Git is required for cloning the repository and version control.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Windows Package Manager
+
+winget install Git.Git
+
+
+
+# Or download from: https://git-scm.com/download/win
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Git is usually pre-installed, but you can update via Homebrew
+
+brew install git
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ubuntu/Debian
+
+sudo apt update &amp;&amp; sudo apt install git
+
+
+
+# RHEL/CentOS
+
+sudo dnf install git
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. Install VS Code</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Visual Studio Code provides the integrated development environment with MCP support.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Installation</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Windows
+
+winget install Microsoft.VisualStudioCode
+
+
+
+# macOS
+
+brew install --cask visual-studio-code
+
+
+
+# Linux (Ubuntu/Debian)
+
+sudo snap install code --classic
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Required Extensions</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Install these VS Code extensions:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Install via command line
+
+code --install-extension ms-python.python
+
+code --install-extension ms-vscode.vscode-json
+
+code --install-extension ms-azuretools.vscode-docker
+
+code --install-extension ms-vscode.azure-account
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Or install through VS Code:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Open VS Code</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Go to Extensions (Ctrl+Shift+X)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Install:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Python</strong> (Microsoft)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Docker</strong> (Microsoft)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Azure Account</strong> (Microsoft)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>JSON</strong> (Microsoft)</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">5. Install Python</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Python 3.8+ is required for MCP server development.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Windows Package Manager
+
+winget install Python.Python.3.11
+
+
+
+# Or download from: https://www.python.org/downloads/
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Homebrew
+
+brew install python@3.11
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ubuntu/Debian
+
+sudo apt update &amp;&amp; sudo apt install python3.11 python3.11-pip python3.11-venv
+
+
+
+# RHEL/CentOS
+
+sudo dnf install python3.11 python3.11-pip
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Verify Installation</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python --version  # Should show Python 3.11.x
+
+pip --version      # Should show pip version
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 Project Setup</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Clone the Repository</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Clone the main repository
+
+git clone https://github.com/microsoft/MCP-Server-and-PostgreSQL-Sample-Retail.git
+
+
+
+# Navigate to the project directory
+
+cd MCP-Server-and-PostgreSQL-Sample-Retail
+
+
+
+# Verify repository structure
+
+ls -la
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Create Python Virtual Environment</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Create virtual environment
+
+python -m venv mcp-env
+
+
+
+# Activate virtual environment
+
+# Windows
+
+mcp-env\Scripts\activate
+
+
+
+# macOS/Linux
+
+source mcp-env/bin/activate
+
+
+
+# Upgrade pip
+
+python -m pip install --upgrade pip
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Install Python Dependencies</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Install development dependencies
+
+pip install -r requirements.lock.txt
+
+
+
+# Verify key packages
+
+pip list | grep fastmcp
+
+pip list | grep asyncpg
+
+pip list | grep azure
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">☁️ Azure Resource Deployment</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Understand Resource Requirements</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our MCP server requires these Azure resources:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Resource</strong> | <strong>Purpose</strong> | <strong>Estimated Cost</strong> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|--------------|-------------|-------------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Azure AI Foundry</strong> | AI model hosting and management | $10-50/month |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>OpenAI Deployment</strong> | Text embedding model (text-embedding-3-small) | $5-20/month |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Application Insights</strong> | Monitoring and telemetry | $5-15/month |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Resource Group</strong> | Resource organization | Free |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Deploy Azure Resources</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Option A: Automated Deployment (Recommended)</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Navigate to infrastructure directory
+
+cd infra
+
+
+
+# Windows - PowerShell
+
+./deploy.ps1
+
+
+
+# macOS/Linux - Bash
+
+./deploy.sh
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The deployment script will:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Create a unique resource group</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Deploy Azure AI Foundry resources</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Deploy the text-embedding-3-small model</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Configure Application Insights</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Create a service principal for authentication</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. Generate <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.env</code> file with configuration</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Option B: Manual Deployment</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If you prefer manual control or the automated script fails:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Set variables
+
+RESOURCE_GROUP=&quot;rg-zava-mcp-$(date +%s)&quot;
+
+LOCATION=&quot;westus2&quot;
+
+AI_PROJECT_NAME=&quot;zava-ai-project&quot;
+
+
+
+# Create resource group
+
+az group create --name $RESOURCE_GROUP --location $LOCATION
+
+
+
+# Deploy main template
+
+az deployment group create \
+
+  --resource-group $RESOURCE_GROUP \
+
+  --template-file main.bicep \
+
+  --parameters location=$LOCATION \
+
+  --parameters resourcePrefix=&quot;zava-mcp&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Verify Azure Deployment</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check resource group
+
+az group show --name $RESOURCE_GROUP --output table
+
+
+
+# List deployed resources
+
+az resource list --resource-group $RESOURCE_GROUP --output table
+
+
+
+# Test AI service
+
+az cognitiveservices account show \
+
+  --name &quot;your-ai-service-name&quot; \
+
+  --resource-group $RESOURCE_GROUP
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. Configure Environment Variables</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After deployment, you should have a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.env</code> file. Verify it contains:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# .env file contents
+
+PROJECT_ENDPOINT=https://your-project.cognitiveservices.azure.com/
+
+AZURE_OPENAI_ENDPOINT=https://your-openai.openai.azure.com/
+
+EMBEDDING_MODEL_DEPLOYMENT_NAME=text-embedding-3-small
+
+AZURE_CLIENT_ID=your-client-id
+
+AZURE_CLIENT_SECRET=your-client-secret
+
+AZURE_TENANT_ID=your-tenant-id
+
+APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=your-key;...
+
+
+
+# Database configuration (for development)
+
+POSTGRES_HOST=localhost
+
+POSTGRES_PORT=5432
+
+POSTGRES_DB=zava
+
+POSTGRES_USER=postgres
+
+POSTGRES_PASSWORD=your-secure-password
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🐳 Docker Environment Setup</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Understand Docker Composition</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our development environment uses Docker Compose:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# docker-compose.yml overview
+
+version: &#x27;3.8&#x27;
+
+services:
+
+  postgres:
+
+    image: pgvector/pgvector:pg17
+
+    environment:
+
+      POSTGRES_DB: zava
+
+      POSTGRES_USER: postgres
+
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+
+    ports:
+
+      - &quot;5432:5432&quot;
+
+    volumes:
+
+      - ./data:/backup_data:ro
+
+      - ./docker-init:/docker-entrypoint-initdb.d:ro
+
+    
+
+  mcp_server:
+
+    build: .
+
+    depends_on:
+
+      postgres:
+
+        condition: service_healthy
+
+    ports:
+
+      - &quot;8000:8000&quot;
+
+    env_file:
+
+      - .env
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Start the Development Environment</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ensure you&#x27;re in the project root directory
+
+cd /path/to/MCP-Server-and-PostgreSQL-Sample-Retail
+
+
+
+# Start the services
+
+docker-compose up -d
+
+
+
+# Check service status
+
+docker-compose ps
+
+
+
+# View logs
+
+docker-compose logs -f
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Verify Database Setup</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Connect to PostgreSQL container
+
+docker-compose exec postgres psql -U postgres -d zava
+
+
+
+# Check database structure
+
+\dt retail.*
+
+
+
+# Verify sample data
+
+SELECT COUNT(*) FROM retail.stores;
+
+SELECT COUNT(*) FROM retail.products;
+
+SELECT COUNT(*) FROM retail.orders;
+
+
+
+# Exit PostgreSQL
+
+\q
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. Test MCP Server</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check MCP server health
+
+curl http://localhost:8000/health
+
+
+
+# Test basic MCP endpoint
+
+curl -X POST http://localhost:8000/mcp \
+
+  -H &quot;Content-Type: application/json&quot; \
+
+  -H &quot;x-rls-user-id: 00000000-0000-0000-0000-000000000000&quot; \
+
+  -d &#x27;{&quot;method&quot;: &quot;tools/list&quot;, &quot;params&quot;: {}}&#x27;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 VS Code Configuration</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Configure MCP Integration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Create VS Code MCP configuration:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/mcp.json
+
+{
+
+    &quot;servers&quot;: {
+
+        &quot;zava-sales-analysis-headoffice&quot;: {
+
+            &quot;url&quot;: &quot;http://127.0.0.1:8000/mcp&quot;,
+
+            &quot;type&quot;: &quot;http&quot;,
+
+            &quot;headers&quot;: {&quot;x-rls-user-id&quot;: &quot;00000000-0000-0000-0000-000000000000&quot;}
+
+        },
+
+        &quot;zava-sales-analysis-seattle&quot;: {
+
+            &quot;url&quot;: &quot;http://127.0.0.1:8000/mcp&quot;,
+
+            &quot;type&quot;: &quot;http&quot;,
+
+            &quot;headers&quot;: {&quot;x-rls-user-id&quot;: &quot;f47ac10b-58cc-4372-a567-0e02b2c3d479&quot;}
+
+        },
+
+        &quot;zava-sales-analysis-redmond&quot;: {
+
+            &quot;url&quot;: &quot;http://127.0.0.1:8000/mcp&quot;,
+
+            &quot;type&quot;: &quot;http&quot;,
+
+            &quot;headers&quot;: {&quot;x-rls-user-id&quot;: &quot;e7f8a9b0-c1d2-3e4f-5678-90abcdef1234&quot;}
+
+        }
+
+    },
+
+    &quot;inputs&quot;: []
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Configure Python Environment</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/settings.json
+
+{
+
+    &quot;python.defaultInterpreterPath&quot;: &quot;./mcp-env/bin/python&quot;,
+
+    &quot;python.linting.enabled&quot;: true,
+
+    &quot;python.linting.pylintEnabled&quot;: true,
+
+    &quot;python.formatting.provider&quot;: &quot;black&quot;,
+
+    &quot;python.testing.pytestEnabled&quot;: true,
+
+    &quot;python.testing.pytestArgs&quot;: [&quot;tests&quot;],
+
+    &quot;files.exclude&quot;: {
+
+        &quot;**/__pycache__&quot;: true,
+
+        &quot;**/.pytest_cache&quot;: true,
+
+        &quot;**/mcp-env&quot;: true
+
+    }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Test VS Code Integration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Open the project in VS Code</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   code .</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Open AI Chat</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- Press <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Ctrl+Shift+P</code> (Windows/Linux) or <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Cmd+Shift+P</code> (macOS)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Type "AI Chat" and select "AI Chat: Open Chat"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Test MCP Server Connection</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - In AI Chat, type <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">#zava</code> and select one of the configured servers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Ask: "What tables are available in the database?"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - You should receive a response listing the retail database tables</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">✅ Environment Validation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Comprehensive System Check</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Run this validation script to verify your setup:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Create validation script
+
+cat &gt; validate_setup.py &lt;&lt; &#x27;EOF&#x27;
+
+#!/usr/bin/env python3
+
+&quot;&quot;&quot;
+
+Environment validation script for MCP Server setup.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import os
+
+import sys
+
+import subprocess
+
+import requests
+
+import asyncpg
+
+from azure.identity import DefaultAzureCredential
+
+from azure.ai.projects import AIProjectClient
+
+
+
+async def validate_environment():
+
+    &quot;&quot;&quot;Comprehensive environment validation.&quot;&quot;&quot;
+
+    results = {}
+
+    
+
+    # Check Python version
+
+    python_version = sys.version_info
+
+    results[&#x27;python&#x27;] = {
+
+        &#x27;status&#x27;: &#x27;pass&#x27; if python_version &gt;= (3, 8) else &#x27;fail&#x27;,
+
+        &#x27;version&#x27;: f&quot;{python_version.major}.{python_version.minor}.{python_version.micro}&quot;,
+
+        &#x27;required&#x27;: &#x27;3.8+&#x27;
+
+    }
+
+    
+
+    # Check required packages
+
+    required_packages = [&#x27;fastmcp&#x27;, &#x27;asyncpg&#x27;, &#x27;azure-ai-projects&#x27;]
+
+    for package in required_packages:
+
+        try:
+
+            __import__(package)
+
+            results[f&#x27;package_{package}&#x27;] = {&#x27;status&#x27;: &#x27;pass&#x27;}
+
+        except ImportError:
+
+            results[f&#x27;package_{package}&#x27;] = {&#x27;status&#x27;: &#x27;fail&#x27;, &#x27;error&#x27;: &#x27;Not installed&#x27;}
+
+    
+
+    # Check Docker
+
+    try:
+
+        result = subprocess.run([&#x27;docker&#x27;, &#x27;--version&#x27;], capture_output=True, text=True)
+
+        results[&#x27;docker&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if result.returncode == 0 else &#x27;fail&#x27;,
+
+            &#x27;version&#x27;: result.stdout.strip() if result.returncode == 0 else &#x27;Not available&#x27;
+
+        }
+
+    except FileNotFoundError:
+
+        results[&#x27;docker&#x27;] = {&#x27;status&#x27;: &#x27;fail&#x27;, &#x27;error&#x27;: &#x27;Docker not found&#x27;}
+
+    
+
+    # Check Azure CLI
+
+    try:
+
+        result = subprocess.run([&#x27;az&#x27;, &#x27;--version&#x27;], capture_output=True, text=True)
+
+        results[&#x27;azure_cli&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if result.returncode == 0 else &#x27;fail&#x27;,
+
+            &#x27;version&#x27;: result.stdout.split(&#x27;\n&#x27;)[0] if result.returncode == 0 else &#x27;Not available&#x27;
+
+        }
+
+    except FileNotFoundError:
+
+        results[&#x27;azure_cli&#x27;] = {&#x27;status&#x27;: &#x27;fail&#x27;, &#x27;error&#x27;: &#x27;Azure CLI not found&#x27;}
+
+    
+
+    # Check environment variables
+
+    required_env_vars = [
+
+        &#x27;PROJECT_ENDPOINT&#x27;,
+
+        &#x27;AZURE_OPENAI_ENDPOINT&#x27;,
+
+        &#x27;EMBEDDING_MODEL_DEPLOYMENT_NAME&#x27;,
+
+        &#x27;AZURE_CLIENT_ID&#x27;,
+
+        &#x27;AZURE_CLIENT_SECRET&#x27;,
+
+        &#x27;AZURE_TENANT_ID&#x27;
+
+    ]
+
+    
+
+    for var in required_env_vars:
+
+        value = os.getenv(var)
+
+        results[f&#x27;env_{var}&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if value else &#x27;fail&#x27;,
+
+            &#x27;value&#x27;: &#x27;***&#x27; if value and &#x27;SECRET&#x27; in var else value
+
+        }
+
+    
+
+    # Check database connection
+
+    try:
+
+        conn = await asyncpg.connect(
+
+            host=os.getenv(&#x27;POSTGRES_HOST&#x27;, &#x27;localhost&#x27;),
+
+            port=int(os.getenv(&#x27;POSTGRES_PORT&#x27;, 5432)),
+
+            database=os.getenv(&#x27;POSTGRES_DB&#x27;, &#x27;zava&#x27;),
+
+            user=os.getenv(&#x27;POSTGRES_USER&#x27;, &#x27;postgres&#x27;),
+
+            password=os.getenv(&#x27;POSTGRES_PASSWORD&#x27;, &#x27;secure_password&#x27;)
+
+        )
+
+        
+
+        # Test query
+
+        result = await conn.fetchval(&#x27;SELECT COUNT(*) FROM retail.stores&#x27;)
+
+        await conn.close()
+
+        
+
+        results[&#x27;database&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27;,
+
+            &#x27;store_count&#x27;: result
+
+        }
+
+    except Exception as e:
+
+        results[&#x27;database&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;fail&#x27;,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+    
+
+    # Check MCP server
+
+    try:
+
+        response = requests.get(&#x27;http://localhost:8000/health&#x27;, timeout=5)
+
+        results[&#x27;mcp_server&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if response.status_code == 200 else &#x27;fail&#x27;,
+
+            &#x27;response&#x27;: response.json() if response.status_code == 200 else response.text
+
+        }
+
+    except Exception as e:
+
+        results[&#x27;mcp_server&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;fail&#x27;,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+    
+
+    # Check Azure AI service
+
+    try:
+
+        credential = DefaultAzureCredential()
+
+        project_client = AIProjectClient(
+
+            endpoint=os.getenv(&#x27;PROJECT_ENDPOINT&#x27;),
+
+            credential=credential
+
+        )
+
+        
+
+        # This will fail if credentials are invalid
+
+        results[&#x27;azure_ai&#x27;] = {&#x27;status&#x27;: &#x27;pass&#x27;}
+
+        
+
+    except Exception as e:
+
+        results[&#x27;azure_ai&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;fail&#x27;,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+    
+
+    return results
+
+
+
+def print_results(results):
+
+    &quot;&quot;&quot;Print formatted validation results.&quot;&quot;&quot;
+
+    print(&quot;🔍 Environment Validation Results\n&quot;)
+
+    print(&quot;=&quot; * 50)
+
+    
+
+    passed = 0
+
+    failed = 0
+
+    
+
+    for component, result in results.items():
+
+        status = result.get(&#x27;status&#x27;, &#x27;unknown&#x27;)
+
+        if status == &#x27;pass&#x27;:
+
+            print(f&quot;✅ {component}: PASS&quot;)
+
+            passed += 1
+
+        else:
+
+            print(f&quot;❌ {component}: FAIL&quot;)
+
+            if &#x27;error&#x27; in result:
+
+                print(f&quot;   Error: {result[&#x27;error&#x27;]}&quot;)
+
+            failed += 1
+
+    
+
+    print(&quot;\n&quot; + &quot;=&quot; * 50)
+
+    print(f&quot;Summary: {passed} passed, {failed} failed&quot;)
+
+    
+
+    if failed &gt; 0:
+
+        print(&quot;\n❗ Please fix the failed components before proceeding.&quot;)
+
+        return False
+
+    else:
+
+        print(&quot;\n🎉 All validations passed! Your environment is ready.&quot;)
+
+        return True
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(main())
+
+
+
+async def main():
+
+    results = await validate_environment()
+
+    success = print_results(results)
+
+    sys.exit(0 if success else 1)
+
+
+
+EOF
+
+
+
+# Run validation
+
+python validate_setup.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Manual Validation Checklist</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ Basic Tools</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Docker version 20.10+ installed and running</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Azure CLI 2.40+ installed and authenticated</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Python 3.8+ with pip installed</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Git 2.30+ installed</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] VS Code with required extensions</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ Azure Resources</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Resource group created successfully</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] AI Foundry project deployed</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] OpenAI text-embedding-3-small model deployed</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Application Insights configured</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Service principal created with proper permissions</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ Environment Configuration</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.env</code> file created with all required variables</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Azure credentials working (test with <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">az account show</code>)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] PostgreSQL container running and accessible</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Sample data loaded in database</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ VS Code Integration</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/mcp.json</code> configured</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Python interpreter set to virtual environment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] MCP servers appear in AI Chat</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Can execute test queries through AI Chat</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ Troubleshooting Common Issues</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Docker Issues</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Problem</strong>: Docker containers won't start</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check Docker service status
+
+docker info
+
+
+
+# Check available resources
+
+docker system df
+
+
+
+# Clean up if needed
+
+docker system prune -f
+
+
+
+# Restart Docker Desktop (Windows/macOS)
+
+# Or restart Docker service (Linux)
+
+sudo systemctl restart docker
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Problem</strong>: PostgreSQL connection fails</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check container logs
+
+docker-compose logs postgres
+
+
+
+# Verify container is healthy
+
+docker-compose ps
+
+
+
+# Test direct connection
+
+docker-compose exec postgres psql -U postgres -d zava -c &quot;SELECT 1;&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure Deployment Issues</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Problem</strong>: Azure deployment fails</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check Azure CLI authentication
+
+az account show
+
+
+
+# Verify subscription permissions
+
+az role assignment list --assignee $(az account show --query user.name -o tsv)
+
+
+
+# Check resource provider registration
+
+az provider register --namespace Microsoft.CognitiveServices
+
+az provider register --namespace Microsoft.Insights
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Problem</strong>: AI service authentication fails</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Test service principal
+
+az login --service-principal \
+
+  --username $AZURE_CLIENT_ID \
+
+  --password $AZURE_CLIENT_SECRET \
+
+  --tenant $AZURE_TENANT_ID
+
+
+
+# Verify AI service deployment
+
+az cognitiveservices account list --query &quot;[].{Name:name,Kind:kind,Location:location}&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Environment Issues</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Problem</strong>: Package installation fails</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Upgrade pip and setuptools
+
+python -m pip install --upgrade pip setuptools wheel
+
+
+
+# Clear pip cache
+
+pip cache purge
+
+
+
+# Install packages one by one to identify issues
+
+pip install fastmcp
+
+pip install asyncpg
+
+pip install azure-ai-projects
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Problem</strong>: VS Code can't find Python interpreter</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Show Python interpreter paths
+
+which python  # macOS/Linux
+
+where python  # Windows
+
+
+
+# Activate virtual environment first
+
+source mcp-env/bin/activate  # macOS/Linux
+
+mcp-env\Scripts\activate     # Windows
+
+
+
+# Then open VS Code
+
+code .
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Complete Development Environment</strong>: All tools installed and configured  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Azure Resources Deployed</strong>: AI services and supporting infrastructure  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Docker Environment Running</strong>: PostgreSQL and MCP server containers  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>VS Code Integration</strong>: MCP servers configured and accessible  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Validated Setup</strong>: All components tested and working together  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Troubleshooting Knowledge</strong>: Common issues and solutions  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">With your environment ready, continue to <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/04-Database/README.md" target="_blank">Lab 04: Database Design and Schema</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explore the retail database schema in detail</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand multi-tenant data modeling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Learn about Row Level Security implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Work with sample retail data</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Development Tools</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.docker.com/">Docker Documentation</a> - Complete Docker reference</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/cli/azure/">Azure CLI Reference</a> - Azure CLI commands</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs">VS Code Documentation</a> - Editor configuration and extensions</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure Services</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/ai-foundry/">Azure AI Foundry Documentation</a> - AI service configuration</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/cognitive-services/openai/">Azure OpenAI Service</a> - AI model deployment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/azure-monitor/app/app-insights-overview">Application Insights</a> - Monitoring setup</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python Development</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/tutorial/venv.html">Python Virtual Environments</a> - Environment management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">AsyncIO Documentation</a> - Async programming patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/">FastAPI Documentation</a> - Web framework patterns</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: Environment ready? Continue with <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/04-Database/README.md" target="_blank">Lab 04: Database Design and Schema</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">환경 설정</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 PostgreSQL 통합을 통해 MCP 서버를 구축하기 위한 완전한 개발 환경을 설정하는 과정을 안내합니다. 필요한 모든 도구를 구성하고, Azure 리소스를 배포하며, 구현을 진행하기 전에 설정을 검증합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">적절한 개발 환경은 MCP 서버 개발의 성공에 필수적입니다. 이 실습은 Docker, Azure 서비스, 개발 도구를 설정하고 모든 것이 올바르게 작동하는지 확인하는 단계별 지침을 제공합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 Zava Retail MCP 서버를 구축할 준비가 된 완전한 개발 환경을 갖추게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>필요한 개발 도구 설치 및 구성</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP 서버에 필요한 Azure 리소스 배포</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>PostgreSQL 및 MCP 서버를 위한 Docker 컨테이너 설정</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>테스트 연결을 통해 환경 설정 검증</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>일반적인 설정 문제 및 구성 문제 해결</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>개발 워크플로 및 파일 구조 이해</strong></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 사전 요구 사항 확인</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">시작하기 전에 다음을 확인하세요:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">필요한 지식</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">기본 명령줄 사용법 (Windows Command Prompt/PowerShell)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">환경 변수에 대한 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Git 버전 관리에 대한 기본 지식</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Docker의 기본 개념 (컨테이너, 이미지, 볼륨)</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시스템 요구 사항</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>운영 체제</strong>: Windows 10/11, macOS 또는 Linux</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RAM</strong>: 최소 8GB (권장 16GB)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>저장 공간</strong>: 최소 10GB의 여유 공간</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>네트워크</strong>: 다운로드 및 Azure 배포를 위한 인터넷 연결</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계정 요구 사항</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Azure 구독</strong>: 무료 계층으로 충분</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>GitHub 계정</strong>: 리포지토리 액세스를 위해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Docker Hub 계정</strong>: (선택 사항) 사용자 정의 이미지 게시를 위해</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ 도구 설치</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Docker Desktop 설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Docker는 개발 환경을 컨테이너화된 형태로 제공합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows 설치</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Docker Desktop 다운로드</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```cmd</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Visit https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Or use Windows Package Manager</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   winget install Docker.DockerDesktop</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>설치 및 구성</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 관리자 권한으로 설치 프로그램 실행</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - WSL 2 통합 활성화</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 설치 완료 후 컴퓨터 재시작</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>설치 확인</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```cmd</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker-compose --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS 설치</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>다운로드 및 설치</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Download from https://desktop.docker.com/mac/stable/Docker.dmg</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Or use Homebrew</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   brew install --cask docker</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Docker Desktop 시작</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 응용 프로그램에서 Docker Desktop 실행</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 초기 설정 마법사 완료</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>설치 확인</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker-compose --version</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux 설치</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Docker Engine 설치</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Ubuntu/Debian</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl -fsSL https://get.docker.com -o get-docker.sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo sh get-docker.sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo usermod -aG docker $USER</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Log out and back in for group changes to take effect</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Docker Compose 설치</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   sudo chmod +x /usr/local/bin/docker-compose</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Azure CLI 설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Azure CLI는 Azure 리소스 배포 및 관리를 가능하게 합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows 설치</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Windows Package Manager
+
+winget install Microsoft.AzureCLI
+
+
+
+# Or download MSI from: https://aka.ms/installazurecliwindows
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS 설치</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Homebrew
+
+brew install azure-cli
+
+
+
+# Or using installer
+
+curl -L https://aka.ms/InstallAzureCli | bash
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux 설치</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ubuntu/Debian
+
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+
+
+# RHEL/CentOS
+
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+sudo dnf install azure-cli
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">설치 확인 및 인증</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check installation
+
+az version
+
+
+
+# Login to Azure
+
+az login
+
+
+
+# Set default subscription (if you have multiple)
+
+az account list --output table
+
+az account set --subscription &quot;Your-Subscription-Name&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Git 설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Git은 리포지토리 클론 및 버전 관리를 위해 필요합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Windows Package Manager
+
+winget install Git.Git
+
+
+
+# Or download from: https://git-scm.com/download/win
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Git is usually pre-installed, but you can update via Homebrew
+
+brew install git
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ubuntu/Debian
+
+sudo apt update &amp;&amp; sudo apt install git
+
+
+
+# RHEL/CentOS
+
+sudo dnf install git
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. VS Code 설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Visual Studio Code는 MCP 지원을 위한 통합 개발 환경을 제공합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">설치</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Windows
+
+winget install Microsoft.VisualStudioCode
+
+
+
+# macOS
+
+brew install --cask visual-studio-code
+
+
+
+# Linux (Ubuntu/Debian)
+
+sudo snap install code --classic
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">필수 확장 프로그램</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 VS Code 확장 프로그램을 설치하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Install via command line
+
+code --install-extension ms-python.python
+
+code --install-extension ms-vscode.vscode-json
+
+code --install-extension ms-azuretools.vscode-docker
+
+code --install-extension ms-vscode.azure-account
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">또는 VS Code를 통해 설치:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. VS Code 열기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 확장 프로그램으로 이동 (Ctrl+Shift+X)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 설치:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Python</strong> (Microsoft)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Docker</strong> (Microsoft)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Azure Account</strong> (Microsoft)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>JSON</strong> (Microsoft)</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">5. Python 설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Python 3.8+는 MCP 서버 개발에 필요합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Windows</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Windows Package Manager
+
+winget install Python.Python.3.11
+
+
+
+# Or download from: https://www.python.org/downloads/
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">macOS</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Using Homebrew
+
+brew install python@3.11
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Linux</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ubuntu/Debian
+
+sudo apt update &amp;&amp; sudo apt install python3.11 python3.11-pip python3.11-venv
+
+
+
+# RHEL/CentOS
+
+sudo dnf install python3.11 python3.11-pip
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">설치 확인</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python --version  # Should show Python 3.11.x
+
+pip --version      # Should show pip version
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 프로젝트 설정</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 리포지토리 클론</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Clone the main repository
+
+git clone https://github.com/microsoft/MCP-Server-and-PostgreSQL-Sample-Retail.git
+
+
+
+# Navigate to the project directory
+
+cd MCP-Server-and-PostgreSQL-Sample-Retail
+
+
+
+# Verify repository structure
+
+ls -la
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Python 가상 환경 생성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Create virtual environment
+
+python -m venv mcp-env
+
+
+
+# Activate virtual environment
+
+# Windows
+
+mcp-env\Scripts\activate
+
+
+
+# macOS/Linux
+
+source mcp-env/bin/activate
+
+
+
+# Upgrade pip
+
+python -m pip install --upgrade pip
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Python 종속성 설치</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Install development dependencies
+
+pip install -r requirements.lock.txt
+
+
+
+# Verify key packages
+
+pip list | grep fastmcp
+
+pip list | grep asyncpg
+
+pip list | grep azure
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">☁️ Azure 리소스 배포</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 리소스 요구 사항 이해</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버에는 다음 Azure 리소스가 필요합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>리소스</strong> | <strong>목적</strong> | <strong>예상 비용</strong> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|------------|----------|---------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Azure AI Foundry</strong> | AI 모델 호스팅 및 관리 | 월 $10-50 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>OpenAI 배포</strong> | 텍스트 임베딩 모델 (text-embedding-3-small) | 월 $5-20 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Application Insights</strong> | 모니터링 및 원격 분석 | 월 $5-15 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Resource Group</strong> | 리소스 조직 | 무료 |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Azure 리소스 배포</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">옵션 A: 자동 배포 (권장)</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Navigate to infrastructure directory
+
+cd infra
+
+
+
+# Windows - PowerShell
+
+./deploy.ps1
+
+
+
+# macOS/Linux - Bash
+
+./deploy.sh
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">배포 스크립트는 다음을 수행합니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 고유한 리소스 그룹 생성</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Azure AI Foundry 리소스 배포</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. text-embedding-3-small 모델 배포</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Application Insights 구성</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 인증을 위한 서비스 주체 생성</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. 구성된 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.env</code> 파일 생성</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">옵션 B: 수동 배포</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">자동 스크립트가 실패하거나 수동 제어를 선호하는 경우:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Set variables
+
+RESOURCE_GROUP=&quot;rg-zava-mcp-$(date +%s)&quot;
+
+LOCATION=&quot;westus2&quot;
+
+AI_PROJECT_NAME=&quot;zava-ai-project&quot;
+
+
+
+# Create resource group
+
+az group create --name $RESOURCE_GROUP --location $LOCATION
+
+
+
+# Deploy main template
+
+az deployment group create \
+
+  --resource-group $RESOURCE_GROUP \
+
+  --template-file main.bicep \
+
+  --parameters location=$LOCATION \
+
+  --parameters resourcePrefix=&quot;zava-mcp&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Azure 배포 확인</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check resource group
+
+az group show --name $RESOURCE_GROUP --output table
+
+
+
+# List deployed resources
+
+az resource list --resource-group $RESOURCE_GROUP --output table
+
+
+
+# Test AI service
+
+az cognitiveservices account show \
+
+  --name &quot;your-ai-service-name&quot; \
+
+  --resource-group $RESOURCE_GROUP
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. 환경 변수 구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">배포 후 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.env</code> 파일이 있어야 합니다. 다음을 포함하는지 확인하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# .env file contents
+
+PROJECT_ENDPOINT=https://your-project.cognitiveservices.azure.com/
+
+AZURE_OPENAI_ENDPOINT=https://your-openai.openai.azure.com/
+
+EMBEDDING_MODEL_DEPLOYMENT_NAME=text-embedding-3-small
+
+AZURE_CLIENT_ID=your-client-id
+
+AZURE_CLIENT_SECRET=your-client-secret
+
+AZURE_TENANT_ID=your-tenant-id
+
+APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=your-key;...
+
+
+
+# Database configuration (for development)
+
+POSTGRES_HOST=localhost
+
+POSTGRES_PORT=5432
+
+POSTGRES_DB=zava
+
+POSTGRES_USER=postgres
+
+POSTGRES_PASSWORD=your-secure-password
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🐳 Docker 환경 설정</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Docker 구성 이해</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">개발 환경은 Docker Compose를 사용합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# docker-compose.yml overview
+
+version: &#x27;3.8&#x27;
+
+services:
+
+  postgres:
+
+    image: pgvector/pgvector:pg17
+
+    environment:
+
+      POSTGRES_DB: zava
+
+      POSTGRES_USER: postgres
+
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+
+    ports:
+
+      - &quot;5432:5432&quot;
+
+    volumes:
+
+      - ./data:/backup_data:ro
+
+      - ./docker-init:/docker-entrypoint-initdb.d:ro
+
+    
+
+  mcp_server:
+
+    build: .
+
+    depends_on:
+
+      postgres:
+
+        condition: service_healthy
+
+    ports:
+
+      - &quot;8000:8000&quot;
+
+    env_file:
+
+      - .env
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 개발 환경 시작</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Ensure you&#x27;re in the project root directory
+
+cd /path/to/MCP-Server-and-PostgreSQL-Sample-Retail
+
+
+
+# Start the services
+
+docker-compose up -d
+
+
+
+# Check service status
+
+docker-compose ps
+
+
+
+# View logs
+
+docker-compose logs -f
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. 데이터베이스 설정 확인</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Connect to PostgreSQL container
+
+docker-compose exec postgres psql -U postgres -d zava
+
+
+
+# Check database structure
+
+\dt retail.*
+
+
+
+# Verify sample data
+
+SELECT COUNT(*) FROM retail.stores;
+
+SELECT COUNT(*) FROM retail.products;
+
+SELECT COUNT(*) FROM retail.orders;
+
+
+
+# Exit PostgreSQL
+
+\q
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. MCP 서버 테스트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check MCP server health
+
+curl http://localhost:8000/health
+
+
+
+# Test basic MCP endpoint
+
+curl -X POST http://localhost:8000/mcp \
+
+  -H &quot;Content-Type: application/json&quot; \
+
+  -H &quot;x-rls-user-id: 00000000-0000-0000-0000-000000000000&quot; \
+
+  -d &#x27;{&quot;method&quot;: &quot;tools/list&quot;, &quot;params&quot;: {}}&#x27;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 VS Code 구성</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. MCP 통합 구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code MCP 구성을 생성하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/mcp.json
+
+{
+
+    &quot;servers&quot;: {
+
+        &quot;zava-sales-analysis-headoffice&quot;: {
+
+            &quot;url&quot;: &quot;http://127.0.0.1:8000/mcp&quot;,
+
+            &quot;type&quot;: &quot;http&quot;,
+
+            &quot;headers&quot;: {&quot;x-rls-user-id&quot;: &quot;00000000-0000-0000-0000-000000000000&quot;}
+
+        },
+
+        &quot;zava-sales-analysis-seattle&quot;: {
+
+            &quot;url&quot;: &quot;http://127.0.0.1:8000/mcp&quot;,
+
+            &quot;type&quot;: &quot;http&quot;,
+
+            &quot;headers&quot;: {&quot;x-rls-user-id&quot;: &quot;f47ac10b-58cc-4372-a567-0e02b2c3d479&quot;}
+
+        },
+
+        &quot;zava-sales-analysis-redmond&quot;: {
+
+            &quot;url&quot;: &quot;http://127.0.0.1:8000/mcp&quot;,
+
+            &quot;type&quot;: &quot;http&quot;,
+
+            &quot;headers&quot;: {&quot;x-rls-user-id&quot;: &quot;e7f8a9b0-c1d2-3e4f-5678-90abcdef1234&quot;}
+
+        }
+
+    },
+
+    &quot;inputs&quot;: []
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Python 환경 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/settings.json
+
+{
+
+    &quot;python.defaultInterpreterPath&quot;: &quot;./mcp-env/bin/python&quot;,
+
+    &quot;python.linting.enabled&quot;: true,
+
+    &quot;python.linting.pylintEnabled&quot;: true,
+
+    &quot;python.formatting.provider&quot;: &quot;black&quot;,
+
+    &quot;python.testing.pytestEnabled&quot;: true,
+
+    &quot;python.testing.pytestArgs&quot;: [&quot;tests&quot;],
+
+    &quot;files.exclude&quot;: {
+
+        &quot;**/__pycache__&quot;: true,
+
+        &quot;**/.pytest_cache&quot;: true,
+
+        &quot;**/mcp-env&quot;: true
+
+    }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. VS Code 통합 테스트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>프로젝트를 VS Code에서 열기</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   code .</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>AI Chat 열기</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Ctrl+Shift+P</code> (Windows/Linux) 또는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Cmd+Shift+P</code> (macOS) 누르기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - "AI Chat" 입력 후 "AI Chat: Open Chat" 선택</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>MCP 서버 연결 테스트</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - AI Chat에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">#zava</code> 입력 후 구성된 서버 중 하나 선택</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 질문: "데이터베이스에 어떤 테이블이 있나요?"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 소매 데이터베이스 테이블 목록을 포함한 응답을 받아야 합니다</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">✅ 환경 검증</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 종합 시스템 점검</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">설정을 확인하기 위해 이 검증 스크립트를 실행하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Create validation script
+
+cat &gt; validate_setup.py &lt;&lt; &#x27;EOF&#x27;
+
+#!/usr/bin/env python3
+
+&quot;&quot;&quot;
+
+Environment validation script for MCP Server setup.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import os
+
+import sys
+
+import subprocess
+
+import requests
+
+import asyncpg
+
+from azure.identity import DefaultAzureCredential
+
+from azure.ai.projects import AIProjectClient
+
+
+
+async def validate_environment():
+
+    &quot;&quot;&quot;Comprehensive environment validation.&quot;&quot;&quot;
+
+    results = {}
+
+    
+
+    # Check Python version
+
+    python_version = sys.version_info
+
+    results[&#x27;python&#x27;] = {
+
+        &#x27;status&#x27;: &#x27;pass&#x27; if python_version &gt;= (3, 8) else &#x27;fail&#x27;,
+
+        &#x27;version&#x27;: f&quot;{python_version.major}.{python_version.minor}.{python_version.micro}&quot;,
+
+        &#x27;required&#x27;: &#x27;3.8+&#x27;
+
+    }
+
+    
+
+    # Check required packages
+
+    required_packages = [&#x27;fastmcp&#x27;, &#x27;asyncpg&#x27;, &#x27;azure-ai-projects&#x27;]
+
+    for package in required_packages:
+
+        try:
+
+            __import__(package)
+
+            results[f&#x27;package_{package}&#x27;] = {&#x27;status&#x27;: &#x27;pass&#x27;}
+
+        except ImportError:
+
+            results[f&#x27;package_{package}&#x27;] = {&#x27;status&#x27;: &#x27;fail&#x27;, &#x27;error&#x27;: &#x27;Not installed&#x27;}
+
+    
+
+    # Check Docker
+
+    try:
+
+        result = subprocess.run([&#x27;docker&#x27;, &#x27;--version&#x27;], capture_output=True, text=True)
+
+        results[&#x27;docker&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if result.returncode == 0 else &#x27;fail&#x27;,
+
+            &#x27;version&#x27;: result.stdout.strip() if result.returncode == 0 else &#x27;Not available&#x27;
+
+        }
+
+    except FileNotFoundError:
+
+        results[&#x27;docker&#x27;] = {&#x27;status&#x27;: &#x27;fail&#x27;, &#x27;error&#x27;: &#x27;Docker not found&#x27;}
+
+    
+
+    # Check Azure CLI
+
+    try:
+
+        result = subprocess.run([&#x27;az&#x27;, &#x27;--version&#x27;], capture_output=True, text=True)
+
+        results[&#x27;azure_cli&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if result.returncode == 0 else &#x27;fail&#x27;,
+
+            &#x27;version&#x27;: result.stdout.split(&#x27;\n&#x27;)[0] if result.returncode == 0 else &#x27;Not available&#x27;
+
+        }
+
+    except FileNotFoundError:
+
+        results[&#x27;azure_cli&#x27;] = {&#x27;status&#x27;: &#x27;fail&#x27;, &#x27;error&#x27;: &#x27;Azure CLI not found&#x27;}
+
+    
+
+    # Check environment variables
+
+    required_env_vars = [
+
+        &#x27;PROJECT_ENDPOINT&#x27;,
+
+        &#x27;AZURE_OPENAI_ENDPOINT&#x27;,
+
+        &#x27;EMBEDDING_MODEL_DEPLOYMENT_NAME&#x27;,
+
+        &#x27;AZURE_CLIENT_ID&#x27;,
+
+        &#x27;AZURE_CLIENT_SECRET&#x27;,
+
+        &#x27;AZURE_TENANT_ID&#x27;
+
+    ]
+
+    
+
+    for var in required_env_vars:
+
+        value = os.getenv(var)
+
+        results[f&#x27;env_{var}&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if value else &#x27;fail&#x27;,
+
+            &#x27;value&#x27;: &#x27;***&#x27; if value and &#x27;SECRET&#x27; in var else value
+
+        }
+
+    
+
+    # Check database connection
+
+    try:
+
+        conn = await asyncpg.connect(
+
+            host=os.getenv(&#x27;POSTGRES_HOST&#x27;, &#x27;localhost&#x27;),
+
+            port=int(os.getenv(&#x27;POSTGRES_PORT&#x27;, 5432)),
+
+            database=os.getenv(&#x27;POSTGRES_DB&#x27;, &#x27;zava&#x27;),
+
+            user=os.getenv(&#x27;POSTGRES_USER&#x27;, &#x27;postgres&#x27;),
+
+            password=os.getenv(&#x27;POSTGRES_PASSWORD&#x27;, &#x27;secure_password&#x27;)
+
+        )
+
+        
+
+        # Test query
+
+        result = await conn.fetchval(&#x27;SELECT COUNT(*) FROM retail.stores&#x27;)
+
+        await conn.close()
+
+        
+
+        results[&#x27;database&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27;,
+
+            &#x27;store_count&#x27;: result
+
+        }
+
+    except Exception as e:
+
+        results[&#x27;database&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;fail&#x27;,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+    
+
+    # Check MCP server
+
+    try:
+
+        response = requests.get(&#x27;http://localhost:8000/health&#x27;, timeout=5)
+
+        results[&#x27;mcp_server&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;pass&#x27; if response.status_code == 200 else &#x27;fail&#x27;,
+
+            &#x27;response&#x27;: response.json() if response.status_code == 200 else response.text
+
+        }
+
+    except Exception as e:
+
+        results[&#x27;mcp_server&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;fail&#x27;,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+    
+
+    # Check Azure AI service
+
+    try:
+
+        credential = DefaultAzureCredential()
+
+        project_client = AIProjectClient(
+
+            endpoint=os.getenv(&#x27;PROJECT_ENDPOINT&#x27;),
+
+            credential=credential
+
+        )
+
+        
+
+        # This will fail if credentials are invalid
+
+        results[&#x27;azure_ai&#x27;] = {&#x27;status&#x27;: &#x27;pass&#x27;}
+
+        
+
+    except Exception as e:
+
+        results[&#x27;azure_ai&#x27;] = {
+
+            &#x27;status&#x27;: &#x27;fail&#x27;,
+
+            &#x27;error&#x27;: str(e)
+
+        }
+
+    
+
+    return results
+
+
+
+def print_results(results):
+
+    &quot;&quot;&quot;Print formatted validation results.&quot;&quot;&quot;
+
+    print(&quot;🔍 Environment Validation Results\n&quot;)
+
+    print(&quot;=&quot; * 50)
+
+    
+
+    passed = 0
+
+    failed = 0
+
+    
+
+    for component, result in results.items():
+
+        status = result.get(&#x27;status&#x27;, &#x27;unknown&#x27;)
+
+        if status == &#x27;pass&#x27;:
+
+            print(f&quot;✅ {component}: PASS&quot;)
+
+            passed += 1
+
+        else:
+
+            print(f&quot;❌ {component}: FAIL&quot;)
+
+            if &#x27;error&#x27; in result:
+
+                print(f&quot;   Error: {result[&#x27;error&#x27;]}&quot;)
+
+            failed += 1
+
+    
+
+    print(&quot;\n&quot; + &quot;=&quot; * 50)
+
+    print(f&quot;Summary: {passed} passed, {failed} failed&quot;)
+
+    
+
+    if failed &gt; 0:
+
+        print(&quot;\n❗ Please fix the failed components before proceeding.&quot;)
+
+        return False
+
+    else:
+
+        print(&quot;\n🎉 All validations passed! Your environment is ready.&quot;)
+
+        return True
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(main())
+
+
+
+async def main():
+
+    results = await validate_environment()
+
+    success = print_results(results)
+
+    sys.exit(0 if success else 1)
+
+
+
+EOF
+
+
+
+# Run validation
+
+python validate_setup.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 수동 검증 체크리스트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ 기본 도구</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Docker 버전 20.10+ 설치 및 실행 중</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Azure CLI 2.40+ 설치 및 인증 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Python 3.8+ 및 pip 설치 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Git 2.30+ 설치 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] VS Code 및 필수 확장 프로그램 설치 완료</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ Azure 리소스</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 리소스 그룹 성공적으로 생성됨</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] AI Foundry 프로젝트 배포 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] OpenAI text-embedding-3-small 모델 배포 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Application Insights 구성 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 적절한 권한을 가진 서비스 주체 생성됨</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ 환경 구성</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.env</code> 파일 생성 및 모든 필수 변수 포함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Azure 자격 증명 작동 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">az account show</code>로 테스트)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] PostgreSQL 컨테이너 실행 및 접근 가능</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 데이터베이스에 샘플 데이터 로드 완료</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ VS Code 통합</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/mcp.json</code> 구성 완료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Python 인터프리터를 가상 환경으로 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] MCP 서버가 AI Chat에 표시됨</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] AI Chat을 통해 테스트 쿼리 실행 가능</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ 일반적인 문제 해결</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Docker 문제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>문제</strong>: Docker 컨테이너가 시작되지 않음</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check Docker service status
+
+docker info
+
+
+
+# Check available resources
+
+docker system df
+
+
+
+# Clean up if needed
+
+docker system prune -f
+
+
+
+# Restart Docker Desktop (Windows/macOS)
+
+# Or restart Docker service (Linux)
+
+sudo systemctl restart docker
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>문제</strong>: PostgreSQL 연결 실패</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check container logs
+
+docker-compose logs postgres
+
+
+
+# Verify container is healthy
+
+docker-compose ps
+
+
+
+# Test direct connection
+
+docker-compose exec postgres psql -U postgres -d zava -c &quot;SELECT 1;&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure 배포 문제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>문제</strong>: Azure 배포 실패</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Check Azure CLI authentication
+
+az account show
+
+
+
+# Verify subscription permissions
+
+az role assignment list --assignee $(az account show --query user.name -o tsv)
+
+
+
+# Check resource provider registration
+
+az provider register --namespace Microsoft.CognitiveServices
+
+az provider register --namespace Microsoft.Insights
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>문제</strong>: AI 서비스 인증 실패</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Test service principal
+
+az login --service-principal \
+
+  --username $AZURE_CLIENT_ID \
+
+  --password $AZURE_CLIENT_SECRET \
+
+  --tenant $AZURE_TENANT_ID
+
+
+
+# Verify AI service deployment
+
+az cognitiveservices account list --query &quot;[].{Name:name,Kind:kind,Location:location}&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 환경 문제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>문제</strong>: 패키지 설치 실패</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Upgrade pip and setuptools
+
+python -m pip install --upgrade pip setuptools wheel
+
+
+
+# Clear pip cache
+
+pip cache purge
+
+
+
+# Install packages one by one to identify issues
+
+pip install fastmcp
+
+pip install asyncpg
+
+pip install azure-ai-projects
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>문제</strong>: VS Code에서 Python 인터프리터를 찾을 수 없음</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Show Python interpreter paths
+
+which python  # macOS/Linux
+
+where python  # Windows
+
+
+
+# Activate virtual environment first
+
+source mcp-env/bin/activate  # macOS/Linux
+
+mcp-env\Scripts\activate     # Windows
+
+
+
+# Then open VS Code
+
+code .
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 갖추게 됩니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>완전한 개발 환경</strong>: 모든 도구 설치 및 구성 완료  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Azure 리소스 배포</strong>: AI 서비스 및 지원 인프라  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Docker 환경 실행</strong>: PostgreSQL 및 MCP 서버 컨테이너  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>VS Code 통합</strong>: MCP 서버 구성 및 접근 가능  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>설정 검증 완료</strong>: 모든 구성 요소 테스트 및 작동 확인  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>문제 해결 지식</strong>: 일반적인 문제 및 해결 방법  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">환경이 준비되었으면 <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/04-Database/README.md" target="_blank">Lab 04: 데이터베이스 설계 및 스키마</a></strong>로 계속 진행하세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">소매 데이터베이스 스키마를 자세히 탐색</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">멀티 테넌트 데이터 모델링 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">행 수준 보안 구현 학습</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">샘플 소매 데이터 작업</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">개발 도구</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.docker.com/">Docker 문서</a> - Docker 참조 자료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/cli/azure/">Azure CLI 참조</a> - Azure CLI 명령어</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs">VS Code 문서</a> - 편집기 구성 및 확장 프로그램</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure 서비스</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/ai-foundry/">Azure AI Foundry 문서</a> - AI 서비스 구성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/cognitive-services/openai/">Azure OpenAI 서비스</a> - AI 모델 배포</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/azure/azure-monitor/app/app-insights-overview">Application Insights</a> - 모니터링 설정</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Python 개발</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/tutorial/venv.html">Python 가상 환경</a> - 환경 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">AsyncIO 문서</a> - 비동기 프로그래밍 패턴</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/">FastAPI 문서</a> - 웹 프레임워크 패턴</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: 환경이 준비되었나요? <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/04-Database/README.md" target="_blank">Lab 04: 데이터베이스 설계 및 스키마</a>로 계속 진행하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전을 신뢰할 수 있는 권위 있는 자료로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_03-02---security-and-multi-tenancy.html">&larr; 02 - Security and Multi-Tenancy</a></span>
+  <span><a href="m11_05-04---database-design-and-schema.html">04 - Database Design and Schema &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

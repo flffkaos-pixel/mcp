@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>12 Mcp Hosts - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 12 Mcp Hosts</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Setting Up Popular MCP Host Clients</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This guide covers how to configure and use MCP servers with popular AI host applications. Each host has its own configuration approach, but once set up, they all communicate with MCP servers using the standardized protocol.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What is an MCP Host?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">An <strong>MCP Host</strong> is an AI application that can connect to MCP servers to extend its capabilities. Think of it as the "front end" that users interact with, while MCP servers provide the "back end" tools and data.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart LR
+
+    User[👤 User] --&gt; Host[🖥️ MCP Host]
+
+    Host --&gt; S1[MCP Server A]
+
+    Host --&gt; S2[MCP Server B]
+
+    Host --&gt; S3[MCP Server C]
+
+    
+
+    subgraph &quot;Popular Hosts&quot;
+
+        H1[Claude Desktop]
+
+        H2[VS Code]
+
+        H3[Cursor]
+
+        H4[Cline]
+
+        H5[Windsurf]
+
+    end
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Prerequisites</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">An MCP server to connect to (see <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">Module 3.1 - First Server</a>)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The host application installed on your system</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Basic familiarity with JSON configuration files</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">1. Claude Desktop</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Claude Desktop</strong> is Anthropic's official desktop application that natively supports MCP.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Installation</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Download Claude Desktop from <a class="text-[var(--accent)] underline" href="https://claude.ai/download">claude.ai/download</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Install and sign in with your Anthropic account</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Configuration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Claude Desktop uses a JSON configuration file to define MCP servers.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Configuration file location:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>macOS</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Windows</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">%APPDATA%\Claude\claude_desktop_config.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Linux</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.config/Claude/claude_desktop_config.json</code></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Example configuration:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;mcpServers&quot;: {
+
+    &quot;calculator&quot;: {
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_calculator_server&quot;],
+
+      &quot;env&quot;: {
+
+        &quot;PYTHONPATH&quot;: &quot;/path/to/your/server&quot;
+
+      }
+
+    },
+
+    &quot;weather&quot;: {
+
+      &quot;command&quot;: &quot;node&quot;,
+
+      &quot;args&quot;: [&quot;/path/to/weather-server/build/index.js&quot;]
+
+    },
+
+    &quot;database&quot;: {
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-postgres&quot;],
+
+      &quot;env&quot;: {
+
+        &quot;DATABASE_URL&quot;: &quot;postgresql://user:pass@localhost/mydb&quot;
+
+      }
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Configuration Options</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Field | Description | Example |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-------|-------------|---------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">command</code> | The executable to run | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"python"</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"node"</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"npx"</code> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">args</code> | Command line arguments | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">["-m", "my_server"]</code> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">env</code> | Environment variables | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">{"API_KEY": "xxx"}</code> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">cwd</code> | Working directory | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"/path/to/server"</code> |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Testing Your Setup</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Save the configuration file</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Restart Claude Desktop completely (quit and reopen)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Open a new conversation</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Look for the 🔌 icon indicating connected servers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Try asking Claude to use one of your tools</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Troubleshooting Claude Desktop</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Server not appearing:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Check the configuration file syntax with a JSON validator</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensure the command path is correct</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Check Claude Desktop logs: Help → Show Logs</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Server crashes on startup:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test your server manually in terminal first</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Check environment variables are set correctly</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensure all dependencies are installed</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">2. VS Code with GitHub Copilot</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code supports MCP through GitHub Copilot Chat extensions.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Prerequisites</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. VS Code 1.99+ installed</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. GitHub Copilot extension installed</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. GitHub Copilot Chat extension installed</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Configuration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code uses <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/mcp.json</code> in your workspace or user settings.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Workspace configuration</strong> (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/mcp.json</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;servers&quot;: {
+
+    &quot;my-calculator&quot;: {
+
+      &quot;type&quot;: &quot;stdio&quot;,
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_calculator_server&quot;]
+
+    },
+
+    &quot;my-database&quot;: {
+
+      &quot;type&quot;: &quot;sse&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:8080/sse&quot;
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>User settings</strong> (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">settings.json</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;mcp.servers&quot;: {
+
+    &quot;global-server&quot;: {
+
+      &quot;type&quot;: &quot;stdio&quot;,
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@anthropic/mcp-server-memory&quot;]
+
+    }
+
+  },
+
+  &quot;mcp.enableLogging&quot;: true
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using MCP in VS Code</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Open the Copilot Chat panel (Ctrl+Shift+I / Cmd+Shift+I)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Type <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">@</code> to see available MCP tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Use natural language to invoke tools: "Calculate 25 * 48 using the calculator"</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Troubleshooting VS Code</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP servers not loading:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Check Output panel → "MCP" for error logs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Reload window: Ctrl+Shift+P → "Developer: Reload Window"</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Verify the server runs standalone first</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">3. Cursor</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Cursor</strong> is an AI-first code editor with built-in MCP support.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Installation</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Download Cursor from <a class="text-[var(--accent)] underline" href="https://cursor.sh">cursor.sh</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Install and sign in</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Configuration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Cursor uses a similar configuration format to Claude Desktop.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Configuration file location:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>macOS</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.cursor/mcp.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Windows</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">%USERPROFILE%\.cursor\mcp.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Linux</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.cursor/mcp.json</code></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Example configuration:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;mcpServers&quot;: {
+
+    &quot;filesystem&quot;: {
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;, &quot;/path/to/allowed/directory&quot;]
+
+    },
+
+    &quot;github&quot;: {
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+
+      &quot;env&quot;: {
+
+        &quot;GITHUB_TOKEN&quot;: &quot;ghp_your_token_here&quot;
+
+      }
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using MCP in Cursor</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Open Cursor's AI chat (Ctrl+L / Cmd+L)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. MCP tools appear automatically in suggestions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Ask the AI to perform tasks using connected servers</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">4. Cline (Terminal-Based)</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Cline</strong> is a terminal-based MCP client, ideal for command-line workflows.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Installation</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm install -g @anthropic/cline
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Configuration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Cline uses environment variables and command-line arguments.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Using environment variables:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+export ANTHROPIC_API_KEY=&quot;your-api-key&quot;
+
+export MCP_SERVER_CALCULATOR=&quot;python -m mcp_calculator_server&quot;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Using command-line arguments:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+cline --mcp-server &quot;calculator:python -m mcp_calculator_server&quot; \
+
+      --mcp-server &quot;weather:node /path/to/weather/index.js&quot;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Configuration file</strong> (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.clinerc</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;apiKey&quot;: &quot;your-api-key&quot;,
+
+  &quot;mcpServers&quot;: {
+
+    &quot;calculator&quot;: {
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_calculator_server&quot;]
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using Cline</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Start an interactive session
+
+cline
+
+
+
+# Single query with MCP
+
+cline &quot;Calculate the square root of 144 using the calculator&quot;
+
+
+
+# List available tools
+
+cline --list-tools
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">5. Windsurf</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Windsurf</strong> is another AI-powered code editor with MCP support.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Installation</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Download Windsurf from <a class="text-[var(--accent)] underline" href="https://codeium.com/windsurf">codeium.com/windsurf</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Install and create an account</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Configuration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Windsurf configuration is managed through the settings UI:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Open Settings (Ctrl+, / Cmd+,)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Search for "MCP"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Click "Edit in settings.json"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Example configuration:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;windsurf.mcp.servers&quot;: {
+
+    &quot;my-tools&quot;: {
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;/path/to/server.py&quot;],
+
+      &quot;env&quot;: {}
+
+    }
+
+  },
+
+  &quot;windsurf.mcp.enabled&quot;: true
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Transport Types Comparison</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Different hosts support different transport mechanisms:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Host | stdio | SSE/HTTP | WebSocket |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|------|-------|----------|-----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Claude Desktop | ✅ | ❌ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| VS Code | ✅ | ✅ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Cursor | ✅ | ✅ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Cline | ✅ | ✅ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Windsurf | ✅ | ✅ | ❌ |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>stdio</strong> (standard input/output): Best for local servers started by the host</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>SSE/HTTP</strong>: Best for remote servers or servers shared between multiple clients</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Common Troubleshooting</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Server won't start</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Test the server manually first:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # For Python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   python -m your_server_module</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # For Node.js</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   node /path/to/server/index.js</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Check the command path:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Use absolute paths when possible</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Ensure the executable is in your PATH</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Verify dependencies:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   pip list | grep mcp</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Node.js</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   npm list @modelcontextprotocol/sdk</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Server connects but tools don't work</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Check server logs</strong> - Most hosts have logging options</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Verify tool registration</strong> - Use MCP Inspector to test</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Check permissions</strong> - Some tools need file/network access</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Environment variables not passed</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Some hosts sanitize environment variables</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Use the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">env</code> configuration field explicitly</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Avoid sensitive data in config files (use secrets management)</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Security Best Practices</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Never commit API keys</strong> to configuration files</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Use environment variables</strong> for sensitive data</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Limit server permissions</strong> to only what's needed</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Review server code</strong> before granting access to your system</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Use allowlists</strong> for file system and network access</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/13-mcp-inspector/README.md" target="_blank">3.13 - Debugging with MCP Inspector</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">3.1 - Create your first MCP server</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/README.md" target="_blank">Module 5 - Advanced Topics</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.anthropic.com/en/docs/claude-desktop/mcp">Claude Desktop MCP Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://marketplace.visualstudio.com/items?itemName=anthropic.claude-mcp">VS Code MCP Extension</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/basic/transports/">MCP Specification - Transports</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">Official MCP Servers Registry</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">인기 있는 MCP 호스트 클라이언트 설정</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 가이드는 인기 있는 AI 호스트 애플리케이션에서 MCP 서버를 구성하고 사용하는 방법을 다룹니다. 각 호스트는 자체 구성 방식을 가지고 있지만, 설정이 완료되면 모두 표준화된 프로토콜을 사용하여 MCP 서버와 통신합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 호스트란?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 호스트</strong>는 MCP 서버에 연결하여 기능을 확장할 수 있는 AI 애플리케이션입니다. 사용자가 상호작용하는 "프론트 엔드"로 생각할 수 있으며, MCP 서버는 "백 엔드" 도구와 데이터를 제공합니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+flowchart LR
+
+    User[👤 사용자] --&gt; Host[🖥️ MCP 호스트]
+
+    Host --&gt; S1[MCP 서버 A]
+
+    Host --&gt; S2[MCP 서버 B]
+
+    Host --&gt; S3[MCP 서버 C]
+
+    
+
+    subgraph &quot;인기 호스트&quot;
+
+        H1[클로드 데스크톱]
+
+        H2[VS 코드]
+
+        H3[커서]
+
+        H4[클라인]
+
+        H5[윈드서프]
+
+    end
+
+</code></pre>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">사전 준비 사항</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">연결할 MCP 서버 (자세한 내용은 <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">Module 3.1 - First Server</a> 참조)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">시스템에 설치된 호스트 애플리케이션</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">JSON 구성 파일에 대한 기본 이해</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">1. Claude Desktop</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Claude Desktop</strong>은 Anthropic의 공식 데스크톱 애플리케이션으로 MCP를 네이티브로 지원합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <a class="text-[var(--accent)] underline" href="https://claude.ai/download">claude.ai/download</a>에서 Claude Desktop 다운로드</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 설치 후 Anthropic 계정으로 로그인</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Claude Desktop은 MCP 서버를 정의하기 위해 JSON 구성 파일을 사용합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>구성 파일 위치:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>macOS</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Windows</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">%APPDATA%\Claude\claude_desktop_config.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Linux</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.config/Claude/claude_desktop_config.json</code></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>구성 예시:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;mcpServers&quot;: {
+
+    &quot;calculator&quot;: {
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_calculator_server&quot;],
+
+      &quot;env&quot;: {
+
+        &quot;PYTHONPATH&quot;: &quot;/path/to/your/server&quot;
+
+      }
+
+    },
+
+    &quot;weather&quot;: {
+
+      &quot;command&quot;: &quot;node&quot;,
+
+      &quot;args&quot;: [&quot;/path/to/weather-server/build/index.js&quot;]
+
+    },
+
+    &quot;database&quot;: {
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-postgres&quot;],
+
+      &quot;env&quot;: {
+
+        &quot;DATABASE_URL&quot;: &quot;postgresql://user:pass@localhost/mydb&quot;
+
+      }
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구성 옵션</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 필드 | 설명 | 예시 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-------|-------------|---------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">command</code> | 실행할 실행 파일 | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"python"</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"node"</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"npx"</code> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">args</code> | 명령행 인수 | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">["-m", "my_server"]</code> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">env</code> | 환경 변수 | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">{"API_KEY": "xxx"}</code> |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">cwd</code> | 작업 디렉터리 | <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"/path/to/server"</code> |</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">설정 테스트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 구성 파일 저장</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Claude Desktop 완전히 재시작 (종료 후 다시 열기)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 새 대화 열기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 연결된 서버를 나타내는 🔌 아이콘 확인</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Claude에게 도구 중 하나를 사용해 보라고 요청</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Claude Desktop 문제 해결</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>서버가 나타나지 않는 경우:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">JSON 유효성 검사 도구로 구성 파일 문법 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">명령 경로가 올바른지 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Claude Desktop 로그 확인: 도움말 → 로그 표시</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>서버가 시작 시 충돌하는 경우:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">터미널에서 서버를 수동으로 먼저 테스트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">환경 변수 올바른 설정 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모든 종속 항목 설치 여부 확인</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">2. VS Code 및 GitHub Copilot</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code는 GitHub Copilot Chat 확장 기능을 통해 MCP를 지원합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">사전 준비</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. VS Code 1.99 이상 설치</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. GitHub Copilot 확장 설치</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. GitHub Copilot Chat 확장 설치</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code는 작업 공간 또는 사용자 설정에 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/mcp.json</code> 파일을 사용합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>작업 공간 구성</strong> (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/mcp.json</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;servers&quot;: {
+
+    &quot;my-calculator&quot;: {
+
+      &quot;type&quot;: &quot;stdio&quot;,
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_calculator_server&quot;]
+
+    },
+
+    &quot;my-database&quot;: {
+
+      &quot;type&quot;: &quot;sse&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:8080/sse&quot;
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>사용자 설정</strong> (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">settings.json</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;mcp.servers&quot;: {
+
+    &quot;global-server&quot;: {
+
+      &quot;type&quot;: &quot;stdio&quot;,
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@anthropic/mcp-server-memory&quot;]
+
+    }
+
+  },
+
+  &quot;mcp.enableLogging&quot;: true
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code에서 MCP 사용하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Copilot Chat 패널 열기 (Ctrl+Shift+I / Cmd+Shift+I)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">@</code> 입력하여 사용 가능한 MCP 도구 보기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 자연어로 도구 호출: "계산기 사용하여 25 * 48 계산하기"</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code 문제 해결</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 서버 로드 실패:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">출력 패널 → "MCP"에서 오류 로그 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">창 새로 고침: Ctrl+Shift+P → "Developer: Reload Window"</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버가 독립 실행형으로 먼저 작동하는지 확인</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">3. Cursor</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Cursor</strong>는 MCP를 내장한 AI 중심 코드 에디터입니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <a class="text-[var(--accent)] underline" href="https://cursor.sh">cursor.sh</a>에서 Cursor 다운로드</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 설치 후 로그인</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Cursor는 Claude Desktop과 비슷한 구성 형식을 사용합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>구성 파일 위치:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>macOS</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.cursor/mcp.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Windows</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">%USERPROFILE%\.cursor\mcp.json</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Linux</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.cursor/mcp.json</code></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>구성 예시:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;mcpServers&quot;: {
+
+    &quot;filesystem&quot;: {
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;, &quot;/path/to/allowed/directory&quot;]
+
+    },
+
+    &quot;github&quot;: {
+
+      &quot;command&quot;: &quot;npx&quot;,
+
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+
+      &quot;env&quot;: {
+
+        &quot;GITHUB_TOKEN&quot;: &quot;ghp_your_token_here&quot;
+
+      }
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Cursor에서 MCP 사용하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Cursor의 AI 채팅 열기 (Ctrl+L / Cmd+L)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. MCP 도구가 제안에 자동으로 나타남</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 연결된 서버를 사용해 AI에게 작업 요청</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">4. Cline (터미널 기반)</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Cline</strong>은 터미널 기반 MCP 클라이언트로 명령줄 작업에 적합합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">설치</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm install -g @anthropic/cline
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Cline은 환경 변수와 명령행 인수를 사용합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>환경 변수 사용:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+export ANTHROPIC_API_KEY=&quot;your-api-key&quot;
+
+export MCP_SERVER_CALCULATOR=&quot;python -m mcp_calculator_server&quot;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>명령행 인수 사용:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+cline --mcp-server &quot;calculator:python -m mcp_calculator_server&quot; \
+
+      --mcp-server &quot;weather:node /path/to/weather/index.js&quot;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>구성 파일</strong> (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">~/.clinerc</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;apiKey&quot;: &quot;your-api-key&quot;,
+
+  &quot;mcpServers&quot;: {
+
+    &quot;calculator&quot;: {
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;-m&quot;, &quot;mcp_calculator_server&quot;]
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Cline 사용법</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 대화형 세션 시작
+
+cline
+
+
+
+# MCP로 단일 쿼리
+
+cline &quot;Calculate the square root of 144 using the calculator&quot;
+
+
+
+# 사용 가능한 도구 목록
+
+cline --list-tools
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">5. Windsurf</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Windsurf</strong>는 MCP를 지원하는 또 다른 AI 기반 코드 에디터입니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">설치</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <a class="text-[var(--accent)] underline" href="https://codeium.com/windsurf">codeium.com/windsurf</a>에서 Windsurf 다운로드</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 설치 후 계정 생성</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Windsurf 구성은 설정 UI를 통해 관리됩니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 설정 열기 (Ctrl+, / Cmd+,)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. "MCP" 검색</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. "settings.json에서 편집" 클릭</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>구성 예시:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;windsurf.mcp.servers&quot;: {
+
+    &quot;my-tools&quot;: {
+
+      &quot;command&quot;: &quot;python&quot;,
+
+      &quot;args&quot;: [&quot;/path/to/server.py&quot;],
+
+      &quot;env&quot;: {}
+
+    }
+
+  },
+
+  &quot;windsurf.mcp.enabled&quot;: true
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">전송 방식 비교</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">각 호스트는 다양한 전송 방식을 지원합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 호스트 | stdio | SSE/HTTP | WebSocket |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|------|-------|----------|-----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Claude Desktop | ✅ | ❌ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| VS Code | ✅ | ✅ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Cursor | ✅ | ✅ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Cline | ✅ | ✅ | ❌ |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Windsurf | ✅ | ✅ | ❌ |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>stdio</strong> (표준 입력/출력): 호스트가 시작한 로컬 서버에 가장 적합  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>SSE/HTTP</strong>: 원격 서버나 여러 클라이언트에서 공유하는 서버에 가장 적합</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">공통 문제 해결</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">서버가 시작되지 않을 때</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>서버를 수동으로 먼저 테스트:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # 파이썬용</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   python -m your_server_module</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Node.js용</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   node /path/to/server/index.js</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>명령 경로 확인:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 가능하면 절대 경로 사용</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 실행 파일이 PATH에 포함되어 있는지 확인</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>종속 항목 확인:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # 파이썬</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   pip list | grep mcp</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Node.js</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   npm list @modelcontextprotocol/sdk</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">서버는 연결되지만 도구가 작동하지 않을 때</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>서버 로그 확인</strong> - 대부분의 호스트는 로깅 옵션 제공</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>도구 등록 확인</strong> - MCP Inspector로 테스트</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>권한 확인</strong> - 일부 도구는 파일/네트워크 접근 권한 필요</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">환경 변수가 전달되지 않을 때</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">일부 호스트는 환경 변수를 필터링함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">env</code> 구성 필드를 명시적으로 사용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">구성 파일에 민감한 데이터 포함하지 말 것 (비밀 관리 사용)</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">보안 모범 사례</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>API 키를 구성 파일에 절대 커밋하지 말 것</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>민감한 데이터는 환경 변수로 관리</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>서버 권한은 필요한 범위로 제한</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>시스템 접근 권한 부여 전 서버 코드 검토</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>파일 시스템 및 네트워크 접근에 허용 목록 사용</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/13-mcp-inspector/README.md" target="_blank">3.13 - MCP Inspector로 디버깅하기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">3.1 - 첫 번째 MCP 서버 만들기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/README.md" target="_blank">모듈 5 - 고급 주제</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.anthropic.com/en/docs/claude-desktop/mcp">Claude Desktop MCP 문서</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://marketplace.visualstudio.com/items?itemName=anthropic.claude-mcp">VS Code MCP 확장</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/basic/transports/">MCP 명세 - 전송 방식</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">공식 MCP 서버 레지스트리</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역은 오류나 부정확성이 포함될 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 자료로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 사람에 의한 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인한 어떠한 오해나 잘못된 해석에 대해서도 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m03_11-11-simple-auth.html">&larr; 11 Simple Auth</a></span>
+  <span><a href="m03_13-13-mcp-inspector.html">13 Mcp Inspector &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

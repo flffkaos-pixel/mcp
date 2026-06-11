@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>C# - Practical Implementation - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 04: Practical Implementation</span> &rsaquo; C#</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Sample</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The previous example shows how to use a local .NET project with the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stdio</code> type.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">And how to run the server locally in a container.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is a good solution in many situations.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">However, it can be useful to have the server running remotely, like in a cloud environment.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is where the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http</code> type comes in.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Looking at the solution in the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">04-PracticalImplementation</code> folder, it may look much more complex than the previous one.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">But in reality, it is not.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If you look closely to the project <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">src/Calculator</code>, you will see that it is mostly the same code as the previous example.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The only difference is that we are using a different library <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ModelContextProtocol.AspNetCore</code> to handle the HTTP requests.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">And we change the method <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">IsPrime</code> to make it private, just to show that you can have private methods in your code.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The rest of the code is the same as before.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The other projects are from <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/dotnet/aspire/get-started/aspire-overview">.NET Aspire</a>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Having .NET Aspire in the solution will improve the experience of the developer while developing and testing and help with observability.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It is not required to run the server, but it is a good practice to have it in your solution.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Start the server locally</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. From VS Code (with the C# DevKit extension), navigate down to the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">04-PracticalImplementation/samples/csharp</code> directory.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Execute the following command to start the server:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    dotnet watch run --project ./src/AppHost</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When a web browser opens the .NET Aspire dashboard, note the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http</code> URL.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It should be something like <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:5058/</code>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/04-PracticalImplementation/samples/csharp/images/dotnet-aspire-dashboard.png" target="_blank">.NET Aspire Dashboard</a></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Test Streamable HTTP with the MCP Inspector</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If you have Node.js 22.7.5 and higher, you can use the MCP Inspector to test your server.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Start the server and run the following command in a terminal:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npx @modelcontextprotocol/inspector http://localhost:5058
+
+</code></pre>
+
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Select the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Streamable HTTP</code> as the Transport type.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">In the Url field, enter the URL of the server noted earlier, and append <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/mcp</code>. It should be <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http</code> (not <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">https</code>) something like <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:5058/mcp</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">select the Connect button.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A nice thing about the Inspector is that it provide a nice visibility on what is happening.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Try listing the available tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Try some of them, it should works just like before.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Test MCP Server with GitHub Copilot Chat in VS Code</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To use the Streamable HTTP transport with GitHub Copilot Chat, change the configuration of the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">calc-mcp</code> server created previously to look like this:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/mcp.json
+
+{
+
+  &quot;servers&quot;: {
+
+    &quot;calc-mcp&quot;: {
+
+      &quot;type&quot;: &quot;http&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:5058/mcp&quot;
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Do some tests:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ask for "3 prime numbers after 6780". Note how Copilot will use the new tools <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">NextFivePrimeNumbers</code> and only return the first 3 prime numbers.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ask for "7 prime numbers after 111", to see what happens.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ask for "John has 24 lollies and wants to distribute them all to his 3 kids. How many lollies does each kid have?", to see what happens.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Deploy the server to Azure</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's deploy the server to Azure so more people can use it.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">From a terminal, navigate to the folder <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">04-PracticalImplementation/samples/csharp</code> and run the following command:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+azd up
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Once the deployment is over, you should see a message like this:</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Grab the URL and use it in the MCP Inspector and in the GitHub Copilot Chat.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/mcp.json
+
+{
+
+  &quot;servers&quot;: {
+
+    &quot;calc-mcp&quot;: {
+
+      &quot;type&quot;: &quot;http&quot;,
+
+      &quot;url&quot;: &quot;https://calc-mcp.gentleriver-3977fbcf.australiaeast.azurecontainerapps.io/mcp&quot;
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We try different transport types and testing tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We also deploy your MCP server to Azure.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">But what if our server needs to access to private resources?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For example, a database or a private API?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the next chapter, we will see how we can improve the security of our server.</p>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">샘플</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이전 예제에서는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stdio</code> 타입을 사용하는 로컬 .NET 프로젝트와 컨테이너에서 서버를 로컬로 실행하는 방법을 보여주었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이는 많은 상황에서 좋은 해결책입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">하지만 서버를 클라우드 환경처럼 원격에서 실행하는 것도 유용할 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이럴 때 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http</code> 타입이 필요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">04-PracticalImplementation</code> 폴더의 솔루션을 보면 이전 예제보다 훨씬 복잡해 보일 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">하지만 실제로는 그렇지 않습니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">src/Calculator</code> 프로젝트를 자세히 살펴보면 이전 예제와 거의 동일한 코드임을 알 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">유일한 차이점은 HTTP 요청을 처리하기 위해 다른 라이브러리인 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ModelContextProtocol.AspNetCore</code>를 사용한다는 점과, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">IsPrime</code> 메서드를 private으로 변경하여 코드 내에 private 메서드를 가질 수 있음을 보여준다는 점입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">나머지 코드는 이전과 동일합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다른 프로젝트들은 <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/dotnet/aspire/get-started/aspire-overview">.NET Aspire</a>에서 가져온 것입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">솔루션에 .NET Aspire를 포함하면 개발 및 테스트 과정에서 개발자 경험이 향상되고 관찰 가능성도 좋아집니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버 실행에 필수는 아니지만 솔루션에 포함하는 것이 좋은 습관입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">서버를 로컬에서 시작하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. VS Code(C# DevKit 확장 기능 포함)에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">04-PracticalImplementation/samples/csharp</code> 디렉터리로 이동합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 다음 명령어를 실행하여 서버를 시작합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    dotnet watch run --project ./src/AppHost</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">웹 브라우저가 .NET Aspire 대시보드를 열면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http</code> URL을 확인하세요.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">보통 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:5058/</code>와 비슷할 것입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/translated_images/ko/dotnet-aspire-dashboard.0a7095710e9301e9.webp" target="_blank">.NET Aspire Dashboard</a></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP Inspector로 Streamable HTTP 테스트하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Node.js 22.7.5 이상이 설치되어 있다면 MCP Inspector를 사용해 서버를 테스트할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버를 시작한 후 터미널에서 다음 명령어를 실행하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npx @modelcontextprotocol/inspector http://localhost:5058
+
+</code></pre>
+
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Transport 타입으로 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Streamable HTTP</code>를 선택합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Url 필드에 앞서 확인한 서버 URL을 입력하고 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/mcp</code>를 덧붙입니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http</code> (https 아님) 형식이어야 하며, 예를 들어 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:5058/mcp</code>와 같습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Connect 버튼을 클릭합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Inspector의 좋은 점은 현재 진행 중인 상황을 잘 보여준다는 것입니다.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용 가능한 도구 목록을 불러와 보세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">몇 가지 도구를 사용해 보세요. 이전과 동일하게 작동할 것입니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">VS Code에서 GitHub Copilot Chat으로 MCP 서버 테스트하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">GitHub Copilot Chat에서 Streamable HTTP 전송을 사용하려면, 이전에 만든 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">calc-mcp</code> 서버 구성을 다음과 같이 변경하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/mcp.json
+
+{
+
+  &quot;servers&quot;: {
+
+    &quot;calc-mcp&quot;: {
+
+      &quot;type&quot;: &quot;http&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:5058/mcp&quot;
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">몇 가지 테스트를 해보세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">"6780 이후의 소수 3개"를 요청해 보세요. Copilot이 새 도구 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">NextFivePrimeNumbers</code>를 사용해 처음 3개의 소수만 반환하는 것을 확인할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">"111 이후의 소수 7개"를 요청해 보세요. 어떤 결과가 나오는지 확인해 보세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">"John이 사탕 24개를 가지고 있고 3명의 아이들에게 모두 나누어 주려고 합니다. 각 아이가 몇 개씩 받나요?"를 물어보세요. 어떤 결과가 나오는지 확인해 보세요.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">서버를 Azure에 배포하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">더 많은 사용자가 서버를 이용할 수 있도록 Azure에 배포해 봅시다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">터미널에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">04-PracticalImplementation/samples/csharp</code> 폴더로 이동한 후 다음 명령어를 실행하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+azd up
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">배포가 완료되면 다음과 같은 메시지를 볼 수 있습니다:</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">URL을 복사하여 MCP Inspector와 GitHub Copilot Chat에서 사용하세요.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .vscode/mcp.json
+
+{
+
+  &quot;servers&quot;: {
+
+    &quot;calc-mcp&quot;: {
+
+      &quot;type&quot;: &quot;http&quot;,
+
+      &quot;url&quot;: &quot;https://calc-mcp.gentleriver-3977fbcf.australiaeast.azurecontainerapps.io/mcp&quot;
+
+    }
+
+  }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음은?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리는 다양한 전송 타입과 테스트 도구를 시도해 보았고, MCP 서버를 Azure에 배포했습니다. 그렇다면 서버가 사설 리소스에 접근해야 한다면 어떻게 할까요? 예를 들어 데이터베이스나 사설 API 같은 경우 말이죠. 다음 장에서는 서버의 보안을 어떻게 강화할 수 있는지 살펴보겠습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span></span>
+  <span><a href="m04_02-java-with-spring.html">Java with Spring &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

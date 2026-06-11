@@ -1,0 +1,2969 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>11 Simple Auth - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 11 Simple Auth</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Simple auth</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP SDKs support the use of OAuth 2.1 which to be fair is a pretty involved process involving concepts like auth server, resource server, posting credentials, getting a code, exchanging the code for a bearer token until you can finally get your resource data.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If you're unused to OAuth which is a great thing to implement, it's a good idea to start with some basic level of auth and build up to better and better security.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">That's why this chapter exists, to build you up to more advanced auth.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Auth, what do we mean?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Auth is short for authentication and authorization. The idea is that we need to do two things:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Authentication</strong>, which is the process of figuring out whether we let a person enter our house, that they have the right to be "here" that is have access to our resource server where our MCP Server features live.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Authorization</strong>, is the process of finding out if a user should have access to these specific resources they're asking for, for example these orders or these products or whether they're allowed to read the content but not delete as another example.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Credentials: how we tell the system who we are</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Well, most web developers out there start thinking in terms of providing a credential to the server, usually a secret that says if they're allowed to be here "Authentication".</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This credential is usually a base64 encoded version of username and password or an API key that uniquely identifies a specific user.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This involves sending it via a header called "Authorization" like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{ &quot;Authorization&quot;: &quot;secret123&quot; }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is usually referred to as basic authentication. How the overall flow then works is in the following way:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+   participant User
+
+   participant Client
+
+   participant Server
+
+
+
+   User-&gt;&gt;Client: show me data
+
+   Client-&gt;&gt;Server: show me data, here&#x27;s my credential
+
+   Server--&gt;&gt;Client: 1a, I know you, here&#x27;s your data
+
+   Server--&gt;&gt;Client: 1b, I don&#x27;t know you, 401 
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now that we understand how it works from a flow standpoint, how do we implement it?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Well, most web servers have a concept called middleware, a piece of code that runs as part of the request that can verify credentials, and if credentials are valid can let the request pass through.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If the request doesn't have valid credentials then you get an auth error.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's see how this can be implemented:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class AuthMiddleware(BaseHTTPMiddleware):
+
+    async def dispatch(self, request, call_next):
+
+
+
+        has_header = request.headers.get(&quot;Authorization&quot;)
+
+        if not has_header:
+
+            print(&quot;-&gt; Missing Authorization header!&quot;)
+
+            return Response(status_code=401, content=&quot;Unauthorized&quot;)
+
+
+
+        if not valid_token(has_header):
+
+            print(&quot;-&gt; Invalid token!&quot;)
+
+            return Response(status_code=403, content=&quot;Forbidden&quot;)
+
+
+
+        print(&quot;Valid token, proceeding...&quot;)
+
+       
+
+        response = await call_next(request)
+
+        # add any customer headers or change in the response in some way
+
+        return response
+
+
+
+
+
+starlette_app.add_middleware(CustomHeaderMiddleware)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we have: </p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a middleware called <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthMiddleware</code> where its <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">dispatch</code> method is being invoked by the web server. </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Added the middleware to the web server:</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    starlette_app.add_middleware(AuthMiddleware)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Written validation logic that checks if Authorization header is present and if the secret being sent is valid:</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    has_header = request.headers.get("Authorization")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    if not has_header:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("-> Missing Authorization header!")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return Response(status_code=401, content="Unauthorized")</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    if not valid_token(has_header):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("-> Invalid token!")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return Response(status_code=403, content="Forbidden")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    if the secret is present and valid then we let the request pass through by calling <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">call_next</code> and return the response.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    response = await call_next(request)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # add any customer headers or change in the response in some way</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    return response</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">How it works is that if a web request is made towards the server the middleware will be invoked and given its implementation it will either let the request pass through or end up returning an error that indicates the client isn't allowed to proceed.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we create a middleware with the popular framework Express and intercept the request before it reaches the MCP Server. Here's the code for that:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+function isValid(secret) {
+
+    return secret === &quot;secret123&quot;;
+
+}
+
+
+
+app.use((req, res, next) =&gt; {
+
+    // 1. Authorization header present?  
+
+    if(!req.headers[&quot;Authorization&quot;]) {
+
+        res.status(401).send(&#x27;Unauthorized&#x27;);
+
+    }
+
+    
+
+    let token = req.headers[&quot;Authorization&quot;];
+
+
+
+    // 2. Check validity.
+
+    if(!isValid(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+    }
+
+
+
+   
+
+    console.log(&#x27;Middleware executed&#x27;);
+
+    // 3. Passes request to the next step in the request pipeline.
+
+    next();
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this code we:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Check if the Authorization header is present in the first place, if not, we send a 401 error.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Ensure the credential/token is valid, if not, we send a 403 error.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Finally passes on the request in the request pipeline and returns the asked for resource.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Exercise: Implement authentication</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Lets take our knowledge and try implementing it. Here's the plan:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Server</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create a web server and MCP instance.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement a middleware for the server.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Client </p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Send web request, with credential, via header.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- Create a web server and MCP instance</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In our first step, we need to create the web server instance and the MCP Server.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we create an MCP server instance, create a starlette web app and host it with uvicorn.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# creating MCP Server
+
+
+
+app = FastMCP(
+
+    name=&quot;MCP Resource Server&quot;,
+
+    instructions=&quot;Resource Server that validates tokens via Authorization Server introspection&quot;,
+
+    host=settings[&quot;host&quot;],
+
+    port=settings[&quot;port&quot;],
+
+    debug=True
+
+)
+
+
+
+# creating starlette web app
+
+starlette_app = app.streamable_http_app()
+
+
+
+# serving app via uvicorn
+
+async def run(starlette_app):
+
+    import uvicorn
+
+    config = uvicorn.Config(
+
+            starlette_app,
+
+            host=app.settings.host,
+
+            port=app.settings.port,
+
+            log_level=app.settings.log_level.lower(),
+
+        )
+
+    server = uvicorn.Server(config)
+
+    await server.serve()
+
+
+
+run(starlette_app)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this code we:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create the MCP Server.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Construct the the starlette web app from the MCP Server, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.streamable_http_app()</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Host and server the web app using uvicorn <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">server.serve()</code>.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we create an MCP Server instance.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const server = new McpServer({
+
+      name: &quot;example-server&quot;,
+
+      version: &quot;1.0.0&quot;
+
+    });
+
+
+
+    // ... set up server resources, tools, and prompts ...
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This MCP Server creation will need to happen within our POST /mcp route definition, so let's take the above code and move it like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import express from &quot;express&quot;;
+
+import { randomUUID } from &quot;node:crypto&quot;;
+
+import { McpServer } from &quot;@modelcontextprotocol/sdk/server/mcp.js&quot;;
+
+import { StreamableHTTPServerTransport } from &quot;@modelcontextprotocol/sdk/server/streamableHttp.js&quot;;
+
+import { isInitializeRequest } from &quot;@modelcontextprotocol/sdk/types.js&quot;
+
+
+
+const app = express();
+
+app.use(express.json());
+
+
+
+// Map to store transports by session ID
+
+const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
+
+
+
+// Handle POST requests for client-to-server communication
+
+app.post(&#x27;/mcp&#x27;, async (req, res) =&gt; {
+
+  // Check for existing session ID
+
+  const sessionId = req.headers[&#x27;mcp-session-id&#x27;] as string | undefined;
+
+  let transport: StreamableHTTPServerTransport;
+
+
+
+  if (sessionId &amp;&amp; transports[sessionId]) {
+
+    // Reuse existing transport
+
+    transport = transports[sessionId];
+
+  } else if (!sessionId &amp;&amp; isInitializeRequest(req.body)) {
+
+    // New initialization request
+
+    transport = new StreamableHTTPServerTransport({
+
+      sessionIdGenerator: () =&gt; randomUUID(),
+
+      onsessioninitialized: (sessionId) =&gt; {
+
+        // Store the transport by session ID
+
+        transports[sessionId] = transport;
+
+      },
+
+      // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
+
+      // locally, make sure to set:
+
+      // enableDnsRebindingProtection: true,
+
+      // allowedHosts: [&#x27;127.0.0.1&#x27;],
+
+    });
+
+
+
+    // Clean up transport when closed
+
+    transport.onclose = () =&gt; {
+
+      if (transport.sessionId) {
+
+        delete transports[transport.sessionId];
+
+      }
+
+    };
+
+    const server = new McpServer({
+
+      name: &quot;example-server&quot;,
+
+      version: &quot;1.0.0&quot;
+
+    });
+
+
+
+    // ... set up server resources, tools, and prompts ...
+
+
+
+    // Connect to the MCP server
+
+    await server.connect(transport);
+
+  } else {
+
+    // Invalid request
+
+    res.status(400).json({
+
+      jsonrpc: &#x27;2.0&#x27;,
+
+      error: {
+
+        code: -32000,
+
+        message: &#x27;Bad Request: No valid session ID provided&#x27;,
+
+      },
+
+      id: null,
+
+    });
+
+    return;
+
+  }
+
+
+
+  // Handle the request
+
+  await transport.handleRequest(req, res, req.body);
+
+});
+
+
+
+// Reusable handler for GET and DELETE requests
+
+const handleSessionRequest = async (req: express.Request, res: express.Response) =&gt; {
+
+  const sessionId = req.headers[&#x27;mcp-session-id&#x27;] as string | undefined;
+
+  if (!sessionId || !transports[sessionId]) {
+
+    res.status(400).send(&#x27;Invalid or missing session ID&#x27;);
+
+    return;
+
+  }
+
+  
+
+  const transport = transports[sessionId];
+
+  await transport.handleRequest(req, res);
+
+};
+
+
+
+// Handle GET requests for server-to-client notifications via SSE
+
+app.get(&#x27;/mcp&#x27;, handleSessionRequest);
+
+
+
+// Handle DELETE requests for session termination
+
+app.delete(&#x27;/mcp&#x27;, handleSessionRequest);
+
+
+
+app.listen(3000);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now you see how the MCP Server creation was moved within <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.post("/mcp")</code>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's move on to the next step of creating the middleware so we can validate the incoming credential.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- Implement a middleware for the server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's get to the middleware portion next.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we will create a middleware that looks for a credential in the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> header and validates it.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If it's acceptable then the request will move on to do what it needs (e.g list tools, read a resource or whatever MCP functionality the client was asking for).</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To create the middleware, we need to create a class that inherits from <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">BaseHTTPMiddleware</code>. There are two interesting pieces:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The request <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">request</code> , that we read the header info from.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">call_next</code> the callback we need to invoke if the client has brought a credential we accept.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">First, we need to handle the case if the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> header is missing:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+has_header = request.headers.get(&quot;Authorization&quot;)
+
+
+
+# no header present, fail with 401, otherwise move on.
+
+if not has_header:
+
+    print(&quot;-&gt; Missing Authorization header!&quot;)
+
+    return Response(status_code=401, content=&quot;Unauthorized&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we send a 401 unauthorized message as the client is failing authentication.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Next, if a credential was submitted, we need to check its validity like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+ if not valid_token(has_header):
+
+    print(&quot;-&gt; Invalid token!&quot;)
+
+    return Response(status_code=403, content=&quot;Forbidden&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Note how we send a 403 forbidden message above. Let's see the full middleware below implementing everything we mentioned above:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class AuthMiddleware(BaseHTTPMiddleware):
+
+    async def dispatch(self, request, call_next):
+
+
+
+        has_header = request.headers.get(&quot;Authorization&quot;)
+
+        if not has_header:
+
+            print(&quot;-&gt; Missing Authorization header!&quot;)
+
+            return Response(status_code=401, content=&quot;Unauthorized&quot;)
+
+
+
+        if not valid_token(has_header):
+
+            print(&quot;-&gt; Invalid token!&quot;)
+
+            return Response(status_code=403, content=&quot;Forbidden&quot;)
+
+
+
+        print(&quot;Valid token, proceeding...&quot;)
+
+        print(f&quot;-&gt; Received {request.method} {request.url}&quot;)
+
+        response = await call_next(request)
+
+        response.headers[&#x27;Custom&#x27;] = &#x27;Example&#x27;
+
+        return response
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, but what about <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">valid_token</code> function? Here it is below:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# DON&#x27;T use for production - improve it !!
+
+def valid_token(token: str) -&gt; bool:
+
+    # remove the &quot;Bearer &quot; prefix
+
+    if token.startswith(&quot;Bearer &quot;):
+
+        token = token[7:]
+
+        return token == &quot;secret-token&quot;
+
+    return False
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This should obviously improve. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">IMPORTANT: You should NEVER have secrets like this in code. You should ideally retrieve the value to compare with from a data source or from an IDP (identity service provider) or better yet, let the IDP do the validation.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To implement this with Express, we need to call the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">use</code> method that takes middleware functions.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We need to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Interact with the request variable to check the passed credential in the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> property.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Validate the credential, and if so let the request continue and have the client's MCP request do what it should (e.g list tools, read resource or anything other MCP related).</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here, we're checking if the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> header is present and if not, we stop the request from going through:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+if(!req.headers[&quot;authorization&quot;]) {
+
+    res.status(401).send(&#x27;Unauthorized&#x27;);
+
+    return;
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If the header isn't sent in the first place, you receive a 401.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Next, we check if the credential is valid, if not we again stop the request but with a slightly different message:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+if(!isValid(token)) {
+
+    res.status(403).send(&#x27;Forbidden&#x27;);
+
+    return;
+
+} 
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Note how you now get a 403 error.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's the full code:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+app.use((req, res, next) =&gt; {
+
+    console.log(&#x27;Request received:&#x27;, req.method, req.url, req.headers);
+
+    console.log(&#x27;Headers:&#x27;, req.headers[&quot;authorization&quot;]);
+
+    if(!req.headers[&quot;authorization&quot;]) {
+
+        res.status(401).send(&#x27;Unauthorized&#x27;);
+
+        return;
+
+    }
+
+    
+
+    let token = req.headers[&quot;authorization&quot;];
+
+
+
+    if(!isValid(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+        return;
+
+    }  
+
+
+
+    console.log(&#x27;Middleware executed&#x27;);
+
+    next();
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We have set up the web server to accept a middleware to check the credential the client is hopefully sending us. What about the client itself?</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- Send web request with credential via header</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We need to ensure the client is passing the credential through the header. As we're going to use an MCP client to do so, we need to figure out how that's done.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For the client, we need to pass a header with our credential like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# DON&#x27;T hardcode the value, have it at minimum in an environment variable or a more secure storage
+
+token = &quot;secret-token&quot;
+
+
+
+async with streamablehttp_client(
+
+        url = f&quot;http://localhost:{port}/mcp&quot;,
+
+        headers = {&quot;Authorization&quot;: f&quot;Bearer {token}&quot;}
+
+    ) as (
+
+        read_stream,
+
+        write_stream,
+
+        session_callback,
+
+    ):
+
+        async with ClientSession(
+
+            read_stream,
+
+            write_stream
+
+        ) as session:
+
+            await session.initialize()
+
+      
+
+            # TODO, what you want done in the client, e.g list tools, call tools etc.
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Note how we populate the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">headers</code> property like so <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30"> headers = {"Authorization": f"Bearer {token}"}</code>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We can solve this in two steps:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Populate a configuration object with our credential.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Pass the configuration object to the transport.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+// DON&#x27;T hardcode the value like shown here. At minimum have it as a env variable and use something like dotenv (in dev mode).
+
+let token = &quot;secret123&quot;
+
+
+
+// define a client transport option object
+
+let options: StreamableHTTPClientTransportOptions = {
+
+  sessionId: sessionId,
+
+  requestInit: {
+
+    headers: {
+
+      &quot;Authorization&quot;: &quot;secret123&quot;
+
+    }
+
+  }
+
+};
+
+
+
+// pass the options object to the transport
+
+async function main() {
+
+   const transport = new StreamableHTTPClientTransport(
+
+      new URL(serverUrl),
+
+      options
+
+   );
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here you see above how we had to create an <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">options</code> object and place our headers under the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">requestInit</code> property.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">IMPORTANT: How do we improve it from here though?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Well, the current implementation has some issues.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">First off, passing a credential like this is pretty risky unless you at minimum have HTTPS.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Even then, the credential can be stolen so you need a system where you can easily revoke the token and add additional checks like where in the world is it coming from, does the request happen way too often (bot-like behavior), in short, there's a whole host of concerns.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It should be said though, for very simple APIs where you don't want anyone calling your API without being authenticated and what we have here is a good start. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">With that said, let's try to harden the security a little bit by using a standardized format like JSON Web Token, also known as JWT or "JOT" tokens.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">JSON Web Tokens, JWT</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">So, we're trying to improve things from sending very simple credentials. What's the immediate improvements we get adopting JWT?</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Security improvements</strong>. In basic auth, you send the username and password as a base64 encoded token (or you send an API key) over and over which increases the risk. With JWT, you send your username and password and get a token in return and it's also time bound meaning it will expire. JWT lets you easily use fine-grained access control using roles, scopes and permissions.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Statelessness and scalability</strong>. JWTs are self-contained, they carry all user info and eliminate the need to store server-side session storage. Token can also be validated locally.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Interoperability and federation</strong>. JWTs is central of Open ID Connect and is used with known identity providers like Entra ID, Google Identity and Auth0. They also make it possible to use single sign on and much more making it enterprise-grade.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Modularity and flexibility</strong>. JWTs can also be used with API Gateways like Azure API Management, NGINX and more. It also supports use authentication scenarios and server-to-service communication including impersonation and delegation scenarios.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Performance and caching</strong>. JWTs can be cached after decoding which reduces the need for parsing. This helps specifically with high-traffic apps as it improves throughput and reduces load on your chosen infrastructure.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Advanced features</strong>. It also supports introspection (checking validity on server) and revocation (making a token invalid).</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">With all of these benefits, let's see how we can take our implementation to the next level.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Turning basic auth into JWT</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">So, the changes we need to make at mile-high level are to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Learn to construct a JWT token</strong> and make it ready for being sent from client to server.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Validate a JWT token</strong>, and if so, let the client have our resources.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Secure token storage</strong>. How we store this token.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Protect the routes</strong>. We need to protect the routes, in our case, we need to protect routes and specific MCP features.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Add refresh tokens</strong>. Ensure we create tokens that are short-lived but refresh tokens that are long-lived that can be used to acquire new tokens if they expire. Also ensure there's a refresh endpoint and a rotation strategy.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- Construct a JWT token</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">First off, a JWT token has the following parts:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>header</strong>, algorithm used and token type.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>payload</strong>, claims, like sub (the user or entity the token represents. In an auth scenario this is typically the userid), exp (when it expires) role (the role)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>signature</strong>, signed with a secret or private key.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For this, we will need to construct the header, payload and the encoded token.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+import jwt
+
+import jwt
+
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+
+import datetime
+
+
+
+# Secret key used to sign the JWT
+
+secret_key = &#x27;your-secret-key&#x27;
+
+
+
+header = {
+
+    &quot;alg&quot;: &quot;HS256&quot;,
+
+    &quot;typ&quot;: &quot;JWT&quot;
+
+}
+
+
+
+# the user info and its claims and expiry time
+
+payload = {
+
+    &quot;sub&quot;: &quot;1234567890&quot;,               # Subject (user ID)
+
+    &quot;name&quot;: &quot;User Userson&quot;,                # Custom claim
+
+    &quot;admin&quot;: True,                     # Custom claim
+
+    &quot;iat&quot;: datetime.datetime.utcnow(),# Issued at
+
+    &quot;exp&quot;: datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expiry
+
+}
+
+
+
+# encode it
+
+encoded_jwt = jwt.encode(payload, secret_key, algorithm=&quot;HS256&quot;, headers=header)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the above code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Defined a header using HS256 as algorithm and type to be JWT.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Constructed a payload that contains a subject or user id, a username, a role, when it was issued and when it's set to expire thereby implementing the time bound aspect we mentioned earlier. </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we will need some dependencies that will help us construct the JWT token.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Dependencies</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+npm install jsonwebtoken
+
+npm install --save-dev @types/jsonwebtoken
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now that we have that in place, let's create the header, payload and through that create the encoded token.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import jwt from &#x27;jsonwebtoken&#x27;;
+
+
+
+const secretKey = &#x27;your-secret-key&#x27;; // Use env vars in production
+
+
+
+// Define the payload
+
+const payload = {
+
+  sub: &#x27;1234567890&#x27;,
+
+  name: &#x27;User usersson&#x27;,
+
+  admin: true,
+
+  iat: Math.floor(Date.now() / 1000), // Issued at
+
+  exp: Math.floor(Date.now() / 1000) + 60 * 60 // Expires in 1 hour
+
+};
+
+
+
+// Define the header (optional, jsonwebtoken sets defaults)
+
+const header = {
+
+  alg: &#x27;HS256&#x27;,
+
+  typ: &#x27;JWT&#x27;
+
+};
+
+
+
+// Create the token
+
+const token = jwt.sign(payload, secretKey, {
+
+  algorithm: &#x27;HS256&#x27;,
+
+  header: header
+
+});
+
+
+
+console.log(&#x27;JWT:&#x27;, token);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This token is:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Signed using HS256</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Valid for 1 hour</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Includes claims like sub, name, admin, iat, and exp.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- Validate a token</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We will also need to validate a token, this is something we should do on the server to ensure what the client is sending us is in fact valid.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There are many checks we should do here from validating its structure to its validity.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You're also encouraged to add other checks to see if the user is in your system and more.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To validate a token, we need to decode it so we can read it and then start checking its validity:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+# Decode and verify the JWT
+
+try:
+
+    decoded = jwt.decode(token, secret_key, algorithms=[&quot;HS256&quot;])
+
+    print(&quot;✅ Token is valid.&quot;)
+
+    print(&quot;Decoded claims:&quot;)
+
+    for key, value in decoded.items():
+
+        print(f&quot;  {key}: {value}&quot;)
+
+except ExpiredSignatureError:
+
+    print(&quot;❌ Token has expired.&quot;)
+
+except InvalidTokenError as e:
+
+    print(f&quot;❌ Invalid token: {e}&quot;)
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this code, we call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">jwt.decode</code> using the token, the secret key and the chosen algorithm as input.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Note how we use a try-catch construct as a failed validation leads to an error being raised.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here we need to call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">jwt.verify</code> to get a decoded version of the token that we can analyze further.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If this call fails, that means the structure of the token is incorrect or it's no longer valid.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+try {
+
+  const decoded = jwt.verify(token, secretKey);
+
+  console.log(&#x27;Decoded Payload:&#x27;, decoded);
+
+} catch (err) {
+
+  console.error(&#x27;Token verification failed:&#x27;, err);
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">NOTE: as mentioned previously, we should perform additional checks to ensure this token points out a user in our system and ensure the user has the rights it claims to have.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Next, let's look into role based access control, also known as RBAC.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Adding role based access control</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The idea is that we want to express that different roles have different permissions.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For example, we assume an admin can do everything and that a normal user can do read/write and that a guest can only read.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Therefore, here are some possible permission levels:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Admin.Write </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">User.Read</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Guest.Read</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's look at how we can implement such a control with middleware. Middlewares can be added per route as well as for all routes.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from starlette.responses import JSONResponse
+
+import jwt
+
+
+
+# DON&#x27;T have the secret in the code like, this is for demonstration purposes only. Read it from a safe place.
+
+SECRET_KEY = &quot;your-secret-key&quot; # put this in env variable
+
+REQUIRED_PERMISSION = &quot;User.Read&quot;
+
+
+
+class JWTPermissionMiddleware(BaseHTTPMiddleware):
+
+    async def dispatch(self, request, call_next):
+
+        auth_header = request.headers.get(&quot;Authorization&quot;)
+
+        if not auth_header or not auth_header.startswith(&quot;Bearer &quot;):
+
+            return JSONResponse({&quot;error&quot;: &quot;Missing or invalid Authorization header&quot;}, status_code=401)
+
+
+
+        token = auth_header.split(&quot; &quot;)[1]
+
+        try:
+
+            decoded = jwt.decode(token, SECRET_KEY, algorithms=[&quot;HS256&quot;])
+
+        except jwt.ExpiredSignatureError:
+
+            return JSONResponse({&quot;error&quot;: &quot;Token expired&quot;}, status_code=401)
+
+        except jwt.InvalidTokenError:
+
+            return JSONResponse({&quot;error&quot;: &quot;Invalid token&quot;}, status_code=401)
+
+
+
+        permissions = decoded.get(&quot;permissions&quot;, [])
+
+        if REQUIRED_PERMISSION not in permissions:
+
+            return JSONResponse({&quot;error&quot;: &quot;Permission denied&quot;}, status_code=403)
+
+
+
+        request.state.user = decoded
+
+        return await call_next(request)
+
+
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There a few different ways to add the middleware like below:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+# Alt 1: add middleware while constructing starlette app
+
+middleware = [
+
+    Middleware(JWTPermissionMiddleware)
+
+]
+
+
+
+app = Starlette(routes=routes, middleware=middleware)
+
+
+
+# Alt 2: add middleware after starlette app is already constructed
+
+starlette_app.add_middleware(JWTPermissionMiddleware)
+
+
+
+# Alt 3: add middleware per route
+
+routes = [
+
+    Route(
+
+        &quot;/mcp&quot;,
+
+        endpoint=..., # handler
+
+        middleware=[Middleware(JWTPermissionMiddleware)]
+
+    )
+
+]
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We can use <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.use</code> and a middleware that will run for all requests. </p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+app.use((req, res, next) =&gt; {
+
+    console.log(&#x27;Request received:&#x27;, req.method, req.url, req.headers);
+
+    console.log(&#x27;Headers:&#x27;, req.headers[&quot;authorization&quot;]);
+
+
+
+    // 1. Check if authorization header has been sent
+
+
+
+    if(!req.headers[&quot;authorization&quot;]) {
+
+        res.status(401).send(&#x27;Unauthorized&#x27;);
+
+        return;
+
+    }
+
+    
+
+    let token = req.headers[&quot;authorization&quot;];
+
+
+
+    // 2. Check if token is valid
+
+    if(!isValid(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+        return;
+
+    }  
+
+
+
+    // 3. Check if token user exist in our system
+
+    if(!isExistingUser(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+        console.log(&quot;User does not exist&quot;);
+
+        return;
+
+    }
+
+    console.log(&quot;User exists&quot;);
+
+
+
+    // 4. Verify the token has the right permissions
+
+    if(!hasScopes(token, [&quot;User.Read&quot;])){
+
+        res.status(403).send(&#x27;Forbidden - insufficient scopes&#x27;);
+
+    }
+
+
+
+    console.log(&quot;User has required scopes&quot;);
+
+
+
+    console.log(&#x27;Middleware executed&#x27;);
+
+    next();
+
+});
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There's quite a few things we can let our middleware and that our middleware SHOULD do, namely:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Check if authorization header is present</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Check if token is valid, we call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">isValid</code> which is a method we wrote that check integrity and validity of JWT token.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Verify the user exists in our system, we should check this.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // users in DB</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   const users = [</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     "user1",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     "User usersson",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ]</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   function isExistingUser(token) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     let decodedToken = verifyToken(token);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     // TODO, check if user exists in DB</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     return users.includes(decodedToken?.name || "");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Above, we've created a very simple <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">users</code> list, which should be in a database obviously.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Additionally, we should also check the token has the right permissions.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   if(!hasScopes(token, ["User.Read"])){</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        res.status(403).send('Forbidden - insufficient scopes');</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this code above from the middleware, we check that the token contains User.Read permission, if not we send a 403 error.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Below is the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">hasScopes</code> helper method.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   function hasScopes(scope: string, requiredScopes: string[]) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     let decodedToken = verifyToken(scope);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    return requiredScopes.every(scope => decodedToken?.scopes.includes(scope));</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Have a think which additional checks you should be doing, but these are the absolute minimum of checks you should be doing.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Using Express as a web framework is a common choice. There are helpers library when you use JWT so you can write less code.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">express-jwt</code>, helper library that provides a middleware that helps decode your token.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">express-jwt-permissions</code>, this provides a middleware <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">guard</code> that helps check if a certain permission is on the token.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's what these libraries can look like when used:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const express = require(&#x27;express&#x27;);
+
+const jwt = require(&#x27;express-jwt&#x27;);
+
+const guard = require(&#x27;express-jwt-permissions&#x27;)();
+
+
+
+const app = express();
+
+const secretKey = &#x27;your-secret-key&#x27;; // put this in env variable
+
+
+
+// Decode JWT and attach to req.user
+
+app.use(jwt({ secret: secretKey, algorithms: [&#x27;HS256&#x27;] }));
+
+
+
+// Check for User.Read permission
+
+app.use(guard.check(&#x27;User.Read&#x27;));
+
+
+
+// multiple permissions
+
+// app.use(guard.check([&#x27;User.Read&#x27;, &#x27;Admin.Access&#x27;]));
+
+
+
+app.get(&#x27;/protected&#x27;, (req, res) =&gt; {
+
+  res.json({ message: `Welcome ${req.user.name}` });
+
+});
+
+
+
+// Error handler
+
+app.use((err, req, res, next) =&gt; {
+
+  if (err.code === &#x27;permission_denied&#x27;) {
+
+    return res.status(403).send(&#x27;Forbidden&#x27;);
+
+  }
+
+  next(err);
+
+});
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now you have seen how middleware can be used for both authentication and authorization, what about MCP though, does it change how we do auth? Let's find out in the next section.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- Add RBAC to MCP</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You've seen so far how you can add RBAC via middleware, however, for MCP there's no easy way to add a per MCP feature RBAC, so what do we do?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Well, we just have to add code like this that checks in this case whether the client has the rights to call a specific tool:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You have a few different choices on how to accomplish per feature RBAC, here are some:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Add a check for each tool, resource, prompt where you need to check permission level.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   @tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   def delete_product(id: int):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      try:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          check_permissions(role="Admin.Write", request)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      catch:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        pass # client failed authorization, raise authorization error</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>typescript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   server.registerTool(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    "delete-product",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      title: Delete a product",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      description: "Deletes a product",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      inputSchema: { id: z.number() }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async ({ id }) => {</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      try {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        checkPermissions("Admin.Write", request);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // todo, send id to productService and remote entry</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      } catch(Exception e) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Authorization error, you're not allowed");  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      return {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        content: [{ type: "text", text: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Deletected product with id ${id}</code> }]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      };</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   );</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Use advanced server approach and the request handlers so you minimize how many places you need to make the check.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```python</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   tool_permission = {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "create_product": ["User.Write", "Admin.Write"],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "delete_product": ["Admin.Write"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   def has_permission(user_permissions, required_permissions) -> bool:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      # user_permissions: list of permissions the user has</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      # required_permissions: list of permissions required for the tool</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      return any(perm in user_permissions for perm in required_permissions)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   @server.call_tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   async def handle_call_tool(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     name: str, arguments: dict[str, str] | None</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ) -> list[types.TextContent]:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # Assume request.user.permissions is a list of permissions for the user</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     user_permissions = request.user.permissions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     required_permissions = tool_permission.get(name, [])</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     if not has_permission(user_permissions, required_permissions):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        # Raise error "You don't have permission to call tool {name}"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        raise Exception(f"You don't have permission to call tool {name}")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     # carry on and call tool</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     # ...</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```   </p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   function hasPermission(userPermissions: string[], requiredPermissions: string[]): boolean {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       if (!Array.isArray(userPermissions) || !Array.isArray(requiredPermissions)) return false;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       // Return true if user has at least one required permission</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       return requiredPermissions.some(perm => userPermissions.includes(perm));</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   server.setRequestHandler(CallToolRequestSchema, async (request) => {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      const { params: { name } } = request;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      let permissions = request.user.permissions;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      if (!hasPermission(permissions, toolPermissions[name])) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         return new Error(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">You don't have permission to call ${name}</code>);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      // carry on..</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Note, you will need to ensure your middleware assigns a decoded token to the request's user property so the code above is made simple.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Summing up</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now that we discussed how to add support for RBAC in general and for MCP in particular, it's time to try to implement security on your own to ensure you understood the concepts presented to you.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Assignment 1: Build an mcp server and mcp client using basic authentication</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here you will take what you've learnt in terms of sending credentials through headers.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Solution 1</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Assignment 2: Upgrade the solution from Assignment 1 to use JWT</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Take the first solution but this time, let's improve upon it. </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Instead of using Basic Auth, let's use JWT. </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Solution 2</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Challenge</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add the RBAC per tool that we describe in section "Add RBAC to MCP".</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Summary</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You've hopefully learned a lot in this chapter, from no security at all, to basic security, to JWT and how it can be added to MCP.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We’ve built a solid foundation with custom JWTs, but as we scale, we’re moving toward a standards-based identity model.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Adopting an IdP like Entra or Keycloak lets us offload token issuance, validation, and lifecycle management to a trusted platform — freeing us to focus on app logic and user experience.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For that, we have a more <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-security-entra/README.md" target="_blank">advanced chapter on Entra</a></p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/12-mcp-hosts/README.md" target="_blank">Setting Up MCP Hosts</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Simple auth</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP SDKs는 OAuth 2.1 사용을 지원합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">솔직히 말하면 인증 서버, 리소스 서버, 자격 증명 게시, 코드 수신, 코드를 베어러 토큰으로 교환하여 최종적으로 리소스 데이터를 얻는 등의 개념이 포함된 꽤 복잡한 프로세스입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">OAuth는 구현하기에 훌륭한 방식이지만 익숙하지 않은 경우, 기본적인 인증 수준부터 시작하여 더 나은 보안으로 점차 구축하는 것이 좋습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 장이 존재하는 이유가 바로 더 발전된 인증으로 넘어갈 수 있도록 도와주기 위함입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">인증, 우리가 의미하는 바는?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">인증은 authentication과 authorization의 줄임말입니다. 즉, 우리는 두 가지 작업을 해야 합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>인증(Authentication)</strong>: 사용자가 우리 집에 들어올 수 있는지, 즉 MCP 서버 기능이 있는 리소스 서버에 접근할 권한이 있는지 확인하는 과정입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>인가(Authorization)</strong>: 사용자가 요청하는 특정 리소스에 접근할 수 있는지 여부를 확인하는 과정입니다. 예를 들어, 주문이나 상품에 접근 가능한지, 또는 읽기만 가능하고 삭제는 불가능한 예시처럼 말이죠.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">자격 증명: 시스템에 우리가 누구인지 알리는 방법</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">대부분의 웹 개발자들은 서버에 자격 증명을 제공하는 방식을 먼저 생각합니다. 일반적으로는 "여기 들어올 권한이 있다"는 비밀이죠. 이 자격 증명은 보통 사용자 이름과 비밀번호를 base64로 인코딩한 버전이나, 특정 사용자를 고유하게 식별하는 API 키입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 자격 증명은 보통 다음과 같이 "Authorization"이라는 헤더를 통해 전송됩니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{ &quot;Authorization&quot;: &quot;secret123&quot; }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이를 기본 인증(basic authentication)이라고 부릅니다. 전체 흐름은 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+   participant User
+
+   participant Client
+
+   participant Server
+
+
+
+   User-&gt;&gt;Client: 데이터 보여줘
+
+   Client-&gt;&gt;Server: 데이터 보여줘, 여기 내 자격 증명 있어
+
+   Server--&gt;&gt;Client: 1a, 널 알아, 여기 네 데이터 있어
+
+   Server--&gt;&gt;Client: 1b, 널 몰라, 401 
+
+</code></pre>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">흐름을 이해했으니, 어떻게 구현할까요? 대부분의 웹 서버는 미들웨어(middleware) 개념이 있습니다. 요청의 일부로 실행되는 코드로, 자격 증명을 검증하고 인증이 성공하면 요청을 통과시킵니다. 유효하지 않은 자격 증명이면 인증 오류가 발생합니다. 구현 방법은 다음과 같습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class AuthMiddleware(BaseHTTPMiddleware):
+
+    async def dispatch(self, request, call_next):
+
+
+
+        has_header = request.headers.get(&quot;Authorization&quot;)
+
+        if not has_header:
+
+            print(&quot;-&gt; Missing Authorization header!&quot;)
+
+            return Response(status_code=401, content=&quot;Unauthorized&quot;)
+
+
+
+        if not valid_token(has_header):
+
+            print(&quot;-&gt; Invalid token!&quot;)
+
+            return Response(status_code=403, content=&quot;Forbidden&quot;)
+
+
+
+        print(&quot;Valid token, proceeding...&quot;)
+
+       
+
+        response = await call_next(request)
+
+        # 고객 헤더를 추가하거나 응답을 어떤 식으로든 변경하십시오
+
+        return response
+
+
+
+
+
+starlette_app.add_middleware(CustomHeaderMiddleware)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthMiddleware</code>라는 미들웨어를 만들었으며, 웹 서버가 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">dispatch</code> 메서드를 호출합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">웹 서버에 미들웨어를 추가했습니다:</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    starlette_app.add_middleware(AuthMiddleware)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Authorization 헤더 존재 여부와 전송된 비밀이 유효한지 확인하는 검증 로직을 작성했습니다:</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    has_header = request.headers.get("Authorization")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    if not has_header:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("-> Missing Authorization header!")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return Response(status_code=401, content="Unauthorized")</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    if not valid_token(has_header):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("-> Invalid token!")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return Response(status_code=403, content="Forbidden")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">비밀이 존재하고 유효하다면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">call_next</code>를 호출하여 요청을 통과시키고 응답을 반환합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    response = await call_next(request)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # 고객 헤더를 추가하거나 응답을 어떤 방식으로든 변경하십시오</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    return response</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">동작 방식은 웹 요청이 서버로 오면 미들웨어가 호출되고, 구현에 따라 요청을 통과시키거나 클라이언트가 진행할 수 없음을 나타내는 오류를 반환합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서는 인기 프레임워크 Express를 사용해 미들웨어를 만들고 MCP 서버에 도달하기 전에 요청을 가로챕니다. 코드는 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+function isValid(secret) {
+
+    return secret === &quot;secret123&quot;;
+
+}
+
+
+
+app.use((req, res, next) =&gt; {
+
+    // 1. 권한 부여 헤더가 존재합니까?
+
+    if(!req.headers[&quot;Authorization&quot;]) {
+
+        res.status(401).send(&#x27;Unauthorized&#x27;);
+
+    }
+
+    
+
+    let token = req.headers[&quot;Authorization&quot;];
+
+
+
+    // 2. 유효성 검사.
+
+    if(!isValid(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+    }
+
+
+
+   
+
+    console.log(&#x27;Middleware executed&#x27;);
+
+    // 3. 요청을 요청 파이프라인의 다음 단계로 전달합니다.
+
+    next();
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 코드에서는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 처음에 Authorization 헤더가 있는지 확인합니다. 없으면 401 오류를 보냅니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 자격 증명/토큰이 유효한지 검증합니다. 유효하지 않으면 403 오류를 보냅니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 마지막으로 요청 파이프라인에 요청을 전달하여 요청한 리소스를 반환합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">연습: 인증 구현하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">지식을 적용해 구현해 봅시다. 계획은 다음과 같습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">웹 서버와 MCP 인스턴스 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버용 미들웨어 구현</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">헤더를 통해 자격 증명과 함께 웹 요청 전송</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- 웹 서버와 MCP 인스턴스 생성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">첫 단계에서 웹 서버 인스턴스와 MCP 서버를 생성해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버 인스턴스를 생성하고 starlette 웹 앱을 만들며 uvicorn으로 호스팅합니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# MCP 서버 생성
+
+
+
+app = FastMCP(
+
+    name=&quot;MCP Resource Server&quot;,
+
+    instructions=&quot;Resource Server that validates tokens via Authorization Server introspection&quot;,
+
+    host=settings[&quot;host&quot;],
+
+    port=settings[&quot;port&quot;],
+
+    debug=True
+
+)
+
+
+
+# starlette 웹 앱 생성
+
+starlette_app = app.streamable_http_app()
+
+
+
+# uvicorn을 통해 앱 제공
+
+async def run(starlette_app):
+
+    import uvicorn
+
+    config = uvicorn.Config(
+
+            starlette_app,
+
+            host=app.settings.host,
+
+            port=app.settings.port,
+
+            log_level=app.settings.log_level.lower(),
+
+        )
+
+    server = uvicorn.Server(config)
+
+    await server.serve()
+
+
+
+run(starlette_app)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 코드는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버를 생성하고,</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버에서 starlette 웹 앱 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.streamable_http_app()</code>을 생성하며,</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">uvicorn으로 웹 앱을 호스팅(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">server.serve()</code>)합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서는 MCP 서버 인스턴스를 생성합니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const server = new McpServer({
+
+      name: &quot;example-server&quot;,
+
+      version: &quot;1.0.0&quot;
+
+    });
+
+
+
+    // ... 서버 리소스, 도구 및 프롬프트 설정 ...
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 MCP 서버 생성은 POST /mcp 경로 정의 내에서 이루어져야 하므로 위 코드를 다음과 같이 이동합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import express from &quot;express&quot;;
+
+import { randomUUID } from &quot;node:crypto&quot;;
+
+import { McpServer } from &quot;@modelcontextprotocol/sdk/server/mcp.js&quot;;
+
+import { StreamableHTTPServerTransport } from &quot;@modelcontextprotocol/sdk/server/streamableHttp.js&quot;;
+
+import { isInitializeRequest } from &quot;@modelcontextprotocol/sdk/types.js&quot;
+
+
+
+const app = express();
+
+app.use(express.json());
+
+
+
+// 세션 ID별 전송 수단을 저장하는 맵
+
+const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
+
+
+
+// 클라이언트에서 서버로의 통신을 위한 POST 요청 처리
+
+app.post(&#x27;/mcp&#x27;, async (req, res) =&gt; {
+
+  // 기존 세션 ID 확인
+
+  const sessionId = req.headers[&#x27;mcp-session-id&#x27;] as string | undefined;
+
+  let transport: StreamableHTTPServerTransport;
+
+
+
+  if (sessionId &amp;&amp; transports[sessionId]) {
+
+    // 기존 전송 수단 재사용
+
+    transport = transports[sessionId];
+
+  } else if (!sessionId &amp;&amp; isInitializeRequest(req.body)) {
+
+    // 새로운 초기화 요청
+
+    transport = new StreamableHTTPServerTransport({
+
+      sessionIdGenerator: () =&gt; randomUUID(),
+
+      onsessioninitialized: (sessionId) =&gt; {
+
+        // 세션 ID별 전송 수단 저장
+
+        transports[sessionId] = transport;
+
+      },
+
+      // DNS 리바인딩 보호는 이전 버전과의 호환성을 위해 기본적으로 비활성화되어 있습니다. 서버를
+
+      // 로컬에서 실행하는 경우 다음을 설정해야 합니다:
+
+      // enableDnsRebindingProtection: true,
+
+      // allowedHosts: [&#x27;127.0.0.1&#x27;],
+
+    });
+
+
+
+    // 닫힐 때 전송 수단 정리
+
+    transport.onclose = () =&gt; {
+
+      if (transport.sessionId) {
+
+        delete transports[transport.sessionId];
+
+      }
+
+    };
+
+    const server = new McpServer({
+
+      name: &quot;example-server&quot;,
+
+      version: &quot;1.0.0&quot;
+
+    });
+
+
+
+    // ... 서버 자원, 도구 및 프롬프트 설정 ...
+
+
+
+    // MCP 서버에 연결
+
+    await server.connect(transport);
+
+  } else {
+
+    // 잘못된 요청
+
+    res.status(400).json({
+
+      jsonrpc: &#x27;2.0&#x27;,
+
+      error: {
+
+        code: -32000,
+
+        message: &#x27;Bad Request: No valid session ID provided&#x27;,
+
+      },
+
+      id: null,
+
+    });
+
+    return;
+
+  }
+
+
+
+  // 요청 처리
+
+  await transport.handleRequest(req, res, req.body);
+
+});
+
+
+
+// GET 및 DELETE 요청을 위한 재사용 가능 핸들러
+
+const handleSessionRequest = async (req: express.Request, res: express.Response) =&gt; {
+
+  const sessionId = req.headers[&#x27;mcp-session-id&#x27;] as string | undefined;
+
+  if (!sessionId || !transports[sessionId]) {
+
+    res.status(400).send(&#x27;Invalid or missing session ID&#x27;);
+
+    return;
+
+  }
+
+  
+
+  const transport = transports[sessionId];
+
+  await transport.handleRequest(req, res);
+
+};
+
+
+
+// SSE를 통한 서버에서 클라이언트로 알림을 위한 GET 요청 처리
+
+app.get(&#x27;/mcp&#x27;, handleSessionRequest);
+
+
+
+// 세션 종료를 위한 DELETE 요청 처리
+
+app.delete(&#x27;/mcp&#x27;, handleSessionRequest);
+
+
+
+app.listen(3000);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">보시다시피 MCP 서버 생성이 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.post("/mcp")</code> 내로 이동했습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 단계인 미들웨어 작성으로 넘어가 자격 증명을 검증할 수 있도록 합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- 서버용 미들웨어 구현</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 미들웨어 부분입니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> 헤더에서 자격 증명을 확인하고 검증하는 미들웨어를 만듭니다. 자격 증명이 적절하면 요청은 필요한 작업(도구 목록 요청, 리소스 읽기 또는 MCP 기능 수행 등)을 진행합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">미들웨어를 만들려면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">BaseHTTPMiddleware</code>에서 상속받은 클래스를 만들어야 합니다. 관심 있는 부분은:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">요청 객체 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">request</code>, 여기서 헤더 정보를 읽습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">call_next</code>, 클라이언트가 올바른 자격 증명을 가져왔을 때 호출하는 콜백입니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">먼저 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> 헤더가 없으면 처리하는 부분입니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+has_header = request.headers.get(&quot;Authorization&quot;)
+
+
+
+# 헤더가 없으면 401 오류로 실패하고, 그렇지 않으면 계속 진행합니다.
+
+if not has_header:
+
+    print(&quot;-&gt; Missing Authorization header!&quot;)
+
+    return Response(status_code=401, content=&quot;Unauthorized&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트 인증 실패로 401 Unauthorized 메시지를 보냅니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">자격 증명이 제출됐다면 유효성 검사를 합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+ if not valid_token(has_header):
+
+    print(&quot;-&gt; Invalid token!&quot;)
+
+    return Response(status_code=403, content=&quot;Forbidden&quot;)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위에서 403 Forbidden 메시지를 보내는 부분을 확인하세요. 모든 내용을 포함한 미들웨어 전체 코드는 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+class AuthMiddleware(BaseHTTPMiddleware):
+
+    async def dispatch(self, request, call_next):
+
+
+
+        has_header = request.headers.get(&quot;Authorization&quot;)
+
+        if not has_header:
+
+            print(&quot;-&gt; Missing Authorization header!&quot;)
+
+            return Response(status_code=401, content=&quot;Unauthorized&quot;)
+
+
+
+        if not valid_token(has_header):
+
+            print(&quot;-&gt; Invalid token!&quot;)
+
+            return Response(status_code=403, content=&quot;Forbidden&quot;)
+
+
+
+        print(&quot;Valid token, proceeding...&quot;)
+
+        print(f&quot;-&gt; Received {request.method} {request.url}&quot;)
+
+        response = await call_next(request)
+
+        response.headers[&#x27;Custom&#x27;] = &#x27;Example&#x27;
+
+        return response
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋지만 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">valid_token</code> 함수는 무엇일까요? 아래에 있습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 프로덕션에서는 사용하지 마세요 - 개선하세요 !!
+
+def valid_token(token: str) -&gt; bool:
+
+    # &quot;Bearer &quot; 접두사를 제거하세요
+
+    if token.startswith(&quot;Bearer &quot;):
+
+        token = token[7:]
+
+        return token == &quot;secret-token&quot;
+
+    return False
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">물론 개선이 필요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요: 이런 비밀 코드를 절대 하드코딩해서는 안 됩니다. 이상적으로는 비교할 값을 데이터 소스나 IDP(아이덴티티 서비스 제공자)에서 가져오거나, 심지어는 IDP가 검증을 직접 하도록 해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Express에서는 미들웨어 함수를 처리하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">use</code> 메서드를 호출해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">해야 할 일은:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">요청 객체에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> 속성에 담긴 자격 증명을 확인하고,</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자격 증명 검증 후 요청을 계속 진행시키고 클라이언트 MCP 요청이 정상 동작하도록 허용합니다(도구 목록 요청, 리소스 읽기 또는 기타 MCP 관련 작업).</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">헤더가 없으면 요청 진행을 차단합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+if(!req.headers[&quot;authorization&quot;]) {
+
+    res.status(401).send(&#x27;Unauthorized&#x27;);
+
+    return;
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">헤더가 없으면 401 오류가 발생합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">자격 증명이 유효하지 않으면 요청을 또 차단하며 다른 메시지를 보냅니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+if(!isValid(token)) {
+
+    res.status(403).send(&#x27;Forbidden&#x27;);
+
+    return;
+
+} 
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">403 오류가 발생하는 것을 확인하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전체 코드는 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+app.use((req, res, next) =&gt; {
+
+    console.log(&#x27;Request received:&#x27;, req.method, req.url, req.headers);
+
+    console.log(&#x27;Headers:&#x27;, req.headers[&quot;authorization&quot;]);
+
+    if(!req.headers[&quot;authorization&quot;]) {
+
+        res.status(401).send(&#x27;Unauthorized&#x27;);
+
+        return;
+
+    }
+
+    
+
+    let token = req.headers[&quot;authorization&quot;];
+
+
+
+    if(!isValid(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+        return;
+
+    }  
+
+
+
+    console.log(&#x27;Middleware executed&#x27;);
+
+    next();
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트가 보내는 자격 증명을 확인하는 미들웨어를 웹 서버에 설정했습니다. 그렇다면 클라이언트는 어떻게 해야 할까요?</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- 헤더를 통한 자격 증명과 함께 웹 요청 보내기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트가 자격 증명을 헤더에 포함해 보내도록 해야 합니다. MCP 클라이언트를 사용할 것이므로 이를 어떻게 하는지 살펴봅니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트에서는 다음과 같이 자격 증명 헤더를 전달해야 합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 값을 하드코딩하지 말고 최소한 환경 변수나 더 안전한 저장소에 보관하세요
+
+token = &quot;secret-token&quot;
+
+
+
+async with streamablehttp_client(
+
+        url = f&quot;http://localhost:{port}/mcp&quot;,
+
+        headers = {&quot;Authorization&quot;: f&quot;Bearer {token}&quot;}
+
+    ) as (
+
+        read_stream,
+
+        write_stream,
+
+        session_callback,
+
+    ):
+
+        async with ClientSession(
+
+            read_stream,
+
+            write_stream
+
+        ) as session:
+
+            await session.initialize()
+
+      
+
+            # TODO, 클라이언트에서 수행할 작업 예: 도구 목록 표시, 도구 호출 등
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">headers</code> 속성을 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">headers = {"Authorization": f"Bearer {token}"}</code>처럼 채운 것을 확인하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">두 단계로 해결할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 구성 객체에 자격 증명을 채웁니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 구성 객체를 전송 계층에 넘깁니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+// 여기와 같이 값을 하드코딩하지 마세요. 최소한 환경 변수로 두고 개발 모드에서는 dotenv와 같은 것을 사용하세요.
+
+let token = &quot;secret123&quot;
+
+
+
+// 클라이언트 전송 옵션 객체를 정의하세요
+
+let options: StreamableHTTPClientTransportOptions = {
+
+  sessionId: sessionId,
+
+  requestInit: {
+
+    headers: {
+
+      &quot;Authorization&quot;: &quot;secret123&quot;
+
+    }
+
+  }
+
+};
+
+
+
+// 옵션 객체를 전송에 전달하세요
+
+async function main() {
+
+   const transport = new StreamableHTTPClientTransport(
+
+      new URL(serverUrl),
+
+      options
+
+   );
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">options</code> 객체를 만들고 헤더를 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">requestInit</code> 속성 아래에 넣은 방법을 보실 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요: 여기서 어떻게 개선할 수 있을까요? 현재 구현에는 몇 가지 문제가 있습니다. 첫째, 최소한 HTTPS가 없다면 자격 증명을 이렇게 전송하는 것은 꽤 위험합니다. 그나마 HTTPS가 있어도 자격 증명이 도난당할 수 있으므로, 토큰 취소가 쉬운 시스템과 어디서 요청하는지(지리적 위치 등), 요청 빈도가 너무 잦은지(봇 행동 등) 추가 검사 기능이 필요합니다. 요약하면 다양한 보안 문제가 존재합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">그런데 아무나 인증 없이 API를 호출하지 못하도록 하는 아주 간단한 API에는 이 방법도 좋은 출발점입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">그래서 JSON Web Token(JWT, JOT 토큰이라고도 함) 같은 표준화된 형식을 사용해 보안을 강화해 봅시다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">JSON Web Tokens, JWT</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">매우 단순한 자격 증명에서 개선하려고 할 때 JWT를 채택하면 어떤 즉각적인 이점이 있을까요?</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>보안 개선</strong>: 기본 인증에서는 사용자 이름과 비밀번호를 base64 인코딩한 토큰(또는 API 키)을 계속 반복해서 전송하는데, 이로 인해 위험이 커집니다. JWT는 사용자 이름과 비밀번호를 보내면 토큰이 발급되고, 이 토큰은 만료 시간이 정해져 있어 기간 제한이 있습니다. 또한 역할, 범위, 권한을 사용해 세밀한 접근 제어가 가능합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>무상태성(stateless)과 확장성</strong>: JWT는 자체 포함(self-contained)되어 사용자 정보를 모두 담으며 서버 측 세션 저장소가 필요 없어집니다. 토큰은 로컬에서 검증할 수도 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상호운용성과 연합</strong>: JWT는 Open ID Connect의 핵심이며 Entra ID, Google Identity, Auth0 같은 잘 알려진 아이덴티티 제공자와 함께 사용됩니다. 싱글 사인온 및 그 이상의 기업급 기능을 가능하게 합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>모듈성 및 유연성</strong>: JWT는 Azure API Management, NGINX 등 API 게이트웨이와도 사용할 수 있으며 인증 시나리오, 서버 대 서비스 통신, 대리 및 위임 시나리오도 지원합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>성능 및 캐싱</strong>: JWT는 디코딩 후 캐시할 수 있어 파싱 필요성을 줄이며, 특히 트래픽이 많은 애플리케이션에서 처리량을 높이고 인프라 부하를 낮춥니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>고급 기능</strong>: 인트로스펙션(서버에서 유효성 검사)과 토큰 무효화(리보크) 기능도 지원합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모든 이점을 바탕으로 구현을 한 단계 업그레이드해봅니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">기본 인증을 JWT로 전환하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">고수준에서 바꿔야 할 사항은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>JWT 토큰 구성</strong> 방법을 배우고 클라이언트에서 서버로 전송 준비를 합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>JWT 토큰 검증</strong>을 하여 유효하면 클라이언트에게 자원 접근 권한을 제공합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>토큰을 안전하게 저장</strong>하는 방법을 익힙니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>경로 보호</strong>: MCP 기능 및 경로를 보호합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>리프레시 토큰 추가</strong>: 짧은 수명의 액세스 토큰과 만료 시 새 토큰을 받을 수 있는 긴 수명의 리프레시 토큰을 만듭니다. 리프레시 엔드포인트와 토큰 회전 전략도 포함합니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- JWT 토큰 구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우선 JWT 토큰은 다음 세 부분으로 구성됩니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>헤더(header)</strong>: 사용된 알고리즘과 토큰 유형</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>페이로드(payload)</strong>: 클레임, 예를 들어 sub(토큰이 나타내는 사용자 또는 엔터티, 보통 userid), exp(만료 시간), role(역할)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>서명(signature)</strong>: 비밀키 또는 개인키로 서명</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">헤더, 페이로드, 인코딩된 토큰을 구성해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+import jwt
+
+import jwt
+
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+
+import datetime
+
+
+
+# JWT에 서명하는 데 사용되는 비밀 키
+
+secret_key = &#x27;your-secret-key&#x27;
+
+
+
+header = {
+
+    &quot;alg&quot;: &quot;HS256&quot;,
+
+    &quot;typ&quot;: &quot;JWT&quot;
+
+}
+
+
+
+# 사용자 정보와 해당 클레임 및 만료 시간
+
+payload = {
+
+    &quot;sub&quot;: &quot;1234567890&quot;,               # 주제 (사용자 ID)
+
+    &quot;name&quot;: &quot;User Userson&quot;,                # 사용자 정의 클레임
+
+    &quot;admin&quot;: True,                     # 사용자 정의 클레임
+
+    &quot;iat&quot;: datetime.datetime.utcnow(),# 발행 시간
+
+    &quot;exp&quot;: datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # 만료 시간
+
+}
+
+
+
+# 인코딩하기
+
+encoded_jwt = jwt.encode(payload, secret_key, algorithm=&quot;HS256&quot;, headers=header)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">HS256 알고리즘과 JWT 타입을 가진 헤더를 정의하였고,</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">sub(주체 또는 사용자 ID), 사용자명, 역할, 발행 시간과 만료 시간을 포함하는 페이로드를 만들어 시간 제한 기능을 구현했습니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">JWT 토큰 구성을 도와줄 라이브러리들이 필요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">필요한 라이브러리:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+npm install jsonwebtoken
+
+npm install --save-dev @types/jsonwebtoken
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">준비가 되었으니 헤더와 페이로드를 만들고 인코딩된 토큰을 생성합니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import jwt from &#x27;jsonwebtoken&#x27;;
+
+
+
+const secretKey = &#x27;your-secret-key&#x27;; // 프로덕션에서 환경 변수를 사용하세요
+
+
+
+// 페이로드 정의
+
+const payload = {
+
+  sub: &#x27;1234567890&#x27;,
+
+  name: &#x27;User usersson&#x27;,
+
+  admin: true,
+
+  iat: Math.floor(Date.now() / 1000), // 발행 시간
+
+  exp: Math.floor(Date.now() / 1000) + 60 * 60 // 1시간 후 만료
+
+};
+
+
+
+// 헤더 정의 (선택 사항, jsonwebtoken이 기본값 설정)
+
+const header = {
+
+  alg: &#x27;HS256&#x27;,
+
+  typ: &#x27;JWT&#x27;
+
+};
+
+
+
+// 토큰 생성
+
+const token = jwt.sign(payload, secretKey, {
+
+  algorithm: &#x27;HS256&#x27;,
+
+  header: header
+
+});
+
+
+
+console.log(&#x27;JWT:&#x27;, token);
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 토큰은:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">HS256으로 서명됨</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1시간 동안 유효</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">sub, name, admin, iat, exp 등의 클레임 포함</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- 토큰 검증</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">토큰을 검증하는 기능도 필요합니다. 서버에서 클라이언트가 보내는 토큰이 실제로 유효한지 확인해야 합니다. 구조 검증부터 유효성 검사까지 다양한 체크를 해야 합니다. 사용자 존재 여부 및 권한 추가 확인도 권장됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">토큰을 검증하려면 먼저 디코딩하여 읽을 수 있어야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+# JWT를 디코딩하고 검증합니다
+
+try:
+
+    decoded = jwt.decode(token, secret_key, algorithms=[&quot;HS256&quot;])
+
+    print(&quot;✅ Token is valid.&quot;)
+
+    print(&quot;Decoded claims:&quot;)
+
+    for key, value in decoded.items():
+
+        print(f&quot;  {key}: {value}&quot;)
+
+except ExpiredSignatureError:
+
+    print(&quot;❌ Token has expired.&quot;)
+
+except InvalidTokenError as e:
+
+    print(f&quot;❌ Invalid token: {e}&quot;)
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">jwt.decode</code>를 호출하는데, 토큰, 비밀 키, 알고리즘을 인자로 사용합니다. 실패하면 예외가 발생하므로 try-catch 문으로 감쌉니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">jwt.verify</code>를 호출해 디코딩된 토큰을 얻고, 더 분석할 수 있습니다. 호출 실패 시 토큰 구조가 잘못되었거나 더 이상 유효하지 않음을 의미합니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+try {
+
+  const decoded = jwt.verify(token, secretKey);
+
+  console.log(&#x27;Decoded Payload:&#x27;, decoded);
+
+} catch (err) {
+
+  console.error(&#x27;Token verification failed:&#x27;, err);
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">참고: 앞서 말했듯, 이 토큰의 사용자가 시스템에 존재하는지, 그리고 권한이 적절한지도 추가 점검해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음으로 역할 기반 접근 제어(RBAC)를 살펴봅시다.</p>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">역할 기반 접근 제어 추가하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다양한 역할이 각각 다른 권한을 가진다는 것을 표현하고자 합니다. 예를 들어, 관리자는 모든 작업을 할 수 있고, 일반 사용자는 읽기/쓰기를 할 수 있으며, 손님은 읽기만 할 수 있다고 가정합니다. 따라서 가능한 권한 수준은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Admin.Write </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">User.Read</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Guest.Read</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 미들웨어로 이러한 제어를 어떻게 구현할 수 있는지 살펴보겠습니다. 미들웨어는 개별 라우트별로 그리고 전체 라우트에 대해 추가할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Python</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from starlette.responses import JSONResponse
+
+import jwt
+
+
+
+# 비밀 정보를 코드에 두지 마세요, 이것은 시연 목적일 뿐입니다. 안전한 곳에서 읽으세요.
+
+SECRET_KEY = &quot;your-secret-key&quot; # 이 값을 환경 변수에 넣으세요
+
+REQUIRED_PERMISSION = &quot;User.Read&quot;
+
+
+
+class JWTPermissionMiddleware(BaseHTTPMiddleware):
+
+    async def dispatch(self, request, call_next):
+
+        auth_header = request.headers.get(&quot;Authorization&quot;)
+
+        if not auth_header or not auth_header.startswith(&quot;Bearer &quot;):
+
+            return JSONResponse({&quot;error&quot;: &quot;Missing or invalid Authorization header&quot;}, status_code=401)
+
+
+
+        token = auth_header.split(&quot; &quot;)[1]
+
+        try:
+
+            decoded = jwt.decode(token, SECRET_KEY, algorithms=[&quot;HS256&quot;])
+
+        except jwt.ExpiredSignatureError:
+
+            return JSONResponse({&quot;error&quot;: &quot;Token expired&quot;}, status_code=401)
+
+        except jwt.InvalidTokenError:
+
+            return JSONResponse({&quot;error&quot;: &quot;Invalid token&quot;}, status_code=401)
+
+
+
+        permissions = decoded.get(&quot;permissions&quot;, [])
+
+        if REQUIRED_PERMISSION not in permissions:
+
+            return JSONResponse({&quot;error&quot;: &quot;Permission denied&quot;}, status_code=403)
+
+
+
+        request.state.user = decoded
+
+        return await call_next(request)
+
+
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">아래와 같이 미들웨어를 추가하는 몇 가지 방법이 있습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+
+
+# 대안 1: 스타렛 앱을 구성하는 동안 미들웨어 추가
+
+middleware = [
+
+    Middleware(JWTPermissionMiddleware)
+
+]
+
+
+
+app = Starlette(routes=routes, middleware=middleware)
+
+
+
+# 대안 2: 스타렛 앱이 이미 구성된 후 미들웨어 추가
+
+starlette_app.add_middleware(JWTPermissionMiddleware)
+
+
+
+# 대안 3: 라우트별 미들웨어 추가
+
+routes = [
+
+    Route(
+
+        &quot;/mcp&quot;,
+
+        endpoint=..., # 핸들러
+
+        middleware=[Middleware(JWTPermissionMiddleware)]
+
+    )
+
+]
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">app.use</code>와 모든 요청에 대해 실행되는 미들웨어를 사용할 수 있습니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+app.use((req, res, next) =&gt; {
+
+    console.log(&#x27;Request received:&#x27;, req.method, req.url, req.headers);
+
+    console.log(&#x27;Headers:&#x27;, req.headers[&quot;authorization&quot;]);
+
+
+
+    // 1. 인증 헤더가 전송되었는지 확인하십시오
+
+
+
+    if(!req.headers[&quot;authorization&quot;]) {
+
+        res.status(401).send(&#x27;Unauthorized&#x27;);
+
+        return;
+
+    }
+
+    
+
+    let token = req.headers[&quot;authorization&quot;];
+
+
+
+    // 2. 토큰이 유효한지 확인하십시오
+
+    if(!isValid(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+        return;
+
+    }  
+
+
+
+    // 3. 토큰 사용자가 우리 시스템에 존재하는지 확인하십시오
+
+    if(!isExistingUser(token)) {
+
+        res.status(403).send(&#x27;Forbidden&#x27;);
+
+        console.log(&quot;User does not exist&quot;);
+
+        return;
+
+    }
+
+    console.log(&quot;User exists&quot;);
+
+
+
+    // 4. 토큰이 올바른 권한을 가지고 있는지 검증하십시오
+
+    if(!hasScopes(token, [&quot;User.Read&quot;])){
+
+        res.status(403).send(&#x27;Forbidden - insufficient scopes&#x27;);
+
+    }
+
+
+
+    console.log(&quot;User has required scopes&quot;);
+
+
+
+    console.log(&#x27;Middleware executed&#x27;);
+
+    next();
+
+});
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">미들웨어가 해야 하며 미들웨어가 할 수 있는 일들이 꽤 많습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 권한 부여 헤더가 있는지 확인하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 토큰이 유효한지 확인하기, 우리는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">isValid</code>라는 메서드를 호출하는데, 이 메서드는 JWT 토큰의 무결성과 유효성을 검사합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 사용자가 시스템에 존재하는지 확인하기, 이것도 검사를 해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // DB의 사용자</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   const users = [</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     "user1",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     "User usersson",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ]</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   function isExistingUser(token) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     let decodedToken = verifyToken(token);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     // TODO, DB에 사용자가 있는지 확인하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     return users.includes(decodedToken?.name || "");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   위에서 우리는 아주 단순한 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">users</code> 리스트를 만들었는데, 실제로는 데이터베이스에 있어야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 추가로, 토큰이 올바른 권한을 갖고 있는지도 확인해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   if(!hasScopes(token, ["User.Read"])){</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        res.status(403).send('Forbidden - insufficient scopes');</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   위 미들웨어 코드에서는 토큰에 User.Read 권한이 포함되어 있는지 검사하며, 없으면 403 오류를 전송합니다. 아래는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">hasScopes</code> 도우미 메서드입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   function hasScopes(scope: string, requiredScopes: string[]) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     let decodedToken = verifyToken(scope);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    return requiredScopes.every(scope => decodedToken?.scopes.includes(scope));</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Have a think which additional checks you should be doing, but these are the absolute minimum of checks you should be doing.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Using Express as a web framework is a common choice. There are helpers library when you use JWT so you can write less code.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">express-jwt</code>, helper library that provides a middleware that helps decode your token.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">express-jwt-permissions</code>, this provides a middleware <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">guard</code> that helps check if a certain permission is on the token.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's what these libraries can look like when used:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+const express = require(&#x27;express&#x27;);
+
+const jwt = require(&#x27;express-jwt&#x27;);
+
+const guard = require(&#x27;express-jwt-permissions&#x27;)();
+
+
+
+const app = express();
+
+const secretKey = &#x27;your-secret-key&#x27;; // put this in env variable
+
+
+
+// Decode JWT and attach to req.user
+
+app.use(jwt({ secret: secretKey, algorithms: [&#x27;HS256&#x27;] }));
+
+
+
+// Check for User.Read permission
+
+app.use(guard.check(&#x27;User.Read&#x27;));
+
+
+
+// multiple permissions
+
+// app.use(guard.check([&#x27;User.Read&#x27;, &#x27;Admin.Access&#x27;]));
+
+
+
+app.get(&#x27;/protected&#x27;, (req, res) =&gt; {
+
+  res.json({ message: `Welcome ${req.user.name}` });
+
+});
+
+
+
+// Error handler
+
+app.use((err, req, res, next) =&gt; {
+
+  if (err.code === &#x27;permission_denied&#x27;) {
+
+    return res.status(403).send(&#x27;Forbidden&#x27;);
+
+  }
+
+  next(err);
+
+});
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 미들웨어가 인증과 권한 부여 모두에 어떻게 사용될 수 있는지 보았습니다. 그렇다면 MCP는 어떻게 할까요? MCP가 인증 방식을 바꾸나요? 다음 섹션에서 알아보겠습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- MCP에 RBAC 추가하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">지금까지 미들웨어를 통해 RBAC를 추가하는 방법을 보았습니다. 하지만 MCP에 대해선 기능별 RBAC를 쉽게 추가할 방법이 없습니다. 그렇다면 어떻게 할까요? 이 경우에는 클라이언트가 특정 도구를 호출할 권한이 있는지 확인하는 코드를 추가해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">기능별 RBAC를 달성하는 방법은 여러 가지가 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">권한 수준을 확인해야 하는 각 도구, 리소스, 프롬프트에 대해 검사 추가.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   @tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   def delete_product(id: int):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      try:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">          check_permissions(role="Admin.Write", request)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      catch:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        pass # 클라이언트가 인증에 실패했습니다, 인증 오류를 발생시킵니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>typescript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   server.registerTool(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    "delete-product",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      title: Delete a product",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      description: "Deletes a product",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      inputSchema: { id: z.number() }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async ({ id }) => {</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      try {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        checkPermissions("Admin.Write", request);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 할 일, id를 productService 및 원격 엔트리로 전송</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      } catch(Exception e) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Authorization error, you're not allowed");  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      return {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        content: [{ type: "text", text: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Deletected product with id ${id}</code> }]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      };</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   );</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">고급 서버 방식을 사용하고 요청 핸들러에 집중하여 검사해야 할 위치를 최소화합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>Python</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```python</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   tool_permission = {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "create_product": ["User.Write", "Admin.Write"],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      "delete_product": ["Admin.Write"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   def has_permission(user_permissions, required_permissions) -> bool:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      # user_permissions: 사용자가 가진 권한 목록</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      # required_permissions: 도구에 필요한 권한 목록</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      return any(perm in user_permissions for perm in required_permissions)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   @server.call_tool()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   async def handle_call_tool(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     name: str, arguments: dict[str, str] | None</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ) -> list[types.TextContent]:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # request.user.permissions는 사용자의 권한 목록이라고 가정합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     user_permissions = request.user.permissions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     required_permissions = tool_permission.get(name, [])</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     if not has_permission(user_permissions, required_permissions):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        # "도구 {name}을(를 호출할 권한이 없습니다"라는 오류를 발생시킵니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        raise Exception(f"You don't have permission to call tool {name}")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     # 계속 진행하고 도구를 호출합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     # ...</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```   </p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <strong>TypeScript</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   function hasPermission(userPermissions: string[], requiredPermissions: string[]): boolean {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       if (!Array.isArray(userPermissions) || !Array.isArray(requiredPermissions)) return false;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       // 사용자가 최소 하나의 필요한 권한을 가지고 있으면 true를 반환합니다</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       return requiredPermissions.some(perm => userPermissions.includes(perm));</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   server.setRequestHandler(CallToolRequestSchema, async (request) => {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      const { params: { name } } = request;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      let permissions = request.user.permissions;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      if (!hasPermission(permissions, toolPermissions[name])) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         return new Error(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">You don't have permission to call ${name}</code>);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      // 계속 진행하세요..</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   참고로, 위 코드를 간단하게 하려면 미들웨어가 요청의 user 속성에 디코드된 토큰을 할당하도록 해야 합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">요약</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 일반적으로 그리고 MCP에 대해 RBAC를 추가하는 방법을 논의했으니, 개념을 이해했는지 확인하기 위해 직접 보안을 구현해 볼 차례입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">과제 1: 기본 인증을 사용하여 mcp 서버와 mcp 클라이언트 구축하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서는 헤더를 통해 자격 증명을 전송하는 방법을 배울 것입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">솔루션 1</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">과제 2: 과제 1의 솔루션을 JWT 사용으로 업그레이드하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">첫 번째 솔루션을 바탕으로 개선해 봅시다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">기본 인증 대신 JWT를 사용합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">솔루션 2</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">도전과제</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">"Add RBAC to MCP" 섹션에서 설명한 도구별 RBAC를 추가하세요.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">요약</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이번 장을 통해 보안이 전혀 없는 상태에서 기본 보안, JWT 그리고 MCP에 추가하는 방법까지 많은 것을 배우셨길 바랍니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리는 맞춤형 JWT로 탄탄한 기초를 쌓았지만, 확장하면서 표준 기반의 아이덴티티 모델로 옮겨가고 있습니다. Entra나 Keycloak 같은 IdP를 도입하면 토큰 발급, 검증, 생명주기 관리를 신뢰받는 플랫폼에 위임할 수 있어, 앱 로직과 사용자 경험에 집중할 수 있게 됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이를 위해 더 <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-security-entra/README.md" target="_blank">고급 Entra 챕터</a>가 준비되어 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/12-mcp-hosts/README.md" target="_blank">MCP 호스트 설정</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역은 오류나 부정확함을 포함할 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문이 해당 언어로 된 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인한 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m03_10-10-advanced.html">&larr; 10 Advanced</a></span>
+  <span><a href="m03_12-12-mcp-hosts.html">12 Mcp Hosts &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

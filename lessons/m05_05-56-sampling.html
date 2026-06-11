@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.6 Sampling - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.6 Sampling</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Sampling in Model Context Protocol</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Sampling is a powerful MCP feature that allows servers to request LLM completions through the client, enabling sophisticated agentic behaviors while maintaining security and privacy.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The right sampling configuration can dramatically improve response quality and performance.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP provides a standardized way to control how models generate text with specific parameters that influence randomness, creativity, and coherence.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this lesson, we will explore how to configure sampling parameters in MCP requests and understand the underlying protocol mechanics of sampling.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the key sampling parameters available in MCP.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure sampling parameters for different use cases.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement deterministic sampling for reproducible results.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Dynamically adjust sampling parameters based on context and user preferences.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply sampling strategies to enhance model performance in various scenarios.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand how sampling works in the client-server flow of MCP.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">How Sampling Works in MCP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The sampling flow in MCP follows these steps:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Server sends a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sampling/createMessage</code> request to the client</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Client reviews the request and can modify it</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Client samples from an LLM</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Client reviews the completion</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Client returns the result to the server</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This human-in-the-loop design ensures users maintain control over what the LLM sees and generates.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Sampling Parameters Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP defines the following sampling parameters that can be configured in client requests:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Parameter | Description | Typical Range |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|-------------|---------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code> | Controls randomness in token selection | 0.0 - 1.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">maxTokens</code> | Maximum number of tokens to generate | Integer value |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stopSequences</code> | Custom sequences that stop generation when encountered | Array of strings |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">metadata</code> | Additional provider-specific parameters | JSON object |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Many LLM providers support additional parameters through the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">metadata</code> field, which may include:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Common Extension Parameter | Description | Typical Range |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|-------------|---------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code> | Nucleus sampling - limits tokens to top cumulative probability | 0.0 - 1.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code> | Limits token selection to top K options | 1 - 100 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presence_penalty</code> | Penalizes tokens based on their presence in the text so far | -2.0 - 2.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequency_penalty</code> | Penalizes tokens based on their frequency in the text so far | -2.0 - 2.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">seed</code> | Specific random seed for reproducible results | Integer value |</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Example Request Format</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's an example of requesting sampling from a client in MCP:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;method&quot;: &quot;sampling/createMessage&quot;,
+
+  &quot;params&quot;: {
+
+    &quot;messages&quot;: [
+
+      {
+
+        &quot;role&quot;: &quot;user&quot;,
+
+        &quot;content&quot;: {
+
+          &quot;type&quot;: &quot;text&quot;,
+
+          &quot;text&quot;: &quot;What files are in the current directory?&quot;
+
+        }
+
+      }
+
+    ],
+
+    &quot;systemPrompt&quot;: &quot;You are a helpful file system assistant.&quot;,
+
+    &quot;includeContext&quot;: &quot;thisServer&quot;,
+
+    &quot;maxTokens&quot;: 100,
+
+    &quot;temperature&quot;: 0.7
+
+  }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Response Format</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The client returns a completion result:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;model&quot;: &quot;string&quot;,  // Name of the model used
+
+  &quot;stopReason&quot;: &quot;endTurn&quot; | &quot;stopSequence&quot; | &quot;maxTokens&quot; | &quot;string&quot;,
+
+  &quot;role&quot;: &quot;assistant&quot;,
+
+  &quot;content&quot;: {
+
+    &quot;type&quot;: &quot;text&quot;,
+
+    &quot;text&quot;: &quot;string&quot;
+
+  }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Human in the Loop Controls</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP sampling is designed with human oversight in mind:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>For prompts</strong>:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Clients should show users the proposed prompt</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Users should be able to modify or reject prompts</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - System prompts can be filtered or modified</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Context inclusion is controlled by the client</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>For completions</strong>:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Clients should show users the completion</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Users should be able to modify or reject completions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Clients can filter or modify completions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Users control which model is used</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">With these principles in mind, let's look at how to implement sampling in different programming languages, focusing on the parameters that are commonly supported across LLM providers.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Security Considerations</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When implementing sampling in MCP, consider these security best practices:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Validate all message content</strong> before sending it to the client</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Sanitize sensitive information</strong> from prompts and completions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement rate limits</strong> to prevent abuse</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Monitor sampling usage</strong> for unusual patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Encrypt data in transit</strong> using secure protocols</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Handle user data privacy</strong> according to relevant regulations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Audit sampling requests</strong> for compliance and security</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Control cost exposure</strong> with appropriate limits</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement timeouts</strong> for sampling requests</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Handle model errors gracefully</strong> with appropriate fallbacks</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Sampling parameters allow fine-tuning the behavior of language models to achieve the desired balance between deterministic and creative outputs.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's look at how to configure these parameters in different programming languages.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="#tab-dotnet">.NET</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .NET Example: Configuring sampling parameters in MCP
+
+public class SamplingExample
+
+{
+
+    public async Task RunWithSamplingAsync()
+
+    {
+
+        // Create MCP client with sampling configuration
+
+        var client = new McpClient(&quot;https://mcp-server-url.com&quot;);
+
+        
+
+        // Create request with specific sampling parameters
+
+        var request = new McpRequest
+
+        {
+
+            Prompt = &quot;Generate creative ideas for a mobile app&quot;,
+
+            SamplingParameters = new SamplingParameters
+
+            {
+
+                Temperature = 0.8f,     // Higher temperature for more creative outputs
+
+                TopP = 0.95f,           // Nucleus sampling parameter
+
+                TopK = 40,              // Limit token selection to top K options
+
+                FrequencyPenalty = 0.5f, // Reduce repetition
+
+                PresencePenalty = 0.2f   // Encourage diversity
+
+            },
+
+            AllowedTools = new[] { &quot;ideaGenerator&quot;, &quot;marketAnalyzer&quot; }
+
+        };
+
+        
+
+        // Send request using specific sampling configuration
+
+        var response = await client.SendRequestAsync(request);
+
+        
+
+        // Output results
+
+        Console.WriteLine($&quot;Generated with Temperature={request.SamplingParameters.Temperature}:&quot;);
+
+        Console.WriteLine(response.GeneratedText);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created an MCP client with a specific server URL.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configured a request with sampling parameters like <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code>, and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Sent the request and printed the generated text.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">allowedTools</code> to specify which tools the model can use during generation.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this case, we allowed the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ideaGenerator</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">marketAnalyzer</code> tools to assist in generating creative app ideas.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequencyPenalty</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presencePenalty</code> to control repetition and diversity in the output.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code> to control the randomness of the output, where higher values lead to more creative responses.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code> to limit the selection of tokens to those that contribute to the top cumulative probability mass, enhancing the quality of generated text.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code> to restrict the model to the top K most probable tokens, which can help in generating more coherent responses.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequencyPenalty</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presencePenalty</code> to reduce repetition and encourage diversity in the generated text.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="#tab/javascript">JavaScript</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Temperature and Top-P sampling configuration
+
+const { McpClient } = require(&#x27;@mcp/client&#x27;);
+
+
+
+async function demonstrateSampling() {
+
+  // Initialize the MCP client
+
+  const client = new McpClient({
+
+    serverUrl: &#x27;https://mcp-server-example.com&#x27;,
+
+    apiKey: process.env.MCP_API_KEY
+
+  });
+
+  
+
+  // Configure request with different sampling parameters
+
+  const creativeSampling = {
+
+    temperature: 0.9,    // Higher temperature = more randomness/creativity
+
+    topP: 0.92,          // Consider tokens with top 92% probability mass
+
+    frequencyPenalty: 0.6, // Reduce repetition of token sequences
+
+    presencePenalty: 0.4   // Penalize tokens that have appeared in the text so far
+
+  };
+
+  
+
+  const factualSampling = {
+
+    temperature: 0.2,    // Lower temperature = more deterministic/factual
+
+    topP: 0.85,          // Slightly more focused token selection
+
+    frequencyPenalty: 0.2, // Minimal repetition penalty
+
+    presencePenalty: 0.1   // Minimal presence penalty
+
+  };
+
+  
+
+  try {
+
+    // Send two requests with different sampling configurations
+
+    const creativeResponse = await client.sendPrompt(
+
+      &quot;Generate innovative ideas for sustainable urban transportation&quot;,
+
+      {
+
+        allowedTools: [&#x27;ideaGenerator&#x27;, &#x27;environmentalImpactTool&#x27;],
+
+        ...creativeSampling
+
+      }
+
+    );
+
+    
+
+    const factualResponse = await client.sendPrompt(
+
+      &quot;Explain how electric vehicles impact carbon emissions&quot;,
+
+      {
+
+        allowedTools: [&#x27;factChecker&#x27;, &#x27;dataAnalysisTool&#x27;],
+
+        ...factualSampling
+
+      }
+
+    );
+
+    
+
+    console.log(&#x27;Creative Response (temperature=0.9):&#x27;);
+
+    console.log(creativeResponse.generatedText);
+
+    
+
+    console.log(&#x27;\nFactual Response (temperature=0.2):&#x27;);
+
+    console.log(factualResponse.generatedText);
+
+    
+
+  } catch (error) {
+
+    console.error(&#x27;Error demonstrating sampling:&#x27;, error);
+
+  }
+
+}
+
+
+
+demonstrateSampling();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Initialized an MCP client with a server URL and API key.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configured two sets of sampling parameters: one for creative tasks and another for factual tasks.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Sent requests with these configurations, allowing the model to use specific tools for each task.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Printed the generated responses to demonstrate the effects of different sampling parameters.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">allowedTools</code> to specify which tools the model can use during generation. In this case, we allowed the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ideaGenerator</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">environmentalImpactTool</code> for creative tasks, and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">factChecker</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">dataAnalysisTool</code> for factual tasks.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code> to control the randomness of the output, where higher values lead to more creative responses.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code> to limit the selection of tokens to those that contribute to the top cumulative probability mass, enhancing the quality of generated text.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequencyPenalty</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presencePenalty</code> to reduce repetition and encourage diversity in the output.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code> to restrict the model to the top K most probable tokens, which can help in generating more coherent responses.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Deterministic Sampling</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For applications requiring consistent outputs, deterministic sampling ensures reproducible results. How it does that is by using a fixed random seed and setting the temperature to zero.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's look at below sample implementation to demonstrate deterministic sampling in different programming languages.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="#tab/java">Java</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Java Example: Deterministic responses with fixed seed
+
+public class DeterministicSamplingExample {
+
+    public void demonstrateDeterministicResponses() {
+
+        McpClient client = new McpClient.Builder()
+
+            .setServerUrl(&quot;https://mcp-server-example.com&quot;)
+
+            .build();
+
+            
+
+        long fixedSeed = 12345; // Using a fixed seed for deterministic results
+
+        
+
+        // First request with fixed seed
+
+        McpRequest request1 = new McpRequest.Builder()
+
+            .setPrompt(&quot;Generate a random number between 1 and 100&quot;)
+
+            .setSeed(fixedSeed)
+
+            .setTemperature(0.0) // Zero temperature for maximum determinism
+
+            .build();
+
+            
+
+        // Second request with the same seed
+
+        McpRequest request2 = new McpRequest.Builder()
+
+            .setPrompt(&quot;Generate a random number between 1 and 100&quot;)
+
+            .setSeed(fixedSeed)
+
+            .setTemperature(0.0)
+
+            .build();
+
+        
+
+        // Execute both requests
+
+        McpResponse response1 = client.sendRequest(request1);
+
+        McpResponse response2 = client.sendRequest(request2);
+
+        
+
+        // Responses should be identical due to same seed and temperature=0
+
+        System.out.println(&quot;Response 1: &quot; + response1.getGeneratedText());
+
+        System.out.println(&quot;Response 2: &quot; + response2.getGeneratedText());
+
+        System.out.println(&quot;Are responses identical: &quot; + 
+
+            response1.getGeneratedText().equals(response2.getGeneratedText()));
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created an MCP client with a specified server URL.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configured two requests with the same prompt, fixed seed, and zero temperature.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Sent both requests and printed the generated text.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Demonstrated that the responses are identical due to the deterministic nature of the sampling configuration (same seed and temperature).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">setSeed</code> to specify a fixed random seed, ensuring that the model generates the same output for the same input every time.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code> to zero to ensure maximum determinism, meaning the model will always select the most probable next token without randomness.</li>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="#tab/javascript-deterministic">JavaScript</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Deterministic responses with seed control
+
+const { McpClient } = require(&#x27;@mcp/client&#x27;);
+
+
+
+async function deterministicSampling() {
+
+  const client = new McpClient({
+
+    serverUrl: &#x27;https://mcp-server-example.com&#x27;
+
+  });
+
+  
+
+  const fixedSeed = 12345;
+
+  const prompt = &quot;Generate a random password with 8 characters&quot;;
+
+  
+
+  try {
+
+    // First request with fixed seed
+
+    const response1 = await client.sendPrompt(prompt, {
+
+      seed: fixedSeed,
+
+      temperature: 0.0  // Zero temperature for maximum determinism
+
+    });
+
+    
+
+    // Second request with same seed and temperature
+
+    const response2 = await client.sendPrompt(prompt, {
+
+      seed: fixedSeed,
+
+      temperature: 0.0
+
+    });
+
+    
+
+    // Third request with different seed but same temperature
+
+    const response3 = await client.sendPrompt(prompt, {
+
+      seed: 67890,
+
+      temperature: 0.0
+
+    });
+
+    
+
+    console.log(&#x27;Response 1:&#x27;, response1.generatedText);
+
+    console.log(&#x27;Response 2:&#x27;, response2.generatedText);
+
+    console.log(&#x27;Response 3:&#x27;, response3.generatedText);
+
+    console.log(&#x27;Responses 1 and 2 match:&#x27;, response1.generatedText === response2.generatedText);
+
+    console.log(&#x27;Responses 1 and 3 match:&#x27;, response1.generatedText === response3.generatedText);
+
+    
+
+  } catch (error) {
+
+    console.error(&#x27;Error in deterministic sampling demo:&#x27;, error);
+
+  }
+
+}
+
+
+
+deterministicSampling();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Initialized an MCP client with a server URL.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configured two requests with the same prompt, fixed seed, and zero temperature.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Sent both requests and printed the generated text.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Demonstrated that the responses are identical due to the deterministic nature of the sampling configuration (same seed and temperature).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">seed</code> to specify a fixed random seed, ensuring that the model generates the same output for the same input every time.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code> to zero to ensure maximum determinism, meaning the model will always select the most probable next token without randomness.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used a different seed for the third request to show that changing the seed results in different outputs, even with the same prompt and temperature.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Dynamic Sampling Configuration</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Intelligent sampling adapts parameters based on the context and requirements of each request. That means dynamically adjusting parameters like temperature, top_p, and penalties based on the task type, user preferences, or historical performance.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's look at how to implement dynamic sampling in different programming languages.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="#tab/python">Python</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Example: Dynamic sampling based on request context
+
+class DynamicSamplingService:
+
+    def __init__(self, mcp_client):
+
+        self.client = mcp_client
+
+        
+
+    async def generate_with_adaptive_sampling(self, prompt, task_type, user_preferences=None):
+
+        &quot;&quot;&quot;Uses different sampling strategies based on task type and user preferences&quot;&quot;&quot;
+
+        
+
+        # Define sampling presets for different task types
+
+        sampling_presets = {
+
+            &quot;creative&quot;: {&quot;temperature&quot;: 0.9, &quot;top_p&quot;: 0.95, &quot;frequency_penalty&quot;: 0.7},
+
+            &quot;factual&quot;: {&quot;temperature&quot;: 0.2, &quot;top_p&quot;: 0.85, &quot;frequency_penalty&quot;: 0.2},
+
+            &quot;code&quot;: {&quot;temperature&quot;: 0.3, &quot;top_p&quot;: 0.9, &quot;frequency_penalty&quot;: 0.5},
+
+            &quot;analytical&quot;: {&quot;temperature&quot;: 0.4, &quot;top_p&quot;: 0.92, &quot;frequency_penalty&quot;: 0.3}
+
+        }
+
+        
+
+        # Select base preset
+
+        sampling_params = sampling_presets.get(task_type, sampling_presets[&quot;factual&quot;])
+
+        
+
+        # Adjust based on user preferences if provided
+
+        if user_preferences:
+
+            if &quot;creativity_level&quot; in user_preferences:
+
+                # Scale temperature based on creativity preference (1-10)
+
+                creativity = min(max(user_preferences[&quot;creativity_level&quot;], 1), 10) / 10
+
+                sampling_params[&quot;temperature&quot;] = 0.1 + (0.9 * creativity)
+
+            
+
+            if &quot;diversity&quot; in user_preferences:
+
+                # Adjust top_p based on desired response diversity
+
+                diversity = min(max(user_preferences[&quot;diversity&quot;], 1), 10) / 10
+
+                sampling_params[&quot;top_p&quot;] = 0.6 + (0.39 * diversity)
+
+        
+
+        # Create and send request with custom sampling parameters
+
+        response = await self.client.send_request(
+
+            prompt=prompt,
+
+            temperature=sampling_params[&quot;temperature&quot;],
+
+            top_p=sampling_params[&quot;top_p&quot;],
+
+            frequency_penalty=sampling_params[&quot;frequency_penalty&quot;]
+
+        )
+
+        
+
+        # Return response with sampling metadata for transparency
+
+        return {
+
+            &quot;text&quot;: response.generated_text,
+
+            &quot;applied_sampling&quot;: sampling_params,
+
+            &quot;task_type&quot;: task_type
+
+        }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">DynamicSamplingService</code> class that manages adaptive sampling.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Defined sampling presets for different task types (creative, factual, code, analytical).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Selected a base sampling preset based on the task type.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Adjusted the sampling parameters based on user preferences, such as creativity level and diversity.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Sent the request with the dynamically configured sampling parameters.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Returned the generated text along with the applied sampling parameters and task type for transparency.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code> to control the randomness of the output, where higher values lead to more creative responses.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code> to limit the selection of tokens to those that contribute to the top cumulative probability mass, enhancing the quality of generated text.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequency_penalty</code> to reduce repetition and encourage diversity in the output.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">user_preferences</code> to allow customization of the sampling parameters based on user-defined creativity and diversity levels.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">task_type</code> to determine the appropriate sampling strategy for the request, allowing for more tailored responses based on the nature of the task.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">send_request</code> method to send the prompt with the configured sampling parameters, ensuring that the model generates text according to the specified requirements.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">generated_text</code> to retrieve the model's response, which is then returned along with the sampling parameters and task type for further analysis or display.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">min</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">max</code> functions to ensure that user preferences are clamped within valid ranges, preventing invalid sampling configurations.</li>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="#tab/javascript-dynamic">JavaScript Dynamic</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Dynamic sampling configuration based on user context
+
+class AdaptiveSamplingManager {
+
+  constructor(mcpClient) {
+
+    this.client = mcpClient;
+
+    
+
+    // Define base sampling profiles
+
+    this.samplingProfiles = {
+
+      creative: { temperature: 0.85, topP: 0.94, frequencyPenalty: 0.7, presencePenalty: 0.5 },
+
+      factual: { temperature: 0.2, topP: 0.85, frequencyPenalty: 0.3, presencePenalty: 0.1 },
+
+      code: { temperature: 0.25, topP: 0.9, frequencyPenalty: 0.4, presencePenalty: 0.3 },
+
+      conversational: { temperature: 0.7, topP: 0.9, frequencyPenalty: 0.6, presencePenalty: 0.4 }
+
+    };
+
+    
+
+    // Track historical performance
+
+    this.performanceHistory = [];
+
+  }
+
+  
+
+  // Detect task type from prompt
+
+  detectTaskType(prompt, context = {}) {
+
+    const promptLower = prompt.toLowerCase();
+
+    
+
+    // Simple heuristic detection - could be enhanced with ML classification
+
+    if (context.taskType) return context.taskType;
+
+    
+
+    if (promptLower.includes(&#x27;code&#x27;) || 
+
+        promptLower.includes(&#x27;function&#x27;) || 
+
+        promptLower.includes(&#x27;program&#x27;)) {
+
+      return &#x27;code&#x27;;
+
+    }
+
+    
+
+    if (promptLower.includes(&#x27;explain&#x27;) || 
+
+        promptLower.includes(&#x27;what is&#x27;) || 
+
+        promptLower.includes(&#x27;how does&#x27;)) {
+
+      return &#x27;factual&#x27;;
+
+    }
+
+    
+
+    if (promptLower.includes(&#x27;creative&#x27;) || 
+
+        promptLower.includes(&#x27;imagine&#x27;) || 
+
+        promptLower.includes(&#x27;story&#x27;)) {
+
+      return &#x27;creative&#x27;;
+
+    }
+
+    
+
+    // Default to conversational if no clear type is detected
+
+    return &#x27;conversational&#x27;;
+
+  }
+
+  
+
+  // Calculate sampling parameters based on context and user preferences
+
+  getSamplingParameters(prompt, context = {}) {
+
+    // Detect the type of task
+
+    const taskType = this.detectTaskType(prompt, context);
+
+    
+
+    // Get base profile
+
+    let params = {...this.samplingProfiles[taskType]};
+
+    
+
+    // Adjust based on user preferences
+
+    if (context.userPreferences) {
+
+      const { creativity, precision, consistency } = context.userPreferences;
+
+      
+
+      if (creativity !== undefined) {
+
+        // Scale from 1-10 to appropriate temperature range
+
+        params.temperature = 0.1 + (creativity * 0.09); // 0.1-1.0
+
+      }
+
+      
+
+      if (precision !== undefined) {
+
+        // Higher precision means lower topP (more focused selection)
+
+        params.topP = 1.0 - (precision * 0.05); // 0.5-1.0
+
+      }
+
+      
+
+      if (consistency !== undefined) {
+
+        // Higher consistency means lower penalties
+
+        params.frequencyPenalty = 0.1 + ((10 - consistency) * 0.08); // 0.1-0.9
+
+      }
+
+    }
+
+    
+
+    // Apply learned adjustments from performance history
+
+    this.applyLearnedAdjustments(params, taskType);
+
+    
+
+    return params;
+
+  }
+
+  
+
+  applyLearnedAdjustments(params, taskType) {
+
+    // Simple adaptive logic - could be enhanced with more sophisticated algorithms
+
+    const relevantHistory = this.performanceHistory
+
+      .filter(entry =&gt; entry.taskType === taskType)
+
+      .slice(-5); // Only consider recent history
+
+    
+
+    if (relevantHistory.length &gt; 0) {
+
+      // Calculate average performance scores
+
+      const avgScore = relevantHistory.reduce((sum, entry) =&gt; sum + entry.score, 0) / relevantHistory.length;
+
+      
+
+      // If performance is below threshold, adjust parameters
+
+      if (avgScore &lt; 0.7) {
+
+        // Slight adjustment toward safer values
+
+        params.temperature = Math.max(params.temperature * 0.9, 0.1);
+
+        params.topP = Math.max(params.topP * 0.95, 0.5);
+
+      }
+
+    }
+
+  }
+
+  
+
+  recordPerformance(prompt, samplingParams, response, score) {
+
+    // Record performance for future adjustments
+
+    this.performanceHistory.push({
+
+      timestamp: Date.now(),
+
+      taskType: this.detectTaskType(prompt),
+
+      samplingParams,
+
+      responseLength: response.generatedText.length,
+
+      score // 0-1 rating of response quality
+
+    });
+
+    
+
+    // Limit history size
+
+    if (this.performanceHistory.length &gt; 100) {
+
+      this.performanceHistory.shift();
+
+    }
+
+  }
+
+  
+
+  async generateResponse(prompt, context = {}) {
+
+    // Get optimized sampling parameters
+
+    const samplingParams = this.getSamplingParameters(prompt, context);
+
+    
+
+    // Send request with optimized parameters
+
+    const response = await this.client.sendPrompt(prompt, {
+
+      ...samplingParams,
+
+      allowedTools: context.allowedTools || []
+
+    });
+
+    
+
+    // If user provides feedback, record it for future optimization
+
+    if (context.recordPerformance) {
+
+      this.recordPerformance(prompt, samplingParams, response, context.feedbackScore || 0.5);
+
+    }
+
+    
+
+    return {
+
+      response,
+
+      appliedSamplingParams: samplingParams,
+
+      detectedTaskType: this.detectTaskType(prompt, context)
+
+    };
+
+  }
+
+}
+
+
+
+// Example usage
+
+async function demonstrateAdaptiveSampling() {
+
+  const client = new McpClient({
+
+    serverUrl: &#x27;https://mcp-server-example.com&#x27;
+
+  });
+
+  
+
+  const samplingManager = new AdaptiveSamplingManager(client);
+
+  
+
+  try {
+
+    // Creative task with custom user preferences
+
+    const creativeResult = await samplingManager.generateResponse(
+
+      &quot;Write a short poem about artificial intelligence&quot;,
+
+      {
+
+        userPreferences: {
+
+          creativity: 9,  // High creativity (1-10)
+
+          consistency: 3  // Low consistency (1-10)
+
+        }
+
+      }
+
+    );
+
+    
+
+    console.log(&#x27;Creative Task:&#x27;);
+
+    console.log(`Detected type: ${creativeResult.detectedTaskType}`);
+
+    console.log(&#x27;Applied sampling:&#x27;, creativeResult.appliedSamplingParams);
+
+    console.log(creativeResult.response.generatedText);
+
+    
+
+    // Code generation task
+
+    const codeResult = await samplingManager.generateResponse(
+
+      &quot;Write a JavaScript function to calculate the Fibonacci sequence&quot;,
+
+      {
+
+        userPreferences: {
+
+          creativity: 2,  // Low creativity
+
+          precision: 8,   // High precision
+
+          consistency: 9  // High consistency
+
+        }
+
+      }
+
+    );
+
+    
+
+    console.log(&#x27;\nCode Task:&#x27;);
+
+    console.log(`Detected type: ${codeResult.detectedTaskType}`);
+
+    console.log(&#x27;Applied sampling:&#x27;, codeResult.appliedSamplingParams);
+
+    console.log(codeResult.response.generatedText);
+
+    
+
+  } catch (error) {
+
+    console.error(&#x27;Error in adaptive sampling demo:&#x27;, error);
+
+  }
+
+}
+
+
+
+demonstrateAdaptiveSampling();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created an <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AdaptiveSamplingManager</code> class that manages dynamic sampling based on task type and user preferences.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Defined sampling profiles for different task types (creative, factual, code, conversational).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implemented a method to detect the task type from the prompt using simple heuristics.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Calculated sampling parameters based on the detected task type and user preferences.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Applied learned adjustments based on historical performance to optimize sampling parameters.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Recorded performance for future adjustments, allowing the system to learn from past interactions.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Sent requests with dynamically configured sampling parameters and returned the generated text along with applied parameters and detected task type.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">userPreferences</code> to allow customization of the sampling parameters based on user-defined creativity, precision, and consistency levels.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">detectTaskType</code> to determine the nature of the task based on the prompt, allowing for more tailored responses.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">recordPerformance</code> to log the performance of generated responses, enabling the system to adapt and improve over time.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">applyLearnedAdjustments</code> to modify sampling parameters based on historical performance, enhancing the model's ability to generate high-quality responses.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">generateResponse</code> to encapsulate the entire process of generating a response with adaptive sampling, making it easy to call with different prompts and contexts.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">allowedTools</code> to specify which tools the model can use during generation, allowing for more context-aware responses.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">feedbackScore</code> to allow users to provide feedback on the quality of the generated response, which can be used to further refine the model's performance over time.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">performanceHistory</code> to maintain a record of past interactions, enabling the system to learn from previous successes and failures.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getSamplingParameters</code> to dynamically adjust sampling parameters based on the context of the request, allowing for more flexible and responsive model behavior.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">detectTaskType</code> to classify the task based on the prompt, enabling the system to apply appropriate sampling strategies for different types of requests.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">samplingProfiles</code> to define base sampling configurations for different task types, allowing for quick adjustments based on the nature of the request.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-scaling/README.md" target="_blank">5.7 Scaling</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">모델 컨텍스트 프로토콜에서의 샘플링</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">샘플링은 서버가 클라이언트를 통해 LLM 완성을 요청할 수 있게 하는 강력한 MCP 기능으로, 보안과 프라이버시를 유지하면서 정교한 에이전트 행동을 가능하게 합니다. 적절한 샘플링 설정은 응답 품질과 성능을 크게 향상시킬 수 있습니다. MCP는 무작위성, 창의성, 일관성에 영향을 주는 특정 매개변수를 통해 모델이 텍스트를 생성하는 방식을 표준화된 방법으로 제어합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">소개</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이번 강의에서는 MCP 요청에서 샘플링 매개변수를 설정하는 방법과 샘플링의 기본 프로토콜 메커니즘을 살펴봅니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 강의를 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP에서 제공하는 주요 샘플링 매개변수를 이해한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 사용 사례에 맞게 샘플링 매개변수를 구성한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">재현 가능한 결과를 위한 결정론적 샘플링을 구현한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">상황과 사용자 선호도에 따라 샘플링 매개변수를 동적으로 조정한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 시나리오에서 모델 성능 향상을 위한 샘플링 전략을 적용한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP의 클라이언트-서버 흐름에서 샘플링이 어떻게 작동하는지 이해한다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP에서 샘플링 작동 방식</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP의 샘플링 흐름은 다음과 같습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 서버가 클라이언트에 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sampling/createMessage</code> 요청을 보냄</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 클라이언트가 요청을 검토하고 수정 가능</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 클라이언트가 LLM에서 샘플링 수행</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 클라이언트가 완성 결과를 검토</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 클라이언트가 결과를 서버에 반환</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 인간 개입형 설계는 사용자가 LLM이 보는 내용과 생성하는 내용을 직접 제어할 수 있도록 보장합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">샘플링 매개변수 개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 클라이언트 요청에서 설정할 수 있는 다음과 같은 샘플링 매개변수를 정의합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 매개변수 | 설명 | 일반 범위 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|-------------|---------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code> | 토큰 선택의 무작위성 제어 | 0.0 - 1.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">maxTokens</code> | 생성할 최대 토큰 수 | 정수 값 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stopSequences</code> | 생성 중단을 유발하는 사용자 정의 시퀀스 | 문자열 배열 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">metadata</code> | 추가 제공자별 매개변수 | JSON 객체 |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">많은 LLM 제공자는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">metadata</code> 필드를 통해 다음과 같은 추가 매개변수를 지원합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 일반 확장 매개변수 | 설명 | 일반 범위 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|-------------|---------------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code> | 누클리어스 샘플링 - 누적 확률 상위 토큰으로 제한 | 0.0 - 1.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code> | 토큰 선택을 상위 K개 옵션으로 제한 | 1 - 100 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presence_penalty</code> | 이미 등장한 토큰에 대한 페널티 부여 | -2.0 - 2.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequency_penalty</code> | 토큰 빈도에 따른 페널티 부여 | -2.0 - 2.0 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">seed</code> | 재현 가능한 결과를 위한 고정 랜덤 시드 | 정수 값 |</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">요청 예시 형식</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음은 MCP에서 클라이언트에 샘플링을 요청하는 예시입니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;method&quot;: &quot;sampling/createMessage&quot;,
+
+  &quot;params&quot;: {
+
+    &quot;messages&quot;: [
+
+      {
+
+        &quot;role&quot;: &quot;user&quot;,
+
+        &quot;content&quot;: {
+
+          &quot;type&quot;: &quot;text&quot;,
+
+          &quot;text&quot;: &quot;What files are in the current directory?&quot;
+
+        }
+
+      }
+
+    ],
+
+    &quot;systemPrompt&quot;: &quot;You are a helpful file system assistant.&quot;,
+
+    &quot;includeContext&quot;: &quot;thisServer&quot;,
+
+    &quot;maxTokens&quot;: 100,
+
+    &quot;temperature&quot;: 0.7
+
+  }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">응답 형식</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트는 완성 결과를 반환합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;model&quot;: &quot;string&quot;,  // Name of the model used
+
+  &quot;stopReason&quot;: &quot;endTurn&quot; | &quot;stopSequence&quot; | &quot;maxTokens&quot; | &quot;string&quot;,
+
+  &quot;role&quot;: &quot;assistant&quot;,
+
+  &quot;content&quot;: {
+
+    &quot;type&quot;: &quot;text&quot;,
+
+    &quot;text&quot;: &quot;string&quot;
+
+  }
+
+}
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">인간 개입형 제어</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 샘플링은 인간 감독을 염두에 두고 설계되었습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>프롬프트에 대해</strong>:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 클라이언트는 사용자에게 제안된 프롬프트를 보여야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 사용자는 프롬프트를 수정하거나 거부할 수 있어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 시스템 프롬프트는 필터링하거나 수정할 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 컨텍스트 포함 여부는 클라이언트가 제어합니다.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>완성에 대해</strong>:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 클라이언트는 사용자에게 완성 결과를 보여야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 사용자는 완성 결과를 수정하거나 거부할 수 있어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 클라이언트는 완성 결과를 필터링하거나 수정할 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 사용자가 사용할 모델을 선택할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 원칙을 바탕으로, 다양한 프로그래밍 언어에서 공통적으로 지원되는 매개변수에 초점을 맞춰 샘플링 구현 방법을 살펴봅니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">보안 고려사항</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP에서 샘플링을 구현할 때 다음 보안 모범 사례를 고려하세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트에 보내기 전 모든 메시지 내용을 검증합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">프롬프트와 완성에서 민감한 정보를 정제합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">남용 방지를 위한 속도 제한을 구현합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비정상적인 샘플링 사용 패턴을 모니터링합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">안전한 프로토콜을 사용해 전송 중 데이터를 암호화합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">관련 규정에 따라 사용자 데이터 프라이버시를 처리합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">준수 및 보안을 위해 샘플링 요청을 감사합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">적절한 제한으로 비용 노출을 통제합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">샘플링 요청에 타임아웃을 설정합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모델 오류 발생 시 적절한 대체 방안을 마련합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">샘플링 매개변수는 결정론적 출력과 창의적 출력을 적절히 조절할 수 있도록 모델 동작을 미세 조정할 수 있게 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음으로 다양한 프로그래밍 언어에서 이 매개변수를 설정하는 방법을 살펴보겠습니다.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling" target="_blank">.NET</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// .NET Example: Configuring sampling parameters in MCP
+
+public class SamplingExample
+
+{
+
+    public async Task RunWithSamplingAsync()
+
+    {
+
+        // Create MCP client with sampling configuration
+
+        var client = new McpClient(&quot;https://mcp-server-url.com&quot;);
+
+        
+
+        // Create request with specific sampling parameters
+
+        var request = new McpRequest
+
+        {
+
+            Prompt = &quot;Generate creative ideas for a mobile app&quot;,
+
+            SamplingParameters = new SamplingParameters
+
+            {
+
+                Temperature = 0.8f,     // Higher temperature for more creative outputs
+
+                TopP = 0.95f,           // Nucleus sampling parameter
+
+                TopK = 40,              // Limit token selection to top K options
+
+                FrequencyPenalty = 0.5f, // Reduce repetition
+
+                PresencePenalty = 0.2f   // Encourage diversity
+
+            },
+
+            AllowedTools = new[] { &quot;ideaGenerator&quot;, &quot;marketAnalyzer&quot; }
+
+        };
+
+        
+
+        // Send request using specific sampling configuration
+
+        var response = await client.SendRequestAsync(request);
+
+        
+
+        // Output results
+
+        Console.WriteLine($&quot;Generated with Temperature={request.SamplingParameters.Temperature}:&quot;);
+
+        Console.WriteLine(response.GeneratedText);
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">특정 서버 URL로 MCP 클라이언트를 생성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code> 같은 샘플링 매개변수를 포함한 요청을 구성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">요청을 보내고 생성된 텍스트를 출력했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음을 사용했습니다:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">allowedTools</code>로 모델이 생성 중 사용할 수 있는 도구를 지정했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ideaGenerator</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">marketAnalyzer</code> 도구를 허용해 창의적인 앱 아이디어 생성에 도움을 주었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequencyPenalty</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presencePenalty</code>로 출력의 반복성과 다양성을 제어했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>로 출력의 무작위성을 조절했으며, 값이 높을수록 더 창의적인 응답이 생성됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code>로 누적 확률 상위 토큰만 선택하도록 제한해 생성 텍스트 품질을 향상시켰습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code>로 모델이 상위 K개의 가장 가능성 높은 토큰만 선택하도록 제한해 더 일관된 응답을 생성하도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">- <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequencyPenalty</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presencePenalty</code>를 사용해 반복을 줄이고 다양성을 촉진했습니다.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling" target="_blank">JavaScript</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Temperature and Top-P sampling configuration
+
+const { McpClient } = require(&#x27;@mcp/client&#x27;);
+
+
+
+async function demonstrateSampling() {
+
+  // Initialize the MCP client
+
+  const client = new McpClient({
+
+    serverUrl: &#x27;https://mcp-server-example.com&#x27;,
+
+    apiKey: process.env.MCP_API_KEY
+
+  });
+
+  
+
+  // Configure request with different sampling parameters
+
+  const creativeSampling = {
+
+    temperature: 0.9,    // Higher temperature = more randomness/creativity
+
+    topP: 0.92,          // Consider tokens with top 92% probability mass
+
+    frequencyPenalty: 0.6, // Reduce repetition of token sequences
+
+    presencePenalty: 0.4   // Penalize tokens that have appeared in the text so far
+
+  };
+
+  
+
+  const factualSampling = {
+
+    temperature: 0.2,    // Lower temperature = more deterministic/factual
+
+    topP: 0.85,          // Slightly more focused token selection
+
+    frequencyPenalty: 0.2, // Minimal repetition penalty
+
+    presencePenalty: 0.1   // Minimal presence penalty
+
+  };
+
+  
+
+  try {
+
+    // Send two requests with different sampling configurations
+
+    const creativeResponse = await client.sendPrompt(
+
+      &quot;Generate innovative ideas for sustainable urban transportation&quot;,
+
+      {
+
+        allowedTools: [&#x27;ideaGenerator&#x27;, &#x27;environmentalImpactTool&#x27;],
+
+        ...creativeSampling
+
+      }
+
+    );
+
+    
+
+    const factualResponse = await client.sendPrompt(
+
+      &quot;Explain how electric vehicles impact carbon emissions&quot;,
+
+      {
+
+        allowedTools: [&#x27;factChecker&#x27;, &#x27;dataAnalysisTool&#x27;],
+
+        ...factualSampling
+
+      }
+
+    );
+
+    
+
+    console.log(&#x27;Creative Response (temperature=0.9):&#x27;);
+
+    console.log(creativeResponse.generatedText);
+
+    
+
+    console.log(&#x27;\nFactual Response (temperature=0.2):&#x27;);
+
+    console.log(factualResponse.generatedText);
+
+    
+
+  } catch (error) {
+
+    console.error(&#x27;Error demonstrating sampling:&#x27;, error);
+
+  }
+
+}
+
+
+
+demonstrateSampling();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버 URL과 API 키로 MCP 클라이언트를 초기화했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">창의적 작업과 사실적 작업을 위한 두 가지 샘플링 매개변수 세트를 구성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">각 구성으로 요청을 보내고, 모델이 각 작업에 맞는 특정 도구를 사용하도록 허용했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">생성된 응답을 출력해 다양한 샘플링 매개변수의 효과를 보여주었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">allowedTools</code>로 모델이 생성 중 사용할 수 있는 도구를 지정했습니다. 창의적 작업에는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ideaGenerator</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">environmentalImpactTool</code>을, 사실적 작업에는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">factChecker</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">dataAnalysisTool</code>을 허용했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>로 출력의 무작위성을 조절했으며, 값이 높을수록 더 창의적인 응답이 생성됩니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code>로 누적 확률 상위 토큰만 선택하도록 제한해 생성 텍스트 품질을 향상시켰습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequencyPenalty</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">presencePenalty</code>로 반복을 줄이고 다양성을 촉진했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_k</code>로 모델이 상위 K개의 가장 가능성 높은 토큰만 선택하도록 제한해 더 일관된 응답을 생성하도록 했습니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">결정론적 샘플링</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">일관된 출력을 요구하는 애플리케이션에서는 결정론적 샘플링이 재현 가능한 결과를 보장합니다. 이는 고정된 랜덤 시드를 사용하고 온도를 0으로 설정함으로써 구현됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음은 다양한 프로그래밍 언어에서 결정론적 샘플링을 시연하는 예시입니다.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling" target="_blank">Java</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Java Example: Deterministic responses with fixed seed
+
+public class DeterministicSamplingExample {
+
+    public void demonstrateDeterministicResponses() {
+
+        McpClient client = new McpClient.Builder()
+
+            .setServerUrl(&quot;https://mcp-server-example.com&quot;)
+
+            .build();
+
+            
+
+        long fixedSeed = 12345; // Using a fixed seed for deterministic results
+
+        
+
+        // First request with fixed seed
+
+        McpRequest request1 = new McpRequest.Builder()
+
+            .setPrompt(&quot;Generate a random number between 1 and 100&quot;)
+
+            .setSeed(fixedSeed)
+
+            .setTemperature(0.0) // Zero temperature for maximum determinism
+
+            .build();
+
+            
+
+        // Second request with the same seed
+
+        McpRequest request2 = new McpRequest.Builder()
+
+            .setPrompt(&quot;Generate a random number between 1 and 100&quot;)
+
+            .setSeed(fixedSeed)
+
+            .setTemperature(0.0)
+
+            .build();
+
+        
+
+        // Execute both requests
+
+        McpResponse response1 = client.sendRequest(request1);
+
+        McpResponse response2 = client.sendRequest(request2);
+
+        
+
+        // Responses should be identical due to same seed and temperature=0
+
+        System.out.println(&quot;Response 1: &quot; + response1.getGeneratedText());
+
+        System.out.println(&quot;Response 2: &quot; + response2.getGeneratedText());
+
+        System.out.println(&quot;Are responses identical: &quot; + 
+
+            response1.getGeneratedText().equals(response2.getGeneratedText()));
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">지정된 서버 URL로 MCP 클라이언트를 생성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">동일한 프롬프트, 고정 시드, 온도 0으로 두 개의 요청을 구성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">두 요청을 보내고 생성된 텍스트를 출력했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">샘플링 설정(같은 시드와 온도) 덕분에 응답이 동일함을 보여주었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">setSeed</code>를 사용해 고정 랜덤 시드를 지정해 동일 입력에 대해 항상 같은 출력을 생성하도록 했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>를 0으로 설정해 최대한 결정론적으로, 즉 무작위성 없이 가장 가능성 높은 다음 토큰을 항상 선택하도록 했습니다.</li>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling" target="_blank">JavaScript</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Deterministic responses with seed control
+
+const { McpClient } = require(&#x27;@mcp/client&#x27;);
+
+
+
+async function deterministicSampling() {
+
+  const client = new McpClient({
+
+    serverUrl: &#x27;https://mcp-server-example.com&#x27;
+
+  });
+
+  
+
+  const fixedSeed = 12345;
+
+  const prompt = &quot;Generate a random password with 8 characters&quot;;
+
+  
+
+  try {
+
+    // First request with fixed seed
+
+    const response1 = await client.sendPrompt(prompt, {
+
+      seed: fixedSeed,
+
+      temperature: 0.0  // Zero temperature for maximum determinism
+
+    });
+
+    
+
+    // Second request with same seed and temperature
+
+    const response2 = await client.sendPrompt(prompt, {
+
+      seed: fixedSeed,
+
+      temperature: 0.0
+
+    });
+
+    
+
+    // Third request with different seed but same temperature
+
+    const response3 = await client.sendPrompt(prompt, {
+
+      seed: 67890,
+
+      temperature: 0.0
+
+    });
+
+    
+
+    console.log(&#x27;Response 1:&#x27;, response1.generatedText);
+
+    console.log(&#x27;Response 2:&#x27;, response2.generatedText);
+
+    console.log(&#x27;Response 3:&#x27;, response3.generatedText);
+
+    console.log(&#x27;Responses 1 and 2 match:&#x27;, response1.generatedText === response2.generatedText);
+
+    console.log(&#x27;Responses 1 and 3 match:&#x27;, response1.generatedText === response3.generatedText);
+
+    
+
+  } catch (error) {
+
+    console.error(&#x27;Error in deterministic sampling demo:&#x27;, error);
+
+  }
+
+}
+
+
+
+deterministicSampling();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버 URL로 MCP 클라이언트를 초기화했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">동일한 프롬프트, 고정 시드, 온도 0으로 두 개의 요청을 구성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">두 요청을 보내고 생성된 텍스트를 출력했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">샘플링 설정(같은 시드와 온도) 덕분에 응답이 동일함을 보여주었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">seed</code>를 사용해 고정 랜덤 시드를 지정해 동일 입력에 대해 항상 같은 출력을 생성하도록 했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>를 0으로 설정해 최대한 결정론적으로, 즉 무작위성 없이 가장 가능성 높은 다음 토큰을 항상 선택하도록 했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">세 번째 요청에는 다른 시드를 사용해, 같은 프롬프트와 온도임에도 시드 변경으로 다른 출력이 생성됨을 보여주었습니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">동적 샘플링 구성</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">지능형 샘플링은 각 요청의 상황과 요구에 따라 매개변수를 조정합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">즉, 작업 유형, 사용자 선호도, 과거 성과에 따라 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code>, 페널티 등을 동적으로 변경합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음은 다양한 프로그래밍 언어에서 동적 샘플링을 구현하는 방법입니다.</p>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling" target="_blank">Python</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python Example: Dynamic sampling based on request context
+
+class DynamicSamplingService:
+
+    def __init__(self, mcp_client):
+
+        self.client = mcp_client
+
+        
+
+    async def generate_with_adaptive_sampling(self, prompt, task_type, user_preferences=None):
+
+        &quot;&quot;&quot;Uses different sampling strategies based on task type and user preferences&quot;&quot;&quot;
+
+        
+
+        # Define sampling presets for different task types
+
+        sampling_presets = {
+
+            &quot;creative&quot;: {&quot;temperature&quot;: 0.9, &quot;top_p&quot;: 0.95, &quot;frequency_penalty&quot;: 0.7},
+
+            &quot;factual&quot;: {&quot;temperature&quot;: 0.2, &quot;top_p&quot;: 0.85, &quot;frequency_penalty&quot;: 0.2},
+
+            &quot;code&quot;: {&quot;temperature&quot;: 0.3, &quot;top_p&quot;: 0.9, &quot;frequency_penalty&quot;: 0.5},
+
+            &quot;analytical&quot;: {&quot;temperature&quot;: 0.4, &quot;top_p&quot;: 0.92, &quot;frequency_penalty&quot;: 0.3}
+
+        }
+
+        
+
+        # Select base preset
+
+        sampling_params = sampling_presets.get(task_type, sampling_presets[&quot;factual&quot;])
+
+        
+
+        # Adjust based on user preferences if provided
+
+        if user_preferences:
+
+            if &quot;creativity_level&quot; in user_preferences:
+
+                # Scale temperature based on creativity preference (1-10)
+
+                creativity = min(max(user_preferences[&quot;creativity_level&quot;], 1), 10) / 10
+
+                sampling_params[&quot;temperature&quot;] = 0.1 + (0.9 * creativity)
+
+            
+
+            if &quot;diversity&quot; in user_preferences:
+
+                # Adjust top_p based on desired response diversity
+
+                diversity = min(max(user_preferences[&quot;diversity&quot;], 1), 10) / 10
+
+                sampling_params[&quot;top_p&quot;] = 0.6 + (0.39 * diversity)
+
+        
+
+        # Create and send request with custom sampling parameters
+
+        response = await self.client.send_request(
+
+            prompt=prompt,
+
+            temperature=sampling_params[&quot;temperature&quot;],
+
+            top_p=sampling_params[&quot;top_p&quot;],
+
+            frequency_penalty=sampling_params[&quot;frequency_penalty&quot;]
+
+        )
+
+        
+
+        # Return response with sampling metadata for transparency
+
+        return {
+
+            &quot;text&quot;: response.generated_text,
+
+            &quot;applied_sampling&quot;: sampling_params,
+
+            &quot;task_type&quot;: task_type
+
+        }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">적응형 샘플링을 관리하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">DynamicSamplingService</code> 클래스를 만들었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">창의적, 사실적, 코드, 분석 작업 유형별 샘플링 프리셋을 정의했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">작업 유형에 따라 기본 샘플링 프리셋을 선택했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자 선호도(창의성 수준, 다양성 등)에 따라 샘플링 매개변수를 조정했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">동적으로 구성된 샘플링 매개변수로 요청을 보냈습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">생성된 텍스트와 적용된 샘플링 매개변수, 작업 유형을 함께 반환했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">temperature</code>로 출력 무작위성을 조절해 값이 높을수록 더 창의적인 응답을 생성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">top_p</code>로 누적 확률 상위 토큰만 선택하도록 제한해 생성 텍스트 품질을 향상시켰습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">frequency_penalty</code>로 반복을 줄이고 다양성을 촉진했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">user_preferences</code>를 사용해 사용자 정의 창의성 및 다양성 수준에 따라 샘플링 매개변수를 맞춤 설정했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">task_type</code>을 사용해 요청에 적합한 샘플링 전략을 결정해 작업 특성에 맞는 응답을 가능하게 했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">send_request</code> 메서드로 구성된 샘플링 매개변수와 함께 프롬프트를 보내 모델이 요구사항에 맞게 텍스트를 생성하도록 했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">generated_text</code>로 모델 응답을 받아 샘플링 매개변수 및 작업 유형과 함께 반환해 투명성을 높였습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">min</code>과 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">max</code> 함수를 사용해 사용자 선호도가 유효 범위 내에 있도록 제한했습니다.</li>
+
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-sampling" target="_blank">JavaScript Dynamic</a></h2>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// JavaScript Example: Dynamic sampling configuration based on user context
+
+class AdaptiveSamplingManager {
+
+  constructor(mcpClient) {
+
+    this.client = mcpClient;
+
+    
+
+    // Define base sampling profiles
+
+    this.samplingProfiles = {
+
+      creative: { temperature: 0.85, topP: 0.94, frequencyPenalty: 0.7, presencePenalty: 0.5 },
+
+      factual: { temperature: 0.2, topP: 0.85, frequencyPenalty: 0.3, presencePenalty: 0.1 },
+
+      code: { temperature: 0.25, topP: 0.9, frequencyPenalty: 0.4, presencePenalty: 0.3 },
+
+      conversational: { temperature: 0.7, topP: 0.9, frequencyPenalty: 0.6, presencePenalty: 0.4 }
+
+    };
+
+    
+
+    // Track historical performance
+
+    this.performanceHistory = [];
+
+  }
+
+  
+
+  // Detect task type from prompt
+
+  detectTaskType(prompt, context = {}) {
+
+    const promptLower = prompt.toLowerCase();
+
+    
+
+    // Simple heuristic detection - could be enhanced with ML classification
+
+    if (context.taskType) return context.taskType;
+
+    
+
+    if (promptLower.includes(&#x27;code&#x27;) || 
+
+        promptLower.includes(&#x27;function&#x27;) || 
+
+        promptLower.includes(&#x27;program&#x27;)) {
+
+      return &#x27;code&#x27;;
+
+    }
+
+    
+
+    if (promptLower.includes(&#x27;explain&#x27;) || 
+
+        promptLower.includes(&#x27;what is&#x27;) || 
+
+        promptLower.includes(&#x27;how does&#x27;)) {
+
+      return &#x27;factual&#x27;;
+
+    }
+
+    
+
+    if (promptLower.includes(&#x27;creative&#x27;) || 
+
+        promptLower.includes(&#x27;imagine&#x27;) || 
+
+        promptLower.includes(&#x27;story&#x27;)) {
+
+      return &#x27;creative&#x27;;
+
+    }
+
+    
+
+    // Default to conversational if no clear type is detected
+
+    return &#x27;conversational&#x27;;
+
+  }
+
+  
+
+  // Calculate sampling parameters based on context and user preferences
+
+  getSamplingParameters(prompt, context = {}) {
+
+    // Detect the type of task
+
+    const taskType = this.detectTaskType(prompt, context);
+
+    
+
+    // Get base profile
+
+    let params = {...this.samplingProfiles[taskType]};
+
+    
+
+    // Adjust based on user preferences
+
+    if (context.userPreferences) {
+
+      const { creativity, precision, consistency } = context.userPreferences;
+
+      
+
+      if (creativity !== undefined) {
+
+        // Scale from 1-10 to appropriate temperature range
+
+        params.temperature = 0.1 + (creativity * 0.09); // 0.1-1.0
+
+      }
+
+      
+
+      if (precision !== undefined) {
+
+        // Higher precision means lower topP (more focused selection)
+
+        params.topP = 1.0 - (precision * 0.05); // 0.5-1.0
+
+      }
+
+      
+
+      if (consistency !== undefined) {
+
+        // Higher consistency means lower penalties
+
+        params.frequencyPenalty = 0.1 + ((10 - consistency) * 0.08); // 0.1-0.9
+
+      }
+
+    }
+
+    
+
+    // Apply learned adjustments from performance history
+
+    this.applyLearnedAdjustments(params, taskType);
+
+    
+
+    return params;
+
+  }
+
+  
+
+  applyLearnedAdjustments(params, taskType) {
+
+    // Simple adaptive logic - could be enhanced with more sophisticated algorithms
+
+    const relevantHistory = this.performanceHistory
+
+      .filter(entry =&gt; entry.taskType === taskType)
+
+      .slice(-5); // Only consider recent history
+
+    
+
+    if (relevantHistory.length &gt; 0) {
+
+      // Calculate average performance scores
+
+      const avgScore = relevantHistory.reduce((sum, entry) =&gt; sum + entry.score, 0) / relevantHistory.length;
+
+      
+
+      // If performance is below threshold, adjust parameters
+
+      if (avgScore &lt; 0.7) {
+
+        // Slight adjustment toward safer values
+
+        params.temperature = Math.max(params.temperature * 0.9, 0.1);
+
+        params.topP = Math.max(params.topP * 0.95, 0.5);
+
+      }
+
+    }
+
+  }
+
+  
+
+  recordPerformance(prompt, samplingParams, response, score) {
+
+    // Record performance for future adjustments
+
+    this.performanceHistory.push({
+
+      timestamp: Date.now(),
+
+      taskType: this.detectTaskType(prompt),
+
+      samplingParams,
+
+      responseLength: response.generatedText.length,
+
+      score // 0-1 rating of response quality
+
+    });
+
+    
+
+    // Limit history size
+
+    if (this.performanceHistory.length &gt; 100) {
+
+      this.performanceHistory.shift();
+
+    }
+
+  }
+
+  
+
+  async generateResponse(prompt, context = {}) {
+
+    // Get optimized sampling parameters
+
+    const samplingParams = this.getSamplingParameters(prompt, context);
+
+    
+
+    // Send request with optimized parameters
+
+    const response = await this.client.sendPrompt(prompt, {
+
+      ...samplingParams,
+
+      allowedTools: context.allowedTools || []
+
+    });
+
+    
+
+    // If user provides feedback, record it for future optimization
+
+    if (context.recordPerformance) {
+
+      this.recordPerformance(prompt, samplingParams, response, context.feedbackScore || 0.5);
+
+    }
+
+    
+
+    return {
+
+      response,
+
+      appliedSamplingParams: samplingParams,
+
+      detectedTaskType: this.detectTaskType(prompt, context)
+
+    };
+
+  }
+
+}
+
+
+
+// Example usage
+
+async function demonstrateAdaptiveSampling() {
+
+  const client = new McpClient({
+
+    serverUrl: &#x27;https://mcp-server-example.com&#x27;
+
+  });
+
+  
+
+  const samplingManager = new AdaptiveSamplingManager(client);
+
+  
+
+  try {
+
+    // Creative task with custom user preferences
+
+    const creativeResult = await samplingManager.generateResponse(
+
+      &quot;Write a short poem about artificial intelligence&quot;,
+
+      {
+
+        userPreferences: {
+
+          creativity: 9,  // High creativity (1-10)
+
+          consistency: 3  // Low consistency (1-10)
+
+        }
+
+      }
+
+    );
+
+    
+
+    console.log(&#x27;Creative Task:&#x27;);
+
+    console.log(`Detected type: ${creativeResult.detectedTaskType}`);
+
+    console.log(&#x27;Applied sampling:&#x27;, creativeResult.appliedSamplingParams);
+
+    console.log(creativeResult.response.generatedText);
+
+    
+
+    // Code generation task
+
+    const codeResult = await samplingManager.generateResponse(
+
+      &quot;Write a JavaScript function to calculate the Fibonacci sequence&quot;,
+
+      {
+
+        userPreferences: {
+
+          creativity: 2,  // Low creativity
+
+          precision: 8,   // High precision
+
+          consistency: 9  // High consistency
+
+        }
+
+      }
+
+    );
+
+    
+
+    console.log(&#x27;\nCode Task:&#x27;);
+
+    console.log(`Detected type: ${codeResult.detectedTaskType}`);
+
+    console.log(&#x27;Applied sampling:&#x27;, codeResult.appliedSamplingParams);
+
+    console.log(codeResult.response.generatedText);
+
+    
+
+  } catch (error) {
+
+    console.error(&#x27;Error in adaptive sampling demo:&#x27;, error);
+
+  }
+
+}
+
+
+
+demonstrateAdaptiveSampling();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">작업 유형과 사용자 선호도에 따라 동적 샘플링을 관리하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AdaptiveSamplingManager</code> 클래스를 만들었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">창의적, 사실적, 코드, 대화형 작업 유형별 샘플링 프로필을 정의했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">간단한 휴리스틱을 사용해 프롬프트에서 작업 유형을 감지하는 메서드를 구현했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">감지된 작업 유형과 사용자 선호도에 따라 샘플링 매개변수를 계산했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">과거 성과를 기반으로 학습된 조정을 적용해 샘플링 매개변수를 최적화했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">향후 조정을 위해 성과를 기록해 시스템이 과거 상호작용에서 학습할 수 있도록 했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">동적으로 구성된 샘플링 매개변수로 요청을 보내고, 생성된 텍스트와 적용된 매개변수, 감지된 작업 유형을 반환했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음을 사용했습니다:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">userPreferences</code>로 사용자 정의 창의성, 정밀성, 일관성 수준에 따라 샘플링 매개변수를 맞춤 설정했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">detectTaskType</code>으로 프롬프트를 분석해 작업 특성을 파악, 보다 맞춤화된 응답을 가능하게 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">recordPerformance</code>로 생성된 응답의 성과를 기록해 시스템이 적응하고 개선할 수 있도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">applyLearnedAdjustments</code>로 과거 성과를 반영해 샘플링 매개변수를 조정, 고품질 응답 생성을 지원했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">generateResponse</code>로 적응형 샘플링을 적용한 응답 생성 과정을 캡슐화해 다양한 프롬프트와 컨텍스트에 쉽게 호출할 수 있도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">allowedTools</code>로 모델이 생성 중 사용할 수 있는 도구를 지정해 더 상황에 맞는 응답을 가능하게 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">feedbackScore</code>로 사용자가 생성된 응답 품질에 대한 피드백을 제공할 수 있게 해, 모델 성능을 지속적으로 개선할 수 있도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">performanceHistory</code>로 과거 상호작용 기록을 유지해 시스템이 이전 성공과 실패에서 학습할 수 있도록 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getSamplingParameters</code>로 요청 상황에 따라 샘플링 매개변수를 동적으로 조정해 더 유연하고 반응성 높은 모델 동작을 가능하게 했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">detectTaskType</code>으로 프롬프트를 기반으로 작업을 분류해 다양한 요청 유형에 적합한 샘플링 전략을 적용했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">samplingProfiles</code>로 작업 유형별 기본 샘플링 구성을 정의해 요청 특성에 따라 빠르게 조정할 수 있도록 했습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-scaling/README.md" target="_blank">5.7 확장</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 자료로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m05_04-55-routing.html">&larr; 5.5 Routing</a></span>
+  <span><a href="m05_06-57-scaling.html">5.7 Scaling &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

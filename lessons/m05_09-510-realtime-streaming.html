@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.10 Realtime Streaming - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.10 Realtime Streaming</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Model Context Protocol for Real-Time Data Streaming</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time data streaming has become essential in today's data-driven world, where businesses and applications require immediate access to information to make timely decisions.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) represents a significant advancement in optimizing these real-time streaming processes, enhancing data processing efficiency, maintaining contextual integrity, and improving overall system performance.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This module explores how MCP transforms real-time data streaming by providing a standardized approach to context management across AI models, streaming platforms, and applications.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction to Real-Time Data Streaming</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time data streaming is a technological paradigm that enables the continuous transfer, processing, and analysis of data as it's generated, allowing systems to react immediately to new information.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Unlike traditional batch processing that operates on static datasets, streaming processes data in motion, delivering insights and actions with minimal latency.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Core Concepts of Real-Time Data Streaming:</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Continuous Data Flow</strong>: Data is processed as a continuous, never-ending stream of events or records.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Low Latency Processing</strong>: Systems are designed to minimize the time between data generation and processing.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Scalability</strong>: Streaming architectures must handle variable data volumes and velocity.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Fault Tolerance</strong>: Systems need to be resilient against failures to ensure uninterrupted data flow.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Stateful Processing</strong>: Maintaining context across events is crucial for meaningful analysis.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">The Model Context Protocol and Real-Time Streaming</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) addresses several critical challenges in real-time streaming environments:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Contextual Continuity</strong>: MCP standardizes how context is maintained across distributed streaming components, ensuring that AI models and processing nodes have access to relevant historical and environmental context.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Efficient State Management</strong>: By providing structured mechanisms for context transmission, MCP reduces the overhead of state management in streaming pipelines.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Interoperability</strong>: MCP creates a common language for context sharing between diverse streaming technologies and AI models, enabling more flexible and extensible architectures.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Streaming-Optimized Context</strong>: MCP implementations can prioritize which context elements are most relevant for real-time decision making, optimizing for both performance and accuracy.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Adaptive Processing</strong>: With proper context management through MCP, streaming systems can dynamically adjust processing based on evolving conditions and patterns in the data.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In modern applications ranging from IoT sensor networks to financial trading platforms, the integration of MCP with streaming technologies enables more intelligent, context-aware processing that can respond appropriately to complex, evolving situations in real time.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the fundamentals of real-time data streaming and its challenges</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explain how the Model Context Protocol (MCP) enhances real-time data streaming</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement MCP-based streaming solutions using popular frameworks like Kafka and Pulsar</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Design and deploy fault-tolerant, high-performance streaming architectures with MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply MCP concepts to IoT, financial trading, and AI-driven analytics use cases</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Evaluate emerging trends and future innovations in MCP-based streaming technologies</li>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Definition and Significance</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time data streaming involves the continuous generation, processing, and delivery of data with minimal latency.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Unlike batch processing, where data is collected and processed in groups, streaming data is processed incrementally as it arrives, enabling immediate insights and actions.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Key characteristics of real-time data streaming include:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Low Latency</strong>: Processing and analyzing data within milliseconds to seconds</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Continuous Flow</strong>: Uninterrupted streams of data from various sources</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Immediate Processing</strong>: Analyzing data as it arrives rather than in batches</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Event-Driven Architecture</strong>: Responding to events as they occur</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenges in Traditional Data Streaming</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Traditional data streaming approaches face several limitations:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Context Loss</strong>: Difficulty maintaining context across distributed systems</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Scalability Issues</strong>: Challenges in scaling to handle high-volume, high-velocity data</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Integration Complexity</strong>: Problems with interoperability between different systems</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Latency Management</strong>: Balancing throughput with processing time</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Data Consistency</strong>: Ensuring data accuracy and completeness across the stream</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Understanding Model Context Protocol (MCP)</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">What is MCP?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) is a standardized communication protocol designed to facilitate efficient interaction between AI models and applications. In the context of real-time data streaming, MCP provides a framework for:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Preserving context throughout the data pipeline</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Standardizing data exchange formats</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Optimizing the transmission of large datasets</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enhancing model-to-model and model-to-application communication</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Core Components and Architecture</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP architecture for real-time streaming consists of several key components:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Context Handlers</strong>: Manage and maintain contextual information across the streaming pipeline</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Stream Processors</strong>: Process incoming data streams using context-aware techniques</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Protocol Adapters</strong>: Convert between different streaming protocols while preserving context</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Context Store</strong>: Efficiently store and retrieve contextual information</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Streaming Connectors</strong>: Connect to various streaming platforms (Kafka, Pulsar, Kinesis, etc.)</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    subgraph &quot;Data Sources&quot;
+
+        IoT[IoT Devices]
+
+        APIs[APIs]
+
+        DB[Databases]
+
+        Apps[Applications]
+
+    end
+
+
+
+    subgraph &quot;MCP Streaming Layer&quot;
+
+        SC[Streaming Connectors]
+
+        PA[Protocol Adapters]
+
+        CH[Context Handlers]
+
+        SP[Stream Processors]
+
+        CS[Context Store]
+
+    end
+
+
+
+    subgraph &quot;Processing &amp; Analytics&quot;
+
+        RT[Real-time Analytics]
+
+        ML[ML Models]
+
+        CEP[Complex Event Processing]
+
+        Viz[Visualization]
+
+    end
+
+
+
+    subgraph &quot;Applications &amp; Services&quot;
+
+        DA[Decision Automation]
+
+        Alerts[Alerting Systems]
+
+        DL[Data Lake/Warehouse]
+
+        API[API Services]
+
+    end
+
+
+
+    IoT --&gt;|Data| SC
+
+    APIs --&gt;|Data| SC
+
+    DB --&gt;|Changes| SC
+
+    Apps --&gt;|Events| SC
+
+    
+
+    SC --&gt;|Raw Streams| PA
+
+    PA --&gt;|Normalized Streams| CH
+
+    CH &lt;--&gt;|Context Operations| CS
+
+    CH --&gt;|Context-Enriched Data| SP
+
+    SP --&gt;|Processed Streams| RT
+
+    SP --&gt;|Features| ML
+
+    SP --&gt;|Events| CEP
+
+    
+
+    RT --&gt;|Insights| Viz
+
+    ML --&gt;|Predictions| DA
+
+    CEP --&gt;|Complex Events| Alerts
+
+    Viz --&gt;|Dashboards| Users((Users))
+
+    
+
+    RT -.-&gt;|Historical Data| DL
+
+    ML -.-&gt;|Model Results| DL
+
+    CEP -.-&gt;|Event Logs| DL
+
+    
+
+    DA --&gt;|Actions| API
+
+    Alerts --&gt;|Notifications| API
+
+    DL &lt;--&gt;|Data Access| API
+
+    
+
+    classDef sources fill:#f9f,stroke:#333,stroke-width:2px
+
+    classDef mcp fill:#bbf,stroke:#333,stroke-width:2px
+
+    classDef processing fill:#bfb,stroke:#333,stroke-width:2px
+
+    classDef apps fill:#fbb,stroke:#333,stroke-width:2px
+
+    
+
+    class IoT,APIs,DB,Apps sources
+
+    class SC,PA,CH,SP,CS mcp
+
+    class RT,ML,CEP,Viz processing
+
+    class DA,Alerts,DL,API apps
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">How MCP Improves Real-Time Data Handling</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP addresses traditional streaming challenges through:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Contextual Integrity</strong>: Maintaining relationships between data points across the entire pipeline</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Optimized Transmission</strong>: Reducing redundancy in data exchange through intelligent context management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Standardized Interfaces</strong>: Providing consistent APIs for streaming components</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Reduced Latency</strong>: Minimizing processing overhead through efficient context handling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Enhanced Scalability</strong>: Supporting horizontal scaling while preserving context</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Integration and Implementation</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Real-time data streaming systems require careful architectural design and implementation to maintain both performance and contextual integrity.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol offers a standardized approach to integrating AI models and streaming technologies, allowing for more sophisticated, context-aware processing pipelines.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Overview of MCP Integration in Streaming Architectures</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Implementing MCP in real-time streaming environments involves several key considerations:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Context Serialization and Transport</strong>: MCP provides efficient mechanisms for encoding contextual information within streaming data packets, ensuring that essential context follows the data throughout the processing pipeline.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This includes standardized serialization formats optimized for streaming transport.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Stateful Stream Processing</strong>: MCP enables more intelligent stateful processing by maintaining consistent context representation across processing nodes.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is particularly valuable in distributed streaming architectures where state management is traditionally challenging.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Event-Time vs.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Processing-Time</strong>: MCP implementations in streaming systems must address the common challenge of differentiating between when events occurred and when they're processed.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The protocol can incorporate temporal context that preserves event time semantics.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Backpressure Management</strong>: By standardizing context handling, MCP helps manage backpressure in streaming systems, allowing components to communicate their processing capabilities and adjust flow accordingly.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Context Windowing and Aggregation</strong>: MCP facilitates more sophisticated windowing operations by providing structured representations of temporal and relational contexts, enabling more meaningful aggregations across event streams.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>Exactly-Once Processing</strong>: In streaming systems requiring exactly-once semantics, MCP can incorporate processing metadata to help track and verify processing status across distributed components.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The implementation of MCP across various streaming technologies creates a unified approach to context management, reducing the need for custom integration code while enhancing the system's ability to maintain meaningful context as data flows through the pipeline.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP in Various Data Streaming Frameworks</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These examples follow the current MCP specification which focuses on a JSON-RPC based protocol with distinct transport mechanisms.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The code demonstrates how you can implement custom transports that integrate streaming platforms like Kafka and Pulsar while maintaining full compatibility with the MCP protocol.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The examples are designed to show how streaming platforms can be integrated with MCP to provide real-time data processing while preserving the contextual awareness that is central to MCP.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This approach ensures that the code samples accurately reflect the current state of the MCP specification as of June 2025.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP can be integrated with popular streaming frameworks including:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Apache Kafka Integration</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+import json
+
+from typing import Dict, Any, Optional
+
+from confluent_kafka import Consumer, Producer, KafkaError
+
+from mcp.client import Client, ClientCapabilities
+
+from mcp.core.message import JsonRpcMessage
+
+from mcp.core.transports import Transport
+
+
+
+# Custom transport class to bridge MCP with Kafka
+
+class KafkaMCPTransport(Transport):
+
+    def __init__(self, bootstrap_servers: str, input_topic: str, output_topic: str):
+
+        self.bootstrap_servers = bootstrap_servers
+
+        self.input_topic = input_topic
+
+        self.output_topic = output_topic
+
+        self.producer = Producer({&#x27;bootstrap.servers&#x27;: bootstrap_servers})
+
+        self.consumer = Consumer({
+
+            &#x27;bootstrap.servers&#x27;: bootstrap_servers,
+
+            &#x27;group.id&#x27;: &#x27;mcp-client-group&#x27;,
+
+            &#x27;auto.offset.reset&#x27;: &#x27;earliest&#x27;
+
+        })
+
+        self.message_queue = asyncio.Queue()
+
+        self.running = False
+
+        self.consumer_task = None
+
+        
+
+    async def connect(self):
+
+        &quot;&quot;&quot;Connect to Kafka and start consuming messages&quot;&quot;&quot;
+
+        self.consumer.subscribe([self.input_topic])
+
+        self.running = True
+
+        self.consumer_task = asyncio.create_task(self._consume_messages())
+
+        return self
+
+        
+
+    async def _consume_messages(self):
+
+        &quot;&quot;&quot;Background task to consume messages from Kafka and queue them for processing&quot;&quot;&quot;
+
+        while self.running:
+
+            try:
+
+                msg = self.consumer.poll(1.0)
+
+                if msg is None:
+
+                    await asyncio.sleep(0.1)
+
+                    continue
+
+                
+
+                if msg.error():
+
+                    if msg.error().code() == KafkaError._PARTITION_EOF:
+
+                        continue
+
+                    print(f&quot;Consumer error: {msg.error()}&quot;)
+
+                    continue
+
+                
+
+                # Parse the message value as JSON-RPC
+
+                try:
+
+                    message_str = msg.value().decode(&#x27;utf-8&#x27;)
+
+                    message_data = json.loads(message_str)
+
+                    mcp_message = JsonRpcMessage.from_dict(message_data)
+
+                    await self.message_queue.put(mcp_message)
+
+                except Exception as e:
+
+                    print(f&quot;Error parsing message: {e}&quot;)
+
+            except Exception as e:
+
+                print(f&quot;Error in consumer loop: {e}&quot;)
+
+                await asyncio.sleep(1)
+
+    
+
+    async def read(self) -&gt; Optional[JsonRpcMessage]:
+
+        &quot;&quot;&quot;Read the next message from the queue&quot;&quot;&quot;
+
+        try:
+
+            message = await self.message_queue.get()
+
+            return message
+
+        except Exception as e:
+
+            print(f&quot;Error reading message: {e}&quot;)
+
+            return None
+
+    
+
+    async def write(self, message: JsonRpcMessage) -&gt; None:
+
+        &quot;&quot;&quot;Write a message to the Kafka output topic&quot;&quot;&quot;
+
+        try:
+
+            message_json = json.dumps(message.to_dict())
+
+            self.producer.produce(
+
+                self.output_topic,
+
+                message_json.encode(&#x27;utf-8&#x27;),
+
+                callback=self._delivery_report
+
+            )
+
+            self.producer.poll(0)  # Trigger callbacks
+
+        except Exception as e:
+
+            print(f&quot;Error writing message: {e}&quot;)
+
+    
+
+    def _delivery_report(self, err, msg):
+
+        &quot;&quot;&quot;Kafka producer delivery callback&quot;&quot;&quot;
+
+        if err is not None:
+
+            print(f&#x27;Message delivery failed: {err}&#x27;)
+
+        else:
+
+            print(f&#x27;Message delivered to {msg.topic()} [{msg.partition()}]&#x27;)
+
+    
+
+    async def close(self) -&gt; None:
+
+        &quot;&quot;&quot;Close the transport&quot;&quot;&quot;
+
+        self.running = False
+
+        if self.consumer_task:
+
+            self.consumer_task.cancel()
+
+            try:
+
+                await self.consumer_task
+
+            except asyncio.CancelledError:
+
+                pass
+
+        self.consumer.close()
+
+        self.producer.flush()
+
+
+
+# Example usage of the Kafka MCP transport
+
+async def kafka_mcp_example():
+
+    # Create MCP client with Kafka transport
+
+    client = Client(
+
+        {&quot;name&quot;: &quot;kafka-mcp-client&quot;, &quot;version&quot;: &quot;1.0.0&quot;},
+
+        ClientCapabilities({})
+
+    )
+
+    
+
+    # Create and connect the Kafka transport
+
+    transport = KafkaMCPTransport(
+
+        bootstrap_servers=&quot;localhost:9092&quot;,
+
+        input_topic=&quot;mcp-responses&quot;,
+
+        output_topic=&quot;mcp-requests&quot;
+
+    )
+
+    
+
+    await client.connect(transport)
+
+    
+
+    try:
+
+        # Initialize the MCP session
+
+        await client.initialize()
+
+        
+
+        # Example of executing a tool via MCP
+
+        response = await client.execute_tool(
+
+            &quot;process_data&quot;,
+
+            {
+
+                &quot;data&quot;: &quot;sample data&quot;,
+
+                &quot;metadata&quot;: {
+
+                    &quot;source&quot;: &quot;sensor-1&quot;,
+
+                    &quot;timestamp&quot;: &quot;2025-06-12T10:30:00Z&quot;
+
+                }
+
+            }
+
+        )
+
+        
+
+        print(f&quot;Tool execution response: {response}&quot;)
+
+        
+
+        # Clean shutdown
+
+        await client.shutdown()
+
+    finally:
+
+        await transport.close()
+
+
+
+# Run the example
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(kafka_mcp_example())
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Apache Pulsar Implementation</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+import json
+
+import pulsar
+
+from typing import Dict, Any, Optional
+
+from mcp.core.message import JsonRpcMessage
+
+from mcp.core.transports import Transport
+
+from mcp.server import Server, ServerOptions
+
+from mcp.server.tools import Tool, ToolExecutionContext, ToolMetadata
+
+
+
+# Create a custom MCP transport that uses Pulsar
+
+class PulsarMCPTransport(Transport):
+
+    def __init__(self, service_url: str, request_topic: str, response_topic: str):
+
+        self.service_url = service_url
+
+        self.request_topic = request_topic
+
+        self.response_topic = response_topic
+
+        self.client = pulsar.Client(service_url)
+
+        self.producer = self.client.create_producer(response_topic)
+
+        self.consumer = self.client.subscribe(
+
+            request_topic,
+
+            &quot;mcp-server-subscription&quot;,
+
+            consumer_type=pulsar.ConsumerType.Shared
+
+        )
+
+        self.message_queue = asyncio.Queue()
+
+        self.running = False
+
+        self.consumer_task = None
+
+    
+
+    async def connect(self):
+
+        &quot;&quot;&quot;Connect to Pulsar and start consuming messages&quot;&quot;&quot;
+
+        self.running = True
+
+        self.consumer_task = asyncio.create_task(self._consume_messages())
+
+        return self
+
+    
+
+    async def _consume_messages(self):
+
+        &quot;&quot;&quot;Background task to consume messages from Pulsar and queue them for processing&quot;&quot;&quot;
+
+        while self.running:
+
+            try:
+
+                # Non-blocking receive with timeout
+
+                msg = self.consumer.receive(timeout_millis=500)
+
+                
+
+                # Process the message
+
+                try:
+
+                    message_str = msg.data().decode(&#x27;utf-8&#x27;)
+
+                    message_data = json.loads(message_str)
+
+                    mcp_message = JsonRpcMessage.from_dict(message_data)
+
+                    await self.message_queue.put(mcp_message)
+
+                    
+
+                    # Acknowledge the message
+
+                    self.consumer.acknowledge(msg)
+
+                except Exception as e:
+
+                    print(f&quot;Error processing message: {e}&quot;)
+
+                    # Negative acknowledge if there was an error
+
+                    self.consumer.negative_acknowledge(msg)
+
+            except Exception as e:
+
+                # Handle timeout or other exceptions
+
+                await asyncio.sleep(0.1)
+
+    
+
+    async def read(self) -&gt; Optional[JsonRpcMessage]:
+
+        &quot;&quot;&quot;Read the next message from the queue&quot;&quot;&quot;
+
+        try:
+
+            message = await self.message_queue.get()
+
+            return message
+
+        except Exception as e:
+
+            print(f&quot;Error reading message: {e}&quot;)
+
+            return None
+
+    
+
+    async def write(self, message: JsonRpcMessage) -&gt; None:
+
+        &quot;&quot;&quot;Write a message to the Pulsar output topic&quot;&quot;&quot;
+
+        try:
+
+            message_json = json.dumps(message.to_dict())
+
+            self.producer.send(message_json.encode(&#x27;utf-8&#x27;))
+
+        except Exception as e:
+
+            print(f&quot;Error writing message: {e}&quot;)
+
+    
+
+    async def close(self) -&gt; None:
+
+        &quot;&quot;&quot;Close the transport&quot;&quot;&quot;
+
+        self.running = False
+
+        if self.consumer_task:
+
+            self.consumer_task.cancel()
+
+            try:
+
+                await self.consumer_task
+
+            except asyncio.CancelledError:
+
+                pass
+
+        self.consumer.close()
+
+        self.producer.close()
+
+        self.client.close()
+
+
+
+# Define a sample MCP tool that processes streaming data
+
+@Tool(
+
+    name=&quot;process_streaming_data&quot;,
+
+    description=&quot;Process streaming data with context preservation&quot;,
+
+    metadata=ToolMetadata(
+
+        required_capabilities=[&quot;streaming&quot;]
+
+    )
+
+)
+
+async def process_streaming_data(
+
+    ctx: ToolExecutionContext,
+
+    data: str,
+
+    source: str,
+
+    priority: str = &quot;medium&quot;
+
+) -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;
+
+    Process streaming data while preserving context
+
+    
+
+    Args:
+
+        ctx: Tool execution context
+
+        data: The data to process
+
+        source: The source of the data
+
+        priority: Priority level (low, medium, high)
+
+        
+
+    Returns:
+
+        Dict containing processed results and context information
+
+    &quot;&quot;&quot;
+
+    # Example processing that leverages MCP context
+
+    print(f&quot;Processing data from {source} with priority {priority}&quot;)
+
+    
+
+    # Access conversation context from MCP
+
+    conversation_id = ctx.conversation_id if hasattr(ctx, &#x27;conversation_id&#x27;) else &quot;unknown&quot;
+
+    
+
+    # Return results with enhanced context
+
+    return {
+
+        &quot;processed_data&quot;: f&quot;Processed: {data}&quot;,
+
+        &quot;context&quot;: {
+
+            &quot;conversation_id&quot;: conversation_id,
+
+            &quot;source&quot;: source,
+
+            &quot;priority&quot;: priority,
+
+            &quot;processing_timestamp&quot;: ctx.get_current_time_iso()
+
+        }
+
+    }
+
+
+
+# Example MCP server implementation using Pulsar transport
+
+async def run_mcp_server_with_pulsar():
+
+    # Create MCP server
+
+    server = Server(
+
+        {&quot;name&quot;: &quot;pulsar-mcp-server&quot;, &quot;version&quot;: &quot;1.0.0&quot;},
+
+        ServerOptions(
+
+            capabilities={&quot;streaming&quot;: True}
+
+        )
+
+    )
+
+    
+
+    # Register our tool
+
+    server.register_tool(process_streaming_data)
+
+    
+
+    # Create and connect Pulsar transport
+
+    transport = PulsarMCPTransport(
+
+        service_url=&quot;pulsar://localhost:6650&quot;,
+
+        request_topic=&quot;mcp-requests&quot;,
+
+        response_topic=&quot;mcp-responses&quot;
+
+    )
+
+    
+
+    try:
+
+        # Start the server with the Pulsar transport
+
+        await server.run(transport)
+
+    finally:
+
+        await transport.close()
+
+
+
+# Run the server
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(run_mcp_server_with_pulsar())
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Best Practices for Deployment</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When implementing MCP for real-time streaming:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Design for Fault Tolerance</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Implement proper error handling</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Use dead-letter queues for failed messages</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Design idempotent processors</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Optimize for Performance</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Configure appropriate buffer sizes</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Use batching where appropriate</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Implement backpressure mechanisms</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Monitor and Observe</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Track stream processing metrics</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Monitor context propagation</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Set up alerts for anomalies</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Secure Your Streams</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Implement encryption for sensitive data</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Use authentication and authorization</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Apply proper access controls</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP in IoT and Edge Computing</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP enhances IoT streaming by:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Preserving device context across the processing pipeline</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enabling efficient edge-to-cloud data streaming</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Supporting real-time analytics on IoT data streams</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Facilitating device-to-device communication with context</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Example: Smart City Sensor Networks</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Sensors → Edge Gateways → MCP Stream Processors → Real-time Analytics → Automated Responses
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Role in Financial Transactions and High-Frequency Trading</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP provides significant advantages for financial data streaming:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ultra-low latency processing for trading decisions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Maintaining transaction context throughout processing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Supporting complex event processing with contextual awareness</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensuring data consistency across distributed trading systems</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Enhancing AI-Driven Data Analytics</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP creates new possibilities for streaming analytics:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Real-time model training and inference</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Continuous learning from streaming data</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Context-aware feature extraction</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Multi-model inference pipelines with preserved context</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Future Trends and Innovations</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Evolution of MCP in Real-Time Environments</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Looking ahead, we anticipate MCP evolving to address:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Quantum Computing Integration</strong>: Preparing for quantum-based streaming systems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Edge-Native Processing</strong>: Moving more context-aware processing to edge devices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Autonomous Stream Management</strong>: Self-optimizing streaming pipelines</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Federated Streaming</strong>: Distributed processing while preserving privacy</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Potential Advancements in Technology</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Emerging technologies that will shape the future of MCP streaming:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>AI-Optimized Streaming Protocols</strong>: Custom protocols designed specifically for AI workloads</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Neuromorphic Computing Integration</strong>: Brain-inspired computing for stream processing</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Serverless Streaming</strong>: Event-driven, scalable streaming without infrastructure management</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Distributed Context Stores</strong>: Globally distributed yet highly consistent context management</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Hands-On Exercises</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 1: Setting Up a Basic MCP Streaming Pipeline</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this exercise, you'll learn how to:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure a basic MCP streaming environment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement context handlers for stream processing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test and validate context preservation</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 2: Building a Real-Time Analytics Dashboard</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Create a complete application that:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ingests streaming data using MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Processes the stream while maintaining context</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Visualizes results in real-time</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 3: Implementing Complex Event Processing with MCP</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Advanced exercise covering:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Pattern detection in streams</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Contextual correlation across multiple streams</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Generating complex events with preserved context</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io">Model Context Protocol Specification</a> - Official MCP specification and documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://kafka.apache.org/documentation/">Apache Kafka Documentation</a> - Learn about Kafka for stream processing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://pulsar.apache.org/">Apache Pulsar</a> - Unified messaging and streaming platform</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.oreilly.com/library/view/streaming-systems/9781491983867/">Streaming Systems: The What, Where, When, and How of Large-Scale Data Processing</a> - Comprehensive book on streaming architectures</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/event-hubs/event-hubs-about">Microsoft Azure Event Hubs</a> - Managed event streaming service</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://mlflow.org/docs/latest/index.html">MLflow Documentation</a> - For ML model tracking and deployment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://storm.apache.org/releases/current/index.html">Real-Time Analytics with Apache Storm</a> - Processing framework for real-time computation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://nightlies.apache.org/flink/flink-ml-docs-master/">Flink ML</a> - Machine learning library for Apache Flink</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://python.langchain.com/docs/get_started/introduction">LangChain Documentation</a> - Building applications with LLMs</li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Outcomes</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By completing this module, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the fundamentals of real-time data streaming and its challenges</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explain how the Model Context Protocol (MCP) enhances real-time data streaming</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement MCP-based streaming solutions using popular frameworks like Kafka and Pulsar</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Design and deploy fault-tolerant, high-performance streaming architectures with MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply MCP concepts to IoT, financial trading, and AI-driven analytics use cases</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Evaluate emerging trends and future innovations in MCP-based streaming technologies</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next </h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-realtimesearch/README.md" target="_blank">5.11 Realtime Search</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">실시간 데이터 스트리밍을 위한 모델 컨텍스트 프로토콜</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 데이터 스트리밍은 오늘날 데이터 중심 세상에서 비즈니스와 애플리케이션이 시기적절한 결정을 내리기 위해 즉각적인 정보 접근이 필수적인 환경에서 매우 중요해졌습니다. 모델 컨텍스트 프로토콜(MCP)은 이러한 실시간 스트리밍 프로세스를 최적화하고, 데이터 처리 효율성을 향상하며, 컨텍스트 무결성을 유지하고, 시스템 전반의 성능을 개선하는 데 있어 중요한 진전을 나타냅니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈은 MCP가 AI 모델, 스트리밍 플랫폼, 애플리케이션 전반에 걸친 컨텍스트 관리를 표준화된 접근법으로 제공함으로써 실시간 데이터 스트리밍을 어떻게 혁신하는지 살펴봅니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">실시간 데이터 스트리밍 소개</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 데이터 스트리밍은 데이터가 생성됨과 동시에 지속적으로 전송, 처리 및 분석할 수 있게 하는 기술적 패러다임으로, 시스템이 새로운 정보에 즉시 반응할 수 있도록 합니다. 정적 데이터셋을 대상으로 하는 전통적 배치 처리와 달리, 스트리밍은 이동 중인 데이터를 처리하여 지연 시간을 최소화하며 인사이트와 조치를 제공합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">실시간 데이터 스트리밍의 핵심 개념:</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>지속적인 데이터 흐름</strong>: 데이터가 계속해서 이벤트나 레코드의 끊임없는 스트림으로 처리됨  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>저지연 처리</strong>: 데이터 생성과 처리 사이의 시간을 최소화  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>확장성</strong>: 다양한 데이터 양과 속도를 처리할 수 있는 스트리밍 아키텍처  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>내결함성</strong>: 데이터 흐름이 중단되지 않도록 장애에 강한 시스템  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상태 유지 처리</strong>: 의미 있는 분석을 위해 이벤트 간 컨텍스트 유지 중요  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">모델 컨텍스트 프로토콜과 실시간 스트리밍</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모델 컨텍스트 프로토콜(MCP)은 실시간 스트리밍 환경의 여러 주요 문제를 해결합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>컨텍스트 연속성</strong>: MCP는 분산된 스트리밍 구성 요소 간 컨텍스트 유지 방식을 표준화하여 AI 모델과 처리 노드가 관련된 과거 및 환경적 컨텍스트에 접근하도록 보장합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>효율적인 상태 관리</strong>: 컨텍스트 전송을 위한 구조화된 메커니즘을 제공하여 스트리밍 파이프라인 내 상태 관리 오버헤드를 감소시킵니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>상호운용성</strong>: 다양한 스트리밍 기술과 AI 모델 간 컨텍스트 공유를 위한 공통 언어를 만들어 더 유연하고 확장 가능한 아키텍처를 가능하게 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>스트리밍 최적화 컨텍스트</strong>: MCP 구현체는 실시간 의사결정에 가장 관련 있는 컨텍스트 요소를 우선시하여 성능과 정확도 모두를 최적화할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>적응형 처리</strong>: MCP를 통한 적절한 컨텍스트 관리를 기반으로 스트리밍 시스템이 데이터 내 변화하는 조건과 패턴에 따라 처리 방식을 동적으로 조정할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">IoT 센서 네트워크부터 금융 거래 플랫폼에 이르기까지, MCP와 스트리밍 기술의 통합은 복잡하고 변화하는 상황에 실시간으로 적절히 반응할 수 있는 더 지능적이고 컨텍스트 인식 처리 방식을 가능하게 합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 수업을 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 데이터 스트리밍의 기본과 도전 과제 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모델 컨텍스트 프로토콜(MCP)이 실시간 데이터 스트리밍을 어떻게 향상시키는지 설명</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Kafka 및 Pulsar와 같은 인기 프레임워크를 사용하여 MCP 기반 스트리밍 솔루션 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP로 내결함성 및 고성능 스트리밍 아키텍처 설계 및 배포</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">IoT, 금융 거래, AI 기반 분석 사례에 MCP 개념 적용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 기반 스트리밍 기술의 최신 동향과 미래 혁신 평가</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">정의 및 중요성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 데이터 스트리밍이란 최소한의 지연으로 데이터를 지속적으로 생성, 처리, 전달하는 것을 의미합니다. 데이터가 그룹으로 수집되어 처리되는 배치 처리와 달리 스트리밍 데이터는 도착 즉시 점진적으로 처리되어 즉각적인 인사이트와 조치를 가능하게 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 데이터 스트리밍의 주요 특성:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>저지연</strong>: 밀리초에서 초 단위 내 데이터 처리 및 분석  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>지속적 흐름</strong>: 다양한 소스에서 끊임없는 데이터 스트림  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>즉시 처리</strong>: 배치가 아닌 도착 즉시 데이터 분석  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>이벤트 기반 아키텍처</strong>: 이벤트 발생 시 즉시 반응  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">전통적 데이터 스트리밍의 도전 과제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전통적 스트리밍 접근법은 여러 한계가 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>컨텍스트 손실</strong>: 분산 시스템 전체에서 컨텍스트 유지 어려움  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>확장성 문제</strong>: 대용량 및 고속 데이터 처리에서 확장 어려움  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>통합 복잡성</strong>: 시스템 간 상호운용성 문제  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>지연 관리</strong>: 처리 시간과 처리량의 균형  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>데이터 일관성</strong>: 스트림 전반에서 데이터 정확성과 완전성 보장  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">모델 컨텍스트 프로토콜(MCP) 이해</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP란?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모델 컨텍스트 프로토콜(MCP)은 AI 모델과 애플리케이션 간 효율적인 상호작용을 가능하게 하는 표준화된 통신 프로토콜입니다. 실시간 데이터 스트리밍에서 MCP는 다음을 제공합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">데이터 파이프라인 전반에 걸친 컨텍스트 보존  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">데이터 교환 포맷 표준화  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">대용량 데이터 전송 최적화  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모델 간 및 모델-애플리케이션 간 통신 강화  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">핵심 구성 요소 및 아키텍처</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 스트리밍용 MCP 아키텍처는 주요 구성 요소로 이루어집니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>컨텍스트 핸들러</strong>: 스트리밍 파이프라인 전체에서 컨텍스트 정보 관리 및 유지  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>스트림 프로세서</strong>: 컨텍스트 인식 기법을 활용해 들어오는 데이터 스트림 처리  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>프로토콜 어댑터</strong>: 컨텍스트를 유지하며 다양한 스트리밍 프로토콜 간 변환  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>컨텍스트 저장소</strong>: 효과적으로 컨텍스트 정보 저장 및 검색  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>스트리밍 커넥터</strong>: Kafka, Pulsar, Kinesis 등 여러 스트리밍 플랫폼과 연결  </p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    subgraph &quot;데이터 소스&quot;
+
+        IoT[IoT 기기]
+
+        APIs[API]
+
+        DB[데이터베이스]
+
+        Apps[애플리케이션]
+
+    end
+
+
+
+    subgraph &quot;MCP 스트리밍 계층&quot;
+
+        SC[스트리밍 커넥터]
+
+        PA[프로토콜 어댑터]
+
+        CH[컨텍스트 핸들러]
+
+        SP[스트림 프로세서]
+
+        CS[컨텍스트 저장소]
+
+    end
+
+
+
+    subgraph &quot;처리 및 분석&quot;
+
+        RT[실시간 분석]
+
+        ML[머신러닝 모델]
+
+        CEP[복합 이벤트 처리]
+
+        Viz[시각화]
+
+    end
+
+
+
+    subgraph &quot;애플리케이션 및 서비스&quot;
+
+        DA[결정 자동화]
+
+        Alerts[경보 시스템]
+
+        DL[데이터 레이크/웨어하우스]
+
+        API[API 서비스]
+
+    end
+
+
+
+    IoT --&gt;|데이터| SC
+
+    APIs --&gt;|데이터| SC
+
+    DB --&gt;|변경사항| SC
+
+    Apps --&gt;|이벤트| SC
+
+    
+
+    SC --&gt;|원시 스트림| PA
+
+    PA --&gt;|정규화된 스트림| CH
+
+    CH &lt;--&gt;|컨텍스트 작업| CS
+
+    CH --&gt;|컨텍스트 강화 데이터| SP
+
+    SP --&gt;|처리된 스트림| RT
+
+    SP --&gt;|특징| ML
+
+    SP --&gt;|이벤트| CEP
+
+    
+
+    RT --&gt;|인사이트| Viz
+
+    ML --&gt;|예측| DA
+
+    CEP --&gt;|복합 이벤트| Alerts
+
+    Viz --&gt;|대시보드| Users((사용자))
+
+    
+
+    RT -.-&gt;|과거 데이터| DL
+
+    ML -.-&gt;|모델 결과| DL
+
+    CEP -.-&gt;|이벤트 로그| DL
+
+    
+
+    DA --&gt;|작업| API
+
+    Alerts --&gt;|알림| API
+
+    DL &lt;--&gt;|데이터 접근| API
+
+    
+
+    classDef sources fill:#f9f,stroke:#333,stroke-width:2px
+
+    classDef mcp fill:#bbf,stroke:#333,stroke-width:2px
+
+    classDef processing fill:#bfb,stroke:#333,stroke-width:2px
+
+    classDef apps fill:#fbb,stroke:#333,stroke-width:2px
+
+    
+
+    class IoT,APIs,DB,Apps sources
+
+    class SC,PA,CH,SP,CS mcp
+
+    class RT,ML,CEP,Viz processing
+
+    class DA,Alerts,DL,API apps
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP가 실시간 데이터 처리에서 개선하는 점</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 전통적 스트리밍 문제를 다음과 같이 해결합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨텍스트 무결성</strong>: 데이터 포인트 간 관계를 파이프라인 전체에 걸쳐 유지  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>최적화된 전송</strong>: 지능적 컨텍스트 관리를 통해 데이터 중복 감소  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>표준화된 인터페이스</strong>: 스트리밍 구성 요소를 위한 일관된 API 제공  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>지연 감소</strong>: 효율적 컨텍스트 처리로 오버헤드 최소화  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>확장성 강화</strong>: 컨텍스트 유지와 함께 수평 확장 지원  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">통합 및 구현</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 데이터 스트리밍 시스템은 성능과 컨텍스트 무결성을 모두 유지하기 위해 신중한 아키텍처 설계와 구현이 필요합니다. 모델 컨텍스트 프로토콜은 AI 모델과 스트리밍 기술 통합을 위한 표준화된 접근 방식을 제공하여 더 정교하고 컨텍스트 인식이 가능한 처리 파이프라인을 구축할 수 있게 합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">스트리밍 아키텍처에서 MCP 통합 개요</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 스트리밍 환경에 MCP를 구현할 때 고려할 주요 사항:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>컨텍스트 직렬화 및 전송</strong>: MCP는 스트리밍 데이터 패킷 내에 컨텍스트 정보를 효율적으로 인코딩하는 메커니즘을 제공하여 필수 컨텍스트가 데이터와 함께 전체 처리 파이프라인을 따라 이동하도록 보장합니다. 여기에는 스트리밍 전송에 최적화된 표준화된 직렬화 포맷이 포함됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>상태 유지 스트림 처리</strong>: MCP는 처리 노드 전반에 걸쳐 일관된 컨텍스트 표현을 유지하며 더 지능적인 상태 유지 처리를 가능하게 합니다. 이는 전통적으로 상태 관리가 어려운 분산 스트리밍 아키텍처에서 특히 중요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>이벤트 시간 대비 처리 시간</strong>: MCP 구현체는 이벤트 발생 시점과 처리 시점 간의 차이를 다루어야 하는 일반적 문제에 대응할 수 있습니다. 프로토콜은 이벤트 시간 의미를 보존하는 시간 컨텍스트를 포함할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>백프레셔 관리</strong>: MCP는 컨텍스트 처리를 표준화함으로써 스트리밍 시스템 내 백프레셔를 관리할 수 있도록 돕고, 구성 요소들이 처리 능력을 소통하며 흐름을 조절할 수 있게 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>컨텍스트 윈도잉 및 집계</strong>: MCP는 시간 및 관계적 컨텍스트의 구조화된 표현을 제공하여 이벤트 스트림 간 더 의미 있는 집계를 가능하게 하는 고급 윈도잉 작업을 지원합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>정확히 한 번 처리</strong>: 정확히 한 번 처리 의미론이 요구되는 스트리밍 시스템에서는 MCP가 처리 상태 추적 및 검증을 위한 메타데이터를 통합할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다양한 스트리밍 기술에 MCP를 구현함으로써 컨텍스트 관리를 위한 통합된 접근법이 만들어지며 맞춤형 통합 코드를 줄이고 데이터가 파이프라인을 통과할 때 의미 있는 컨텍스트를 유지할 수 있는 시스템 능력을 강화합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">다양한 데이터 스트리밍 프레임워크에서의 MCP</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 예시는 JSON-RPC 기반 프로토콜과 각기 다른 전송 메커니즘에 중점을 둔 현재 MCP 사양을 따릅니다. 코드는 MCP 프로토콜과 완벽하게 호환되면서 Kafka와 Pulsar 같은 스트리밍 플랫폼을 통합하는 맞춤 전송을 구현하는 방법을 보여줍니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 예시는 MCP 중심의 컨텍스트 인식 기능을 유지하면서 실시간 데이터 처리를 제공하는 스트리밍 플랫폼 통합 방법을 설명합니다. 이 접근법은 2025년 6월 현재 MCP 사양 상태를 정확히 반영합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 다음의 유명 스트리밍 프레임워크에 통합할 수 있습니다:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Apache Kafka 통합</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+import json
+
+from typing import Dict, Any, Optional
+
+from confluent_kafka import Consumer, Producer, KafkaError
+
+from mcp.client import Client, ClientCapabilities
+
+from mcp.core.message import JsonRpcMessage
+
+from mcp.core.transports import Transport
+
+
+
+# MCP와 Kafka를 연결하는 맞춤형 전송 클래스
+
+class KafkaMCPTransport(Transport):
+
+    def __init__(self, bootstrap_servers: str, input_topic: str, output_topic: str):
+
+        self.bootstrap_servers = bootstrap_servers
+
+        self.input_topic = input_topic
+
+        self.output_topic = output_topic
+
+        self.producer = Producer({&#x27;bootstrap.servers&#x27;: bootstrap_servers})
+
+        self.consumer = Consumer({
+
+            &#x27;bootstrap.servers&#x27;: bootstrap_servers,
+
+            &#x27;group.id&#x27;: &#x27;mcp-client-group&#x27;,
+
+            &#x27;auto.offset.reset&#x27;: &#x27;earliest&#x27;
+
+        })
+
+        self.message_queue = asyncio.Queue()
+
+        self.running = False
+
+        self.consumer_task = None
+
+        
+
+    async def connect(self):
+
+        &quot;&quot;&quot;Connect to Kafka and start consuming messages&quot;&quot;&quot;
+
+        self.consumer.subscribe([self.input_topic])
+
+        self.running = True
+
+        self.consumer_task = asyncio.create_task(self._consume_messages())
+
+        return self
+
+        
+
+    async def _consume_messages(self):
+
+        &quot;&quot;&quot;Background task to consume messages from Kafka and queue them for processing&quot;&quot;&quot;
+
+        while self.running:
+
+            try:
+
+                msg = self.consumer.poll(1.0)
+
+                if msg is None:
+
+                    await asyncio.sleep(0.1)
+
+                    continue
+
+                
+
+                if msg.error():
+
+                    if msg.error().code() == KafkaError._PARTITION_EOF:
+
+                        continue
+
+                    print(f&quot;Consumer error: {msg.error()}&quot;)
+
+                    continue
+
+                
+
+                # 메시지 값을 JSON-RPC로 파싱
+
+                try:
+
+                    message_str = msg.value().decode(&#x27;utf-8&#x27;)
+
+                    message_data = json.loads(message_str)
+
+                    mcp_message = JsonRpcMessage.from_dict(message_data)
+
+                    await self.message_queue.put(mcp_message)
+
+                except Exception as e:
+
+                    print(f&quot;Error parsing message: {e}&quot;)
+
+            except Exception as e:
+
+                print(f&quot;Error in consumer loop: {e}&quot;)
+
+                await asyncio.sleep(1)
+
+    
+
+    async def read(self) -&gt; Optional[JsonRpcMessage]:
+
+        &quot;&quot;&quot;Read the next message from the queue&quot;&quot;&quot;
+
+        try:
+
+            message = await self.message_queue.get()
+
+            return message
+
+        except Exception as e:
+
+            print(f&quot;Error reading message: {e}&quot;)
+
+            return None
+
+    
+
+    async def write(self, message: JsonRpcMessage) -&gt; None:
+
+        &quot;&quot;&quot;Write a message to the Kafka output topic&quot;&quot;&quot;
+
+        try:
+
+            message_json = json.dumps(message.to_dict())
+
+            self.producer.produce(
+
+                self.output_topic,
+
+                message_json.encode(&#x27;utf-8&#x27;),
+
+                callback=self._delivery_report
+
+            )
+
+            self.producer.poll(0)  # 콜백을 트리거
+
+        except Exception as e:
+
+            print(f&quot;Error writing message: {e}&quot;)
+
+    
+
+    def _delivery_report(self, err, msg):
+
+        &quot;&quot;&quot;Kafka producer delivery callback&quot;&quot;&quot;
+
+        if err is not None:
+
+            print(f&#x27;Message delivery failed: {err}&#x27;)
+
+        else:
+
+            print(f&#x27;Message delivered to {msg.topic()} [{msg.partition()}]&#x27;)
+
+    
+
+    async def close(self) -&gt; None:
+
+        &quot;&quot;&quot;Close the transport&quot;&quot;&quot;
+
+        self.running = False
+
+        if self.consumer_task:
+
+            self.consumer_task.cancel()
+
+            try:
+
+                await self.consumer_task
+
+            except asyncio.CancelledError:
+
+                pass
+
+        self.consumer.close()
+
+        self.producer.flush()
+
+
+
+# Kafka MCP 전송의 사용 예
+
+async def kafka_mcp_example():
+
+    # Kafka 전송으로 MCP 클라이언트 생성
+
+    client = Client(
+
+        {&quot;name&quot;: &quot;kafka-mcp-client&quot;, &quot;version&quot;: &quot;1.0.0&quot;},
+
+        ClientCapabilities({})
+
+    )
+
+    
+
+    # Kafka 전송 생성 및 연결
+
+    transport = KafkaMCPTransport(
+
+        bootstrap_servers=&quot;localhost:9092&quot;,
+
+        input_topic=&quot;mcp-responses&quot;,
+
+        output_topic=&quot;mcp-requests&quot;
+
+    )
+
+    
+
+    await client.connect(transport)
+
+    
+
+    try:
+
+        # MCP 세션 초기화
+
+        await client.initialize()
+
+        
+
+        # MCP를 통해 도구 실행 예
+
+        response = await client.execute_tool(
+
+            &quot;process_data&quot;,
+
+            {
+
+                &quot;data&quot;: &quot;sample data&quot;,
+
+                &quot;metadata&quot;: {
+
+                    &quot;source&quot;: &quot;sensor-1&quot;,
+
+                    &quot;timestamp&quot;: &quot;2025-06-12T10:30:00Z&quot;
+
+                }
+
+            }
+
+        )
+
+        
+
+        print(f&quot;Tool execution response: {response}&quot;)
+
+        
+
+        # 정상 종료
+
+        await client.shutdown()
+
+    finally:
+
+        await transport.close()
+
+
+
+# 예제 실행
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(kafka_mcp_example())
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Apache Pulsar 구현</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import asyncio
+
+import json
+
+import pulsar
+
+from typing import Dict, Any, Optional
+
+from mcp.core.message import JsonRpcMessage
+
+from mcp.core.transports import Transport
+
+from mcp.server import Server, ServerOptions
+
+from mcp.server.tools import Tool, ToolExecutionContext, ToolMetadata
+
+
+
+# Pulsar를 사용하는 맞춤형 MCP 전송 생성
+
+class PulsarMCPTransport(Transport):
+
+    def __init__(self, service_url: str, request_topic: str, response_topic: str):
+
+        self.service_url = service_url
+
+        self.request_topic = request_topic
+
+        self.response_topic = response_topic
+
+        self.client = pulsar.Client(service_url)
+
+        self.producer = self.client.create_producer(response_topic)
+
+        self.consumer = self.client.subscribe(
+
+            request_topic,
+
+            &quot;mcp-server-subscription&quot;,
+
+            consumer_type=pulsar.ConsumerType.Shared
+
+        )
+
+        self.message_queue = asyncio.Queue()
+
+        self.running = False
+
+        self.consumer_task = None
+
+    
+
+    async def connect(self):
+
+        &quot;&quot;&quot;Connect to Pulsar and start consuming messages&quot;&quot;&quot;
+
+        self.running = True
+
+        self.consumer_task = asyncio.create_task(self._consume_messages())
+
+        return self
+
+    
+
+    async def _consume_messages(self):
+
+        &quot;&quot;&quot;Background task to consume messages from Pulsar and queue them for processing&quot;&quot;&quot;
+
+        while self.running:
+
+            try:
+
+                # 타임아웃이 있는 논블로킹 수신
+
+                msg = self.consumer.receive(timeout_millis=500)
+
+                
+
+                # 메시지 처리
+
+                try:
+
+                    message_str = msg.data().decode(&#x27;utf-8&#x27;)
+
+                    message_data = json.loads(message_str)
+
+                    mcp_message = JsonRpcMessage.from_dict(message_data)
+
+                    await self.message_queue.put(mcp_message)
+
+                    
+
+                    # 메시지 승인
+
+                    self.consumer.acknowledge(msg)
+
+                except Exception as e:
+
+                    print(f&quot;Error processing message: {e}&quot;)
+
+                    # 오류 발생 시 부정 승인
+
+                    self.consumer.negative_acknowledge(msg)
+
+            except Exception as e:
+
+                # 타임아웃 또는 기타 예외 처리
+
+                await asyncio.sleep(0.1)
+
+    
+
+    async def read(self) -&gt; Optional[JsonRpcMessage]:
+
+        &quot;&quot;&quot;Read the next message from the queue&quot;&quot;&quot;
+
+        try:
+
+            message = await self.message_queue.get()
+
+            return message
+
+        except Exception as e:
+
+            print(f&quot;Error reading message: {e}&quot;)
+
+            return None
+
+    
+
+    async def write(self, message: JsonRpcMessage) -&gt; None:
+
+        &quot;&quot;&quot;Write a message to the Pulsar output topic&quot;&quot;&quot;
+
+        try:
+
+            message_json = json.dumps(message.to_dict())
+
+            self.producer.send(message_json.encode(&#x27;utf-8&#x27;))
+
+        except Exception as e:
+
+            print(f&quot;Error writing message: {e}&quot;)
+
+    
+
+    async def close(self) -&gt; None:
+
+        &quot;&quot;&quot;Close the transport&quot;&quot;&quot;
+
+        self.running = False
+
+        if self.consumer_task:
+
+            self.consumer_task.cancel()
+
+            try:
+
+                await self.consumer_task
+
+            except asyncio.CancelledError:
+
+                pass
+
+        self.consumer.close()
+
+        self.producer.close()
+
+        self.client.close()
+
+
+
+# 스트리밍 데이터를 처리하는 샘플 MCP 도구 정의
+
+@Tool(
+
+    name=&quot;process_streaming_data&quot;,
+
+    description=&quot;Process streaming data with context preservation&quot;,
+
+    metadata=ToolMetadata(
+
+        required_capabilities=[&quot;streaming&quot;]
+
+    )
+
+)
+
+async def process_streaming_data(
+
+    ctx: ToolExecutionContext,
+
+    data: str,
+
+    source: str,
+
+    priority: str = &quot;medium&quot;
+
+) -&gt; Dict[str, Any]:
+
+    &quot;&quot;&quot;
+
+    Process streaming data while preserving context
+
+    
+
+    Args:
+
+        ctx: Tool execution context
+
+        data: The data to process
+
+        source: The source of the data
+
+        priority: Priority level (low, medium, high)
+
+        
+
+    Returns:
+
+        Dict containing processed results and context information
+
+    &quot;&quot;&quot;
+
+    # MCP 컨텍스트를 활용하는 예제 처리
+
+    print(f&quot;Processing data from {source} with priority {priority}&quot;)
+
+    
+
+    # MCP에서 대화 컨텍스트 접근
+
+    conversation_id = ctx.conversation_id if hasattr(ctx, &#x27;conversation_id&#x27;) else &quot;unknown&quot;
+
+    
+
+    # 향상된 컨텍스트와 함께 결과 반환
+
+    return {
+
+        &quot;processed_data&quot;: f&quot;Processed: {data}&quot;,
+
+        &quot;context&quot;: {
+
+            &quot;conversation_id&quot;: conversation_id,
+
+            &quot;source&quot;: source,
+
+            &quot;priority&quot;: priority,
+
+            &quot;processing_timestamp&quot;: ctx.get_current_time_iso()
+
+        }
+
+    }
+
+
+
+# Pulsar 전송을 사용하는 MCP 서버 구현 예
+
+async def run_mcp_server_with_pulsar():
+
+    # MCP 서버 생성
+
+    server = Server(
+
+        {&quot;name&quot;: &quot;pulsar-mcp-server&quot;, &quot;version&quot;: &quot;1.0.0&quot;},
+
+        ServerOptions(
+
+            capabilities={&quot;streaming&quot;: True}
+
+        )
+
+    )
+
+    
+
+    # 도구 등록
+
+    server.register_tool(process_streaming_data)
+
+    
+
+    # Pulsar 전송 생성 및 연결
+
+    transport = PulsarMCPTransport(
+
+        service_url=&quot;pulsar://localhost:6650&quot;,
+
+        request_topic=&quot;mcp-requests&quot;,
+
+        response_topic=&quot;mcp-responses&quot;
+
+    )
+
+    
+
+    try:
+
+        # Pulsar 전송으로 서버 시작
+
+        await server.run(transport)
+
+    finally:
+
+        await transport.close()
+
+
+
+# 서버 실행
+
+if __name__ == &quot;__main__&quot;:
+
+    asyncio.run(run_mcp_server_with_pulsar())
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">배포를 위한 모범 사례</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실시간 스트리밍에 MCP를 구현할 때:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>내결함성 설계</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 적절한 오류 처리 구현  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 실패한 메시지에 데드레터 큐 사용  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 멱등 프로세서 설계  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>성능 최적화</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 적절한 버퍼 크기 설정  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 상황에 맞는 배칭 사용  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 백프레셔 메커니즘 구현  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>모니터링 및 관찰</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 스트림 처리 지표 추적  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 컨텍스트 전파 모니터링  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 이상 징후에 대한 경고 설정  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>스트림 보안 강화</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 민감 데이터 암호화 구현  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 인증 및 권한 부여 사용  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 적절한 접근 제어 적용  </p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">IoT 및 엣지 컴퓨팅에서의 MCP</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 IoT 스트리밍을 다음과 같이 강화합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">처리 파이프라인 전반에 걸친 장치 컨텍스트 보존  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">효율적인 엣지-클라우드 데이터 스트리밍 지원  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">IoT 데이터 스트림에 대한 실시간 분석 지원  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 기반 장치 간 통신 촉진  </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예시: 스마트 시티 센서 네트워크  </p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Sensors → Edge Gateways → MCP Stream Processors → Real-time Analytics → Automated Responses
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">금융 거래 및 고빈도 거래에서의 역할</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 금융 데이터 스트리밍에 다음과 같은 중요한 이점을 제공합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">거래 결정을 위한 초저지연 처리  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">처리 전반에 걸친 거래 컨텍스트 유지  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 인식 복합 이벤트 처리 지원  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">분산 거래 시스템 전반의 데이터 일관성 보장  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">AI 기반 데이터 분석 강화</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 스트리밍 분석에 새로운 가능성을 열어줍니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 모델 훈련 및 추론  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">스트리밍 데이터 기반 지속적 학습  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 인식 특성 추출  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보존된 컨텍스트를 활용한 다중 모델 추론 파이프라인  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">미래 동향 및 혁신</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">실시간 환경에서 MCP의 진화</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">앞으로 MCP가 다음 문제를 해결하며 진화할 것으로 예상됩니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>양자 컴퓨팅 통합</strong>: 양자 기반 스트리밍 시스템 대비  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>엣지 네이티브 처리</strong>: 더 많은 컨텍스트 인식 처리를 엣지 디바이스로 이전  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>자율 스트림 관리</strong>: 스스로 최적화하는 스트리밍 파이프라인  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>연합 스트리밍</strong>: 프라이버시를 유지하면서 분산 처리  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">기술의 잠재적 발전</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 스트리밍 미래에 영향을 줄 신기술:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>AI 최적화 스트리밍 프로토콜</strong>: AI 워크로드에 특화된 맞춤 프로토콜  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>신경형 컴퓨팅 통합</strong>: 뇌를 모방한 연산 방식의 스트림 처리  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>서버리스 스트리밍</strong>: 인프라 관리 없이 이벤트 기반, 확장형 스트리밍  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>분산 컨텍스트 저장소</strong>: 전 세계에 분산되면서도 높은 일관성 유지하는 컨텍스트 관리  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">실습</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연습 1: 기본 MCP 스트리밍 파이프라인 설정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 연습에서 배우는 내용:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">기본 MCP 스트리밍 환경 구성  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">스트림 처리를 위한 컨텍스트 핸들러 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 유지 테스트 및 검증  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연습 2: 실시간 분석 대시보드 구축</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">완성할 애플리케이션:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP를 사용한 스트리밍 데이터 인제스트  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 유지하며 스트림 처리  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 결과 시각화  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연습 3: MCP로 복합 이벤트 처리 구현</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">고급 연습 내용:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">스트림 내 패턴 탐지  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">여러 스트림 간 컨텍스트 연관성  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보존된 컨텍스트로 복합 이벤트 생성  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io">Model Context Protocol Specification</a> - 공식 MCP 사양 및 문서  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://kafka.apache.org/documentation/">Apache Kafka Documentation</a> - Kafka 기반 스트림 처리 학습  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://pulsar.apache.org/">Apache Pulsar</a> - 통합 메시징 및 스트리밍 플랫폼  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.oreilly.com/library/view/streaming-systems/9781491983867/">Streaming Systems: The What, Where, When, and How of Large-Scale Data Processing</a> - 스트리밍 아키텍처 종합서  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/azure/event-hubs/event-hubs-about">Microsoft Azure Event Hubs</a> - 관리형 이벤트 스트리밍 서비스  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://mlflow.org/docs/latest/index.html">MLflow Documentation</a> - ML 모델 추적 및 배포용  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://storm.apache.org/releases/current/index.html">Real-Time Analytics with Apache Storm</a> - 실시간 컴퓨팅 처리 프레임워크  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://nightlies.apache.org/flink/flink-ml-docs-master/">Flink ML</a> - Apache Flink용 머신러닝 라이브러리  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://python.langchain.com/docs/get_started/introduction">LangChain Documentation</a> - LLM 기반 애플리케이션 구축  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 성과</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈을 완료하면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 데이터 스트리밍의 기본과 과제 이해  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모델 컨텍스트 프로토콜(MCP)이 실시간 데이터 스트리밍을 어떻게 개선하는지 설명  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Kafka와 Pulsar 같은 인기 프레임워크를 사용해 MCP 기반 스트리밍 솔루션 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP를 활용한 내결함성 및 고성능 스트리밍 아키텍처 설계 및 배포  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">IoT, 금융 거래, AI 기반 분석 사례에 MCP 개념 적용  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 기반 스트리밍 기술의 최신 동향과 미래 혁신 평가  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-realtimesearch/README.md" target="_blank">5.11 Realtime Search</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 기하기 위해 노력하고 있으나, 자동 번역은 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어본이 권위 있는 자료로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문가의 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m05_08-59-web-search-sample.html">&larr; 5.9 Web Search sample</a></span>
+  <span><a href="m05_10-511-realtime-web-search.html">5.11 Realtime Web Search &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

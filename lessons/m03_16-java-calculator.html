@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Java Calculator - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; Java Calculator</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Basic Calculator MCP Service</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This service provides basic calculator operations through the Model Context Protocol (MCP) using Spring Boot with WebFlux transport. It's designed as a simple example for beginners learning about MCP implementations.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For more information, see the <a class="text-[var(--accent)] underline" href="https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html">MCP Server Boot Starter</a> reference documentation.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The service showcases:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Support for SSE (Server-Sent Events)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Automatic tool registration using Spring AI's <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">@Tool</code> annotation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Basic calculator functions:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Addition, subtraction, multiplication, division</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Power calculation and square root</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Modulus (remainder) and absolute value</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Help function for operation descriptions</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Features</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This calculator service offers the following capabilities:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Basic Arithmetic Operations</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Addition of two numbers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Subtraction of one number from another</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Multiplication of two numbers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Division of one number by another (with zero division check)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Advanced Operations</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Power calculation (raising a base to an exponent)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Square root calculation (with negative number check)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Modulus (remainder) calculation</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Absolute value calculation</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Help System</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Built-in help function explaining all available operations</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Using the Service</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The service exposes the following API endpoints through the MCP protocol:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">add(a, b)</code>: Add two numbers together</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">subtract(a, b)</code>: Subtract the second number from the first</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">multiply(a, b)</code>: Multiply two numbers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">divide(a, b)</code>: Divide the first number by the second (with zero check)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">power(base, exponent)</code>: Calculate the power of a number</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">squareRoot(number)</code>: Calculate the square root (with negative number check)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">modulus(a, b)</code>: Calculate the remainder when dividing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">absolute(number)</code>: Calculate the absolute value</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">help()</code>: Get information about available operations</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Test Client</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">A simple test client is included in the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">com.microsoft.mcp.sample.client</code> package.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">SampleCalculatorClient</code> class demonstrates the available operations of the calculator service.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Using the LangChain4j Client</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The project includes a LangChain4j example client in <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">com.microsoft.mcp.sample.client.LangChain4jClient</code> that demonstrates how to integrate the calculator service with LangChain4j and GitHub models:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Prerequisites</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>GitHub Token Setup</strong>:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   To use GitHub's AI models (like phi-4), you need a GitHub personal access token:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   a. Go to your GitHub account settings: https://github.com/settings/tokens</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   b. Click "Generate new token" → "Generate new token (classic)"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   c. Give your token a descriptive name</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   d. Select the following scopes:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">repo</code> (Full control of private repositories)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">read:org</code> (Read org and team membership, read org projects)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">gist</code> (Create gists)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">user:email</code> (Access user email addresses (read-only))</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   e. Click "Generate token" and copy your new token</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   f. Set it as an environment variable:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      On Windows:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      set GITHUB_TOKEN=your-github-token</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      On macOS/Linux:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      export GITHUB_TOKEN=your-github-token</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   g. For persistent setup, add it to your environment variables through system settings</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Add the LangChain4j GitHub dependency to your project (already included in pom.xml):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```xml</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <dependency></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       <groupId>dev.langchain4j</groupId></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       <artifactId>langchain4j-github</artifactId></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       <version>${langchain4j.version}</version></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   </dependency></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Ensure the calculator server is running on <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">localhost:8080</code></p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Running the LangChain4j Client</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This example demonstrates:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Connecting to the calculator MCP server via SSE transport</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Using LangChain4j to create a chat bot that leverages calculator operations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integrating with GitHub AI models (now using phi-4 model)</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The client sends the following sample queries to demonstrate functionality:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Calculating the sum of two numbers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Finding the square root of a number</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Getting help information about available calculator operations</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Run the example and check the console output to see how the AI model uses the calculator tools to respond to queries.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">GitHub Model Configuration</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The LangChain4j client is configured to use GitHub's phi-4 model with the following settings:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+ChatLanguageModel model = GitHubChatModel.builder()
+
+    .apiKey(System.getenv(&quot;GITHUB_TOKEN&quot;))
+
+    .timeout(Duration.ofSeconds(60))
+
+    .modelName(&quot;phi-4&quot;)
+
+    .logRequests(true)
+
+    .logResponses(true)
+
+    .build();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To use different GitHub models, simply change the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">modelName</code> parameter to another supported model (e.g., "claude-3-haiku-20240307", "llama-3-70b-8192", etc.).</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Dependencies</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The project requires the following key dependencies:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;!-- For MCP Server --&gt;
+
+&lt;dependency&gt;
+
+    &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+
+    &lt;artifactId&gt;spring-ai-starter-mcp-server-webflux&lt;/artifactId&gt;
+
+&lt;/dependency&gt;
+
+
+
+&lt;!-- For LangChain4j integration --&gt;
+
+&lt;dependency&gt;
+
+    &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+    &lt;artifactId&gt;langchain4j-mcp&lt;/artifactId&gt;
+
+    &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+&lt;/dependency&gt;
+
+
+
+&lt;!-- For GitHub models support --&gt;
+
+&lt;dependency&gt;
+
+    &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+    &lt;artifactId&gt;langchain4j-github&lt;/artifactId&gt;
+
+    &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+&lt;/dependency&gt;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Building the Project</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Build the project using Maven:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+./mvnw clean install -DskipTests
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Running the Server</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using Java</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+java -jar target/calculator-server-0.0.1-SNAPSHOT.jar
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using MCP Inspector</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The MCP Inspector is a helpful tool for interacting with MCP services. To use it with this calculator service:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Install and run MCP Inspector</strong> in a new terminal window:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   npx @modelcontextprotocol/inspector</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Access the web UI</strong> by clicking the URL displayed by the app (typically http://localhost:6274)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Configure the connection</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Set the transport type to "SSE"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Set the URL to your running server's SSE endpoint: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:8080/sse</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Click "Connect"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Use the tools</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Click "List Tools" to see available calculator operations</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Select a tool and click "Run Tool" to execute an operation</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using Docker</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The project includes a Dockerfile for containerized deployment:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Build the Docker image</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker build -t calculator-mcp-service .</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Run the Docker container</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker run -p 8080:8080 calculator-mcp-service</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This will:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Build a multi-stage Docker image with Maven 3.9.9 and Eclipse Temurin 24 JDK</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create an optimized container image</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Expose the service on port 8080</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Start the MCP calculator service inside the container</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You can access the service at <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:8080</code> once the container is running.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Troubleshooting</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Common Issues with GitHub Token</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Token Permission Issues</strong>: If you get a 403 Forbidden error, check that your token has the correct permissions as outlined in the prerequisites.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Token Not Found</strong>: If you get a "No API key found" error, ensure the GITHUB_TOKEN environment variable is properly set.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Rate Limiting</strong>: GitHub API has rate limits. If you encounter a rate limit error (status code 429), wait a few minutes before trying again.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Token Expiration</strong>: GitHub tokens can expire. If you receive authentication errors after some time, generate a new token and update your environment variable.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If you need further assistance, check the <a class="text-[var(--accent)] underline" href="https://github.com/langchain4j/langchain4j">LangChain4j documentation</a> or <a class="text-[var(--accent)] underline" href="https://docs.github.com/en/rest">GitHub API documentation</a>.</p>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Basic Calculator MCP Service</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 서비스는 Spring Boot와 WebFlux 전송을 사용하여 Model Context Protocol(MCP)을 통해 기본 계산기 연산을 제공합니다. MCP 구현을 배우는 초보자를 위한 간단한 예제로 설계되었습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">자세한 내용은 <a class="text-[var(--accent)] underline" href="https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html">MCP Server Boot Starter</a> 참조 문서를 확인하세요.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 서비스는 다음을 보여줍니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">SSE(Server-Sent Events) 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Spring AI의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">@Tool</code> 애노테이션을 통한 자동 도구 등록</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">기본 계산기 기능:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 덧셈, 뺄셈, 곱셈, 나눗셈</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 거듭제곱 계산과 제곱근</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 나머지 연산과 절댓값</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 연산 설명을 위한 도움말 기능</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">기능</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 계산기 서비스는 다음과 같은 기능을 제공합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>기본 산술 연산</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 두 수의 덧셈</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 한 수에서 다른 수를 뺌</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 두 수의 곱셈</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 한 수를 다른 수로 나눔 (0으로 나누기 검사 포함)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>고급 연산</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 거듭제곱 계산 (밑을 지수만큼 올림)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 제곱근 계산 (음수 검사 포함)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 나머지(모듈로) 계산</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 절댓값 계산</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>도움말 시스템</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 사용 가능한 모든 연산을 설명하는 내장 도움말 기능</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">서비스 사용법</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 서비스는 MCP 프로토콜을 통해 다음 API 엔드포인트를 제공합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">add(a, b)</code>: 두 수를 더함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">subtract(a, b)</code>: 두 번째 수를 첫 번째 수에서 뺌</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">multiply(a, b)</code>: 두 수를 곱함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">divide(a, b)</code>: 첫 번째 수를 두 번째 수로 나눔 (0 검사 포함)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">power(base, exponent)</code>: 거듭제곱 계산</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">squareRoot(number)</code>: 제곱근 계산 (음수 검사 포함)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">modulus(a, b)</code>: 나눗셈 후 나머지 계산</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">absolute(number)</code>: 절댓값 계산</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">help()</code>: 사용 가능한 연산에 대한 정보 제공</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">테스트 클라이언트</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">com.microsoft.mcp.sample.client</code> 패키지에 간단한 테스트 클라이언트가 포함되어 있습니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">SampleCalculatorClient</code> 클래스는 계산기 서비스의 사용 가능한 연산을 시연합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">LangChain4j 클라이언트 사용법</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">프로젝트에는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">com.microsoft.mcp.sample.client.LangChain4jClient</code>에 LangChain4j 예제 클라이언트가 포함되어 있어 계산기 서비스를 LangChain4j 및 GitHub 모델과 통합하는 방법을 보여줍니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">사전 준비 사항</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>GitHub 토큰 설정</strong>:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   GitHub의 AI 모델(phi-4 등)을 사용하려면 GitHub 개인 액세스 토큰이 필요합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   a. GitHub 계정 설정으로 이동: https://github.com/settings/tokens</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   b. "Generate new token" → "Generate new token (classic)" 클릭</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   c. 토큰에 설명 이름 지정</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   d. 다음 권한 선택:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">repo</code> (비공개 저장소 전체 제어)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">read:org</code> (조직 및 팀 멤버십, 조직 프로젝트 읽기)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">gist</code> (Gist 생성)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">user:email</code> (사용자 이메일 주소 접근(읽기 전용))</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   e. "Generate token" 클릭 후 새 토큰 복사</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   f. 환경 변수로 설정:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      Windows에서:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      set GITHUB_TOKEN=your-github-token</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      macOS/Linux에서:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      export GITHUB_TOKEN=your-github-token</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">      ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   g. 지속적인 설정을 위해 시스템 환경 변수에 추가</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. LangChain4j GitHub 의존성을 프로젝트에 추가 (pom.xml에 이미 포함됨):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```xml</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <dependency></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       <groupId>dev.langchain4j</groupId></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       <artifactId>langchain4j-github</artifactId></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       <version>${langchain4j.version}</version></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   </dependency></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 계산기 서버가 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">localhost:8080</code>에서 실행 중인지 확인</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">LangChain4j 클라이언트 실행</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 예제는 다음을 보여줍니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">SSE 전송을 통해 계산기 MCP 서버에 연결</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LangChain4j를 사용해 계산기 연산을 활용하는 챗봇 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub AI 모델(phi-4 모델 사용)과 통합</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트는 다음 샘플 쿼리를 보내 기능을 시연합니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 두 수의 합 계산</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 수의 제곱근 계산</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 사용 가능한 계산기 연산에 대한 도움말 정보 요청</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예제를 실행하고 콘솔 출력을 확인하여 AI 모델이 계산기 도구를 어떻게 활용하는지 확인하세요.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">GitHub 모델 구성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">LangChain4j 클라이언트는 다음 설정으로 GitHub의 phi-4 모델을 사용하도록 구성되어 있습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+ChatLanguageModel model = GitHubChatModel.builder()
+
+    .apiKey(System.getenv(&quot;GITHUB_TOKEN&quot;))
+
+    .timeout(Duration.ofSeconds(60))
+
+    .modelName(&quot;phi-4&quot;)
+
+    .logRequests(true)
+
+    .logResponses(true)
+
+    .build();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다른 GitHub 모델을 사용하려면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">modelName</code> 매개변수를 지원되는 다른 모델 이름(예: "claude-3-haiku-20240307", "llama-3-70b-8192" 등)으로 변경하면 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">의존성</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">프로젝트에 필요한 주요 의존성은 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;!-- For MCP Server --&gt;
+
+&lt;dependency&gt;
+
+    &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+
+    &lt;artifactId&gt;spring-ai-starter-mcp-server-webflux&lt;/artifactId&gt;
+
+&lt;/dependency&gt;
+
+
+
+&lt;!-- For LangChain4j integration --&gt;
+
+&lt;dependency&gt;
+
+    &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+    &lt;artifactId&gt;langchain4j-mcp&lt;/artifactId&gt;
+
+    &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+&lt;/dependency&gt;
+
+
+
+&lt;!-- For GitHub models support --&gt;
+
+&lt;dependency&gt;
+
+    &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+    &lt;artifactId&gt;langchain4j-github&lt;/artifactId&gt;
+
+    &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+&lt;/dependency&gt;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">프로젝트 빌드</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Maven을 사용하여 프로젝트를 빌드하세요:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+./mvnw clean install -DskipTests
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">서버 실행</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Java 사용</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+java -jar target/calculator-server-0.0.1-SNAPSHOT.jar
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP Inspector 사용</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP Inspector는 MCP 서비스와 상호작용할 수 있는 유용한 도구입니다. 이 계산기 서비스와 함께 사용하려면:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>MCP Inspector 설치 및 실행</strong> (새 터미널 창에서):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   npx @modelcontextprotocol/inspector</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>웹 UI 접속</strong>: 앱에서 표시하는 URL(보통 http://localhost:6274)을 클릭</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>연결 설정</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 전송 유형을 "SSE"로 설정</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 실행 중인 서버의 SSE 엔드포인트 URL을 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:8080/sse</code>로 설정</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - "Connect" 클릭</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>도구 사용</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - "List Tools" 클릭하여 사용 가능한 계산기 연산 확인</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 도구 선택 후 "Run Tool" 클릭하여 연산 실행</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Docker 사용</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">프로젝트에는 컨테이너 배포를 위한 Dockerfile이 포함되어 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Docker 이미지 빌드</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker build -t calculator-mcp-service .</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Docker 컨테이너 실행</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   docker run -p 8080:8080 calculator-mcp-service</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 작업은:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Maven 3.9.9와 Eclipse Temurin 24 JDK를 사용하는 다단계 Docker 이미지 빌드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">최적화된 컨테이너 이미지 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">포트 8080 노출</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨테이너 내에서 MCP 계산기 서비스 시작</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨테이너가 실행되면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:8080</code>에서 서비스에 접속할 수 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">문제 해결</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">GitHub 토큰 관련 일반 문제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>토큰 권한 문제</strong>: 403 Forbidden 오류가 발생하면, 사전 준비 사항에 명시된 권한이 올바르게 설정되었는지 확인하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>토큰 미설정</strong>: "No API key found" 오류가 발생하면 GITHUB_TOKEN 환경 변수가 제대로 설정되었는지 확인하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>요청 제한 초과</strong>: GitHub API는 요청 제한이 있습니다. 429 상태 코드 오류가 발생하면 잠시 기다렸다가 다시 시도하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>토큰 만료</strong>: GitHub 토큰은 만료될 수 있습니다. 인증 오류가 발생하면 새 토큰을 생성하고 환경 변수를 업데이트하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">추가 도움이 필요하면 <a class="text-[var(--accent)] underline" href="https://github.com/langchain4j/langchain4j">LangChain4j 문서</a> 또는 <a class="text-[var(--accent)] underline" href="https://docs.github.com/en/rest">GitHub API 문서</a>를 참고하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m03_15-15-mcp-apps.html">&larr; 15 Mcp Apps</a></span>
+  <span><a href="m03_17-javascript-calculator.html">JavaScript Calculator &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

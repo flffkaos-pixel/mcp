@@ -1,0 +1,3808 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>05 - MCP Server Implementation - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 05 - MCP Server Implementation</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP Server Implementation</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This hands-on lab guides you through implementing a production-ready MCP server using FastMCP framework.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll build the core server structure, implement database integration, create tools for data access, and establish the foundation for AI-powered retail analytics.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The MCP server is the heart of our retail analytics solution. It acts as a bridge between AI assistants and the PostgreSQL database, providing secure, intelligent access to business data through a standardized protocol.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab teaches you to build a robust, scalable MCP server following enterprise patterns and best practices.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Build</strong> a FastMCP server with proper architecture and organization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> database integration with connection pooling and error handling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Create</strong> MCP tools for database schema introspection and query execution</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Configure</strong> Row Level Security context management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Add</strong> health monitoring and observability features</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Test</strong> your MCP server implementation locally and with VS Code</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📁 Project Structure</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's examine the MCP server organization:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_server/
+
+├── __init__.py                 # Package initialization
+
+├── config.py                   # Configuration management
+
+├── health_check.py             # Health monitoring endpoints
+
+├── sales_analysis.py           # Main MCP server implementation
+
+├── sales_analysis_postgres.py  # Database integration layer
+
+└── sales_analysis_text_embeddings.py  # AI/semantic search integration
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 Configuration Management</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Environment Configuration (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">config.py</code>)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">First, let's create a robust configuration system:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/config.py
+
+&quot;&quot;&quot;
+
+Configuration management for the MCP server.
+
+Handles environment variables, validation, and defaults.
+
+&quot;&quot;&quot;
+
+import os
+
+import logging
+
+from typing import Optional, Dict, Any
+
+from dataclasses import dataclass
+
+from dotenv import load_dotenv
+
+
+
+# Load environment variables from .env file
+
+load_dotenv()
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+@dataclass
+
+class DatabaseConfig:
+
+    &quot;&quot;&quot;Database connection configuration.&quot;&quot;&quot;
+
+    host: str
+
+    port: int
+
+    database: str
+
+    user: str
+
+    password: str
+
+    min_connections: int = 2
+
+    max_connections: int = 10
+
+    command_timeout: int = 30
+
+    
+
+    @classmethod
+
+    def from_env(cls) -&gt; &#x27;DatabaseConfig&#x27;:
+
+        &quot;&quot;&quot;Create configuration from environment variables.&quot;&quot;&quot;
+
+        return cls(
+
+            host=os.getenv(&#x27;POSTGRES_HOST&#x27;, &#x27;localhost&#x27;),
+
+            port=int(os.getenv(&#x27;POSTGRES_PORT&#x27;, &#x27;5432&#x27;)),
+
+            database=os.getenv(&#x27;POSTGRES_DB&#x27;, &#x27;zava&#x27;),
+
+            user=os.getenv(&#x27;POSTGRES_USER&#x27;, &#x27;postgres&#x27;),
+
+            password=os.getenv(&#x27;POSTGRES_PASSWORD&#x27;, &#x27;&#x27;),
+
+            min_connections=int(os.getenv(&#x27;POSTGRES_MIN_CONNECTIONS&#x27;, &#x27;2&#x27;)),
+
+            max_connections=int(os.getenv(&#x27;POSTGRES_MAX_CONNECTIONS&#x27;, &#x27;10&#x27;)),
+
+            command_timeout=int(os.getenv(&#x27;POSTGRES_COMMAND_TIMEOUT&#x27;, &#x27;30&#x27;))
+
+        )
+
+    
+
+    def to_asyncpg_params(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Convert to asyncpg connection parameters.&quot;&quot;&quot;
+
+        return {
+
+            &#x27;host&#x27;: self.host,
+
+            &#x27;port&#x27;: self.port,
+
+            &#x27;database&#x27;: self.database,
+
+            &#x27;user&#x27;: self.user,
+
+            &#x27;password&#x27;: self.password,
+
+            &#x27;command_timeout&#x27;: self.command_timeout,
+
+            &#x27;server_settings&#x27;: {
+
+                &#x27;application_name&#x27;: &#x27;zava-mcp-server&#x27;,
+
+                &#x27;jit&#x27;: &#x27;off&#x27;,  # Disable JIT for stability
+
+                &#x27;work_mem&#x27;: &#x27;4MB&#x27;,
+
+                &#x27;statement_timeout&#x27;: f&#x27;{self.command_timeout}s&#x27;
+
+            }
+
+        }
+
+
+
+@dataclass
+
+class AzureConfig:
+
+    &quot;&quot;&quot;Azure AI services configuration.&quot;&quot;&quot;
+
+    project_endpoint: str
+
+    openai_endpoint: str
+
+    embedding_model_deployment: str
+
+    client_id: str
+
+    client_secret: str
+
+    tenant_id: str
+
+    
+
+    @classmethod
+
+    def from_env(cls) -&gt; &#x27;AzureConfig&#x27;:
+
+        &quot;&quot;&quot;Create configuration from environment variables.&quot;&quot;&quot;
+
+        return cls(
+
+            project_endpoint=os.getenv(&#x27;PROJECT_ENDPOINT&#x27;, &#x27;&#x27;),
+
+            openai_endpoint=os.getenv(&#x27;AZURE_OPENAI_ENDPOINT&#x27;, &#x27;&#x27;),
+
+            embedding_model_deployment=os.getenv(&#x27;EMBEDDING_MODEL_DEPLOYMENT_NAME&#x27;, &#x27;text-embedding-3-small&#x27;),
+
+            client_id=os.getenv(&#x27;AZURE_CLIENT_ID&#x27;, &#x27;&#x27;),
+
+            client_secret=os.getenv(&#x27;AZURE_CLIENT_SECRET&#x27;, &#x27;&#x27;),
+
+            tenant_id=os.getenv(&#x27;AZURE_TENANT_ID&#x27;, &#x27;&#x27;)
+
+        )
+
+    
+
+    def is_configured(self) -&gt; bool:
+
+        &quot;&quot;&quot;Check if all required Azure configuration is present.&quot;&quot;&quot;
+
+        return all([
+
+            self.project_endpoint,
+
+            self.openai_endpoint,
+
+            self.client_id,
+
+            self.client_secret,
+
+            self.tenant_id
+
+        ])
+
+
+
+@dataclass
+
+class ServerConfig:
+
+    &quot;&quot;&quot;MCP server configuration.&quot;&quot;&quot;
+
+    host: str = &#x27;0.0.0.0&#x27;
+
+    port: int = 8000
+
+    log_level: str = &#x27;INFO&#x27;
+
+    enable_cors: bool = True
+
+    enable_health_check: bool = True
+
+    applicationinsights_connection_string: Optional[str] = None
+
+    
+
+    @classmethod
+
+    def from_env(cls) -&gt; &#x27;ServerConfig&#x27;:
+
+        &quot;&quot;&quot;Create configuration from environment variables.&quot;&quot;&quot;
+
+        return cls(
+
+            host=os.getenv(&#x27;MCP_SERVER_HOST&#x27;, &#x27;0.0.0.0&#x27;),
+
+            port=int(os.getenv(&#x27;MCP_SERVER_PORT&#x27;, &#x27;8000&#x27;)),
+
+            log_level=os.getenv(&#x27;LOG_LEVEL&#x27;, &#x27;INFO&#x27;).upper(),
+
+            enable_cors=os.getenv(&#x27;ENABLE_CORS&#x27;, &#x27;true&#x27;).lower() == &#x27;true&#x27;,
+
+            enable_health_check=os.getenv(&#x27;ENABLE_HEALTH_CHECK&#x27;, &#x27;true&#x27;).lower() == &#x27;true&#x27;,
+
+            applicationinsights_connection_string=os.getenv(&#x27;APPLICATIONINSIGHTS_CONNECTION_STRING&#x27;)
+
+        )
+
+
+
+class MCPServerConfig:
+
+    &quot;&quot;&quot;Main configuration class for the MCP server.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.database = DatabaseConfig.from_env()
+
+        self.azure = AzureConfig.from_env()
+
+        self.server = ServerConfig.from_env()
+
+        
+
+        # Validate configuration
+
+        self._validate_config()
+
+    
+
+    def _validate_config(self):
+
+        &quot;&quot;&quot;Validate configuration and log warnings for missing values.&quot;&quot;&quot;
+
+        if not self.database.password:
+
+            logger.warning(&quot;Database password is empty. This may cause connection issues.&quot;)
+
+        
+
+        if not self.azure.is_configured():
+
+            logger.warning(&quot;Azure configuration is incomplete. AI features may not work.&quot;)
+
+        
+
+        logger.info(f&quot;Configuration loaded - Database: {self.database.host}:{self.database.port}&quot;)
+
+        logger.info(f&quot;Server will run on {self.server.host}:{self.server.port}&quot;)
+
+
+
+# Global configuration instance
+
+config = MCPServerConfig()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Key Configuration Features</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Environment Variable Loading</strong>: Automatic .env file support</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Type Safety</strong>: Dataclass validation and type hints</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Flexible Defaults</strong>: Sensible defaults for development</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Validation</strong>: Configuration validation with helpful error messages</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Security</strong>: Sensitive values only from environment variables</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🗄️ Database Integration Layer</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">PostgreSQL Provider (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sales_analysis_postgres.py</code>)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's implement the database integration layer:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/sales_analysis_postgres.py
+
+&quot;&quot;&quot;
+
+PostgreSQL database integration for MCP server.
+
+Handles connections, queries, and schema introspection.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+import logging
+
+from typing import Dict, Any, List, Optional, Tuple
+
+from contextlib import asynccontextmanager
+
+from datetime import datetime
+
+import json
+
+
+
+from .config import config
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class PostgreSQLSchemaProvider:
+
+    &quot;&quot;&quot;Provides PostgreSQL database access and schema information.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.connection_pool: Optional[asyncpg.Pool] = None
+
+        self.postgres_config = config.database.to_asyncpg_params()
+
+        
+
+    async def create_pool(self) -&gt; None:
+
+        &quot;&quot;&quot;Create connection pool for database operations.&quot;&quot;&quot;
+
+        if self.connection_pool is None:
+
+            try:
+
+                self.connection_pool = await asyncpg.create_pool(
+
+                    **self.postgres_config,
+
+                    min_size=config.database.min_connections,
+
+                    max_size=config.database.max_connections,
+
+                    max_inactive_connection_lifetime=300  # 5 minutes
+
+                )
+
+                logger.info(&quot;Database connection pool created successfully&quot;)
+
+            except Exception as e:
+
+                logger.error(f&quot;Failed to create database connection pool: {e}&quot;)
+
+                raise
+
+    
+
+    async def close_pool(self) -&gt; None:
+
+        &quot;&quot;&quot;Close the connection pool.&quot;&quot;&quot;
+
+        if self.connection_pool:
+
+            await self.connection_pool.close()
+
+            self.connection_pool = None
+
+            logger.info(&quot;Database connection pool closed&quot;)
+
+    
+
+    @asynccontextmanager
+
+    async def get_connection(self):
+
+        &quot;&quot;&quot;Get a database connection from the pool.&quot;&quot;&quot;
+
+        if not self.connection_pool:
+
+            await self.create_pool()
+
+        
+
+        async with self.connection_pool.acquire() as connection:
+
+            yield connection
+
+    
+
+    async def set_rls_context(self, connection: asyncpg.Connection, rls_user_id: str) -&gt; None:
+
+        &quot;&quot;&quot;Set Row Level Security context for the connection.&quot;&quot;&quot;
+
+        try:
+
+            await connection.execute(
+
+                &quot;SELECT set_config(&#x27;app.current_rls_user_id&#x27;, $1, false)&quot;,
+
+                rls_user_id
+
+            )
+
+            logger.debug(f&quot;RLS context set for user: {rls_user_id}&quot;)
+
+        except Exception as e:
+
+            logger.error(f&quot;Failed to set RLS context: {e}&quot;)
+
+            raise
+
+    
+
+    async def get_table_schema(self, table_name: str, rls_user_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get detailed schema information for a specific table.&quot;&quot;&quot;
+
+        async with self.get_connection() as conn:
+
+            await self.set_rls_context(conn, rls_user_id)
+
+            
+
+            # Parse schema and table name
+
+            if &#x27;.&#x27; in table_name:
+
+                schema_name, table_name = table_name.split(&#x27;.&#x27;, 1)
+
+            else:
+
+                schema_name = &#x27;retail&#x27;  # Default schema
+
+            
+
+            # Get column information
+
+            columns_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    column_name,
+
+                    data_type,
+
+                    is_nullable,
+
+                    column_default,
+
+                    character_maximum_length,
+
+                    numeric_precision,
+
+                    numeric_scale,
+
+                    ordinal_position
+
+                FROM information_schema.columns 
+
+                WHERE table_schema = $1 AND table_name = $2
+
+                ORDER BY ordinal_position
+
+            &quot;&quot;&quot;
+
+            
+
+            columns = await conn.fetch(columns_query, schema_name, table_name)
+
+            
+
+            if not columns:
+
+                raise ValueError(f&quot;Table {schema_name}.{table_name} not found or not accessible&quot;)
+
+            
+
+            # Get foreign key relationships
+
+            fk_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    kcu.column_name,
+
+                    ccu.table_schema AS foreign_table_schema,
+
+                    ccu.table_name AS foreign_table_name,
+
+                    ccu.column_name AS foreign_column_name
+
+                FROM information_schema.table_constraints tc
+
+                JOIN information_schema.key_column_usage kcu 
+
+                    ON tc.constraint_name = kcu.constraint_name
+
+                JOIN information_schema.constraint_column_usage ccu 
+
+                    ON ccu.constraint_name = tc.constraint_name
+
+                WHERE tc.constraint_type = &#x27;FOREIGN KEY&#x27; 
+
+                    AND tc.table_schema = $1 
+
+                    AND tc.table_name = $2
+
+            &quot;&quot;&quot;
+
+            
+
+            foreign_keys = await conn.fetch(fk_query, schema_name, table_name)
+
+            
+
+            # Get indexes
+
+            index_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    indexname,
+
+                    indexdef
+
+                FROM pg_indexes 
+
+                WHERE schemaname = $1 AND tablename = $2
+
+            &quot;&quot;&quot;
+
+            
+
+            indexes = await conn.fetch(index_query, schema_name, table_name)
+
+            
+
+            # Format schema information
+
+            schema_info = {
+
+                &quot;table_name&quot;: f&quot;{schema_name}.{table_name}&quot;,
+
+                &quot;columns&quot;: [
+
+                    {
+
+                        &quot;name&quot;: col[&quot;column_name&quot;],
+
+                        &quot;type&quot;: col[&quot;data_type&quot;],
+
+                        &quot;nullable&quot;: col[&quot;is_nullable&quot;] == &quot;YES&quot;,
+
+                        &quot;default&quot;: col[&quot;column_default&quot;],
+
+                        &quot;max_length&quot;: col[&quot;character_maximum_length&quot;],
+
+                        &quot;precision&quot;: col[&quot;numeric_precision&quot;],
+
+                        &quot;scale&quot;: col[&quot;numeric_scale&quot;],
+
+                        &quot;position&quot;: col[&quot;ordinal_position&quot;]
+
+                    }
+
+                    for col in columns
+
+                ],
+
+                &quot;foreign_keys&quot;: [
+
+                    {
+
+                        &quot;column&quot;: fk[&quot;column_name&quot;],
+
+                        &quot;references&quot;: f&quot;{fk[&#x27;foreign_table_schema&#x27;]}.{fk[&#x27;foreign_table_name&#x27;]}.{fk[&#x27;foreign_column_name&#x27;]}&quot;
+
+                    }
+
+                    for fk in foreign_keys
+
+                ],
+
+                &quot;indexes&quot;: [
+
+                    {
+
+                        &quot;name&quot;: idx[&quot;indexname&quot;],
+
+                        &quot;definition&quot;: idx[&quot;indexdef&quot;]
+
+                    }
+
+                    for idx in indexes
+
+                ]
+
+            }
+
+            
+
+            return schema_info
+
+    
+
+    async def get_multiple_table_schemas(
+
+        self, 
+
+        table_names: List[str], 
+
+        rls_user_id: str
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Get schema information for multiple tables.&quot;&quot;&quot;
+
+        schemas = []
+
+        
+
+        for table_name in table_names:
+
+            try:
+
+                schema = await self.get_table_schema(table_name, rls_user_id)
+
+                schemas.append(self._format_schema_for_ai(schema))
+
+            except Exception as e:
+
+                logger.warning(f&quot;Failed to get schema for {table_name}: {e}&quot;)
+
+                schemas.append(f&quot;Error retrieving schema for {table_name}: {str(e)}&quot;)
+
+        
+
+        return &quot;\n\n&quot;.join(schemas)
+
+    
+
+    def _format_schema_for_ai(self, schema: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Format schema information for AI consumption.&quot;&quot;&quot;
+
+        table_name = schema[&quot;table_name&quot;]
+
+        columns = schema[&quot;columns&quot;]
+
+        foreign_keys = schema[&quot;foreign_keys&quot;]
+
+        
+
+        # Create column definitions
+
+        column_lines = []
+
+        for col in columns:
+
+            nullable = &quot;NULL&quot; if col[&quot;nullable&quot;] else &quot;NOT NULL&quot;
+
+            type_info = col[&quot;type&quot;]
+
+            
+
+            if col[&quot;max_length&quot;]:
+
+                type_info += f&quot;({col[&#x27;max_length&#x27;]})&quot;
+
+            elif col[&quot;precision&quot;] and col[&quot;scale&quot;]:
+
+                type_info += f&quot;({col[&#x27;precision&#x27;]},{col[&#x27;scale&#x27;]})&quot;
+
+            
+
+            default_info = f&quot; DEFAULT {col[&#x27;default&#x27;]}&quot; if col[&quot;default&quot;] else &quot;&quot;
+
+            
+
+            column_lines.append(f&quot;  {col[&#x27;name&#x27;]} {type_info} {nullable}{default_info}&quot;)
+
+        
+
+        # Create foreign key information
+
+        fk_lines = []
+
+        for fk in foreign_keys:
+
+            fk_lines.append(f&quot;  {fk[&#x27;column&#x27;]} -&gt; {fk[&#x27;references&#x27;]}&quot;)
+
+        
+
+        # Combine into readable format
+
+        schema_text = f&quot;Table: {table_name}\n&quot;
+
+        schema_text += &quot;Columns:\n&quot; + &quot;\n&quot;.join(column_lines)
+
+        
+
+        if fk_lines:
+
+            schema_text += &quot;\n\nForeign Keys:\n&quot; + &quot;\n&quot;.join(fk_lines)
+
+        
+
+        return schema_text
+
+    
+
+    async def execute_query(
+
+        self, 
+
+        sql_query: str, 
+
+        rls_user_id: str,
+
+        max_rows: int = 20
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Execute a SQL query with Row Level Security context.&quot;&quot;&quot;
+
+        async with self.get_connection() as conn:
+
+            await self.set_rls_context(conn, rls_user_id)
+
+            
+
+            try:
+
+                # Set a query timeout
+
+                rows = await asyncio.wait_for(
+
+                    conn.fetch(sql_query),
+
+                    timeout=config.database.command_timeout
+
+                )
+
+                
+
+                if not rows:
+
+                    return &quot;Query executed successfully. No rows returned.&quot;
+
+                
+
+                # Limit result set size
+
+                limited_rows = rows[:max_rows]
+
+                
+
+                # Format results
+
+                result = self._format_query_results(limited_rows, len(rows), max_rows)
+
+                
+
+                logger.info(f&quot;Query executed successfully. Returned {len(limited_rows)} rows.&quot;)
+
+                return result
+
+                
+
+            except asyncio.TimeoutError:
+
+                error_msg = f&quot;Query timeout after {config.database.command_timeout} seconds&quot;
+
+                logger.error(error_msg)
+
+                raise Exception(error_msg)
+
+            except Exception as e:
+
+                logger.error(f&quot;Query execution failed: {e}&quot;)
+
+                raise
+
+    
+
+    def _format_query_results(
+
+        self, 
+
+        rows: List[asyncpg.Record], 
+
+        total_rows: int,
+
+        max_rows: int
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Format query results for AI consumption.&quot;&quot;&quot;
+
+        if not rows:
+
+            return &quot;No results found.&quot;
+
+        
+
+        # Get column names
+
+        columns = list(rows[0].keys())
+
+        
+
+        # Create header
+
+        result_lines = [f&quot;Results ({len(rows)} of {total_rows} rows):&quot;]
+
+        result_lines.append(&quot;=&quot; * 50)
+
+        
+
+        # Add column headers
+
+        header = &quot; | &quot;.join(columns)
+
+        result_lines.append(header)
+
+        result_lines.append(&quot;-&quot; * len(header))
+
+        
+
+        # Add data rows
+
+        for row in rows:
+
+            formatted_values = []
+
+            for col in columns:
+
+                value = row[col]
+
+                if value is None:
+
+                    formatted_values.append(&quot;NULL&quot;)
+
+                elif isinstance(value, datetime):
+
+                    formatted_values.append(value.strftime(&quot;%Y-%m-%d %H:%M:%S&quot;))
+
+                elif isinstance(value, (dict, list)):
+
+                    formatted_values.append(json.dumps(value))
+
+                else:
+
+                    formatted_values.append(str(value))
+
+            
+
+            result_lines.append(&quot; | &quot;.join(formatted_values))
+
+        
+
+        # Add truncation notice if needed
+
+        if total_rows &gt; max_rows:
+
+            result_lines.append(f&quot;\n... and {total_rows - max_rows} more rows (truncated for display)&quot;)
+
+        
+
+        return &quot;\n&quot;.join(result_lines)
+
+    
+
+    async def get_current_utc_date(self) -&gt; str:
+
+        &quot;&quot;&quot;Get current UTC date/time.&quot;&quot;&quot;
+
+        async with self.get_connection() as conn:
+
+            result = await conn.fetchval(&quot;SELECT NOW() AT TIME ZONE &#x27;UTC&#x27;&quot;)
+
+            return result.isoformat() + &quot;Z&quot;
+
+    
+
+    async def health_check(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Perform database health check.&quot;&quot;&quot;
+
+        try:
+
+            async with self.get_connection() as conn:
+
+                # Simple connectivity test
+
+                result = await conn.fetchval(&quot;SELECT 1&quot;)
+
+                
+
+                # Check pool status
+
+                pool_info = {
+
+                    &quot;min_size&quot;: self.connection_pool._minsize if self.connection_pool else 0,
+
+                    &quot;max_size&quot;: self.connection_pool._maxsize if self.connection_pool else 0,
+
+                    &quot;current_size&quot;: self.connection_pool.get_size() if self.connection_pool else 0,
+
+                    &quot;idle_size&quot;: self.connection_pool.get_idle_size() if self.connection_pool else 0
+
+                }
+
+                
+
+                return {
+
+                    &quot;status&quot;: &quot;healthy&quot;,
+
+                    &quot;database_responsive&quot;: result == 1,
+
+                    &quot;pool_info&quot;: pool_info
+
+                }
+
+                
+
+        except Exception as e:
+
+            return {
+
+                &quot;status&quot;: &quot;unhealthy&quot;,
+
+                &quot;error&quot;: str(e)
+
+            }
+
+
+
+# Global database provider instance
+
+db_provider = PostgreSQLSchemaProvider()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Key Database Layer Features</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Connection Pooling</strong>: Efficient resource management with asyncpg</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RLS Integration</strong>: Automatic Row Level Security context setting</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Schema Introspection</strong>: Dynamic table schema discovery</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Error Handling</strong>: Comprehensive error management and logging</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Query Formatting</strong>: AI-friendly result formatting</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Health Monitoring</strong>: Database connectivity and pool status checks</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 Main MCP Server Implementation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">FastMCP Server (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sales_analysis.py</code>)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now let's implement the main MCP server:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/sales_analysis.py
+
+&quot;&quot;&quot;
+
+Main MCP server implementation for Zava Retail Sales Analysis.
+
+Provides AI assistants with secure access to retail database.
+
+&quot;&quot;&quot;
+
+import logging
+
+import asyncio
+
+from typing import Dict, Any, List, Annotated
+
+from contextlib import asynccontextmanager
+
+
+
+from fastmcp import FastMCP, Context
+
+from pydantic import Field
+
+
+
+from .config import config
+
+from .sales_analysis_postgres import db_provider
+
+from .health_check import setup_health_endpoints
+
+
+
+# Configure logging
+
+logging.basicConfig(
+
+    level=getattr(logging, config.server.log_level),
+
+    format=&#x27;%(asctime)s - %(name)s - %(levelname)s - %(message)s&#x27;
+
+)
+
+logger = logging.getLogger(__name__)
+
+
+
+# Create FastMCP server instance
+
+mcp = FastMCP(&quot;Zava Retail Sales Analysis&quot;)
+
+
+
+# List of valid tables for schema access
+
+VALID_TABLES = [
+
+    &quot;retail.stores&quot;,
+
+    &quot;retail.customers&quot;, 
+
+    &quot;retail.categories&quot;,
+
+    &quot;retail.product_types&quot;,
+
+    &quot;retail.products&quot;,
+
+    &quot;retail.orders&quot;,
+
+    &quot;retail.order_items&quot;,
+
+    &quot;retail.inventory&quot;
+
+]
+
+
+
+def get_rls_user_id(ctx: Context) -&gt; str:
+
+    &quot;&quot;&quot;Extract Row Level Security User ID from request context.&quot;&quot;&quot;
+
+    # In HTTP mode, get from headers
+
+    if hasattr(ctx, &#x27;headers&#x27;) and ctx.headers:
+
+        rls_user_id = ctx.headers.get(&quot;x-rls-user-id&quot;)
+
+        if rls_user_id:
+
+            logger.debug(f&quot;RLS User ID from headers: {rls_user_id}&quot;)
+
+            return rls_user_id
+
+    
+
+    # Default fallback for development/testing
+
+    default_id = &quot;00000000-0000-0000-0000-000000000000&quot;
+
+    logger.warning(f&quot;No RLS User ID found, using default: {default_id}&quot;)
+
+    return default_id
+
+
+
+@mcp.tool()
+
+async def get_multiple_table_schemas(
+
+    ctx: Context,
+
+    table_names: Annotated[List[str], Field(description=&quot;List of table names to retrieve schemas for. Valid tables: &quot; + &quot;, &quot;.join(VALID_TABLES))]
+
+) -&gt; str:
+
+    &quot;&quot;&quot;
+
+    Retrieve database schemas for multiple tables in a single request.
+
+    
+
+    This tool provides comprehensive schema information including:
+
+    - Column names, types, and constraints
+
+    - Foreign key relationships
+
+    - Index information
+
+    - Table structure for AI query planning
+
+    
+
+    Args:
+
+        table_names: List of valid table names from the retail schema
+
+        
+
+    Returns:
+
+        Formatted schema information for all requested tables
+
+    &quot;&quot;&quot;
+
+    rls_user_id = get_rls_user_id(ctx)
+
+    
+
+    # Validate table names
+
+    invalid_tables = [table for table in table_names if table not in VALID_TABLES]
+
+    if invalid_tables:
+
+        logger.warning(f&quot;Invalid table names requested: {invalid_tables}&quot;)
+
+        return f&quot;Error: Invalid table names: {&#x27;, &#x27;.join(invalid_tables)}. Valid tables are: {&#x27;, &#x27;.join(VALID_TABLES)}&quot;
+
+    
+
+    try:
+
+        logger.info(f&quot;Retrieving schemas for tables: {table_names} (User: {rls_user_id})&quot;)
+
+        result = await db_provider.get_multiple_table_schemas(table_names, rls_user_id)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Error retrieving table schemas: {e}&quot;)
+
+        return f&quot;Error retrieving table schemas: {e!s}&quot;
+
+
+
+@mcp.tool()
+
+async def execute_sales_query(
+
+    ctx: Context,
+
+    postgresql_query: Annotated[str, Field(description=&quot;A well-formed PostgreSQL query to execute against the retail database. Always get table schemas first before writing queries.&quot;)]
+
+) -&gt; str:
+
+    &quot;&quot;&quot;
+
+    Execute PostgreSQL queries against the retail sales database with Row Level Security.
+
+    
+
+    This tool allows AI assistants to run analytical queries on retail data including:
+
+    - Sales performance analysis
+
+    - Customer behavior insights  
+
+    - Inventory management queries
+
+    - Product performance metrics
+
+    - Store-specific reporting
+
+    
+
+    Important: Row Level Security ensures users only see data they&#x27;re authorized to access.
+
+    
+
+    Args:
+
+        postgresql_query: SQL query to execute (automatically filtered by RLS)
+
+        
+
+    Returns:
+
+        Query results formatted for AI analysis (limited to 20 rows for readability)
+
+    &quot;&quot;&quot;
+
+    rls_user_id = get_rls_user_id(ctx)
+
+    
+
+    try:
+
+        logger.info(f&quot;Executing query for user: {rls_user_id}&quot;)
+
+        logger.debug(f&quot;Query: {postgresql_query[:100]}...&quot;)
+
+        
+
+        result = await db_provider.execute_query(postgresql_query, rls_user_id)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Error executing database query: {e}&quot;)
+
+        return f&quot;Error executing database query: {e!s}&quot;
+
+
+
+@mcp.tool()
+
+async def get_current_utc_date(ctx: Context) -&gt; str:
+
+    &quot;&quot;&quot;
+
+    Get the current UTC date and time in ISO format.
+
+    
+
+    Useful for time-sensitive queries and date-based analysis.
+
+    
+
+    Returns:
+
+        Current UTC date/time in ISO format (YYYY-MM-DDTHH:MM:SS.fffffZ)
+
+    &quot;&quot;&quot;
+
+    try:
+
+        result = await db_provider.get_current_utc_date()
+
+        logger.debug(f&quot;Current UTC date retrieved: {result}&quot;)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Error getting current UTC date: {e}&quot;)
+
+        return f&quot;Error getting current UTC date: {e!s}&quot;
+
+
+
+# Application lifecycle management
+
+@asynccontextmanager
+
+async def lifespan(app):
+
+    &quot;&quot;&quot;Manage application startup and shutdown.&quot;&quot;&quot;
+
+    logger.info(&quot;Starting Zava Retail MCP Server...&quot;)
+
+    
+
+    try:
+
+        # Initialize database connection pool
+
+        await db_provider.create_pool()
+
+        logger.info(&quot;Database connection pool initialized&quot;)
+
+        
+
+        # Test database connectivity
+
+        health_status = await db_provider.health_check()
+
+        if health_status[&quot;status&quot;] != &quot;healthy&quot;:
+
+            logger.error(f&quot;Database health check failed: {health_status}&quot;)
+
+            raise Exception(&quot;Database not healthy&quot;)
+
+        
+
+        logger.info(&quot;MCP Server startup complete&quot;)
+
+        yield
+
+        
+
+    except Exception as e:
+
+        logger.error(f&quot;Startup failed: {e}&quot;)
+
+        raise
+
+    finally:
+
+        # Cleanup
+
+        logger.info(&quot;Shutting down MCP Server...&quot;)
+
+        await db_provider.close_pool()
+
+        logger.info(&quot;MCP Server shutdown complete&quot;)
+
+
+
+# Configure server application
+
+def create_app():
+
+    &quot;&quot;&quot;Create and configure the MCP server application.&quot;&quot;&quot;
+
+    
+
+    # Get the FastMCP app instance
+
+    app = mcp.sse_app()
+
+    
+
+    # Set up lifecycle management
+
+    app.router.lifespan_context = lifespan
+
+    
+
+    # Add health check endpoints if enabled
+
+    if config.server.enable_health_check:
+
+        setup_health_endpoints(app, db_provider)
+
+    
+
+    # Configure CORS if enabled
+
+    if config.server.enable_cors:
+
+        from fastapi.middleware.cors import CORSMiddleware
+
+        app.add_middleware(
+
+            CORSMiddleware,
+
+            allow_origins=[&quot;*&quot;],  # Configure appropriately for production
+
+            allow_credentials=True,
+
+            allow_methods=[&quot;*&quot;],
+
+            allow_headers=[&quot;*&quot;],
+
+        )
+
+    
+
+    logger.info(f&quot;MCP Server configured - CORS: {config.server.enable_cors}, Health: {config.server.enable_health_check}&quot;)
+
+    
+
+    return app
+
+
+
+# Create the application instance
+
+app = create_app()
+
+
+
+# Main entry point for development
+
+if __name__ == &quot;__main__&quot;:
+
+    import uvicorn
+
+    
+
+    logger.info(f&quot;Starting development server on {config.server.host}:{config.server.port}&quot;)
+
+    
+
+    uvicorn.run(
+
+        &quot;sales_analysis:app&quot;,
+
+        host=config.server.host,
+
+        port=config.server.port,
+
+        reload=True,
+
+        log_level=config.server.log_level.lower()
+
+    )
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Key MCP Server Features</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Tool Registration</strong>: Declarative tool definitions with type safety</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RLS Context Management</strong>: Automatic user identity extraction and context setting</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Error Handling</strong>: Comprehensive error management with user-friendly messages</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Lifecycle Management</strong>: Proper startup/shutdown with resource cleanup</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Health Monitoring</strong>: Built-in health check endpoints</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Development Support</strong>: Hot reload and debugging capabilities</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏥 Health Monitoring</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Health Check Implementation (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">health_check.py</code>)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/health_check.py
+
+&quot;&quot;&quot;
+
+Health check endpoints for monitoring MCP server status.
+
+&quot;&quot;&quot;
+
+import logging
+
+from typing import Dict, Any
+
+from fastapi import FastAPI, HTTPException
+
+from fastapi.responses import JSONResponse
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+def setup_health_endpoints(app: FastAPI, db_provider) -&gt; None:
+
+    &quot;&quot;&quot;Add health check endpoints to the FastAPI application.&quot;&quot;&quot;
+
+    
+
+    @app.get(&quot;/health&quot;)
+
+    async def health_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Basic health check endpoint.&quot;&quot;&quot;
+
+        return JSONResponse(
+
+            status_code=200,
+
+            content={
+
+                &quot;status&quot;: &quot;healthy&quot;,
+
+                &quot;service&quot;: &quot;zava-retail-mcp-server&quot;,
+
+                &quot;timestamp&quot;: await db_provider.get_current_utc_date()
+
+            }
+
+        )
+
+    
+
+    @app.get(&quot;/health/detailed&quot;)
+
+    async def detailed_health_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Detailed health check including database connectivity.&quot;&quot;&quot;
+
+        health_status = {
+
+            &quot;service&quot;: &quot;zava-retail-mcp-server&quot;,
+
+            &quot;status&quot;: &quot;healthy&quot;,
+
+            &quot;components&quot;: {}
+
+        }
+
+        
+
+        overall_healthy = True
+
+        
+
+        # Check database
+
+        try:
+
+            db_health = await db_provider.health_check()
+
+            health_status[&quot;components&quot;][&quot;database&quot;] = db_health
+
+            
+
+            if db_health[&quot;status&quot;] != &quot;healthy&quot;:
+
+                overall_healthy = False
+
+                
+
+        except Exception as e:
+
+            health_status[&quot;components&quot;][&quot;database&quot;] = {
+
+                &quot;status&quot;: &quot;unhealthy&quot;,
+
+                &quot;error&quot;: str(e)
+
+            }
+
+            overall_healthy = False
+
+        
+
+        # Update overall status
+
+        if not overall_healthy:
+
+            health_status[&quot;status&quot;] = &quot;unhealthy&quot;
+
+        
+
+        status_code = 200 if overall_healthy else 503
+
+        
+
+        return JSONResponse(
+
+            status_code=status_code,
+
+            content=health_status
+
+        )
+
+    
+
+    @app.get(&quot;/health/ready&quot;)
+
+    async def readiness_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Kubernetes readiness probe endpoint.&quot;&quot;&quot;
+
+        try:
+
+            # Test critical functionality
+
+            db_health = await db_provider.health_check()
+
+            
+
+            if db_health[&quot;status&quot;] != &quot;healthy&quot;:
+
+                raise HTTPException(status_code=503, detail=&quot;Database not ready&quot;)
+
+            
+
+            return JSONResponse(
+
+                status_code=200,
+
+                content={&quot;status&quot;: &quot;ready&quot;}
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Readiness check failed: {e}&quot;)
+
+            raise HTTPException(status_code=503, detail=&quot;Service not ready&quot;)
+
+    
+
+    @app.get(&quot;/health/live&quot;)
+
+    async def liveness_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Kubernetes liveness probe endpoint.&quot;&quot;&quot;
+
+        return JSONResponse(
+
+            status_code=200,
+
+            content={&quot;status&quot;: &quot;alive&quot;}
+
+        )
+
+    
+
+    logger.info(&quot;Health check endpoints configured&quot;)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 Testing Your MCP Server</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Local Testing</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Start the MCP Server</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Activate virtual environment</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   source mcp-env/bin/activate  # macOS/Linux</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # mcp-env\Scripts\activate   # Windows</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Start server</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   cd mcp_server</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   python sales_analysis.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Test Health Endpoints</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Basic health check</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl http://localhost:8000/health</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Detailed health check</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl http://localhost:8000/health/detailed</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Test MCP Tools</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # List available tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl -X POST http://localhost:8000/mcp \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "Content-Type: application/json" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "x-rls-user-id: 00000000-0000-0000-0000-000000000000" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -d '{"method": "tools/list", "params": {}}'</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Get table schemas</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl -X POST http://localhost:8000/mcp \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "Content-Type: application/json" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "x-rls-user-id: 00000000-0000-0000-0000-000000000000" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -d '{</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       "method": "tools/call",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       "params": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         "name": "get_multiple_table_schemas",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         "arguments": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">           "table_names": ["retail.stores", "retail.products"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     }'</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code Integration Testing</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Configure VS Code MCP</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   // .vscode/mcp.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       "servers": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">           "zava-retail-test": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">               "url": "http://127.0.0.1:8000/mcp",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">               "type": "http",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">               "headers": {"x-rls-user-id": "00000000-0000-0000-0000-000000000000"}</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">           }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Test in AI Chat</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Open VS Code AI Chat</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Type <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">#zava</code> and select your server</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Ask: "What tables are available?"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Ask: "Show me the top 5 stores by number of orders"</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Unit Testing</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Create comprehensive unit tests:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_mcp_server.py
+
+import pytest
+
+import asyncio
+
+from mcp_server.sales_analysis_postgres import PostgreSQLSchemaProvider
+
+from mcp_server.config import config
+
+
+
+@pytest.mark.asyncio
+
+async def test_database_connection():
+
+    &quot;&quot;&quot;Test database connectivity.&quot;&quot;&quot;
+
+    db = PostgreSQLSchemaProvider()
+
+    
+
+    try:
+
+        await db.create_pool()
+
+        health = await db.health_check()
+
+        assert health[&quot;status&quot;] == &quot;healthy&quot;
+
+    finally:
+
+        await db.close_pool()
+
+
+
+@pytest.mark.asyncio
+
+async def test_table_schema_retrieval():
+
+    &quot;&quot;&quot;Test table schema retrieval.&quot;&quot;&quot;
+
+    db = PostgreSQLSchemaProvider()
+
+    
+
+    try:
+
+        await db.create_pool()
+
+        schema = await db.get_table_schema(&quot;retail.stores&quot;, &quot;00000000-0000-0000-0000-000000000000&quot;)
+
+        
+
+        assert schema[&quot;table_name&quot;] == &quot;retail.stores&quot;
+
+        assert len(schema[&quot;columns&quot;]) &gt; 0
+
+        
+
+    finally:
+
+        await db.close_pool()
+
+
+
+@pytest.mark.asyncio
+
+async def test_query_execution():
+
+    &quot;&quot;&quot;Test query execution with RLS.&quot;&quot;&quot;
+
+    db = PostgreSQLSchemaProvider()
+
+    
+
+    try:
+
+        await db.create_pool()
+
+        result = await db.execute_query(
+
+            &quot;SELECT COUNT(*) as store_count FROM retail.stores&quot;,
+
+            &quot;00000000-0000-0000-0000-000000000000&quot;
+
+        )
+
+        
+
+        assert &quot;store_count&quot; in result
+
+        
+
+    finally:
+
+        await db.close_pool()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Working MCP Server</strong>: FastMCP server with database integration  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Configuration Management</strong>: Robust environment-based configuration  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Database Layer</strong>: PostgreSQL integration with connection pooling  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>MCP Tools</strong>: Schema introspection and query execution tools  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>RLS Integration</strong>: Row Level Security context management  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Health Monitoring</strong>: Comprehensive health check endpoints  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Testing Strategy</strong>: Local testing and VS Code integration  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/06-Tools/README.md" target="_blank">Lab 06: Tool Development</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Expand your MCP tool collection</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement advanced query patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Add data validation and transformation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create specialized analytics tools</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">FastMCP Framework</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">FastMCP Documentation</a> - Official FastMCP guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/">MCP Specification</a> - Protocol specification</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/tools/">Tool Development Guide</a> - Creating MCP tools</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Database Integration</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://magicstack.github.io/asyncpg/current/">asyncpg Documentation</a> - PostgreSQL async driver</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-connection.html">Connection Pooling Best Practices</a> - PostgreSQL tuning</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html">Row Level Security Guide</a> - RLS implementation</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">FastAPI Patterns</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/">FastAPI Documentation</a> - Web framework reference</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/tutorial/dependencies/">Dependency Injection</a> - FastAPI patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/tutorial/background-tasks/">Background Tasks</a> - Async task management</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: Ready to expand your tools? Continue with <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/06-Tools/README.md" target="_blank">Lab 06: Tool Development</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP 서버 구현</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 FastMCP 프레임워크를 사용하여 프로덕션 수준의 MCP 서버를 구현하는 과정을 안내합니다. 핵심 서버 구조를 구축하고, 데이터베이스 통합을 구현하며, 데이터 액세스를 위한 도구를 만들고, AI 기반 소매 분석을 위한 기초를 설정하게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버는 소매 분석 솔루션의 중심입니다. 이 서버는 AI 어시스턴트와 PostgreSQL 데이터베이스 간의 다리 역할을 하며, 표준화된 프로토콜을 통해 비즈니스 데이터를 안전하고 지능적으로 액세스할 수 있도록 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습에서는 엔터프라이즈 패턴과 모범 사례를 따르는 견고하고 확장 가능한 MCP 서버를 구축하는 방법을 배웁니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구축</strong>: 적절한 아키텍처와 조직을 갖춘 FastMCP 서버</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구현</strong>: 연결 풀링 및 오류 처리를 포함한 데이터베이스 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>생성</strong>: 데이터베이스 스키마 탐색 및 쿼리 실행을 위한 MCP 도구</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구성</strong>: 행 수준 보안(RLS) 컨텍스트 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>추가</strong>: 상태 모니터링 및 관찰 기능</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>테스트</strong>: MCP 서버 구현을 로컬 및 VS Code에서 테스트</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📁 프로젝트 구조</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버의 조직을 살펴보겠습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp_server/
+
+├── __init__.py                 # Package initialization
+
+├── config.py                   # Configuration management
+
+├── health_check.py             # Health monitoring endpoints
+
+├── sales_analysis.py           # Main MCP server implementation
+
+├── sales_analysis_postgres.py  # Database integration layer
+
+└── sales_analysis_text_embeddings.py  # AI/semantic search integration
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 구성 관리</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">환경 구성 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">config.py</code>)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">먼저 견고한 구성 시스템을 만들어 봅시다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/config.py
+
+&quot;&quot;&quot;
+
+Configuration management for the MCP server.
+
+Handles environment variables, validation, and defaults.
+
+&quot;&quot;&quot;
+
+import os
+
+import logging
+
+from typing import Optional, Dict, Any
+
+from dataclasses import dataclass
+
+from dotenv import load_dotenv
+
+
+
+# Load environment variables from .env file
+
+load_dotenv()
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+@dataclass
+
+class DatabaseConfig:
+
+    &quot;&quot;&quot;Database connection configuration.&quot;&quot;&quot;
+
+    host: str
+
+    port: int
+
+    database: str
+
+    user: str
+
+    password: str
+
+    min_connections: int = 2
+
+    max_connections: int = 10
+
+    command_timeout: int = 30
+
+    
+
+    @classmethod
+
+    def from_env(cls) -&gt; &#x27;DatabaseConfig&#x27;:
+
+        &quot;&quot;&quot;Create configuration from environment variables.&quot;&quot;&quot;
+
+        return cls(
+
+            host=os.getenv(&#x27;POSTGRES_HOST&#x27;, &#x27;localhost&#x27;),
+
+            port=int(os.getenv(&#x27;POSTGRES_PORT&#x27;, &#x27;5432&#x27;)),
+
+            database=os.getenv(&#x27;POSTGRES_DB&#x27;, &#x27;zava&#x27;),
+
+            user=os.getenv(&#x27;POSTGRES_USER&#x27;, &#x27;postgres&#x27;),
+
+            password=os.getenv(&#x27;POSTGRES_PASSWORD&#x27;, &#x27;&#x27;),
+
+            min_connections=int(os.getenv(&#x27;POSTGRES_MIN_CONNECTIONS&#x27;, &#x27;2&#x27;)),
+
+            max_connections=int(os.getenv(&#x27;POSTGRES_MAX_CONNECTIONS&#x27;, &#x27;10&#x27;)),
+
+            command_timeout=int(os.getenv(&#x27;POSTGRES_COMMAND_TIMEOUT&#x27;, &#x27;30&#x27;))
+
+        )
+
+    
+
+    def to_asyncpg_params(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Convert to asyncpg connection parameters.&quot;&quot;&quot;
+
+        return {
+
+            &#x27;host&#x27;: self.host,
+
+            &#x27;port&#x27;: self.port,
+
+            &#x27;database&#x27;: self.database,
+
+            &#x27;user&#x27;: self.user,
+
+            &#x27;password&#x27;: self.password,
+
+            &#x27;command_timeout&#x27;: self.command_timeout,
+
+            &#x27;server_settings&#x27;: {
+
+                &#x27;application_name&#x27;: &#x27;zava-mcp-server&#x27;,
+
+                &#x27;jit&#x27;: &#x27;off&#x27;,  # Disable JIT for stability
+
+                &#x27;work_mem&#x27;: &#x27;4MB&#x27;,
+
+                &#x27;statement_timeout&#x27;: f&#x27;{self.command_timeout}s&#x27;
+
+            }
+
+        }
+
+
+
+@dataclass
+
+class AzureConfig:
+
+    &quot;&quot;&quot;Azure AI services configuration.&quot;&quot;&quot;
+
+    project_endpoint: str
+
+    openai_endpoint: str
+
+    embedding_model_deployment: str
+
+    client_id: str
+
+    client_secret: str
+
+    tenant_id: str
+
+    
+
+    @classmethod
+
+    def from_env(cls) -&gt; &#x27;AzureConfig&#x27;:
+
+        &quot;&quot;&quot;Create configuration from environment variables.&quot;&quot;&quot;
+
+        return cls(
+
+            project_endpoint=os.getenv(&#x27;PROJECT_ENDPOINT&#x27;, &#x27;&#x27;),
+
+            openai_endpoint=os.getenv(&#x27;AZURE_OPENAI_ENDPOINT&#x27;, &#x27;&#x27;),
+
+            embedding_model_deployment=os.getenv(&#x27;EMBEDDING_MODEL_DEPLOYMENT_NAME&#x27;, &#x27;text-embedding-3-small&#x27;),
+
+            client_id=os.getenv(&#x27;AZURE_CLIENT_ID&#x27;, &#x27;&#x27;),
+
+            client_secret=os.getenv(&#x27;AZURE_CLIENT_SECRET&#x27;, &#x27;&#x27;),
+
+            tenant_id=os.getenv(&#x27;AZURE_TENANT_ID&#x27;, &#x27;&#x27;)
+
+        )
+
+    
+
+    def is_configured(self) -&gt; bool:
+
+        &quot;&quot;&quot;Check if all required Azure configuration is present.&quot;&quot;&quot;
+
+        return all([
+
+            self.project_endpoint,
+
+            self.openai_endpoint,
+
+            self.client_id,
+
+            self.client_secret,
+
+            self.tenant_id
+
+        ])
+
+
+
+@dataclass
+
+class ServerConfig:
+
+    &quot;&quot;&quot;MCP server configuration.&quot;&quot;&quot;
+
+    host: str = &#x27;0.0.0.0&#x27;
+
+    port: int = 8000
+
+    log_level: str = &#x27;INFO&#x27;
+
+    enable_cors: bool = True
+
+    enable_health_check: bool = True
+
+    applicationinsights_connection_string: Optional[str] = None
+
+    
+
+    @classmethod
+
+    def from_env(cls) -&gt; &#x27;ServerConfig&#x27;:
+
+        &quot;&quot;&quot;Create configuration from environment variables.&quot;&quot;&quot;
+
+        return cls(
+
+            host=os.getenv(&#x27;MCP_SERVER_HOST&#x27;, &#x27;0.0.0.0&#x27;),
+
+            port=int(os.getenv(&#x27;MCP_SERVER_PORT&#x27;, &#x27;8000&#x27;)),
+
+            log_level=os.getenv(&#x27;LOG_LEVEL&#x27;, &#x27;INFO&#x27;).upper(),
+
+            enable_cors=os.getenv(&#x27;ENABLE_CORS&#x27;, &#x27;true&#x27;).lower() == &#x27;true&#x27;,
+
+            enable_health_check=os.getenv(&#x27;ENABLE_HEALTH_CHECK&#x27;, &#x27;true&#x27;).lower() == &#x27;true&#x27;,
+
+            applicationinsights_connection_string=os.getenv(&#x27;APPLICATIONINSIGHTS_CONNECTION_STRING&#x27;)
+
+        )
+
+
+
+class MCPServerConfig:
+
+    &quot;&quot;&quot;Main configuration class for the MCP server.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.database = DatabaseConfig.from_env()
+
+        self.azure = AzureConfig.from_env()
+
+        self.server = ServerConfig.from_env()
+
+        
+
+        # Validate configuration
+
+        self._validate_config()
+
+    
+
+    def _validate_config(self):
+
+        &quot;&quot;&quot;Validate configuration and log warnings for missing values.&quot;&quot;&quot;
+
+        if not self.database.password:
+
+            logger.warning(&quot;Database password is empty. This may cause connection issues.&quot;)
+
+        
+
+        if not self.azure.is_configured():
+
+            logger.warning(&quot;Azure configuration is incomplete. AI features may not work.&quot;)
+
+        
+
+        logger.info(f&quot;Configuration loaded - Database: {self.database.host}:{self.database.port}&quot;)
+
+        logger.info(f&quot;Server will run on {self.server.host}:{self.server.port}&quot;)
+
+
+
+# Global configuration instance
+
+config = MCPServerConfig()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">주요 구성 기능</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>환경 변수 로드</strong>: 자동 .env 파일 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>타입 안전성</strong>: 데이터 클래스 검증 및 타입 힌트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>유연한 기본값</strong>: 개발을 위한 합리적인 기본값</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>검증</strong>: 유용한 오류 메시지를 포함한 구성 검증</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>보안</strong>: 환경 변수에서만 민감한 값 로드</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🗄️ 데이터베이스 통합 계층</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">PostgreSQL 제공자 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sales_analysis_postgres.py</code>)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">데이터베이스 통합 계층을 구현해 봅시다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/sales_analysis_postgres.py
+
+&quot;&quot;&quot;
+
+PostgreSQL database integration for MCP server.
+
+Handles connections, queries, and schema introspection.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import asyncpg
+
+import logging
+
+from typing import Dict, Any, List, Optional, Tuple
+
+from contextlib import asynccontextmanager
+
+from datetime import datetime
+
+import json
+
+
+
+from .config import config
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class PostgreSQLSchemaProvider:
+
+    &quot;&quot;&quot;Provides PostgreSQL database access and schema information.&quot;&quot;&quot;
+
+    
+
+    def __init__(self):
+
+        self.connection_pool: Optional[asyncpg.Pool] = None
+
+        self.postgres_config = config.database.to_asyncpg_params()
+
+        
+
+    async def create_pool(self) -&gt; None:
+
+        &quot;&quot;&quot;Create connection pool for database operations.&quot;&quot;&quot;
+
+        if self.connection_pool is None:
+
+            try:
+
+                self.connection_pool = await asyncpg.create_pool(
+
+                    **self.postgres_config,
+
+                    min_size=config.database.min_connections,
+
+                    max_size=config.database.max_connections,
+
+                    max_inactive_connection_lifetime=300  # 5 minutes
+
+                )
+
+                logger.info(&quot;Database connection pool created successfully&quot;)
+
+            except Exception as e:
+
+                logger.error(f&quot;Failed to create database connection pool: {e}&quot;)
+
+                raise
+
+    
+
+    async def close_pool(self) -&gt; None:
+
+        &quot;&quot;&quot;Close the connection pool.&quot;&quot;&quot;
+
+        if self.connection_pool:
+
+            await self.connection_pool.close()
+
+            self.connection_pool = None
+
+            logger.info(&quot;Database connection pool closed&quot;)
+
+    
+
+    @asynccontextmanager
+
+    async def get_connection(self):
+
+        &quot;&quot;&quot;Get a database connection from the pool.&quot;&quot;&quot;
+
+        if not self.connection_pool:
+
+            await self.create_pool()
+
+        
+
+        async with self.connection_pool.acquire() as connection:
+
+            yield connection
+
+    
+
+    async def set_rls_context(self, connection: asyncpg.Connection, rls_user_id: str) -&gt; None:
+
+        &quot;&quot;&quot;Set Row Level Security context for the connection.&quot;&quot;&quot;
+
+        try:
+
+            await connection.execute(
+
+                &quot;SELECT set_config(&#x27;app.current_rls_user_id&#x27;, $1, false)&quot;,
+
+                rls_user_id
+
+            )
+
+            logger.debug(f&quot;RLS context set for user: {rls_user_id}&quot;)
+
+        except Exception as e:
+
+            logger.error(f&quot;Failed to set RLS context: {e}&quot;)
+
+            raise
+
+    
+
+    async def get_table_schema(self, table_name: str, rls_user_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get detailed schema information for a specific table.&quot;&quot;&quot;
+
+        async with self.get_connection() as conn:
+
+            await self.set_rls_context(conn, rls_user_id)
+
+            
+
+            # Parse schema and table name
+
+            if &#x27;.&#x27; in table_name:
+
+                schema_name, table_name = table_name.split(&#x27;.&#x27;, 1)
+
+            else:
+
+                schema_name = &#x27;retail&#x27;  # Default schema
+
+            
+
+            # Get column information
+
+            columns_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    column_name,
+
+                    data_type,
+
+                    is_nullable,
+
+                    column_default,
+
+                    character_maximum_length,
+
+                    numeric_precision,
+
+                    numeric_scale,
+
+                    ordinal_position
+
+                FROM information_schema.columns 
+
+                WHERE table_schema = $1 AND table_name = $2
+
+                ORDER BY ordinal_position
+
+            &quot;&quot;&quot;
+
+            
+
+            columns = await conn.fetch(columns_query, schema_name, table_name)
+
+            
+
+            if not columns:
+
+                raise ValueError(f&quot;Table {schema_name}.{table_name} not found or not accessible&quot;)
+
+            
+
+            # Get foreign key relationships
+
+            fk_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    kcu.column_name,
+
+                    ccu.table_schema AS foreign_table_schema,
+
+                    ccu.table_name AS foreign_table_name,
+
+                    ccu.column_name AS foreign_column_name
+
+                FROM information_schema.table_constraints tc
+
+                JOIN information_schema.key_column_usage kcu 
+
+                    ON tc.constraint_name = kcu.constraint_name
+
+                JOIN information_schema.constraint_column_usage ccu 
+
+                    ON ccu.constraint_name = tc.constraint_name
+
+                WHERE tc.constraint_type = &#x27;FOREIGN KEY&#x27; 
+
+                    AND tc.table_schema = $1 
+
+                    AND tc.table_name = $2
+
+            &quot;&quot;&quot;
+
+            
+
+            foreign_keys = await conn.fetch(fk_query, schema_name, table_name)
+
+            
+
+            # Get indexes
+
+            index_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    indexname,
+
+                    indexdef
+
+                FROM pg_indexes 
+
+                WHERE schemaname = $1 AND tablename = $2
+
+            &quot;&quot;&quot;
+
+            
+
+            indexes = await conn.fetch(index_query, schema_name, table_name)
+
+            
+
+            # Format schema information
+
+            schema_info = {
+
+                &quot;table_name&quot;: f&quot;{schema_name}.{table_name}&quot;,
+
+                &quot;columns&quot;: [
+
+                    {
+
+                        &quot;name&quot;: col[&quot;column_name&quot;],
+
+                        &quot;type&quot;: col[&quot;data_type&quot;],
+
+                        &quot;nullable&quot;: col[&quot;is_nullable&quot;] == &quot;YES&quot;,
+
+                        &quot;default&quot;: col[&quot;column_default&quot;],
+
+                        &quot;max_length&quot;: col[&quot;character_maximum_length&quot;],
+
+                        &quot;precision&quot;: col[&quot;numeric_precision&quot;],
+
+                        &quot;scale&quot;: col[&quot;numeric_scale&quot;],
+
+                        &quot;position&quot;: col[&quot;ordinal_position&quot;]
+
+                    }
+
+                    for col in columns
+
+                ],
+
+                &quot;foreign_keys&quot;: [
+
+                    {
+
+                        &quot;column&quot;: fk[&quot;column_name&quot;],
+
+                        &quot;references&quot;: f&quot;{fk[&#x27;foreign_table_schema&#x27;]}.{fk[&#x27;foreign_table_name&#x27;]}.{fk[&#x27;foreign_column_name&#x27;]}&quot;
+
+                    }
+
+                    for fk in foreign_keys
+
+                ],
+
+                &quot;indexes&quot;: [
+
+                    {
+
+                        &quot;name&quot;: idx[&quot;indexname&quot;],
+
+                        &quot;definition&quot;: idx[&quot;indexdef&quot;]
+
+                    }
+
+                    for idx in indexes
+
+                ]
+
+            }
+
+            
+
+            return schema_info
+
+    
+
+    async def get_multiple_table_schemas(
+
+        self, 
+
+        table_names: List[str], 
+
+        rls_user_id: str
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Get schema information for multiple tables.&quot;&quot;&quot;
+
+        schemas = []
+
+        
+
+        for table_name in table_names:
+
+            try:
+
+                schema = await self.get_table_schema(table_name, rls_user_id)
+
+                schemas.append(self._format_schema_for_ai(schema))
+
+            except Exception as e:
+
+                logger.warning(f&quot;Failed to get schema for {table_name}: {e}&quot;)
+
+                schemas.append(f&quot;Error retrieving schema for {table_name}: {str(e)}&quot;)
+
+        
+
+        return &quot;\n\n&quot;.join(schemas)
+
+    
+
+    def _format_schema_for_ai(self, schema: Dict[str, Any]) -&gt; str:
+
+        &quot;&quot;&quot;Format schema information for AI consumption.&quot;&quot;&quot;
+
+        table_name = schema[&quot;table_name&quot;]
+
+        columns = schema[&quot;columns&quot;]
+
+        foreign_keys = schema[&quot;foreign_keys&quot;]
+
+        
+
+        # Create column definitions
+
+        column_lines = []
+
+        for col in columns:
+
+            nullable = &quot;NULL&quot; if col[&quot;nullable&quot;] else &quot;NOT NULL&quot;
+
+            type_info = col[&quot;type&quot;]
+
+            
+
+            if col[&quot;max_length&quot;]:
+
+                type_info += f&quot;({col[&#x27;max_length&#x27;]})&quot;
+
+            elif col[&quot;precision&quot;] and col[&quot;scale&quot;]:
+
+                type_info += f&quot;({col[&#x27;precision&#x27;]},{col[&#x27;scale&#x27;]})&quot;
+
+            
+
+            default_info = f&quot; DEFAULT {col[&#x27;default&#x27;]}&quot; if col[&quot;default&quot;] else &quot;&quot;
+
+            
+
+            column_lines.append(f&quot;  {col[&#x27;name&#x27;]} {type_info} {nullable}{default_info}&quot;)
+
+        
+
+        # Create foreign key information
+
+        fk_lines = []
+
+        for fk in foreign_keys:
+
+            fk_lines.append(f&quot;  {fk[&#x27;column&#x27;]} -&gt; {fk[&#x27;references&#x27;]}&quot;)
+
+        
+
+        # Combine into readable format
+
+        schema_text = f&quot;Table: {table_name}\n&quot;
+
+        schema_text += &quot;Columns:\n&quot; + &quot;\n&quot;.join(column_lines)
+
+        
+
+        if fk_lines:
+
+            schema_text += &quot;\n\nForeign Keys:\n&quot; + &quot;\n&quot;.join(fk_lines)
+
+        
+
+        return schema_text
+
+    
+
+    async def execute_query(
+
+        self, 
+
+        sql_query: str, 
+
+        rls_user_id: str,
+
+        max_rows: int = 20
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Execute a SQL query with Row Level Security context.&quot;&quot;&quot;
+
+        async with self.get_connection() as conn:
+
+            await self.set_rls_context(conn, rls_user_id)
+
+            
+
+            try:
+
+                # Set a query timeout
+
+                rows = await asyncio.wait_for(
+
+                    conn.fetch(sql_query),
+
+                    timeout=config.database.command_timeout
+
+                )
+
+                
+
+                if not rows:
+
+                    return &quot;Query executed successfully. No rows returned.&quot;
+
+                
+
+                # Limit result set size
+
+                limited_rows = rows[:max_rows]
+
+                
+
+                # Format results
+
+                result = self._format_query_results(limited_rows, len(rows), max_rows)
+
+                
+
+                logger.info(f&quot;Query executed successfully. Returned {len(limited_rows)} rows.&quot;)
+
+                return result
+
+                
+
+            except asyncio.TimeoutError:
+
+                error_msg = f&quot;Query timeout after {config.database.command_timeout} seconds&quot;
+
+                logger.error(error_msg)
+
+                raise Exception(error_msg)
+
+            except Exception as e:
+
+                logger.error(f&quot;Query execution failed: {e}&quot;)
+
+                raise
+
+    
+
+    def _format_query_results(
+
+        self, 
+
+        rows: List[asyncpg.Record], 
+
+        total_rows: int,
+
+        max_rows: int
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Format query results for AI consumption.&quot;&quot;&quot;
+
+        if not rows:
+
+            return &quot;No results found.&quot;
+
+        
+
+        # Get column names
+
+        columns = list(rows[0].keys())
+
+        
+
+        # Create header
+
+        result_lines = [f&quot;Results ({len(rows)} of {total_rows} rows):&quot;]
+
+        result_lines.append(&quot;=&quot; * 50)
+
+        
+
+        # Add column headers
+
+        header = &quot; | &quot;.join(columns)
+
+        result_lines.append(header)
+
+        result_lines.append(&quot;-&quot; * len(header))
+
+        
+
+        # Add data rows
+
+        for row in rows:
+
+            formatted_values = []
+
+            for col in columns:
+
+                value = row[col]
+
+                if value is None:
+
+                    formatted_values.append(&quot;NULL&quot;)
+
+                elif isinstance(value, datetime):
+
+                    formatted_values.append(value.strftime(&quot;%Y-%m-%d %H:%M:%S&quot;))
+
+                elif isinstance(value, (dict, list)):
+
+                    formatted_values.append(json.dumps(value))
+
+                else:
+
+                    formatted_values.append(str(value))
+
+            
+
+            result_lines.append(&quot; | &quot;.join(formatted_values))
+
+        
+
+        # Add truncation notice if needed
+
+        if total_rows &gt; max_rows:
+
+            result_lines.append(f&quot;\n... and {total_rows - max_rows} more rows (truncated for display)&quot;)
+
+        
+
+        return &quot;\n&quot;.join(result_lines)
+
+    
+
+    async def get_current_utc_date(self) -&gt; str:
+
+        &quot;&quot;&quot;Get current UTC date/time.&quot;&quot;&quot;
+
+        async with self.get_connection() as conn:
+
+            result = await conn.fetchval(&quot;SELECT NOW() AT TIME ZONE &#x27;UTC&#x27;&quot;)
+
+            return result.isoformat() + &quot;Z&quot;
+
+    
+
+    async def health_check(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Perform database health check.&quot;&quot;&quot;
+
+        try:
+
+            async with self.get_connection() as conn:
+
+                # Simple connectivity test
+
+                result = await conn.fetchval(&quot;SELECT 1&quot;)
+
+                
+
+                # Check pool status
+
+                pool_info = {
+
+                    &quot;min_size&quot;: self.connection_pool._minsize if self.connection_pool else 0,
+
+                    &quot;max_size&quot;: self.connection_pool._maxsize if self.connection_pool else 0,
+
+                    &quot;current_size&quot;: self.connection_pool.get_size() if self.connection_pool else 0,
+
+                    &quot;idle_size&quot;: self.connection_pool.get_idle_size() if self.connection_pool else 0
+
+                }
+
+                
+
+                return {
+
+                    &quot;status&quot;: &quot;healthy&quot;,
+
+                    &quot;database_responsive&quot;: result == 1,
+
+                    &quot;pool_info&quot;: pool_info
+
+                }
+
+                
+
+        except Exception as e:
+
+            return {
+
+                &quot;status&quot;: &quot;unhealthy&quot;,
+
+                &quot;error&quot;: str(e)
+
+            }
+
+
+
+# Global database provider instance
+
+db_provider = PostgreSQLSchemaProvider()
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">주요 데이터베이스 계층 기능</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>연결 풀링</strong>: asyncpg를 사용한 효율적인 리소스 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RLS 통합</strong>: 자동 행 수준 보안 컨텍스트 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>스키마 탐색</strong>: 동적 테이블 스키마 검색</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>오류 처리</strong>: 포괄적인 오류 관리 및 로깅</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>쿼리 포맷팅</strong>: AI 친화적인 결과 포맷팅</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상태 모니터링</strong>: 데이터베이스 연결 및 풀 상태 확인</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 주요 MCP 서버 구현</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">FastMCP 서버 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">sales_analysis.py</code>)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 주요 MCP 서버를 구현해 봅시다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/sales_analysis.py
+
+&quot;&quot;&quot;
+
+Main MCP server implementation for Zava Retail Sales Analysis.
+
+Provides AI assistants with secure access to retail database.
+
+&quot;&quot;&quot;
+
+import logging
+
+import asyncio
+
+from typing import Dict, Any, List, Annotated
+
+from contextlib import asynccontextmanager
+
+
+
+from fastmcp import FastMCP, Context
+
+from pydantic import Field
+
+
+
+from .config import config
+
+from .sales_analysis_postgres import db_provider
+
+from .health_check import setup_health_endpoints
+
+
+
+# Configure logging
+
+logging.basicConfig(
+
+    level=getattr(logging, config.server.log_level),
+
+    format=&#x27;%(asctime)s - %(name)s - %(levelname)s - %(message)s&#x27;
+
+)
+
+logger = logging.getLogger(__name__)
+
+
+
+# Create FastMCP server instance
+
+mcp = FastMCP(&quot;Zava Retail Sales Analysis&quot;)
+
+
+
+# List of valid tables for schema access
+
+VALID_TABLES = [
+
+    &quot;retail.stores&quot;,
+
+    &quot;retail.customers&quot;, 
+
+    &quot;retail.categories&quot;,
+
+    &quot;retail.product_types&quot;,
+
+    &quot;retail.products&quot;,
+
+    &quot;retail.orders&quot;,
+
+    &quot;retail.order_items&quot;,
+
+    &quot;retail.inventory&quot;
+
+]
+
+
+
+def get_rls_user_id(ctx: Context) -&gt; str:
+
+    &quot;&quot;&quot;Extract Row Level Security User ID from request context.&quot;&quot;&quot;
+
+    # In HTTP mode, get from headers
+
+    if hasattr(ctx, &#x27;headers&#x27;) and ctx.headers:
+
+        rls_user_id = ctx.headers.get(&quot;x-rls-user-id&quot;)
+
+        if rls_user_id:
+
+            logger.debug(f&quot;RLS User ID from headers: {rls_user_id}&quot;)
+
+            return rls_user_id
+
+    
+
+    # Default fallback for development/testing
+
+    default_id = &quot;00000000-0000-0000-0000-000000000000&quot;
+
+    logger.warning(f&quot;No RLS User ID found, using default: {default_id}&quot;)
+
+    return default_id
+
+
+
+@mcp.tool()
+
+async def get_multiple_table_schemas(
+
+    ctx: Context,
+
+    table_names: Annotated[List[str], Field(description=&quot;List of table names to retrieve schemas for. Valid tables: &quot; + &quot;, &quot;.join(VALID_TABLES))]
+
+) -&gt; str:
+
+    &quot;&quot;&quot;
+
+    Retrieve database schemas for multiple tables in a single request.
+
+    
+
+    This tool provides comprehensive schema information including:
+
+    - Column names, types, and constraints
+
+    - Foreign key relationships
+
+    - Index information
+
+    - Table structure for AI query planning
+
+    
+
+    Args:
+
+        table_names: List of valid table names from the retail schema
+
+        
+
+    Returns:
+
+        Formatted schema information for all requested tables
+
+    &quot;&quot;&quot;
+
+    rls_user_id = get_rls_user_id(ctx)
+
+    
+
+    # Validate table names
+
+    invalid_tables = [table for table in table_names if table not in VALID_TABLES]
+
+    if invalid_tables:
+
+        logger.warning(f&quot;Invalid table names requested: {invalid_tables}&quot;)
+
+        return f&quot;Error: Invalid table names: {&#x27;, &#x27;.join(invalid_tables)}. Valid tables are: {&#x27;, &#x27;.join(VALID_TABLES)}&quot;
+
+    
+
+    try:
+
+        logger.info(f&quot;Retrieving schemas for tables: {table_names} (User: {rls_user_id})&quot;)
+
+        result = await db_provider.get_multiple_table_schemas(table_names, rls_user_id)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Error retrieving table schemas: {e}&quot;)
+
+        return f&quot;Error retrieving table schemas: {e!s}&quot;
+
+
+
+@mcp.tool()
+
+async def execute_sales_query(
+
+    ctx: Context,
+
+    postgresql_query: Annotated[str, Field(description=&quot;A well-formed PostgreSQL query to execute against the retail database. Always get table schemas first before writing queries.&quot;)]
+
+) -&gt; str:
+
+    &quot;&quot;&quot;
+
+    Execute PostgreSQL queries against the retail sales database with Row Level Security.
+
+    
+
+    This tool allows AI assistants to run analytical queries on retail data including:
+
+    - Sales performance analysis
+
+    - Customer behavior insights  
+
+    - Inventory management queries
+
+    - Product performance metrics
+
+    - Store-specific reporting
+
+    
+
+    Important: Row Level Security ensures users only see data they&#x27;re authorized to access.
+
+    
+
+    Args:
+
+        postgresql_query: SQL query to execute (automatically filtered by RLS)
+
+        
+
+    Returns:
+
+        Query results formatted for AI analysis (limited to 20 rows for readability)
+
+    &quot;&quot;&quot;
+
+    rls_user_id = get_rls_user_id(ctx)
+
+    
+
+    try:
+
+        logger.info(f&quot;Executing query for user: {rls_user_id}&quot;)
+
+        logger.debug(f&quot;Query: {postgresql_query[:100]}...&quot;)
+
+        
+
+        result = await db_provider.execute_query(postgresql_query, rls_user_id)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Error executing database query: {e}&quot;)
+
+        return f&quot;Error executing database query: {e!s}&quot;
+
+
+
+@mcp.tool()
+
+async def get_current_utc_date(ctx: Context) -&gt; str:
+
+    &quot;&quot;&quot;
+
+    Get the current UTC date and time in ISO format.
+
+    
+
+    Useful for time-sensitive queries and date-based analysis.
+
+    
+
+    Returns:
+
+        Current UTC date/time in ISO format (YYYY-MM-DDTHH:MM:SS.fffffZ)
+
+    &quot;&quot;&quot;
+
+    try:
+
+        result = await db_provider.get_current_utc_date()
+
+        logger.debug(f&quot;Current UTC date retrieved: {result}&quot;)
+
+        return result
+
+    except Exception as e:
+
+        logger.error(f&quot;Error getting current UTC date: {e}&quot;)
+
+        return f&quot;Error getting current UTC date: {e!s}&quot;
+
+
+
+# Application lifecycle management
+
+@asynccontextmanager
+
+async def lifespan(app):
+
+    &quot;&quot;&quot;Manage application startup and shutdown.&quot;&quot;&quot;
+
+    logger.info(&quot;Starting Zava Retail MCP Server...&quot;)
+
+    
+
+    try:
+
+        # Initialize database connection pool
+
+        await db_provider.create_pool()
+
+        logger.info(&quot;Database connection pool initialized&quot;)
+
+        
+
+        # Test database connectivity
+
+        health_status = await db_provider.health_check()
+
+        if health_status[&quot;status&quot;] != &quot;healthy&quot;:
+
+            logger.error(f&quot;Database health check failed: {health_status}&quot;)
+
+            raise Exception(&quot;Database not healthy&quot;)
+
+        
+
+        logger.info(&quot;MCP Server startup complete&quot;)
+
+        yield
+
+        
+
+    except Exception as e:
+
+        logger.error(f&quot;Startup failed: {e}&quot;)
+
+        raise
+
+    finally:
+
+        # Cleanup
+
+        logger.info(&quot;Shutting down MCP Server...&quot;)
+
+        await db_provider.close_pool()
+
+        logger.info(&quot;MCP Server shutdown complete&quot;)
+
+
+
+# Configure server application
+
+def create_app():
+
+    &quot;&quot;&quot;Create and configure the MCP server application.&quot;&quot;&quot;
+
+    
+
+    # Get the FastMCP app instance
+
+    app = mcp.sse_app()
+
+    
+
+    # Set up lifecycle management
+
+    app.router.lifespan_context = lifespan
+
+    
+
+    # Add health check endpoints if enabled
+
+    if config.server.enable_health_check:
+
+        setup_health_endpoints(app, db_provider)
+
+    
+
+    # Configure CORS if enabled
+
+    if config.server.enable_cors:
+
+        from fastapi.middleware.cors import CORSMiddleware
+
+        app.add_middleware(
+
+            CORSMiddleware,
+
+            allow_origins=[&quot;*&quot;],  # Configure appropriately for production
+
+            allow_credentials=True,
+
+            allow_methods=[&quot;*&quot;],
+
+            allow_headers=[&quot;*&quot;],
+
+        )
+
+    
+
+    logger.info(f&quot;MCP Server configured - CORS: {config.server.enable_cors}, Health: {config.server.enable_health_check}&quot;)
+
+    
+
+    return app
+
+
+
+# Create the application instance
+
+app = create_app()
+
+
+
+# Main entry point for development
+
+if __name__ == &quot;__main__&quot;:
+
+    import uvicorn
+
+    
+
+    logger.info(f&quot;Starting development server on {config.server.host}:{config.server.port}&quot;)
+
+    
+
+    uvicorn.run(
+
+        &quot;sales_analysis:app&quot;,
+
+        host=config.server.host,
+
+        port=config.server.port,
+
+        reload=True,
+
+        log_level=config.server.log_level.lower()
+
+    )
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">주요 MCP 서버 기능</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>도구 등록</strong>: 타입 안전성을 갖춘 선언적 도구 정의</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>RLS 컨텍스트 관리</strong>: 사용자 신원 추출 및 컨텍스트 설정 자동화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>오류 처리</strong>: 사용자 친화적인 메시지를 포함한 포괄적인 오류 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>라이프사이클 관리</strong>: 리소스 정리를 포함한 적절한 시작/종료</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상태 모니터링</strong>: 내장 상태 확인 엔드포인트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>개발 지원</strong>: 핫 리로드 및 디버깅 기능</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏥 상태 모니터링</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">상태 확인 구현 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">health_check.py</code>)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/health_check.py
+
+&quot;&quot;&quot;
+
+Health check endpoints for monitoring MCP server status.
+
+&quot;&quot;&quot;
+
+import logging
+
+from typing import Dict, Any
+
+from fastapi import FastAPI, HTTPException
+
+from fastapi.responses import JSONResponse
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+def setup_health_endpoints(app: FastAPI, db_provider) -&gt; None:
+
+    &quot;&quot;&quot;Add health check endpoints to the FastAPI application.&quot;&quot;&quot;
+
+    
+
+    @app.get(&quot;/health&quot;)
+
+    async def health_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Basic health check endpoint.&quot;&quot;&quot;
+
+        return JSONResponse(
+
+            status_code=200,
+
+            content={
+
+                &quot;status&quot;: &quot;healthy&quot;,
+
+                &quot;service&quot;: &quot;zava-retail-mcp-server&quot;,
+
+                &quot;timestamp&quot;: await db_provider.get_current_utc_date()
+
+            }
+
+        )
+
+    
+
+    @app.get(&quot;/health/detailed&quot;)
+
+    async def detailed_health_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Detailed health check including database connectivity.&quot;&quot;&quot;
+
+        health_status = {
+
+            &quot;service&quot;: &quot;zava-retail-mcp-server&quot;,
+
+            &quot;status&quot;: &quot;healthy&quot;,
+
+            &quot;components&quot;: {}
+
+        }
+
+        
+
+        overall_healthy = True
+
+        
+
+        # Check database
+
+        try:
+
+            db_health = await db_provider.health_check()
+
+            health_status[&quot;components&quot;][&quot;database&quot;] = db_health
+
+            
+
+            if db_health[&quot;status&quot;] != &quot;healthy&quot;:
+
+                overall_healthy = False
+
+                
+
+        except Exception as e:
+
+            health_status[&quot;components&quot;][&quot;database&quot;] = {
+
+                &quot;status&quot;: &quot;unhealthy&quot;,
+
+                &quot;error&quot;: str(e)
+
+            }
+
+            overall_healthy = False
+
+        
+
+        # Update overall status
+
+        if not overall_healthy:
+
+            health_status[&quot;status&quot;] = &quot;unhealthy&quot;
+
+        
+
+        status_code = 200 if overall_healthy else 503
+
+        
+
+        return JSONResponse(
+
+            status_code=status_code,
+
+            content=health_status
+
+        )
+
+    
+
+    @app.get(&quot;/health/ready&quot;)
+
+    async def readiness_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Kubernetes readiness probe endpoint.&quot;&quot;&quot;
+
+        try:
+
+            # Test critical functionality
+
+            db_health = await db_provider.health_check()
+
+            
+
+            if db_health[&quot;status&quot;] != &quot;healthy&quot;:
+
+                raise HTTPException(status_code=503, detail=&quot;Database not ready&quot;)
+
+            
+
+            return JSONResponse(
+
+                status_code=200,
+
+                content={&quot;status&quot;: &quot;ready&quot;}
+
+            )
+
+            
+
+        except Exception as e:
+
+            logger.error(f&quot;Readiness check failed: {e}&quot;)
+
+            raise HTTPException(status_code=503, detail=&quot;Service not ready&quot;)
+
+    
+
+    @app.get(&quot;/health/live&quot;)
+
+    async def liveness_check() -&gt; JSONResponse:
+
+        &quot;&quot;&quot;Kubernetes liveness probe endpoint.&quot;&quot;&quot;
+
+        return JSONResponse(
+
+            status_code=200,
+
+            content={&quot;status&quot;: &quot;alive&quot;}
+
+        )
+
+    
+
+    logger.info(&quot;Health check endpoints configured&quot;)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 MCP 서버 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">로컬 테스트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>MCP 서버 시작</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Activate virtual environment</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   source mcp-env/bin/activate  # macOS/Linux</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # mcp-env\Scripts\activate   # Windows</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Start server</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   cd mcp_server</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   python sales_analysis.py</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>상태 엔드포인트 테스트</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Basic health check</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl http://localhost:8000/health</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Detailed health check</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl http://localhost:8000/health/detailed</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>MCP 도구 테스트</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # List available tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl -X POST http://localhost:8000/mcp \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "Content-Type: application/json" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "x-rls-user-id: 00000000-0000-0000-0000-000000000000" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -d '{"method": "tools/list", "params": {}}'</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   # Get table schemas</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   curl -X POST http://localhost:8000/mcp \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "Content-Type: application/json" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -H "x-rls-user-id: 00000000-0000-0000-0000-000000000000" \</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     -d '{</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       "method": "tools/call",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       "params": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         "name": "get_multiple_table_schemas",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         "arguments": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">           "table_names": ["retail.stores", "retail.products"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">         }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">     }'</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">VS Code 통합 테스트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>VS Code MCP 구성</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   // .vscode/mcp.json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       "servers": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">           "zava-retail-test": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">               "url": "http://127.0.0.1:8000/mcp",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">               "type": "http",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">               "headers": {"x-rls-user-id": "00000000-0000-0000-0000-000000000000"}</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">           }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">       }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>AI 채팅에서 테스트</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - VS Code AI 채팅 열기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">#zava</code>를 입력하고 서버 선택</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 질문: "사용 가능한 테이블은 무엇인가요?"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 질문: "주문 수 기준 상위 5개 매장을 보여주세요."</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">단위 테스트</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">포괄적인 단위 테스트를 작성하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_mcp_server.py
+
+import pytest
+
+import asyncio
+
+from mcp_server.sales_analysis_postgres import PostgreSQLSchemaProvider
+
+from mcp_server.config import config
+
+
+
+@pytest.mark.asyncio
+
+async def test_database_connection():
+
+    &quot;&quot;&quot;Test database connectivity.&quot;&quot;&quot;
+
+    db = PostgreSQLSchemaProvider()
+
+    
+
+    try:
+
+        await db.create_pool()
+
+        health = await db.health_check()
+
+        assert health[&quot;status&quot;] == &quot;healthy&quot;
+
+    finally:
+
+        await db.close_pool()
+
+
+
+@pytest.mark.asyncio
+
+async def test_table_schema_retrieval():
+
+    &quot;&quot;&quot;Test table schema retrieval.&quot;&quot;&quot;
+
+    db = PostgreSQLSchemaProvider()
+
+    
+
+    try:
+
+        await db.create_pool()
+
+        schema = await db.get_table_schema(&quot;retail.stores&quot;, &quot;00000000-0000-0000-0000-000000000000&quot;)
+
+        
+
+        assert schema[&quot;table_name&quot;] == &quot;retail.stores&quot;
+
+        assert len(schema[&quot;columns&quot;]) &gt; 0
+
+        
+
+    finally:
+
+        await db.close_pool()
+
+
+
+@pytest.mark.asyncio
+
+async def test_query_execution():
+
+    &quot;&quot;&quot;Test query execution with RLS.&quot;&quot;&quot;
+
+    db = PostgreSQLSchemaProvider()
+
+    
+
+    try:
+
+        await db.create_pool()
+
+        result = await db.execute_query(
+
+            &quot;SELECT COUNT(*) as store_count FROM retail.stores&quot;,
+
+            &quot;00000000-0000-0000-0000-000000000000&quot;
+
+        )
+
+        
+
+        assert &quot;store_count&quot; in result
+
+        
+
+    finally:
+
+        await db.close_pool()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 갖추게 됩니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>작동하는 MCP 서버</strong>: 데이터베이스 통합을 갖춘 FastMCP 서버  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>구성 관리</strong>: 환경 기반의 견고한 구성  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>데이터베이스 계층</strong>: 연결 풀링을 포함한 PostgreSQL 통합  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>MCP 도구</strong>: 스키마 탐색 및 쿼리 실행 도구  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>RLS 통합</strong>: 행 수준 보안 컨텍스트 관리  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>상태 모니터링</strong>: 포괄적인 상태 확인 엔드포인트  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>테스트 전략</strong>: 로컬 테스트 및 VS Code 통합  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/06-Tools/README.md" target="_blank">Lab 06: 도구 개발</a></strong>을 계속 진행하여:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 도구 컬렉션 확장</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">고급 쿼리 패턴 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">데이터 검증 및 변환 추가</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">전문화된 분석 도구 생성</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">FastMCP 프레임워크</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">FastMCP 문서</a> - 공식 FastMCP 가이드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/">MCP 사양</a> - 프로토콜 사양</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs/tools/">도구 개발 가이드</a> - MCP 도구 생성</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">데이터베이스 통합</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://magicstack.github.io/asyncpg/current/">asyncpg 문서</a> - PostgreSQL 비동기 드라이버</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-connection.html">연결 풀링 모범 사례</a> - PostgreSQL 튜닝</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html">행 수준 보안 가이드</a> - RLS 구현</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">FastAPI 패턴</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/">FastAPI 문서</a> - 웹 프레임워크 참조</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/tutorial/dependencies/">의존성 주입</a> - FastAPI 패턴</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/tutorial/background-tasks/">백그라운드 작업</a> - 비동기 작업 관리</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: 도구를 확장할 준비가 되셨나요? <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/06-Tools/README.md" target="_blank">Lab 06: 도구 개발</a>을 계속 진행하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전을 신뢰할 수 있는 권위 있는 자료로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_05-04---database-design-and-schema.html">&larr; 04 - Database Design and Schema</a></span>
+  <span><a href="m11_07-06---tool-development.html">06 - Tool Development &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

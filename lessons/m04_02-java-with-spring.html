@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Java with Spring - Practical Implementation - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 04: Practical Implementation</span> &rsaquo; Java with Spring</div>
+<div id="content-en" class="lang-content"><h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">System Architecture</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This project demonstrates a web application that uses content safety checking before passing user prompts to a calculator service via Model Context Protocol (MCP).</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">How It Works</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>User Input</strong>: The user enters a calculation prompt in the web interface</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Content Safety Screening (Input)</strong>: The prompt is analyzed by Azure Content Safety API</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Safety Decision (Input)</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - If the content is safe (severity < 2 in all categories), it proceeds to the calculator</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - If the content is flagged as potentially harmful, the process stops and returns a warning</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Calculator Integration</strong>: Safe content is processed by LangChain4j, which communicates with the MCP calculator server</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Content Safety Screening (Output)</strong>: The bot's response is analyzed by Azure Content Safety API</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>Safety Decision (Output)</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - If the bot response is safe, it's shown to the user</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - If the bot response is flagged as potentially harmful, it's replaced with a warning</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">7. <strong>Response</strong>: Results (if safe) are displayed to the user along with both safety analyses</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Using Model Context Protocol (MCP) with Calculator Services</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This project demonstrates how to use Model Context Protocol (MCP) to call calculator MCP services from LangChain4j. The implementation uses a local MCP server running on port 8080 to provide calculator operations.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Setting up Azure Content Safety Service</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before using the content safety features, you need to create an Azure Content Safety service resource:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Sign in to the <a class="text-[var(--accent)] underline" href="https://portal.azure.com">Azure Portal</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Click "Create a resource" and search for "Content Safety"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Select "Content Safety" and click "Create"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Enter a unique name for your resource</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Select your subscription and resource group (or create a new one)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. Choose a supported region (check <a class="text-[var(--accent)] underline" href="https://azure.microsoft.com/en-us/global-infrastructure/services/?products=cognitive-services">Region availability</a> for details)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">7. Select an appropriate pricing tier</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">8. Click "Create" to deploy the resource</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">9. Once deployment is complete, click "Go to resource"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">10. In the left pane, under "Resource Management", select "Keys and Endpoint"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">11. Copy either of the keys and the endpoint URL for use in the next step</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Configuring Environment Variables</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Set the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GITHUB_TOKEN</code> environment variable for GitHub models authentication:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+export GITHUB_TOKEN=&lt;your_github_token&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For content safety features, set:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+export CONTENT_SAFETY_ENDPOINT=&lt;your_content_safety_endpoint&gt;
+
+export CONTENT_SAFETY_KEY=&lt;your_content_safety_key&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These environment variables are used by the application to authenticate with the Azure Content Safety service.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If these variables are not set, the application will use placeholder values for demonstration purposes, but the content safety features will not work properly.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Starting the Calculator MCP Server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before running the client, you need to start the calculator MCP server in SSE mode on localhost:8080.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Project Description</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This project demonstrates the integration of Model Context Protocol (MCP) with LangChain4j to call calculator services. Key features include:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Using MCP to connect to a calculator service for basic math operations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Dual-layer content safety checking on both user prompts and bot responses</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integration with GitHub's gpt-4.1-nano model via LangChain4j</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Using Server-Sent Events (SSE) for MCP transport</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Content Safety Integration</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The project includes comprehensive content safety features to ensure that both user inputs and system responses are free from harmful content:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Input Screening</strong>: All user prompts are analyzed for harmful content categories such as hate speech, violence, self-harm, and sexual content before processing.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Output Screening</strong>: Even when using potentially uncensored models, the system checks all generated responses through the same content safety filters before displaying them to the user.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This dual-layer approach ensures that the system remains safe regardless of which AI model is being used, protecting users from both harmful inputs and potentially problematic AI-generated outputs.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Web Client</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The application includes a user-friendly web interface that allows users to interact with the Content Safety Calculator system:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Web Interface Features</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Simple, intuitive form for entering calculation prompts</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Dual-layer content safety validation (input and output)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Real-time feedback on prompt and response safety</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Color-coded safety indicators for easy interpretation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Clean, responsive design that works on various devices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Example safe prompts to guide users</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using the Web Client</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Start the application:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   mvn spring-boot:run</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Open your browser and navigate to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:8087</code></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Enter a calculation prompt in the provided text area (e.g., "Calculate the sum of 24.5 and 17.3")</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Click "Submit" to process your request</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. View the results, which will include:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Content safety analysis of your prompt</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - The calculated result (if prompt was safe)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Content safety analysis of the bot's response</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Any safety warnings if either the input or output was flagged</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The web client automatically handles both content safety verification processes, ensuring all interactions are safe and appropriate regardless of which AI model is being used.</p>
+</div>
+<div id="content-ko" class="lang-content"><h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">시스템 아키텍처</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 프로젝트는 사용자 프롬프트를 계산기 서비스에 전달하기 전에 콘텐츠 안전성 검사를 수행하는 웹 애플리케이션을 Model Context Protocol (MCP)을 통해 구현한 예시입니다.</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">작동 방식</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>사용자 입력</strong>: 사용자가 웹 인터페이스에 계산 프롬프트를 입력합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>콘텐츠 안전성 검사 (입력)</strong>: 프롬프트는 Azure Content Safety API로 분석됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>안전성 판단 (입력)</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 모든 카테고리에서 심각도(severity)가 2 미만인 경우 안전하다고 판단되어 계산기로 전달됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 잠재적으로 유해한 콘텐츠로 표시되면 프로세스가 중단되고 경고가 반환됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>계산기 연동</strong>: 안전한 콘텐츠는 LangChain4j를 통해 MCP 계산기 서버와 통신하여 처리됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>콘텐츠 안전성 검사 (출력)</strong>: 봇의 응답은 Azure Content Safety API로 분석됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>안전성 판단 (출력)</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 봇 응답이 안전하면 사용자에게 표시됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 잠재적으로 유해한 응답으로 표시되면 경고 메시지로 대체됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">7. <strong>응답</strong>: 결과(안전한 경우)는 사용자에게 두 번의 안전성 분석 결과와 함께 표시됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Model Context Protocol (MCP)을 이용한 계산기 서비스 사용법</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 프로젝트는 LangChain4j에서 Model Context Protocol (MCP)을 사용해 계산기 MCP 서비스를 호출하는 방법을 보여줍니다. 구현은 포트 8080에서 실행되는 로컬 MCP 서버를 통해 계산기 연산을 제공합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure Content Safety 서비스 설정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">콘텐츠 안전성 기능을 사용하기 전에 Azure Content Safety 서비스 리소스를 생성해야 합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <a class="text-[var(--accent)] underline" href="https://portal.azure.com">Azure Portal</a>에 로그인합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. "리소스 만들기"를 클릭하고 "Content Safety"를 검색합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. "Content Safety"를 선택하고 "만들기"를 클릭합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 리소스에 고유한 이름을 입력합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 구독과 리소스 그룹을 선택하거나 새로 만듭니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. 지원되는 지역을 선택합니다 (<a class="text-[var(--accent)] underline" href="https://azure.microsoft.com/en-us/global-infrastructure/services/?products=cognitive-services">지역 가용성</a> 참고).</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">7. 적절한 가격 책정 계층을 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">8. "만들기"를 클릭하여 리소스를 배포합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">9. 배포가 완료되면 "리소스로 이동"을 클릭합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">10. 왼쪽 메뉴에서 "리소스 관리" 아래의 "키 및 엔드포인트"를 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">11. 다음 단계에서 사용할 키 중 하나와 엔드포인트 URL을 복사합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">환경 변수 설정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">GitHub 모델 인증을 위해 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GITHUB_TOKEN</code> 환경 변수를 설정하세요:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+export GITHUB_TOKEN=&lt;your_github_token&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">콘텐츠 안전성 기능을 위해 다음을 설정하세요:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+export CONTENT_SAFETY_ENDPOINT=&lt;your_content_safety_endpoint&gt;
+
+export CONTENT_SAFETY_KEY=&lt;your_content_safety_key&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 환경 변수들은 애플리케이션이 Azure Content Safety 서비스에 인증하는 데 사용됩니다. 설정하지 않으면 데모용 자리 표시자 값이 사용되지만 콘텐츠 안전성 기능은 제대로 작동하지 않습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계산기 MCP 서버 시작</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트를 실행하기 전에 localhost:8080에서 SSE 모드로 계산기 MCP 서버를 시작해야 합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">프로젝트 설명</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 프로젝트는 LangChain4j와 Model Context Protocol (MCP)을 통합하여 계산기 서비스를 호출하는 방법을 보여줍니다. 주요 기능은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP를 사용해 기본 수학 연산을 위한 계산기 서비스에 연결</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자 프롬프트와 봇 응답 모두에 대한 이중 콘텐츠 안전성 검사</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LangChain4j를 통한 GitHub의 gpt-4.1-nano 모델 연동</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 전송에 Server-Sent Events (SSE) 사용</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">콘텐츠 안전성 통합</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 프로젝트는 사용자 입력과 시스템 응답 모두에서 유해한 콘텐츠가 없도록 포괄적인 콘텐츠 안전성 기능을 포함합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>입력 검사</strong>: 모든 사용자 프롬프트는 증오 발언, 폭력, 자해, 성적 콘텐츠 등 유해 콘텐츠 카테고리에 대해 처리 전에 분석됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>출력 검사</strong>: 잠재적으로 검열되지 않은 모델을 사용하더라도, 생성된 모든 응답은 사용자에게 표시되기 전에 동일한 콘텐츠 안전성 필터를 거칩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이중 검사 방식을 통해 어떤 AI 모델을 사용하더라도 시스템이 안전하게 유지되며, 사용자와 AI 생성 출력 모두를 유해한 콘텐츠로부터 보호합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">웹 클라이언트</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">애플리케이션은 사용자가 Content Safety Calculator 시스템과 상호작용할 수 있는 직관적인 웹 인터페이스를 제공합니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">웹 인터페이스 기능</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">계산 프롬프트 입력을 위한 간단하고 직관적인 폼</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">입력과 출력 모두에 대한 이중 콘텐츠 안전성 검증</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">프롬프트와 응답 안전성에 대한 실시간 피드백</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">쉽게 이해할 수 있는 색상 구분 안전성 표시기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 기기에서 작동하는 깔끔하고 반응형 디자인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자를 위한 안전한 예시 프롬프트 제공</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">웹 클라이언트 사용법</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 애플리케이션을 시작합니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```sh</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   mvn spring-boot:run</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 브라우저를 열고 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:8087</code>로 접속합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 제공된 텍스트 영역에 계산 프롬프트를 입력합니다 (예: "24.5와 17.3의 합을 계산해 주세요").</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. "Submit" 버튼을 클릭하여 요청을 처리합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 결과를 확인합니다. 결과에는 다음이 포함됩니다:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 프롬프트에 대한 콘텐츠 안전성 분석</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 계산된 결과 (프롬프트가 안전한 경우)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 봇 응답에 대한 콘텐츠 안전성 분석</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 입력 또는 출력이 플래그된 경우 안전성 경고</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">웹 클라이언트는 두 단계의 콘텐츠 안전성 검증을 자동으로 처리하여, 어떤 AI 모델을 사용하더라도 모든 상호작용이 안전하고 적절하게 이루어지도록 보장합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m04_01-c.html">&larr; C#</a></span>
+  <span><a href="m04_03-typescript.html">TypeScript &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

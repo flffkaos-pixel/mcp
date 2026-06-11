@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>13 Mcp Inspector - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 13 Mcp Inspector</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Debugging with MCP Inspector</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <strong>MCP Inspector</strong> is an essential debugging tool that lets you interactively test and troubleshoot your MCP servers without needing a full AI host application.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Think of it as "Postman for MCP" - it provides a visual interface to send requests, view responses, and understand how your server behaves.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Why Use MCP Inspector?</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When building MCP servers, you'll often encounter these challenges:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"Is my server even running?"</strong> - Inspector shows connection status</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"Are my tools registered correctly?"</strong> - Inspector lists all available tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"What's the response format?"</strong> - Inspector displays full JSON responses</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"Why isn't this tool working?"</strong> - Inspector shows detailed error messages</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Prerequisites</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Node.js 18+ installed</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">npm (comes with Node.js)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">An MCP server to test (see <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">Module 3.1 - First Server</a>)</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Installation</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Option 1: Run with npx (Recommended for Quick Testing)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npx @modelcontextprotocol/inspector
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Option 2: Install Globally</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm install -g @modelcontextprotocol/inspector
+
+mcp-inspector
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Option 3: Add to Your Project</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+cd your-mcp-server-project
+
+npm install --save-dev @modelcontextprotocol/inspector
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">package.json</code>:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;scripts&quot;: {
+
+    &quot;inspector&quot;: &quot;mcp-inspector&quot;
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Connecting to Your Server</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">stdio Servers (Local Process)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For servers that communicate via standard input/output:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Python server
+
+npx @modelcontextprotocol/inspector python -m your_server_module
+
+
+
+# Node.js server
+
+npx @modelcontextprotocol/inspector node ./build/index.js
+
+
+
+# With environment variables
+
+OPENAI_API_KEY=xxx npx @modelcontextprotocol/inspector python server.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">SSE/HTTP Servers (Network)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For servers running as HTTP services:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Start your server first:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   python server.py  # Server running on http://localhost:8080</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Launch Inspector and connect:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   npx @modelcontextprotocol/inspector --sse http://localhost:8080/sse</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Inspector Interface Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When Inspector launches, you'll see a web interface (typically at <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:5173</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────────────────┐
+
+│  MCP Inspector                              [Connected ✅]   │
+
+├─────────────────────────────────────────────────────────────┤
+
+│                                                             │
+
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+
+│  │   🔧 Tools  │  │ 📄 Resources│  │ 💬 Prompts  │         │
+
+│  │    (3)      │  │    (2)      │  │    (1)      │         │
+
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+
+│                                                             │
+
+│  ┌───────────────────────────────────────────────────────┐ │
+
+│  │  📋 Message Log                                       │ │
+
+│  │  ─────────────────────────────────────────────────── │ │
+
+│  │  → initialize                                         │ │
+
+│  │  ← initialized (server info)                          │ │
+
+│  │  → tools/list                                         │ │
+
+│  │  ← tools (3 tools)                                    │ │
+
+│  └───────────────────────────────────────────────────────┘ │
+
+│                                                             │
+
+└─────────────────────────────────────────────────────────────┘
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Testing Tools</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Listing Available Tools</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Click the <strong>Tools</strong> tab</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Inspector automatically calls <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. You'll see all registered tools with:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Tool name</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Description</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Input schema (parameters)</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Invoking a Tool</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select a tool from the list</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Fill in the required parameters in the form</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Click <strong>Run Tool</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. View the response in the results panel</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Example: Testing a calculator tool</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Tool: add
+
+Parameters:
+
+  a: 25
+
+  b: 17
+
+
+
+Response:
+
+{
+
+  &quot;content&quot;: [
+
+    {
+
+      &quot;type&quot;: &quot;text&quot;,
+
+      &quot;text&quot;: &quot;42&quot;
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Debugging Tool Errors</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When a tool fails, Inspector shows:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Error Response:
+
+{
+
+  &quot;error&quot;: {
+
+    &quot;code&quot;: -32602,
+
+    &quot;message&quot;: &quot;Invalid params: &#x27;b&#x27; is required&quot;
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Common error codes:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Code | Meaning |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|------|---------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32700 | Parse error (invalid JSON) |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32600 | Invalid request |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32601 | Method not found |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32602 | Invalid params |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32603 | Internal error |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Testing Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Listing Resources</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Click the <strong>Resources</strong> tab</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Inspector calls <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resources/list</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. You'll see:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Resource URIs</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Names and descriptions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - MIME types</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Reading a Resource</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select a resource</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Click <strong>Read Resource</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. View the content returned</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Example output:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Resource: file:///config/settings.json
+
+Content-Type: application/json
+
+
+
+{
+
+  &quot;config&quot;: {
+
+    &quot;debug&quot;: true,
+
+    &quot;maxConnections&quot;: 10
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Testing Prompts</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Listing Prompts</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Click the <strong>Prompts</strong> tab</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Inspector calls <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">prompts/list</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. View available prompt templates</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Getting a Prompt</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Select a prompt</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Fill in any required arguments</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Click <strong>Get Prompt</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. See the rendered prompt messages</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Message Log Analysis</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The message log shows all MCP protocol messages:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+14:32:01 → {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;initialize&quot;,...}
+
+14:32:01 ← {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;result&quot;:{&quot;protocolVersion&quot;:&quot;2025-11-25&quot;,...}}
+
+14:32:02 → {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;method&quot;:&quot;tools/list&quot;}
+
+14:32:02 ← {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;result&quot;:{&quot;tools&quot;:[...]}}
+
+14:32:05 → {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:3,&quot;method&quot;:&quot;tools/call&quot;,&quot;params&quot;:{&quot;name&quot;:&quot;add&quot;,...}}
+
+14:32:05 ← {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:3,&quot;result&quot;:{&quot;content&quot;:[...]}}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">What to Look For</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Request/Response pairs</strong>: Each <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">→</code> should have a matching <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">←</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Error messages</strong>: Look for <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"error"</code> in responses</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Timing</strong>: Large gaps might indicate performance issues</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Protocol version</strong>: Ensure server and client agree on version</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">VS Code Integration</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You can run Inspector directly from VS Code:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using launch.json</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/launch.json</code>:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;0.2.0&quot;,
+
+  &quot;configurations&quot;: [
+
+    {
+
+      &quot;name&quot;: &quot;Debug with MCP Inspector&quot;,
+
+      &quot;type&quot;: &quot;node&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;runtimeExecutable&quot;: &quot;npx&quot;,
+
+      &quot;runtimeArgs&quot;: [
+
+        &quot;@modelcontextprotocol/inspector&quot;,
+
+        &quot;python&quot;,
+
+        &quot;${workspaceFolder}/server.py&quot;
+
+      ],
+
+      &quot;console&quot;: &quot;integratedTerminal&quot;
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Debug SSE Server with Inspector&quot;,
+
+      &quot;type&quot;: &quot;chrome&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:5173&quot;,
+
+      &quot;preLaunchTask&quot;: &quot;Start MCP Inspector&quot;
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Using Tasks</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/tasks.json</code>:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;2.0.0&quot;,
+
+  &quot;tasks&quot;: [
+
+    {
+
+      &quot;label&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;npx @modelcontextprotocol/inspector node ${workspaceFolder}/build/index.js&quot;,
+
+      &quot;isBackground&quot;: true,
+
+      &quot;problemMatcher&quot;: {
+
+        &quot;pattern&quot;: {
+
+          &quot;regexp&quot;: &quot;^$&quot;
+
+        },
+
+        &quot;background&quot;: {
+
+          &quot;activeOnStart&quot;: true,
+
+          &quot;beginsPattern&quot;: &quot;Inspector&quot;,
+
+          &quot;endsPattern&quot;: &quot;listening&quot;
+
+        }
+
+      }
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Common Debugging Scenarios</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Scenario 1: Server Won't Connect</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Symptoms:</strong> Inspector shows "Disconnected" or hangs on "Connecting..."</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Checklist:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. ✅ Is the server command correct?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. ✅ Are all dependencies installed?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. ✅ Is the server path absolute or relative to current directory?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. ✅ Are required environment variables set?</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Debug steps:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Test server manually first
+
+python -c &quot;import your_server_module; print(&#x27;OK&#x27;)&quot;
+
+
+
+# Check for import errors
+
+python -m your_server_module 2&gt;&amp;1 | head -20
+
+
+
+# Verify MCP SDK is installed
+
+pip show mcp
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Scenario 2: Tools Not Appearing</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Symptoms:</strong> Tools tab shows empty list</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Possible causes:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Tools not registered during server initialization</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Server crashed after startup</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code> handler returning empty array</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Debug steps:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Check message log for <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code> response</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Add logging to your tool registration code</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Verify <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">@mcp.tool()</code> decorators are present (Python)</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Scenario 3: Tool Returns Error</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Symptoms:</strong> Tool call returns error response</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Debug approach:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Read the error message carefully</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Check parameter types match schema</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Add try/catch with detailed error messages</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Check server logs for stack traces</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Example improved error handling:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool()
+
+async def my_tool(param1: str, param2: int) -&gt; str:
+
+    try:
+
+        # Tool logic here
+
+        result = process(param1, param2)
+
+        return str(result)
+
+    except ValueError as e:
+
+        raise McpError(f&quot;Invalid parameter: {e}&quot;)
+
+    except Exception as e:
+
+        raise McpError(f&quot;Tool failed: {type(e).__name__}: {e}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Scenario 4: Resource Content Empty</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Symptoms:</strong> Resource returns but content is empty or null</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Checklist:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. ✅ File path or URI is correct</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. ✅ Server has permission to read the resource</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. ✅ Resource content is being returned correctly</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Advanced Inspector Features</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Custom Headers (SSE)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npx @modelcontextprotocol/inspector \
+
+  --sse http://localhost:8080/sse \
+
+  --header &quot;Authorization: Bearer your-token&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Verbose Logging</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+DEBUG=mcp* npx @modelcontextprotocol/inspector python server.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Recording Sessions</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Inspector can export message logs for later analysis:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Click <strong>Export Log</strong> in the message panel</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Save the JSON file</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Share with team members for debugging</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Best Practices</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Test early and often</strong> - Use Inspector during development, not just when things break</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Start simple</strong> - Test basic connectivity before complex tool calls</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Check the schema</strong> - Many errors come from parameter type mismatches</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Read error messages</strong> - MCP errors are usually descriptive</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Keep Inspector open</strong> - It helps catch issues as you develop</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You've completed Module 3: Getting Started! Continue your learning:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/04-PracticalImplementation/README.md" target="_blank">Module 4: Practical Implementation</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/inspector">MCP Inspector GitHub Repository</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP Specification - Protocol Messages</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.jsonrpc.org/specification">JSON-RPC 2.0 Specification</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">MCP Inspector로 디버깅하기</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP Inspector</strong>는 전체 AI 호스트 애플리케이션 없이도 MCP 서버를 대화형으로 테스트하고 문제를 해결할 수 있는 필수 디버깅 도구입니다. "MCP를 위한 Postman"으로 생각할 수 있으며, 요청을 보내고, 응답을 보고, 서버 동작 방식을 이해할 수 있는 시각적 인터페이스를 제공합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP Inspector를 사용하는 이유</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버를 구축할 때 자주 겪는 문제들:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"내 서버가 실행 중인가?"</strong> - Inspector가 연결 상태를 보여줌</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"내 도구들이 올바르게 등록되었나?"</strong> - Inspector가 모든 도구 목록을 표시함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"응답 형식이 어떻게 되지?"</strong> - Inspector가 전체 JSON 응답을 표시함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>"이 도구가 왜 작동하지 않지?"</strong> - Inspector가 상세한 오류 메시지를 보여줌</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">전제 조건</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Node.js 18 이상 설치</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">npm (Node.js에 포함)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">테스트할 MCP 서버 (<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">Module 3.1 - First Server</a> 참조)</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">설치</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">옵션 1: npx로 실행 (빠른 테스트 권장)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npx @modelcontextprotocol/inspector
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">옵션 2: 전역 설치</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npm install -g @modelcontextprotocol/inspector
+
+mcp-inspector
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">옵션 3: 프로젝트에 추가</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+cd your-mcp-server-project
+
+npm install --save-dev @modelcontextprotocol/inspector
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">package.json</code>에 추가:</p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;scripts&quot;: {
+
+    &quot;inspector&quot;: &quot;mcp-inspector&quot;
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">서버에 연결하기</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">stdio 서버 (로컬 프로세스)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">표준 입력/출력으로 통신하는 서버용:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 파이썬 서버
+
+npx @modelcontextprotocol/inspector python -m your_server_module
+
+
+
+# Node.js 서버
+
+npx @modelcontextprotocol/inspector node ./build/index.js
+
+
+
+# 환경 변수 사용
+
+OPENAI_API_KEY=xxx npx @modelcontextprotocol/inspector python server.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">SSE/HTTP 서버 (네트워크)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">HTTP 서비스로 실행되는 서버용:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 먼저 서버를 시작하세요:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   python server.py  # 서버가 http://localhost:8080 에서 실행 중입니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Inspector를 실행하고 연결하세요:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```bash</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   npx @modelcontextprotocol/inspector --sse http://localhost:8080/sse</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Inspector 인터페이스 개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Inspector 실행 시 보이는 웹 인터페이스(보통 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:5173</code>):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────────────────┐
+
+│  MCP Inspector                              [Connected ✅]   │
+
+├─────────────────────────────────────────────────────────────┤
+
+│                                                             │
+
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+
+│  │   🔧 Tools  │  │ 📄 Resources│  │ 💬 Prompts  │         │
+
+│  │    (3)      │  │    (2)      │  │    (1)      │         │
+
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+
+│                                                             │
+
+│  ┌───────────────────────────────────────────────────────┐ │
+
+│  │  📋 Message Log                                       │ │
+
+│  │  ─────────────────────────────────────────────────── │ │
+
+│  │  → initialize                                         │ │
+
+│  │  ← initialized (server info)                          │ │
+
+│  │  → tools/list                                         │ │
+
+│  │  ← tools (3 tools)                                    │ │
+
+│  └───────────────────────────────────────────────────────┘ │
+
+│                                                             │
+
+└─────────────────────────────────────────────────────────────┘
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">도구 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">사용 가능한 도구 목록 확인</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Tools</strong> 탭 클릭</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Inspector가 자동으로 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code> 호출</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 등록된 모든 도구가 다음과 함께 표시됨:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 도구 이름</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 설명</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 입력 스키마(매개변수)</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">도구 호출하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 목록에서 도구 선택</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 폼에 필요한 매개변수 입력</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Run Tool</strong> 클릭</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 결과 패널에서 응답 확인</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>예: 계산기 도구 테스트</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Tool: add
+
+Parameters:
+
+  a: 25
+
+  b: 17
+
+
+
+Response:
+
+{
+
+  &quot;content&quot;: [
+
+    {
+
+      &quot;type&quot;: &quot;text&quot;,
+
+      &quot;text&quot;: &quot;42&quot;
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">도구 오류 디버깅</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">도구 실패 시 Inspector가 보여주는 내용:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Error Response:
+
+{
+
+  &quot;error&quot;: {
+
+    &quot;code&quot;: -32602,
+
+    &quot;message&quot;: &quot;Invalid params: &#x27;b&#x27; is required&quot;
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">일반 오류 코드:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 코드 | 의미 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|------|---------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32700 | 파싱 오류 (잘못된 JSON) |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32600 | 잘못된 요청 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32601 | 메서드 없음 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32602 | 매개변수 오류 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| -32603 | 내부 오류 |</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">리소스 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">리소스 목록 확인</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Resources</strong> 탭 클릭</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Inspector가 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">resources/list</code> 호출</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 다음 항목을 볼 수 있음:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 리소스 URI</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 이름 및 설명</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - MIME 타입</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">리소스 읽기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 리소스 선택</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Read Resource</strong> 클릭</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 반환된 콘텐츠 확인</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>예시 출력:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Resource: file:///config/settings.json
+
+Content-Type: application/json
+
+
+
+{
+
+  &quot;config&quot;: {
+
+    &quot;debug&quot;: true,
+
+    &quot;maxConnections&quot;: 10
+
+  }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">프롬프트 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">프롬프트 목록 확인</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Prompts</strong> 탭 클릭</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Inspector가 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">prompts/list</code> 호출</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 사용 가능한 프롬프트 템플릿 확인</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">프롬프트 가져오기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 프롬프트 선택</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 필요한 인수 입력</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Get Prompt</strong> 클릭</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 렌더링된 프롬프트 메시지 확인</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">메시지 로그 분석</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">메시지 로그는 모든 MCP 프로토콜 메시지를 보여줌:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+14:32:01 → {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;initialize&quot;,...}
+
+14:32:01 ← {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;result&quot;:{&quot;protocolVersion&quot;:&quot;2025-11-25&quot;,...}}
+
+14:32:02 → {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;method&quot;:&quot;tools/list&quot;}
+
+14:32:02 ← {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;result&quot;:{&quot;tools&quot;:[...]}}
+
+14:32:05 → {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:3,&quot;method&quot;:&quot;tools/call&quot;,&quot;params&quot;:{&quot;name&quot;:&quot;add&quot;,...}}
+
+14:32:05 ← {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:3,&quot;result&quot;:{&quot;content&quot;:[...]}}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">확인할 내용</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>요청/응답 쌍</strong>: 각 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">→</code>는 대응하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">←</code>가 있어야 함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>오류 메시지</strong>: 응답에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">"error"</code> 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>시간 간격</strong>: 큰 간격은 성능 문제 가능성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>프로토콜 버전</strong>: 서버와 클라이언트 버전 일치 여부 확인</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">VS Code 통합</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">VS Code에서 Inspector를 직접 실행 가능:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">launch.json 사용</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/launch.json</code>에 추가:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;0.2.0&quot;,
+
+  &quot;configurations&quot;: [
+
+    {
+
+      &quot;name&quot;: &quot;Debug with MCP Inspector&quot;,
+
+      &quot;type&quot;: &quot;node&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;runtimeExecutable&quot;: &quot;npx&quot;,
+
+      &quot;runtimeArgs&quot;: [
+
+        &quot;@modelcontextprotocol/inspector&quot;,
+
+        &quot;python&quot;,
+
+        &quot;${workspaceFolder}/server.py&quot;
+
+      ],
+
+      &quot;console&quot;: &quot;integratedTerminal&quot;
+
+    },
+
+    {
+
+      &quot;name&quot;: &quot;Debug SSE Server with Inspector&quot;,
+
+      &quot;type&quot;: &quot;chrome&quot;,
+
+      &quot;request&quot;: &quot;launch&quot;,
+
+      &quot;url&quot;: &quot;http://localhost:5173&quot;,
+
+      &quot;preLaunchTask&quot;: &quot;Start MCP Inspector&quot;
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Tasks 사용</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">.vscode/tasks.json</code>에 추가:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+  &quot;version&quot;: &quot;2.0.0&quot;,
+
+  &quot;tasks&quot;: [
+
+    {
+
+      &quot;label&quot;: &quot;Start MCP Inspector&quot;,
+
+      &quot;type&quot;: &quot;shell&quot;,
+
+      &quot;command&quot;: &quot;npx @modelcontextprotocol/inspector node ${workspaceFolder}/build/index.js&quot;,
+
+      &quot;isBackground&quot;: true,
+
+      &quot;problemMatcher&quot;: {
+
+        &quot;pattern&quot;: {
+
+          &quot;regexp&quot;: &quot;^$&quot;
+
+        },
+
+        &quot;background&quot;: {
+
+          &quot;activeOnStart&quot;: true,
+
+          &quot;beginsPattern&quot;: &quot;Inspector&quot;,
+
+          &quot;endsPattern&quot;: &quot;listening&quot;
+
+        }
+
+      }
+
+    }
+
+  ]
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">일반적인 디버깅 시나리오</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시나리오 1: 서버 연결 실패</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>증상:</strong> Inspector가 "Disconnected" 표시하거나 "Connecting..." 상태에서 멈춤</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>점검 목록:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. ✅ 서버 명령어가 올바른가?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. ✅ 모든 종속성이 설치되었나?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. ✅ 서버 경로가 절대 경로인지 현재 디렉터리 기준 상대 경로인지 확인</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. ✅ 필수 환경 변수 설정 여부</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>디버그 단계:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 서버를 먼저 수동으로 테스트하세요
+
+python -c &quot;import your_server_module; print(&#x27;OK&#x27;)&quot;
+
+
+
+# 가져오기 오류를 확인하세요
+
+python -m your_server_module 2&gt;&amp;1 | head -20
+
+
+
+# MCP SDK가 설치되었는지 확인하세요
+
+pip show mcp
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시나리오 2: 도구 목록이 나타나지 않음</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>증상:</strong> Tools 탭에 빈 목록 표시</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>가능 원인:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 서버 초기화 중 도구가 등록되지 않음</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 서버 시작 후 크래시 발생</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code> 핸들러가 빈 배열 반환</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>디버그 단계:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 메시지 로그에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tools/list</code> 응답 확인</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 도구 등록 코드에 로깅 추가</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Python의 경우 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">@mcp.tool()</code> 데코레이터 존재 여부 확인</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시나리오 3: 도구 오류 반환</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>증상:</strong> 도구 호출 시 오류 응답</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>디버그 방법:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 오류 메시지 꼼꼼히 읽기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 매개변수 타입이 스키마와 일치하는지 확인</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 상세 오류 메시지를 위한 try/catch 추가</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 서버 로그에서 스택 트레이스 확인</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>개선된 오류 처리 예:</strong></p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool()
+
+async def my_tool(param1: str, param2: int) -&gt; str:
+
+    try:
+
+        # 여기 도구 로직
+
+        result = process(param1, param2)
+
+        return str(result)
+
+    except ValueError as e:
+
+        raise McpError(f&quot;Invalid parameter: {e}&quot;)
+
+    except Exception as e:
+
+        raise McpError(f&quot;Tool failed: {type(e).__name__}: {e}&quot;)
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시나리오 4: 리소스 내용이 비어 있음</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>증상:</strong> 리소스는 반환되나 내용이 비었거나 null</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>점검 목록:</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. ✅ 파일 경로나 URI가 정확한가</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. ✅ 서버에 리소스 읽기 권한이 있는가</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. ✅ 리소스 내용이 올바르게 반환되는가</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">고급 Inspector 기능</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">사용자 정의 헤더 (SSE)</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+npx @modelcontextprotocol/inspector \
+
+  --sse http://localhost:8080/sse \
+
+  --header &quot;Authorization: Bearer your-token&quot;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">자세한 로깅</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+DEBUG=mcp* npx @modelcontextprotocol/inspector python server.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">세션 기록</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Inspector는 메시지 로그를 내보내서 나중에 분석할 수 있음:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 메시지 패널에서 <strong>Export Log</strong> 클릭</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. JSON 파일 저장</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 팀과 공유하여 디버깅</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">모범 사례</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>조기에 자주 테스트하세요</strong> - 문제가 생겼을 때만이 아니라 개발 중에도 Inspector 사용</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>단순하게 시작하세요</strong> - 복잡한 도구 호출 전에 기본 연결부터 확인</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>스키마 체크</strong> - 많은 오류가 매개변수 타입 불일치에서 발생</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>오류 메시지 읽기</strong> - MCP 오류는 대체로 설명적임</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Inspector를 열어두세요</strong> - 개발 중 문제를 발견하는 데 도움됨</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Module 3: Getting Started를 완료했습니다! 학습을 계속하세요:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/04-PracticalImplementation/README.md" target="_blank">Module 4: Practical Implementation</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/inspector">MCP Inspector GitHub 저장소</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://spec.modelcontextprotocol.io/specification/2025-11-25/">MCP 명세 - 프로토콜 메시지</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.jsonrpc.org/specification">JSON-RPC 2.0 명세</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있음을 양지해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문 인력에 의한 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인한 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m03_12-12-mcp-hosts.html">&larr; 12 Mcp Hosts</a></span>
+  <span><a href="m03_14-14-sampling.html">14 Sampling &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

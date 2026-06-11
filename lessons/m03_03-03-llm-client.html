@@ -1,0 +1,4350 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>03 Llm Client - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 03 Llm Client</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Creating a client with LLM</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">So far, you've seen how to create a server and a client.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The client has been able to call the server explicitly to list its tools, resources, and prompts.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">However, this is not a very practical approach.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Your users live in the agentic era and expect to use prompts and communicate with an LLM instead.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">They do not care whether you use MCP to store your capabilities; they simply expect to interact using natural language.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">So how do we solve this?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The solution is to add an LLM to the client.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this lesson we focus on adding an LLM to do your client and show how this provides a much better experience for your user.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create a client with an LLM.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Seamlessly interact with an MCP server using an LLM.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Provide a better end user experience on the client side.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Approach</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's try to understand the approach we need to take. Adding an LLM sounds simple, but will we actually do this?</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's how the client will interact with the server:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Establish connection with server.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. List capabilities, prompts, resources and tools, and save down their schema.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Add an LLM and pass the saved capabilities and their schema in a format the LLM understands.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Handle a user prompt by passing it to the LLM together with the tools listed by the client.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, now we understand how we can do this at high level, let's try this out in below exercise.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Exercise: Creating a client with an LLM</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this exercise, we will learn to add an LLM to our client.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Authentication using GitHub Personal Access Token</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Creating a GitHub token is a straightforward process. Here’s how you can do it:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Go to GitHub Settings – Click on your profile picture in the top right corner and select Settings.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Navigate to Developer Settings – Scroll down and click on Developer Settings.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Select Personal Access Tokens – Click on Fine-grained tokens and then Generate new token.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure Your Token – Add a note for reference, set an expiration date, and select the necessary scopes (permissions). In this case be sure to add the Models permission.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Generate and Copy the Token – Click Generate token, and make sure to copy it immediately, as you won’t be able to see it again.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- Connect to server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's create our client first:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">TypeScript</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Client } from &quot;@modelcontextprotocol/sdk/client/index.js&quot;;
+
+import { StdioClientTransport } from &quot;@modelcontextprotocol/sdk/client/stdio.js&quot;;
+
+import { Transport } from &quot;@modelcontextprotocol/sdk/shared/transport.js&quot;;
+
+import OpenAI from &quot;openai&quot;;
+
+import { z } from &quot;zod&quot;; // Import zod for schema validation
+
+
+
+class MCPClient {
+
+    private openai: OpenAI;
+
+    private client: Client;
+
+    constructor(){
+
+        this.openai = new OpenAI({
+
+            baseURL: &quot;https://models.inference.ai.azure.com&quot;, 
+
+            apiKey: process.env.GITHUB_TOKEN,
+
+        });
+
+
+
+        this.client = new Client(
+
+            {
+
+                name: &quot;example-client&quot;,
+
+                version: &quot;1.0.0&quot;
+
+            },
+
+            {
+
+                capabilities: {
+
+                prompts: {},
+
+                resources: {},
+
+                tools: {}
+
+                }
+
+            }
+
+            );    
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Imported the needed libraries</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create a class with two members, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">client</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">openai</code> that will help us manage a client and interact with an LLM respectively.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configured our LLM instance to use GitHub Models by setting <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">baseUrl</code> to point to the inference API.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp import ClientSession, StdioServerParameters, types
+
+from mcp.client.stdio import stdio_client
+
+
+
+# Create server parameters for stdio connection
+
+server_params = StdioServerParameters(
+
+    command=&quot;mcp&quot;,  # Executable
+
+    args=[&quot;run&quot;, &quot;server.py&quot;],  # Optional command line arguments
+
+    env=None,  # Optional environment variables
+
+)
+
+
+
+
+
+async def run():
+
+    async with stdio_client(server_params) as (read, write):
+
+        async with ClientSession(
+
+            read, write
+
+        ) as session:
+
+            # Initialize the connection
+
+            await session.initialize()
+
+
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    import asyncio
+
+
+
+    asyncio.run(run())
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Imported the needed libraries for MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a client</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+using Azure;
+
+using Azure.AI.Inference;
+
+using Azure.Identity;
+
+using System.Text.Json;
+
+using ModelContextProtocol.Client;
+
+using System.Text.Json;
+
+
+
+var clientTransport = new StdioClientTransport(new()
+
+{
+
+    Name = &quot;Demo Server&quot;,
+
+    Command = &quot;/workspaces/mcp-for-beginners/03-GettingStarted/02-client/solution/server/bin/Debug/net8.0/server&quot;,
+
+    Arguments = [],
+
+});
+
+
+
+await using var mcpClient = await McpClient.CreateAsync(clientTransport);
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">First, you'll need to add the LangChain4j dependencies to your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pom.xml</code> file.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add these dependencies to enable MCP integration and GitHub Models support:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;properties&gt;
+
+    &lt;langchain4j.version&gt;1.0.0-beta3&lt;/langchain4j.version&gt;
+
+&lt;/properties&gt;
+
+
+
+&lt;dependencies&gt;
+
+    &lt;!-- LangChain4j MCP Integration --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+        &lt;artifactId&gt;langchain4j-mcp&lt;/artifactId&gt;
+
+        &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+    &lt;/dependency&gt;
+
+    
+
+    &lt;!-- OpenAI Official API Client --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+        &lt;artifactId&gt;langchain4j-open-ai-official&lt;/artifactId&gt;
+
+        &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+    &lt;/dependency&gt;
+
+    
+
+    &lt;!-- GitHub Models Support --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+        &lt;artifactId&gt;langchain4j-github-models&lt;/artifactId&gt;
+
+        &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+    &lt;/dependency&gt;
+
+    
+
+    &lt;!-- Spring Boot Starter (optional, for production apps) --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+
+        &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+
+    &lt;/dependency&gt;
+
+&lt;/dependencies&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Then create your Java client class:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import dev.langchain4j.mcp.McpToolProvider;
+
+import dev.langchain4j.mcp.client.DefaultMcpClient;
+
+import dev.langchain4j.mcp.client.McpClient;
+
+import dev.langchain4j.mcp.client.transport.McpTransport;
+
+import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
+
+import dev.langchain4j.model.chat.ChatLanguageModel;
+
+import dev.langchain4j.model.openaiofficial.OpenAiOfficialChatModel;
+
+import dev.langchain4j.service.AiServices;
+
+import dev.langchain4j.service.tool.ToolProvider;
+
+
+
+import java.time.Duration;
+
+import java.util.List;
+
+
+
+public class LangChain4jClient {
+
+    
+
+    public static void main(String[] args) throws Exception {        // Configure the LLM to use GitHub Models
+
+        ChatLanguageModel model = OpenAiOfficialChatModel.builder()
+
+                .isGitHubModels(true)
+
+                .apiKey(System.getenv(&quot;GITHUB_TOKEN&quot;))
+
+                .timeout(Duration.ofSeconds(60))
+
+                .modelName(&quot;gpt-4.1-nano&quot;)
+
+                .build();
+
+
+
+        // Create MCP transport for connecting to server
+
+        McpTransport transport = new HttpMcpTransport.Builder()
+
+                .sseUrl(&quot;http://localhost:8080/sse&quot;)
+
+                .timeout(Duration.ofSeconds(60))
+
+                .logRequests(true)
+
+                .logResponses(true)
+
+                .build();
+
+
+
+        // Create MCP client
+
+        McpClient mcpClient = new DefaultMcpClient.Builder()
+
+                .transport(transport)
+
+                .build();
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Added LangChain4j dependencies</strong>: Required for MCP integration, OpenAI official client, and GitHub Models support</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Imported the LangChain4j libraries</strong>: For MCP integration and OpenAI chat model functionality</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Created a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ChatLanguageModel</code></strong>: Configured to use GitHub Models with your GitHub token</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Set up HTTP transport</strong>: Using Server-Sent Events (SSE) to connect to the MCP server</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Created an MCP client</strong>: That will handle communication with the server</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Used LangChain4j's built-in MCP support</strong>: Which simplifies integration between LLMs and MCP servers</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This example assumes you have a Rust based MCP server running. If you don't have one, refer back to the <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">01-first-server</a> lesson to create the server.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Once you have your Rust MCP server, open a terminal and navigate to the same directory as the server. Then run the following command to create a new LLM client project:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mkdir calculator-llmclient
+
+cd calculator-llmclient
+
+cargo init
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add the following dependencies to your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Cargo.toml</code> file:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+[dependencies]
+
+async-openai = { version = &quot;0.29.0&quot;, features = [&quot;byot&quot;] }
+
+rmcp = { version = &quot;0.5.0&quot;, features = [&quot;client&quot;, &quot;transport-child-process&quot;] }
+
+serde_json = &quot;1.0.141&quot;
+
+tokio = { version = &quot;1.46.1&quot;, features = [&quot;rt-multi-thread&quot;] }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!NOTE]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> There isn't an official Rust library for OpenAI, however, the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">async-openai</code> crate is a <a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/libraries/rust#rust">community maintained library</a> that is commonly used.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Open the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">src/main.rs</code> file and replace its content with the following code:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+use async_openai::{Client, config::OpenAIConfig};
+
+use rmcp::{
+
+    RmcpError,
+
+    model::{CallToolRequestParam, ListToolsResult},
+
+    service::{RoleClient, RunningService, ServiceExt},
+
+    transport::{ConfigureCommandExt, TokioChildProcess},
+
+};
+
+use serde_json::{Value, json};
+
+use std::error::Error;
+
+use tokio::process::Command;
+
+
+
+#[tokio::main]
+
+async fn main() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+
+    // Initial message
+
+    let mut messages = vec![json!({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is the sum of 3 and 2?&quot;})];
+
+
+
+    // Setup OpenAI client
+
+    let api_key = std::env::var(&quot;OPENAI_API_KEY&quot;)?;
+
+    let openai_client = Client::with_config(
+
+        OpenAIConfig::new()
+
+            .with_api_base(&quot;https://models.github.ai/inference/chat&quot;)
+
+            .with_api_key(api_key),
+
+    );
+
+
+
+    // Setup MCP client
+
+    let server_dir = std::path::Path::new(env!(&quot;CARGO_MANIFEST_DIR&quot;))
+
+        .parent()
+
+        .unwrap()
+
+        .join(&quot;calculator-server&quot;);
+
+
+
+    let mcp_client = ()
+
+        .serve(
+
+            TokioChildProcess::new(Command::new(&quot;cargo&quot;).configure(|cmd| {
+
+                cmd.arg(&quot;run&quot;).current_dir(server_dir);
+
+            }))
+
+            .map_err(RmcpError::transport_creation::&lt;TokioChildProcess&gt;)?,
+
+        )
+
+        .await?;
+
+
+
+    // TODO: Get MCP tool listing 
+
+
+
+    // TODO: LLM conversation with tool calls
+
+
+
+    Ok(())
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This code sets up a basic Rust application that will connect to an MCP server and GitHub Models for LLM interactions.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!IMPORTANT]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> Make sure to set the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">OPENAI_API_KEY</code> environment variable with your GitHub token before running the application.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, for our next step, let's list the capabilities on the server.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- List server capabilities</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now we will connect to the server and ask for its capabilities:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Typescript</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the same class, add the following methods:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async connectToServer(transport: Transport) {
+
+     await this.client.connect(transport);
+
+     this.run();
+
+     console.error(&quot;MCPClient started on stdin/stdout&quot;);
+
+}
+
+
+
+async run() {
+
+    console.log(&quot;Asking server for available tools&quot;);
+
+
+
+    // listing tools
+
+    const toolsResult = await this.client.listTools();
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Added code for connecting to the server, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">connectToServer</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> method responsible for handling our app flow. So far it only lists the tools but we will add more to it shortly.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# List available resources
+
+resources = await session.list_resources()
+
+print(&quot;LISTING RESOURCES&quot;)
+
+for resource in resources:
+
+    print(&quot;Resource: &quot;, resource)
+
+
+
+# List available tools
+
+tools = await session.list_tools()
+
+print(&quot;LISTING TOOLS&quot;)
+
+for tool in tools.tools:
+
+    print(&quot;Tool: &quot;, tool.name)
+
+    print(&quot;Tool&quot;, tool.inputSchema[&quot;properties&quot;])
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's what we added:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Listing resources and tools and printed them. For tools we also list <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inputSchema</code> which we use later.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async Task&lt;List&lt;ChatCompletionsToolDefinition&gt;&gt; GetMcpTools()
+
+{
+
+    Console.WriteLine(&quot;Listing tools&quot;);
+
+    var tools = await mcpClient.ListToolsAsync();
+
+
+
+    List&lt;ChatCompletionsToolDefinition&gt; toolDefinitions = new List&lt;ChatCompletionsToolDefinition&gt;();
+
+
+
+    foreach (var tool in tools)
+
+    {
+
+        Console.WriteLine($&quot;Connected to server with tools: {tool.Name}&quot;);
+
+        Console.WriteLine($&quot;Tool description: {tool.Description}&quot;);
+
+        Console.WriteLine($&quot;Tool parameters: {tool.JsonSchema}&quot;);
+
+
+
+        // TODO: convert tool definition from MCP tool to LLm tool     
+
+    }
+
+
+
+    return toolDefinitions;
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Listed the tools available on the MCP Server</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">For each tool, listed name, description and its schema. The latter is something we will use to call the tools shortly.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Create a tool provider that automatically discovers MCP tools
+
+ToolProvider toolProvider = McpToolProvider.builder()
+
+        .mcpClients(List.of(mcpClient))
+
+        .build();
+
+
+
+// The MCP tool provider automatically handles:
+
+// - Listing available tools from the MCP server
+
+// - Converting MCP tool schemas to LangChain4j format
+
+// - Managing tool execution and responses
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpToolProvider</code> that automatically discovers and registers all tools from the MCP server</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The tool provider handles the conversion between MCP tool schemas and LangChain4j's tool format internally</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">This approach abstracts away the manual tool listing and conversion process</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Retrieving tools from the MCP server is done using the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">list_tools</code> method.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main</code> function, after setting up the MCP client, add the following code:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Get MCP tool listing 
+
+let tools = mcp_client.list_tools(Default::default()).await?;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- Convert server capabilities to LLM tools</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Next step after listing server capabilities is to convert them into a format that the LLM understands. Once we do that, we can provide these capabilities as tools to our LLM.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">TypeScript</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Add the following code to convert response from MCP Server to a tool format the LLM can use:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    openAiToolAdapter(tool: {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        name: string;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        description?: string;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        input_schema: any;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // Create a zod schema based on the input_schema</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const schema = z.object(tool.input_schema);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            type: "function" as const, // Explicitly set type to "function"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            function: {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: tool.name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            description: tool.description,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            parameters: {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            type: "object",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            properties: tool.input_schema.properties,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            required: tool.input_schema.required,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        };</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    The above code takes a response from the MCP Server and converts that to a tool definition format the LLM can understand.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Let's update the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> method next to list server capabilities:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async run() {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Asking server for available tools");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolsResult = await this.client.listTools();</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const tools = toolsResult.tools.map((tool) => {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            return this.openAiToolAdapter({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: tool.name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            description: tool.description,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            input_schema: tool.inputSchema,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code, we've update the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> method to map through the result and for each entry call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">openAiToolAdapter</code>.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. First, let's create the following converter function</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def convert_to_llm_tool(tool):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tool_schema = {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            "type": "function",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            "function": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "name": tool.name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "description": tool.description,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "type": "function",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "parameters": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                    "type": "object",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                    "properties": tool.inputSchema["properties"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return tool_schema</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    In the function above <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">convert_to_llm_tools</code> we take an MCP tool response and convert it to a format that the LLM can understand.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Next, let's update our client code to leverage this function like so:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    functions = []</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for tool in tools.tools:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("Tool: ", tool.name)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("Tool", tool.inputSchema["properties"])</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        functions.append(convert_to_llm_tool(tool))</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    Here, we're adding a call to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">convert_to_llm_tool</code> to convert the MCP tool response to something we can feed the LLM later.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Let's add code to convert the MCP tool response to something the LLM can understand</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+ChatCompletionsToolDefinition ConvertFrom(string name, string description, JsonElement jsonElement)
+
+{ 
+
+    // convert the tool to a function definition
+
+    FunctionDefinition functionDefinition = new FunctionDefinition(name)
+
+    {
+
+        Description = description,
+
+        Parameters = BinaryData.FromObjectAsJson(new
+
+        {
+
+            Type = &quot;object&quot;,
+
+            Properties = jsonElement
+
+        },
+
+        new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
+
+    };
+
+
+
+    // create a tool definition
+
+    ChatCompletionsToolDefinition toolDefinition = new ChatCompletionsToolDefinition(functionDefinition);
+
+    return toolDefinition;
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Created a function <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ConvertFrom</code> that takes, name, description and input schema.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Defined functionality that creates a FunctionDefinition that gets passed to a ChatCompletionsDefinition. The latter is something the LLM can understand.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Let's see how we can update some existing code to take advantage of this function above:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async Task<List<ChatCompletionsToolDefinition>> GetMcpTools()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine("Listing tools");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var tools = await mcpClient.ListToolsAsync();</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        List<ChatCompletionsToolDefinition> toolDefinitions = new List<ChatCompletionsToolDefinition>();</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        foreach (var tool in tools)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Connected to server with tools: {tool.Name}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Tool description: {tool.Description}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Tool parameters: {tool.JsonSchema}");</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            JsonElement propertiesElement;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            tool.JsonSchema.TryGetProperty("properties", out propertiesElement);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            var def = ConvertFrom(tool.Name, tool.Description, propertiesElement);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Tool definition: {def}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            toolDefinitions.Add(def);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Properties: {propertiesElement}");        </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return toolDefinitions;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```    In the preceding code, we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Update the function to convert the MCP tool response to an LLm tool. Let's highlight the code we added:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        JsonElement propertiesElement;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tool.JsonSchema.TryGetProperty("properties", out propertiesElement);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var def = ConvertFrom(tool.Name, tool.Description, propertiesElement);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine($"Tool definition: {def}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        toolDefinitions.Add(def);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The input schema is part of the tool response but on the "properties" attribute, so we need to extract.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Furthermore, we now call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ConvertFrom</code> with the tool details.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now we've done the heavy lifting, let's see how it call comes together as we handle a user prompt next.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Create a Bot interface for natural language interaction
+
+public interface Bot {
+
+    String chat(String prompt);
+
+}
+
+
+
+// Configure the AI service with LLM and MCP tools
+
+Bot bot = AiServices.builder(Bot.class)
+
+        .chatLanguageModel(model)
+
+        .toolProvider(toolProvider)
+
+        .build();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Defined a simple <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Bot</code> interface for natural language interactions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used LangChain4j's <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AiServices</code> to automatically bind the LLM with the MCP tool provider</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The framework automatically handles tool schema conversion and function calling behind the scenes</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">This approach eliminates manual tool conversion - LangChain4j handles all the complexity of converting MCP tools to LLM-compatible format</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To convert the MCP tool response to a format that the LLM can understand, we will add a helper function that formats the tools listing.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add the following code to your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main.rs</code> file below the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main</code> function.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This will be called when making requests to the LLM:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async fn format_tools(tools: &amp;ListToolsResult) -&gt; Result&lt;Vec&lt;Value&gt;, Box&lt;dyn Error&gt;&gt; {
+
+    let tools_json = serde_json::to_value(tools)?;
+
+    let Some(tools_array) = tools_json.get(&quot;tools&quot;).and_then(|t| t.as_array()) else {
+
+        return Ok(vec![]);
+
+    };
+
+
+
+    let formatted_tools = tools_array
+
+        .iter()
+
+        .filter_map(|tool| {
+
+            let name = tool.get(&quot;name&quot;)?.as_str()?;
+
+            let description = tool.get(&quot;description&quot;)?.as_str()?;
+
+            let schema = tool.get(&quot;inputSchema&quot;)?;
+
+
+
+            Some(json!({
+
+                &quot;type&quot;: &quot;function&quot;,
+
+                &quot;function&quot;: {
+
+                    &quot;name&quot;: name,
+
+                    &quot;description&quot;: description,
+
+                    &quot;parameters&quot;: {
+
+                        &quot;type&quot;: &quot;object&quot;,
+
+                        &quot;properties&quot;: schema.get(&quot;properties&quot;).unwrap_or(&amp;json!({})),
+
+                        &quot;required&quot;: schema.get(&quot;required&quot;).unwrap_or(&amp;json!([]))
+
+                    }
+
+                }
+
+            }))
+
+        })
+
+        .collect();
+
+
+
+    Ok(formatted_tools)
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, we're not set up to handle any user requests, so let's tackle that next.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-4- Handle user prompt request</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this part of the code, we will handle user requests.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">TypeScript</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Add a method that will be used to call our LLM:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async callTools(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        toolResults: any[]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        for (const tool_call of tool_calls) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolName = tool_call.function.name;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const args = tool_call.function.arguments;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Calling tool ${toolName} with args ${JSON.stringify(args)}</code>);</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 2. Call the server's tool </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolResult = await this.client.callTool({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: toolName,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            arguments: JSON.parse(args),</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        });</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Tool result: ", toolResult);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 3. Do something with the result</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // TODO  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    In the preceding code we:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Added a method <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callTools</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - The method takes an LLM response and checks to see what tools have been called, if any:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        for (const tool_call of tool_calls) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolName = tool_call.function.name;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const args = tool_call.function.arguments;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Calling tool ${toolName} with args ${JSON.stringify(args)}</code>);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // call tool</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Calls a tool, if LLM indicates it should be called:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 2. Call the server's tool </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolResult = await this.client.callTool({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: toolName,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            arguments: JSON.parse(args),</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        });</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Tool result: ", toolResult);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 3. Do something with the result</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // TODO  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Update the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> method to include calls to the LLM and calling <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callTools</code>:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 1. Create messages that's input for the LLM</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    const prompt = "What is the sum of 2 and 3?"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                role: "user",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                content: prompt,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ];</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    console.log("Querying LLM: ", messages[0].content);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 2. Calling the LLM</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    let response = this.openai.chat.completions.create({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        model: "gpt-4.1-mini",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        max_tokens: 1000,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        messages,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tools: tools,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    });    </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    let results: any[] = [];</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 3. Go through the LLM response,for each choice, check if it has tool calls </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    (await response).choices.map(async (choice: { message: any; }) => {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const message = choice.message;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        if (message.tool_calls) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            console.log("Making tool call")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            await this.callTools(message.tool_calls, results);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, let's list the code in full:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Client } from &quot;@modelcontextprotocol/sdk/client/index.js&quot;;
+
+import { StdioClientTransport } from &quot;@modelcontextprotocol/sdk/client/stdio.js&quot;;
+
+import { Transport } from &quot;@modelcontextprotocol/sdk/shared/transport.js&quot;;
+
+import OpenAI from &quot;openai&quot;;
+
+import { z } from &quot;zod&quot;; // Import zod for schema validation
+
+
+
+class MyClient {
+
+    private openai: OpenAI;
+
+    private client: Client;
+
+    constructor(){
+
+        this.openai = new OpenAI({
+
+            baseURL: &quot;https://models.inference.ai.azure.com&quot;, // might need to change to this url in the future: https://models.github.ai/inference
+
+            apiKey: process.env.GITHUB_TOKEN,
+
+        });
+
+
+
+        this.client = new Client(
+
+            {
+
+                name: &quot;example-client&quot;,
+
+                version: &quot;1.0.0&quot;
+
+            },
+
+            {
+
+                capabilities: {
+
+                prompts: {},
+
+                resources: {},
+
+                tools: {}
+
+                }
+
+            }
+
+            );    
+
+    }
+
+
+
+    async connectToServer(transport: Transport) {
+
+        await this.client.connect(transport);
+
+        this.run();
+
+        console.error(&quot;MCPClient started on stdin/stdout&quot;);
+
+    }
+
+
+
+    openAiToolAdapter(tool: {
+
+        name: string;
+
+        description?: string;
+
+        input_schema: any;
+
+          }) {
+
+          // Create a zod schema based on the input_schema
+
+          const schema = z.object(tool.input_schema);
+
+      
+
+          return {
+
+            type: &quot;function&quot; as const, // Explicitly set type to &quot;function&quot;
+
+            function: {
+
+              name: tool.name,
+
+              description: tool.description,
+
+              parameters: {
+
+              type: &quot;object&quot;,
+
+              properties: tool.input_schema.properties,
+
+              required: tool.input_schema.required,
+
+              },
+
+            },
+
+          };
+
+    }
+
+    
+
+    async callTools(
+
+        tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[],
+
+        toolResults: any[]
+
+      ) {
+
+        for (const tool_call of tool_calls) {
+
+          const toolName = tool_call.function.name;
+
+          const args = tool_call.function.arguments;
+
+    
+
+          console.log(`Calling tool ${toolName} with args ${JSON.stringify(args)}`);
+
+    
+
+    
+
+          // 2. Call the server&#x27;s tool 
+
+          const toolResult = await this.client.callTool({
+
+            name: toolName,
+
+            arguments: JSON.parse(args),
+
+          });
+
+    
+
+          console.log(&quot;Tool result: &quot;, toolResult);
+
+    
+
+          // 3. Do something with the result
+
+          // TODO  
+
+    
+
+         }
+
+    }
+
+
+
+    async run() {
+
+        console.log(&quot;Asking server for available tools&quot;);
+
+        const toolsResult = await this.client.listTools();
+
+        const tools = toolsResult.tools.map((tool) =&gt; {
+
+            return this.openAiToolAdapter({
+
+              name: tool.name,
+
+              description: tool.description,
+
+              input_schema: tool.inputSchema,
+
+            });
+
+        });
+
+
+
+        const prompt = &quot;What is the sum of 2 and 3?&quot;;
+
+    
+
+        const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+
+            {
+
+                role: &quot;user&quot;,
+
+                content: prompt,
+
+            },
+
+        ];
+
+
+
+        console.log(&quot;Querying LLM: &quot;, messages[0].content);
+
+        let response = this.openai.chat.completions.create({
+
+            model: &quot;gpt-4.1-mini&quot;,
+
+            max_tokens: 1000,
+
+            messages,
+
+            tools: tools,
+
+        });    
+
+
+
+        let results: any[] = [];
+
+    
+
+        // 3. Go through the LLM response, for each choice, check if it has tool calls 
+
+        (await response).choices.map(async (choice: { message: any; }) =&gt; {
+
+          const message = choice.message;
+
+          if (message.tool_calls) {
+
+              console.log(&quot;Making tool call&quot;)
+
+              await this.callTools(message.tool_calls, results);
+
+          }
+
+        });
+
+    }
+
+    
+
+}
+
+
+
+let client = new MyClient();
+
+ const transport = new StdioClientTransport({
+
+            command: &quot;node&quot;,
+
+            args: [&quot;./build/index.js&quot;]
+
+        });
+
+
+
+client.connectToServer(transport);
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Let's add some imports needed to call an LLM</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # llm</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    import os</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from azure.ai.inference import ChatCompletionsClient</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from azure.ai.inference.models import SystemMessage, UserMessage</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from azure.core.credentials import AzureKeyCredential</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    import json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Next, let's add the function that will call the LLM:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # llm</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def call_llm(prompt, functions):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        token = os.environ["GITHUB_TOKEN"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        endpoint = "https://models.inference.ai.azure.com"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        model_name = "gpt-4o"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        client = ChatCompletionsClient(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            endpoint=endpoint,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            credential=AzureKeyCredential(token),</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        )</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("CALLING LLM")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        response = client.complete(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            messages=[</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "role": "system",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "content": "You are a helpful assistant.",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "role": "user",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "content": prompt,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            ],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            model=model_name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            tools = functions,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            # Optional parameters</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            temperature=1.,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            max_tokens=1000,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            top_p=1.    </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        )</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        response_message = response.choices[0].message</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        functions_to_call = []</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        if response_message.tool_calls:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            for tool_call in response_message.tool_calls:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                print("TOOL: ", tool_call)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                name = tool_call.function.name</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                args = json.loads(tool_call.function.arguments)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                functions_to_call.append({ "name": name, "args": args })</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return functions_to_call</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    In the preceding code we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Passed our functions, that we found on the MCP server and converted, to the LLM.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Then we called the LLM with said functions.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Then, we're inspecting the result to see what functions we should call, if any.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Finally, we pass an array of functions to call.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Final step, let's update our main code:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    prompt = "Add 2 to 20"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # ask LLM what tools to all, if any</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    functions_to_call = call_llm(prompt, functions)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # call suggested functions</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for f in functions_to_call:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        result = await session.call_tool(f["name"], arguments=f["args"])</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("TOOLS result: ", result.content)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    There, that was the final step, in the code above we're:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Calling an MCP tool via <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">call_tool</code> using a function that the LLM thought we should call based on our prompt.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Printing the result of the tool call to the MCP Server.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Let's show some code for doing an LLM prompt request:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var tools = await GetMcpTools();</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for (int i = 0; i < tools.Count; i++)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var tool = tools[i];</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine($"MCP Tools def: {i}: {tool}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 0. Define the chat history and the user message</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var userMessage = "add 2 and 4";</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    chatHistory.Add(new ChatRequestUserMessage(userMessage));</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 1. Define tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ChatCompletionsToolDefinition def = CreateToolDefinition();</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 2. Define options, including the tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var options = new ChatCompletionsOptions(chatHistory)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Model = "gpt-4.1-mini",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Tools = { tools[0] }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    };</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 3. Call the model  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ChatCompletions? response = await client.CompleteAsync(options);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var content = response.Content;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    In the preceding code we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Fetched tools from the MCP server, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">var tools = await GetMcpTools()</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Defined a user prompt <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">userMessage</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Constructor an options object specifying model and tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Made a request towards the LLM.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. One last step, let's see if the LLM thinks we should call a function:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 4. Check if the response contains a function call</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ChatCompletionsToolCall? calls = response.ToolCalls.FirstOrDefault();</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for (int i = 0; i < response.ToolCalls.Count; i++)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var call = response.ToolCalls[i];</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine($"Tool call {i}: {call.Name} with arguments {call.Arguments}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        //Tool call 0: add with arguments {"a":2,"b":4}</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(call.Arguments);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var result = await mcpClient.CallToolAsync(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            call.Name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            dict!,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            cancellationToken: CancellationToken.None</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        );</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine(result.Content.First(c => c.Type == "text").Text);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    In the preceding code we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Looped through a list of function calls.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - For each tool call, parse out name and arguments and call the tool on the MCP server using the MCP client. Finally we print the results.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's the code in full:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+using Azure;
+
+using Azure.AI.Inference;
+
+using Azure.Identity;
+
+using System.Text.Json;
+
+using ModelContextProtocol.Client;
+
+using ModelContextProtocol.Protocol;
+
+
+
+var endpoint = &quot;https://models.inference.ai.azure.com&quot;;
+
+var token = Environment.GetEnvironmentVariable(&quot;GITHUB_TOKEN&quot;); // Your GitHub Access Token
+
+var client = new ChatCompletionsClient(new Uri(endpoint), new AzureKeyCredential(token));
+
+var chatHistory = new List&lt;ChatRequestMessage&gt;
+
+{
+
+    new ChatRequestSystemMessage(&quot;You are a helpful assistant that knows about AI&quot;)
+
+};
+
+
+
+var clientTransport = new StdioClientTransport(new()
+
+{
+
+    Name = &quot;Demo Server&quot;,
+
+    Command = &quot;/workspaces/mcp-for-beginners/03-GettingStarted/02-client/solution/server/bin/Debug/net8.0/server&quot;,
+
+    Arguments = [],
+
+});
+
+
+
+Console.WriteLine(&quot;Setting up stdio transport&quot;);
+
+
+
+await using var mcpClient = await McpClient.CreateAsync(clientTransport);
+
+
+
+ChatCompletionsToolDefinition ConvertFrom(string name, string description, JsonElement jsonElement)
+
+{ 
+
+    // convert the tool to a function definition
+
+    FunctionDefinition functionDefinition = new FunctionDefinition(name)
+
+    {
+
+        Description = description,
+
+        Parameters = BinaryData.FromObjectAsJson(new
+
+        {
+
+            Type = &quot;object&quot;,
+
+            Properties = jsonElement
+
+        },
+
+        new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
+
+    };
+
+
+
+    // create a tool definition
+
+    ChatCompletionsToolDefinition toolDefinition = new ChatCompletionsToolDefinition(functionDefinition);
+
+    return toolDefinition;
+
+}
+
+
+
+
+
+
+
+async Task&lt;List&lt;ChatCompletionsToolDefinition&gt;&gt; GetMcpTools()
+
+{
+
+    Console.WriteLine(&quot;Listing tools&quot;);
+
+    var tools = await mcpClient.ListToolsAsync();
+
+
+
+    List&lt;ChatCompletionsToolDefinition&gt; toolDefinitions = new List&lt;ChatCompletionsToolDefinition&gt;();
+
+
+
+    foreach (var tool in tools)
+
+    {
+
+        Console.WriteLine($&quot;Connected to server with tools: {tool.Name}&quot;);
+
+        Console.WriteLine($&quot;Tool description: {tool.Description}&quot;);
+
+        Console.WriteLine($&quot;Tool parameters: {tool.JsonSchema}&quot;);
+
+
+
+        JsonElement propertiesElement;
+
+        tool.JsonSchema.TryGetProperty(&quot;properties&quot;, out propertiesElement);
+
+
+
+        var def = ConvertFrom(tool.Name, tool.Description, propertiesElement);
+
+        Console.WriteLine($&quot;Tool definition: {def}&quot;);
+
+        toolDefinitions.Add(def);
+
+
+
+        Console.WriteLine($&quot;Properties: {propertiesElement}&quot;);        
+
+    }
+
+
+
+    return toolDefinitions;
+
+}
+
+
+
+// 1. List tools on mcp server
+
+
+
+var tools = await GetMcpTools();
+
+for (int i = 0; i &lt; tools.Count; i++)
+
+{
+
+    var tool = tools[i];
+
+    Console.WriteLine($&quot;MCP Tools def: {i}: {tool}&quot;);
+
+}
+
+
+
+// 2. Define the chat history and the user message
+
+var userMessage = &quot;add 2 and 4&quot;;
+
+
+
+chatHistory.Add(new ChatRequestUserMessage(userMessage));
+
+
+
+
+
+// 3. Define options, including the tools
+
+var options = new ChatCompletionsOptions(chatHistory)
+
+{
+
+    Model = &quot;gpt-4.1-mini&quot;,
+
+    Tools = { tools[0] }
+
+};
+
+
+
+// 4. Call the model  
+
+
+
+ChatCompletions? response = await client.CompleteAsync(options);
+
+var content = response.Content;
+
+
+
+// 5. Check if the response contains a function call
+
+ChatCompletionsToolCall? calls = response.ToolCalls.FirstOrDefault();
+
+for (int i = 0; i &lt; response.ToolCalls.Count; i++)
+
+{
+
+    var call = response.ToolCalls[i];
+
+    Console.WriteLine($&quot;Tool call {i}: {call.Name} with arguments {call.Arguments}&quot;);
+
+    //Tool call 0: add with arguments {&quot;a&quot;:2,&quot;b&quot;:4}
+
+
+
+    var dict = JsonSerializer.Deserialize&lt;Dictionary&lt;string, object&gt;&gt;(call.Arguments);
+
+    var result = await mcpClient.CallToolAsync(
+
+        call.Name,
+
+        dict!,
+
+        cancellationToken: CancellationToken.None
+
+    );
+
+
+
+    Console.WriteLine(result.Content.OfType&lt;TextContentBlock&gt;().First().Text);
+
+
+
+}
+
+
+
+// 6. Print the generic response
+
+Console.WriteLine($&quot;Assistant response: {content}&quot;);
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+try {
+
+    // Execute natural language requests that automatically use MCP tools
+
+    String response = bot.chat(&quot;Calculate the sum of 24.5 and 17.3 using the calculator service&quot;);
+
+    System.out.println(response);
+
+
+
+    response = bot.chat(&quot;What&#x27;s the square root of 144?&quot;);
+
+    System.out.println(response);
+
+
+
+    response = bot.chat(&quot;Show me the help for the calculator service&quot;);
+
+    System.out.println(response);
+
+} finally {
+
+    mcpClient.close();
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In the preceding code we've:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Used simple natural language prompts to interact with the MCP server tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The LangChain4j framework automatically handles:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Converting user prompts to tool calls when needed</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Calling the appropriate MCP tools based on the LLM's decision</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - Managing the conversation flow between the LLM and MCP server</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">bot.chat()</code> method returns natural language responses that may include results from MCP tool executions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">This approach provides a seamless user experience where users don't need to know about the underlying MCP implementation</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Complete code example:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+public class LangChain4jClient {
+
+    
+
+    public static void main(String[] args) throws Exception {        ChatLanguageModel model = OpenAiOfficialChatModel.builder()
+
+                .isGitHubModels(true)
+
+                .apiKey(System.getenv(&quot;GITHUB_TOKEN&quot;))
+
+                .timeout(Duration.ofSeconds(60))
+
+                .modelName(&quot;gpt-4.1-nano&quot;)
+
+                .timeout(Duration.ofSeconds(60))
+
+                .build();
+
+
+
+        McpTransport transport = new HttpMcpTransport.Builder()
+
+                .sseUrl(&quot;http://localhost:8080/sse&quot;)
+
+                .timeout(Duration.ofSeconds(60))
+
+                .logRequests(true)
+
+                .logResponses(true)
+
+                .build();
+
+
+
+        McpClient mcpClient = new DefaultMcpClient.Builder()
+
+                .transport(transport)
+
+                .build();
+
+
+
+        ToolProvider toolProvider = McpToolProvider.builder()
+
+                .mcpClients(List.of(mcpClient))
+
+                .build();
+
+
+
+        Bot bot = AiServices.builder(Bot.class)
+
+                .chatLanguageModel(model)
+
+                .toolProvider(toolProvider)
+
+                .build();
+
+
+
+        try {
+
+            String response = bot.chat(&quot;Calculate the sum of 24.5 and 17.3 using the calculator service&quot;);
+
+            System.out.println(response);
+
+
+
+            response = bot.chat(&quot;What&#x27;s the square root of 144?&quot;);
+
+            System.out.println(response);
+
+
+
+            response = bot.chat(&quot;Show me the help for the calculator service&quot;);
+
+            System.out.println(response);
+
+        } finally {
+
+            mcpClient.close();
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here is where the majority of the work happens.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We will call the LLM with the initial user prompt, then process the response to see if any tools need to be called.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If so, we will call those tools and continue the conversation with the LLM until no more tool calls are needed and we have a final response.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We will be making multiple calls to the LLM, so let's define a function that will handle the LLM call.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add the following function to your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main.rs</code> file:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async fn call_llm(
+
+    client: &amp;Client&lt;OpenAIConfig&gt;,
+
+    messages: &amp;[Value],
+
+    tools: &amp;ListToolsResult,
+
+) -&gt; Result&lt;Value, Box&lt;dyn Error&gt;&gt; {
+
+    let response = client
+
+        .completions()
+
+        .create_byot(json!({
+
+            &quot;messages&quot;: messages,
+
+            &quot;model&quot;: &quot;openai/gpt-4.1&quot;,
+
+            &quot;tools&quot;: format_tools(tools).await?,
+
+        }))
+
+        .await?;
+
+    Ok(response)
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This function takes the LLM client, a list of messages (including the user prompt), tools from the MCP server, and sends a request to the LLM, returning the response.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The response from the LLM will contain an array of <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">choices</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">We will need to process the result to see if any <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tool_calls</code> are present.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This let's us know the LLM is requesting a specific tool should be called with arguments.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add the following code to the bottom of your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main.rs</code> file to define a function to handle the LLM response:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async fn process_llm_response(
+
+    llm_response: &amp;Value,
+
+    mcp_client: &amp;RunningService&lt;RoleClient, ()&gt;,
+
+    openai_client: &amp;Client&lt;OpenAIConfig&gt;,
+
+    mcp_tools: &amp;ListToolsResult,
+
+    messages: &amp;mut Vec&lt;Value&gt;,
+
+) -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+
+    let Some(message) = llm_response
+
+        .get(&quot;choices&quot;)
+
+        .and_then(|c| c.as_array())
+
+        .and_then(|choices| choices.first())
+
+        .and_then(|choice| choice.get(&quot;message&quot;))
+
+    else {
+
+        return Ok(());
+
+    };
+
+
+
+    // Print content if available
+
+    if let Some(content) = message.get(&quot;content&quot;).and_then(|c| c.as_str()) {
+
+        println!(&quot;🤖 {}&quot;, content);
+
+    }
+
+
+
+    // Handle tool calls
+
+    if let Some(tool_calls) = message.get(&quot;tool_calls&quot;).and_then(|tc| tc.as_array()) {
+
+        messages.push(message.clone()); // Add assistant message
+
+
+
+        // Execute each tool call
+
+        for tool_call in tool_calls {
+
+            let (tool_id, name, args) = extract_tool_call_info(tool_call)?;
+
+            println!(&quot;⚡ Calling tool: {}&quot;, name);
+
+
+
+            let result = mcp_client
+
+                .call_tool(CallToolRequestParam {
+
+                    name: name.into(),
+
+                    arguments: serde_json::from_str::&lt;Value&gt;(&amp;args)?.as_object().cloned(),
+
+                })
+
+                .await?;
+
+
+
+            // Add tool result to messages
+
+            messages.push(json!({
+
+                &quot;role&quot;: &quot;tool&quot;,
+
+                &quot;tool_call_id&quot;: tool_id,
+
+                &quot;content&quot;: serde_json::to_string_pretty(&amp;result)?
+
+            }));
+
+        }
+
+
+
+        // Continue conversation with tool results
+
+        let response = call_llm(openai_client, messages, mcp_tools).await?;
+
+        Box::pin(process_llm_response(
+
+            &amp;response,
+
+            mcp_client,
+
+            openai_client,
+
+            mcp_tools,
+
+            messages,
+
+        ))
+
+        .await?;
+
+    }
+
+    Ok(())
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tool_calls</code> are present, it extracts the tool information, calls the MCP server with the tool request, and adds the results to the conversation messages.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It then continues the conversation with the LLM and the messages are updated with the assistant's response and tool call results.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To extract tool call information that the LLM returns for MCP calls, we will add another helper function to extract everything needed to make the call.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add the following code to the bottom of your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main.rs</code> file:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+fn extract_tool_call_info(tool_call: &amp;Value) -&gt; Result&lt;(String, String, String), Box&lt;dyn Error&gt;&gt; {
+
+    let tool_id = tool_call
+
+        .get(&quot;id&quot;)
+
+        .and_then(|id| id.as_str())
+
+        .unwrap_or(&quot;&quot;)
+
+        .to_string();
+
+    let function = tool_call.get(&quot;function&quot;).ok_or(&quot;Missing function&quot;)?;
+
+    let name = function
+
+        .get(&quot;name&quot;)
+
+        .and_then(|n| n.as_str())
+
+        .unwrap_or(&quot;&quot;)
+
+        .to_string();
+
+    let args = function
+
+        .get(&quot;arguments&quot;)
+
+        .and_then(|a| a.as_str())
+
+        .unwrap_or(&quot;{}&quot;)
+
+        .to_string();
+
+    Ok((tool_id, name, args))
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">With all the pieces in place, we can now handle the initial user prompt and call the LLM. Update your <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main</code> function to include the following code:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// LLM conversation with tool calls
+
+let response = call_llm(&amp;openai_client, &amp;messages, &amp;tools).await?;
+
+process_llm_response(
+
+    &amp;response,
+
+    &amp;mcp_client,
+
+    &amp;openai_client,
+
+    &amp;tools,
+
+    &amp;mut messages,
+
+)
+
+.await?;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This will query the LLM with the initial user prompt asking for the sum of two numbers, and it will process the response to dynamically handle tool calls.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, you did it!</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Assignment</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Take the code from the exercise and build out the server with some more tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Then create a client with an LLM, like in the exercise, and test it out with different prompts to make sure all your server tools gets called dynamically.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This way of building a client means the end user will have a great user experience as they're able to use prompts, instead of exact client commands, and be oblivious to any MCP server being called.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Solution</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Key Takeaways</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Adding an LLM to your client provides a better way for users to interact with MCP Servers.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">You need to convert the MCP Server response to something the LLM can understand.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Samples</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/java/calculator/README.md" target="_blank">Java Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/csharp/" target="_blank">.Net Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/javascript/README.md" target="_blank">JavaScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/typescript/README.md" target="_blank">TypeScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/python/" target="_blank">Python Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/rust/" target="_blank">Rust Calculator</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/04-vscode/README.md" target="_blank">Consuming a server using Visual Studio Code</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">LLM을 사용하여 클라이언트 만들기</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">지금까지 서버와 클라이언트를 만드는 방법을 보았습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트는 서버를 명시적으로 호출하여 도구, 리소스, 프롬프트를 나열할 수 있었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">하지만 이는 그리 실용적인 방법이 아닙니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">사용자는 에이전트 시대에 살고 있으며 프롬프트를 사용하고 LLM과 소통하기를 기대합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">사용자가 MCP를 사용하여 기능을 저장하는지 여부는 신경 쓰지 않고 단순히 자연어를 사용하여 상호작용하기를 기대합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">그렇다면 이것을 어떻게 해결할 수 있을까요?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">해결책은 클라이언트에 LLM을 추가하는 것입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이번 수업에서는 클라이언트에 LLM을 추가하는 데 중점을 두며, 이를 통해 사용자에게 훨씬 더 나은 경험을 제공하는 방법을 보여줍니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 수업이 끝나면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LLM이 포함된 클라이언트를 만듭니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LLM을 사용하여 MCP 서버와 원활하게 상호작용합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트 측에서 더 나은 최종 사용자 경험을 제공합니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">접근 방법</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리가 취해야 할 접근 방식을 이해해 봅시다. LLM을 추가하는 것은 간단해 보이지만 실제로 이렇게 할 수 있을까요?</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트가 서버와 상호작용하는 방식은 다음과 같습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 서버와 연결을 설정합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 기능, 프롬프트, 리소스 및 도구를 나열하고 해당 스키마를 저장합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. LLM을 추가하고, 저장된 기능과 그들의 스키마를 LLM이 이해하는 형식으로 전달합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 사용자 프롬프트를 처리하여 클라이언트가 나열한 도구와 함께 LLM에 전달합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋습니다. 이제 어떻게 고수준에서 이 작업을 수행할 수 있는지 이해했으니, 아래 연습 문제에서 직접 시도해 봅시다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">연습 문제: LLM이 포함된 클라이언트 만들기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 연습 문제에서는 클라이언트에 LLM을 추가하는 방법을 배웁니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">GitHub 개인 액세스 토큰을 사용한 인증</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">GitHub 토큰 만드는 과정은 간단합니다. 방법은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub 설정으로 이동 – 오른쪽 상단의 프로필 사진을 클릭하고 설정을 선택합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">개발자 설정으로 이동 – 아래로 스크롤하여 개발자 설정(Developer Settings)을 클릭합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">개인 액세스 토큰 선택 – 정밀 범위 토큰(Fine-grained tokens)을 클릭한 다음 새 토큰 생성(Generate new token)을 클릭합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰 구성 – 참고용 메모를 추가하고 만료 날짜를 설정하며 필요한 범위(권한)를 선택합니다. 이번 경우에는 Models 권한을 반드시 추가하세요.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰 생성 및 복사 – 토큰 생성을 클릭하고, 다시 볼 수 없으니 바로 복사하세요.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- 서버에 연결</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">먼저 클라이언트를 만들어 봅시다:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">TypeScript</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Client } from &quot;@modelcontextprotocol/sdk/client/index.js&quot;;
+
+import { StdioClientTransport } from &quot;@modelcontextprotocol/sdk/client/stdio.js&quot;;
+
+import { Transport } from &quot;@modelcontextprotocol/sdk/shared/transport.js&quot;;
+
+import OpenAI from &quot;openai&quot;;
+
+import { z } from &quot;zod&quot;; // 스키마 검증을 위해 zod를 가져옵니다
+
+
+
+class MCPClient {
+
+    private openai: OpenAI;
+
+    private client: Client;
+
+    constructor(){
+
+        this.openai = new OpenAI({
+
+            baseURL: &quot;https://models.inference.ai.azure.com&quot;, 
+
+            apiKey: process.env.GITHUB_TOKEN,
+
+        });
+
+
+
+        this.client = new Client(
+
+            {
+
+                name: &quot;example-client&quot;,
+
+                version: &quot;1.0.0&quot;
+
+            },
+
+            {
+
+                capabilities: {
+
+                prompts: {},
+
+                resources: {},
+
+                tools: {}
+
+                }
+
+            }
+
+            );    
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">필요한 라이브러리를 임포트했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트와 LLM 상호작용을 돕는 두 멤버 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">client</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">openai</code>가 있는 클래스를 생성했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">baseUrl</code>을 추론 API로 설정하여 GitHub 모델을 사용하도록 LLM 인스턴스를 구성했습니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+from mcp import ClientSession, StdioServerParameters, types
+
+from mcp.client.stdio import stdio_client
+
+
+
+# stdio 연결을 위한 서버 매개변수 생성
+
+server_params = StdioServerParameters(
+
+    command=&quot;mcp&quot;,  # 실행 파일
+
+    args=[&quot;run&quot;, &quot;server.py&quot;],  # 선택적 명령줄 인수
+
+    env=None,  # 선택적 환경 변수
+
+)
+
+
+
+
+
+async def run():
+
+    async with stdio_client(server_params) as (read, write):
+
+        async with ClientSession(
+
+            read, write
+
+        ) as session:
+
+            # 연결 초기화
+
+            await session.initialize()
+
+
+
+
+
+if __name__ == &quot;__main__&quot;:
+
+    import asyncio
+
+
+
+    asyncio.run(run())
+
+
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP에 필요한 라이브러리를 임포트했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트를 생성했습니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+using Azure;
+
+using Azure.AI.Inference;
+
+using Azure.Identity;
+
+using System.Text.Json;
+
+using ModelContextProtocol.Client;
+
+using System.Text.Json;
+
+
+
+var clientTransport = new StdioClientTransport(new()
+
+{
+
+    Name = &quot;Demo Server&quot;,
+
+    Command = &quot;/workspaces/mcp-for-beginners/03-GettingStarted/02-client/solution/server/bin/Debug/net8.0/server&quot;,
+
+    Arguments = [],
+
+});
+
+
+
+await using var mcpClient = await McpClient.CreateAsync(clientTransport);
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">먼저 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pom.xml</code> 파일에 LangChain4j 의존성을 추가해야 합니다. MCP 통합 및 GitHub 모델 지원을 가능하게 하는 의존성을 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+&lt;properties&gt;
+
+    &lt;langchain4j.version&gt;1.0.0-beta3&lt;/langchain4j.version&gt;
+
+&lt;/properties&gt;
+
+
+
+&lt;dependencies&gt;
+
+    &lt;!-- LangChain4j MCP Integration --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+        &lt;artifactId&gt;langchain4j-mcp&lt;/artifactId&gt;
+
+        &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+    &lt;/dependency&gt;
+
+    
+
+    &lt;!-- OpenAI Official API Client --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+        &lt;artifactId&gt;langchain4j-open-ai-official&lt;/artifactId&gt;
+
+        &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+    &lt;/dependency&gt;
+
+    
+
+    &lt;!-- GitHub Models Support --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+
+        &lt;artifactId&gt;langchain4j-github-models&lt;/artifactId&gt;
+
+        &lt;version&gt;${langchain4j.version}&lt;/version&gt;
+
+    &lt;/dependency&gt;
+
+    
+
+    &lt;!-- Spring Boot Starter (optional, for production apps) --&gt;
+
+    &lt;dependency&gt;
+
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+
+        &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+
+    &lt;/dependency&gt;
+
+&lt;/dependencies&gt;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">그런 다음 Java 클라이언트 클래스를 만듭니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import dev.langchain4j.mcp.McpToolProvider;
+
+import dev.langchain4j.mcp.client.DefaultMcpClient;
+
+import dev.langchain4j.mcp.client.McpClient;
+
+import dev.langchain4j.mcp.client.transport.McpTransport;
+
+import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
+
+import dev.langchain4j.model.chat.ChatLanguageModel;
+
+import dev.langchain4j.model.openaiofficial.OpenAiOfficialChatModel;
+
+import dev.langchain4j.service.AiServices;
+
+import dev.langchain4j.service.tool.ToolProvider;
+
+
+
+import java.time.Duration;
+
+import java.util.List;
+
+
+
+public class LangChain4jClient {
+
+    
+
+    public static void main(String[] args) throws Exception {        // LLM이 GitHub 모델을 사용하도록 구성하기
+
+        ChatLanguageModel model = OpenAiOfficialChatModel.builder()
+
+                .isGitHubModels(true)
+
+                .apiKey(System.getenv(&quot;GITHUB_TOKEN&quot;))
+
+                .timeout(Duration.ofSeconds(60))
+
+                .modelName(&quot;gpt-4.1-nano&quot;)
+
+                .build();
+
+
+
+        // 서버에 연결하기 위한 MCP 전송 생성하기
+
+        McpTransport transport = new HttpMcpTransport.Builder()
+
+                .sseUrl(&quot;http://localhost:8080/sse&quot;)
+
+                .timeout(Duration.ofSeconds(60))
+
+                .logRequests(true)
+
+                .logResponses(true)
+
+                .build();
+
+
+
+        // MCP 클라이언트 생성하기
+
+        McpClient mcpClient = new DefaultMcpClient.Builder()
+
+                .transport(transport)
+
+                .build();
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>LangChain4j 의존성 추가</strong>: MCP 통합, OpenAI 공식 클라이언트, GitHub 모델 지원을 위해 필요합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>LangChain4j 라이브러리 임포트</strong>: MCP 통합과 OpenAI 채팅 모델 기능을 위해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ChatLanguageModel</code> 생성</strong>: GitHub 토큰으로 GitHub 모델을 사용하도록 구성함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>HTTP 전송 설정</strong>: 서버 발신 이벤트(SSE)를 사용하여 MCP 서버에 연결함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP 클라이언트 생성</strong>: 서버와의 통신을 처리함</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>LangChain4j 내장 MCP 지원 사용</strong>: LLM과 MCP 서버 간 통합을 간소화함</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 예제는 Rust 기반 MCP 서버가 실행 중임을 가정합니다. 서버가 없다면 <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/01-first-server/README.md" target="_blank">01-first-server</a> 수업으로 돌아가서 서버를 만드세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Rust MCP 서버가 준비되면 터미널을 열고 서버와 같은 디렉터리로 이동한 후 다음 명령어로 새 LLM 클라이언트 프로젝트를 생성합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mkdir calculator-llmclient
+
+cd calculator-llmclient
+
+cargo init
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Cargo.toml</code> 파일에 다음 의존성을 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+[dependencies]
+
+async-openai = { version = &quot;0.29.0&quot;, features = [&quot;byot&quot;] }
+
+rmcp = { version = &quot;0.5.0&quot;, features = [&quot;client&quot;, &quot;transport-child-process&quot;] }
+
+serde_json = &quot;1.0.141&quot;
+
+tokio = { version = &quot;1.46.1&quot;, features = [&quot;rt-multi-thread&quot;] }
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!NOTE]  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> OpenAI 공식 Rust 라이브러리는 없지만, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">async-openai</code> 크레이트는 많이 사용되는 <a class="text-[var(--accent)] underline" href="https://platform.openai.com/docs/libraries/rust#rust">커뮤니티 유지 라이브러리</a>입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">src/main.rs</code> 파일을 열고 내용을 다음 코드로 교체하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+use async_openai::{Client, config::OpenAIConfig};
+
+use rmcp::{
+
+    RmcpError,
+
+    model::{CallToolRequestParam, ListToolsResult},
+
+    service::{RoleClient, RunningService, ServiceExt},
+
+    transport::{ConfigureCommandExt, TokioChildProcess},
+
+};
+
+use serde_json::{Value, json};
+
+use std::error::Error;
+
+use tokio::process::Command;
+
+
+
+#[tokio::main]
+
+async fn main() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+
+    // 초기 메시지
+
+    let mut messages = vec![json!({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is the sum of 3 and 2?&quot;})];
+
+
+
+    // OpenAI 클라이언트 설정
+
+    let api_key = std::env::var(&quot;OPENAI_API_KEY&quot;)?;
+
+    let openai_client = Client::with_config(
+
+        OpenAIConfig::new()
+
+            .with_api_base(&quot;https://models.github.ai/inference/chat&quot;)
+
+            .with_api_key(api_key),
+
+    );
+
+
+
+    // MCP 클라이언트 설정
+
+    let server_dir = std::path::Path::new(env!(&quot;CARGO_MANIFEST_DIR&quot;))
+
+        .parent()
+
+        .unwrap()
+
+        .join(&quot;calculator-server&quot;);
+
+
+
+    let mcp_client = ()
+
+        .serve(
+
+            TokioChildProcess::new(Command::new(&quot;cargo&quot;).configure(|cmd| {
+
+                cmd.arg(&quot;run&quot;).current_dir(server_dir);
+
+            }))
+
+            .map_err(RmcpError::transport_creation::&lt;TokioChildProcess&gt;)?,
+
+        )
+
+        .await?;
+
+
+
+    // TODO: MCP 도구 목록 가져오기
+
+
+
+    // TODO: 도구 호출과 함께 LLM 대화
+
+
+
+    Ok(())
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 코드는 MCP 서버와 GitHub 모델에 연결할 기본 Rust 애플리케이션을 설정합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> [!IMPORTANT]  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 애플리케이션을 실행하기 전에 반드시 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">OPENAI_API_KEY</code> 환경 변수에 GitHub 토큰을 설정하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋습니다, 다음 단계로 서버에서 기능 목록을 불러옵시다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- 서버 기능 목록 가져오기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 서버에 연결하여 기능을 요청해 봅시다:</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Typescript</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">같은 클래스에 다음 메서드를 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async connectToServer(transport: Transport) {
+
+     await this.client.connect(transport);
+
+     this.run();
+
+     console.error(&quot;MCPClient started on stdin/stdout&quot;);
+
+}
+
+
+
+async run() {
+
+    console.log(&quot;Asking server for available tools&quot;);
+
+
+
+    // 도구 나열하기
+
+    const toolsResult = await this.client.listTools();
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버에 연결하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">connectToServer</code> 코드를 추가했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">앱 플로우를 담당하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> 메서드를 만들었습니다. 현재는 도구만 나열하지만 곧 더 추가할 예정입니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# 사용 가능한 리소스 목록
+
+resources = await session.list_resources()
+
+print(&quot;LISTING RESOURCES&quot;)
+
+for resource in resources:
+
+    print(&quot;Resource: &quot;, resource)
+
+
+
+# 사용 가능한 도구 목록
+
+tools = await session.list_tools()
+
+print(&quot;LISTING TOOLS&quot;)
+
+for tool in tools.tools:
+
+    print(&quot;Tool: &quot;, tool.name)
+
+    print(&quot;Tool&quot;, tool.inputSchema[&quot;properties&quot;])
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음과 같이 추가했습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">리소스와 도구 목록을 받고 출력했습니다. 도구의 경우 나중에 사용할 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">inputSchema</code>도 나열했습니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async Task&lt;List&lt;ChatCompletionsToolDefinition&gt;&gt; GetMcpTools()
+
+{
+
+    Console.WriteLine(&quot;Listing tools&quot;);
+
+    var tools = await mcpClient.ListToolsAsync();
+
+
+
+    List&lt;ChatCompletionsToolDefinition&gt; toolDefinitions = new List&lt;ChatCompletionsToolDefinition&gt;();
+
+
+
+    foreach (var tool in tools)
+
+    {
+
+        Console.WriteLine($&quot;Connected to server with tools: {tool.Name}&quot;);
+
+        Console.WriteLine($&quot;Tool description: {tool.Description}&quot;);
+
+        Console.WriteLine($&quot;Tool parameters: {tool.JsonSchema}&quot;);
+
+
+
+        // TODO: convert tool definition from MCP tool to LLm tool     
+
+    }
+
+
+
+    return toolDefinitions;
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버에서 사용 가능한 도구를 나열했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">각 도구의 이름, 설명 및 스키마를 나열했습니다. 후자는 곧 도구 호출에 사용할 예정입니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// MCP 도구를 자동으로 검색하는 도구 제공자 생성
+
+ToolProvider toolProvider = McpToolProvider.builder()
+
+        .mcpClients(List.of(mcpClient))
+
+        .build();
+
+
+
+// MCP 도구 제공자는 자동으로 다음을 처리합니다:
+
+// - MCP 서버에서 사용 가능한 도구 목록 작성
+
+// - MCP 도구 스키마를 LangChain4j 형식으로 변환
+
+// - 도구 실행 및 응답 관리
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버의 모든 도구를 자동으로 검색하고 등록하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpToolProvider</code>를 만들었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">도구 공급자는 MCP 도구 스키마를 LangChain4j 도구 포맷으로 내부 변환합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">수동으로 도구를 나열하고 변환하는 과정을 추상화합니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버에서 도구를 가져오는 것은 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">list_tools</code> 메서드를 사용합니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main</code> 함수에서 MCP 클라이언트를 설정한 후 다음 코드를 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// MCP 도구 목록 가져오기
+
+let tools = mcp_client.list_tools(Default::default()).await?;
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- 서버 기능을 LLM 도구로 변환</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버 기능 목록을 불러온 다음, LLM이 이해할 수 있는 형식으로 변환해야 합니다. 변환하면 이를 LLM의 도구로 제공할 수 있습니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">TypeScript</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 다음 코드를 추가하여 MCP 서버 응답을 LLM이 사용할 도구 형식으로 변환하세요:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    openAiToolAdapter(tool: {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        name: string;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        description?: string;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        input_schema: any;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // input_schema를 기반으로 zod 스키마 생성</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const schema = z.object(tool.input_schema);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            type: "function" as const, // 타입을 명시적으로 "function"으로 설정</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            function: {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: tool.name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            description: tool.description,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            parameters: {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            type: "object",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            properties: tool.input_schema.properties,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            required: tool.input_schema.required,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        };</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    위 코드는 MCP 서버 응답을 받아 LLM이 이해할 수 있는 도구 정의 형식으로 변환합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 다음으로 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> 메서드를 업데이트하여 서버 기능을 나열해 봅시다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async run() {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Asking server for available tools");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolsResult = await this.client.listTools();</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const tools = toolsResult.tools.map((tool) => {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            return this.openAiToolAdapter({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: tool.name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            description: tool.description,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            input_schema: tool.inputSchema,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">앞 코드에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> 메서드를 업데이트하여 결과에서 각 항목에 대해 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">openAiToolAdapter</code>를 호출하도록 했습니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 먼저 다음 변환 함수를 만듭니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def convert_to_llm_tool(tool):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tool_schema = {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            "type": "function",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            "function": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "name": tool.name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "description": tool.description,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "type": "function",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "parameters": {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                    "type": "object",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                    "properties": tool.inputSchema["properties"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return tool_schema</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    위 함수 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">convert_to_llm_tools</code>는 MCP 도구 응답을 받아 LLM이 이해할 수 있는 형식으로 변환합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 다음으로 이 함수를 활용하도록 클라이언트 코드를 업데이트합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    functions = []</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for tool in tools.tools:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("Tool: ", tool.name)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("Tool", tool.inputSchema["properties"])</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        functions.append(convert_to_llm_tool(tool))</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    여기서는 MCP 도구 응답을 LLM에 공급할 수 있게 변환하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">convert_to_llm_tool</code> 호출을 추가했습니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. MCP 도구 응답을 LLM이 이해할 수 있는 형태로 변환하는 코드를 추가합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+ChatCompletionsToolDefinition ConvertFrom(string name, string description, JsonElement jsonElement)
+
+{ 
+
+    // convert the tool to a function definition
+
+    FunctionDefinition functionDefinition = new FunctionDefinition(name)
+
+    {
+
+        Description = description,
+
+        Parameters = BinaryData.FromObjectAsJson(new
+
+        {
+
+            Type = &quot;object&quot;,
+
+            Properties = jsonElement
+
+        },
+
+        new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
+
+    };
+
+
+
+    // create a tool definition
+
+    ChatCompletionsToolDefinition toolDefinition = new ChatCompletionsToolDefinition(functionDefinition);
+
+    return toolDefinition;
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이름, 설명, 입력 스키마를 받아 변환하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ConvertFrom</code> 함수를 만들었습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이 함수는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">FunctionDefinition</code>을 생성하며, 이는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ChatCompletionsDefinition</code>에 전달됩니다. 후자는 LLM이 이해하는 형식입니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 위 함수를 활용하도록 기존 코드를 업데이트해 봅시다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async Task<List<ChatCompletionsToolDefinition>> GetMcpTools()</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine("Listing tools");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var tools = await mcpClient.ListToolsAsync();</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        List<ChatCompletionsToolDefinition> toolDefinitions = new List<ChatCompletionsToolDefinition>();</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        foreach (var tool in tools)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Connected to server with tools: {tool.Name}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Tool description: {tool.Description}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Tool parameters: {tool.JsonSchema}");</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            JsonElement propertiesElement;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            tool.JsonSchema.TryGetProperty("properties", out propertiesElement);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            var def = ConvertFrom(tool.Name, tool.Description, propertiesElement);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Tool definition: {def}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            toolDefinitions.Add(def);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            Console.WriteLine($"Properties: {propertiesElement}");        </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return toolDefinitions;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```    In the preceding code, we've:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - Update the function to convert the MCP tool response to an LLm tool. Let's highlight the code we added:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        JsonElement propertiesElement;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tool.JsonSchema.TryGetProperty("properties", out propertiesElement);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var def = ConvertFrom(tool.Name, tool.Description, propertiesElement);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine($"Tool definition: {def}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        toolDefinitions.Add(def);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The input schema is part of the tool response but on the "properties" attribute, so we need to extract.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Furthermore, we now call <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">ConvertFrom</code> with the tool details.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now we've done the heavy lifting, let's see how it call comes together as we handle a user prompt next.</p>
+
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// 자연어 상호작용을 위한 Bot 인터페이스 생성
+
+public interface Bot {
+
+    String chat(String prompt);
+
+}
+
+
+
+// LLM 및 MCP 도구로 AI 서비스 구성
+
+Bot bot = AiServices.builder(Bot.class)
+
+        .chatLanguageModel(model)
+
+        .toolProvider(toolProvider)
+
+        .build();
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자연어 상호작용을 위한 간단한 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Bot</code> 인터페이스를 정의했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LangChain4j의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AiServices</code>를 사용해 LLM과 MCP 도구 제공자를 자동 바인딩했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">프레임워크가 도구 스키마 변환과 함수 호출을 자동으로 처리합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이 접근법은 수동 도구 변환을 없애고 LangChain4j가 MCP 도구를 LLM 호환 포맷으로 전부 처리합니다.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 도구 응답을 LLM이 이해할 수 있는 형식으로 변환하려면 도구 목록을 형식화하는 헬퍼 함수를 추가해야 합니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main</code> 함수 아래에 다음 코드를 추가하세요. LLM에 요청할 때 호출됩니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async fn format_tools(tools: &amp;ListToolsResult) -&gt; Result&lt;Vec&lt;Value&gt;, Box&lt;dyn Error&gt;&gt; {
+
+    let tools_json = serde_json::to_value(tools)?;
+
+    let Some(tools_array) = tools_json.get(&quot;tools&quot;).and_then(|t| t.as_array()) else {
+
+        return Ok(vec![]);
+
+    };
+
+
+
+    let formatted_tools = tools_array
+
+        .iter()
+
+        .filter_map(|tool| {
+
+            let name = tool.get(&quot;name&quot;)?.as_str()?;
+
+            let description = tool.get(&quot;description&quot;)?.as_str()?;
+
+            let schema = tool.get(&quot;inputSchema&quot;)?;
+
+
+
+            Some(json!({
+
+                &quot;type&quot;: &quot;function&quot;,
+
+                &quot;function&quot;: {
+
+                    &quot;name&quot;: name,
+
+                    &quot;description&quot;: description,
+
+                    &quot;parameters&quot;: {
+
+                        &quot;type&quot;: &quot;object&quot;,
+
+                        &quot;properties&quot;: schema.get(&quot;properties&quot;).unwrap_or(&amp;json!({})),
+
+                        &quot;required&quot;: schema.get(&quot;required&quot;).unwrap_or(&amp;json!([]))
+
+                    }
+
+                }
+
+            }))
+
+        })
+
+        .collect();
+
+
+
+    Ok(formatted_tools)
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋습니다, 이제 사용자 요청을 처리할 준비가 되었으니 다음 단계로 넘어갑시다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-4- 사용자 프롬프트 요청 처리</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 코드 부분에서는 사용자 요청을 처리합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">TypeScript</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. LLM을 호출하는데 사용할 메서드를 추가하세요:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    async callTools(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        toolResults: any[]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        for (const tool_call of tool_calls) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolName = tool_call.function.name;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const args = tool_call.function.arguments;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Calling tool ${toolName} with args ${JSON.stringify(args)}</code>);</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 2. 서버의 도구를 호출합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolResult = await this.client.callTool({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: toolName,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            arguments: JSON.parse(args),</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        });</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Tool result: ", toolResult);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 3. 결과를 가지고 무언가를 합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 할 일</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    위 코드에서:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callTools</code> 메서드를 추가했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 메서드는 LLM 응답을 받고 어떤 도구가 호출되었는지 검사합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        for (const tool_call of tool_calls) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolName = tool_call.function.name;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const args = tool_call.function.arguments;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Calling tool ${toolName} with args ${JSON.stringify(args)}</code>);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 도구 호출</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - LLM이 호출할 것을 지시하면 도구를 호출합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```typescript</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 2. 서버의 도구를 호출합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const toolResult = await this.client.callTool({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            name: toolName,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            arguments: JSON.parse(args),</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        });</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        console.log("Tool result: ", toolResult);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 3. 결과로 무언가를 합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        // 할 일</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">run</code> 메서드를 업데이트하여 LLM 호출과 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">callTools</code> 호출을 포함시킵니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```typescript</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 1. LLM의 입력으로 사용할 메시지를 생성합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    const prompt = "What is the sum of 2 and 3?"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                role: "user",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                content: prompt,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        ];</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    console.log("Querying LLM: ", messages[0].content);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 2. LLM 호출</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    let response = this.openai.chat.completions.create({</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        model: "gpt-4.1-mini",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        max_tokens: 1000,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        messages,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        tools: tools,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    });    </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    let results: any[] = [];</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 3. LLM 응답을 확인하며 각 선택지에 도구 호출이 있는지 점검합니다</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    (await response).choices.map(async (choice: { message: any; }) => {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        const message = choice.message;</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        if (message.tool_calls) {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            console.log("Making tool call")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            await this.callTools(message.tool_calls, results);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    });</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋습니다, 전체 코드를 나열해 봅시다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+import { Client } from &quot;@modelcontextprotocol/sdk/client/index.js&quot;;
+
+import { StdioClientTransport } from &quot;@modelcontextprotocol/sdk/client/stdio.js&quot;;
+
+import { Transport } from &quot;@modelcontextprotocol/sdk/shared/transport.js&quot;;
+
+import OpenAI from &quot;openai&quot;;
+
+import { z } from &quot;zod&quot;; // 스키마 유효성 검사를 위해 zod를 가져옵니다
+
+
+
+class MyClient {
+
+    private openai: OpenAI;
+
+    private client: Client;
+
+    constructor(){
+
+        this.openai = new OpenAI({
+
+            baseURL: &quot;https://models.inference.ai.azure.com&quot;, // 미래에 이 URL로 변경해야 할 수도 있습니다: https://models.github.ai/inference
+
+            apiKey: process.env.GITHUB_TOKEN,
+
+        });
+
+
+
+        this.client = new Client(
+
+            {
+
+                name: &quot;example-client&quot;,
+
+                version: &quot;1.0.0&quot;
+
+            },
+
+            {
+
+                capabilities: {
+
+                prompts: {},
+
+                resources: {},
+
+                tools: {}
+
+                }
+
+            }
+
+            );    
+
+    }
+
+
+
+    async connectToServer(transport: Transport) {
+
+        await this.client.connect(transport);
+
+        this.run();
+
+        console.error(&quot;MCPClient started on stdin/stdout&quot;);
+
+    }
+
+
+
+    openAiToolAdapter(tool: {
+
+        name: string;
+
+        description?: string;
+
+        input_schema: any;
+
+          }) {
+
+          // input_schema를 기반으로 zod 스키마를 생성합니다
+
+          const schema = z.object(tool.input_schema);
+
+      
+
+          return {
+
+            type: &quot;function&quot; as const, // 타입을 명시적으로 &quot;function&quot;으로 설정합니다
+
+            function: {
+
+              name: tool.name,
+
+              description: tool.description,
+
+              parameters: {
+
+              type: &quot;object&quot;,
+
+              properties: tool.input_schema.properties,
+
+              required: tool.input_schema.required,
+
+              },
+
+            },
+
+          };
+
+    }
+
+    
+
+    async callTools(
+
+        tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[],
+
+        toolResults: any[]
+
+      ) {
+
+        for (const tool_call of tool_calls) {
+
+          const toolName = tool_call.function.name;
+
+          const args = tool_call.function.arguments;
+
+    
+
+          console.log(`Calling tool ${toolName} with args ${JSON.stringify(args)}`);
+
+    
+
+    
+
+          // 2. 서버의 도구를 호출합니다
+
+          const toolResult = await this.client.callTool({
+
+            name: toolName,
+
+            arguments: JSON.parse(args),
+
+          });
+
+    
+
+          console.log(&quot;Tool result: &quot;, toolResult);
+
+    
+
+          // 3. 결과로 무언가를 수행합니다
+
+          // 해야 할 일
+
+    
+
+         }
+
+    }
+
+
+
+    async run() {
+
+        console.log(&quot;Asking server for available tools&quot;);
+
+        const toolsResult = await this.client.listTools();
+
+        const tools = toolsResult.tools.map((tool) =&gt; {
+
+            return this.openAiToolAdapter({
+
+              name: tool.name,
+
+              description: tool.description,
+
+              input_schema: tool.inputSchema,
+
+            });
+
+        });
+
+
+
+        const prompt = &quot;What is the sum of 2 and 3?&quot;;
+
+    
+
+        const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+
+            {
+
+                role: &quot;user&quot;,
+
+                content: prompt,
+
+            },
+
+        ];
+
+
+
+        console.log(&quot;Querying LLM: &quot;, messages[0].content);
+
+        let response = this.openai.chat.completions.create({
+
+            model: &quot;gpt-4.1-mini&quot;,
+
+            max_tokens: 1000,
+
+            messages,
+
+            tools: tools,
+
+        });    
+
+
+
+        let results: any[] = [];
+
+    
+
+        // 3. LLM 응답을 확인하고, 각 선택지에 도구 호출이 있는지 검사합니다
+
+        (await response).choices.map(async (choice: { message: any; }) =&gt; {
+
+          const message = choice.message;
+
+          if (message.tool_calls) {
+
+              console.log(&quot;Making tool call&quot;)
+
+              await this.callTools(message.tool_calls, results);
+
+          }
+
+        });
+
+    }
+
+    
+
+}
+
+
+
+let client = new MyClient();
+
+ const transport = new StdioClientTransport({
+
+            command: &quot;node&quot;,
+
+            args: [&quot;./build/index.js&quot;]
+
+        });
+
+
+
+client.connectToServer(transport);
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Python</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. LLM 호출에 필요한 일부 import를 추가합시다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # 대형 언어 모델</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    import os</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from azure.ai.inference import ChatCompletionsClient</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from azure.ai.inference.models import SystemMessage, UserMessage</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    from azure.core.credentials import AzureKeyCredential</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    import json</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. LLM을 호출하는 함수를 추가합시다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # llm</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    def call_llm(prompt, functions):</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        token = os.environ["GITHUB_TOKEN"]</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        endpoint = "https://models.inference.ai.azure.com"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        model_name = "gpt-4o"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        client = ChatCompletionsClient(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            endpoint=endpoint,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            credential=AzureKeyCredential(token),</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        )</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("CALLING LLM")</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        response = client.complete(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            messages=[</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "role": "system",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "content": "You are a helpful assistant.",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "role": "user",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                "content": prompt,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                },</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            ],</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            model=model_name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            tools = functions,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            # 선택적 매개변수</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            temperature=1.,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            max_tokens=1000,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            top_p=1.    </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        )</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        response_message = response.choices[0].message</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        functions_to_call = []</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        if response_message.tool_calls:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            for tool_call in response_message.tool_calls:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                print("TOOL: ", tool_call)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                name = tool_call.function.name</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                args = json.loads(tool_call.function.arguments)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">                functions_to_call.append({ "name": name, "args": args })</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        return functions_to_call</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    위 코드에서:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - MCP 서버에서 찾고 변환한 함수들을 LLM에 전달했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 해당 함수들과 함께 LLM을 호출했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 결과를 검사하여 호출해야 할 함수가 있으면 호출합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 호출할 함수 목록 배열을 전달합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 마지막으로 메인 코드를 업데이트합시다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```python</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    prompt = "Add 2 to 20"</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # 어떤 도구가 모두 필요한지 LLM에 물어보세요, 만약 있다면</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    functions_to_call = call_llm(prompt, functions)</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    # 제안된 함수를 호출하세요</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for f in functions_to_call:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        result = await session.call_tool(f["name"], arguments=f["args"])</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        print("TOOLS result: ", result.content)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    위 코드가 마지막 단계입니다. 여기서 우리는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - LLM이 프롬프트에 따라 호출해야 한다고 판단한 함수를 사용해 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">call_tool</code>로 MCP 도구를 호출했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 도구 호출 결과를 출력했습니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">.NET</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. LLM 프롬프트 요청을 수행하는 코드를 봅시다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var tools = await GetMcpTools();</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for (int i = 0; i < tools.Count; i++)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var tool = tools[i];</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine($"MCP Tools def: {i}: {tool}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 0. Define the chat history and the user message</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var userMessage = "add 2 and 4";</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    chatHistory.Add(new ChatRequestUserMessage(userMessage));</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 1. Define tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ChatCompletionsToolDefinition def = CreateToolDefinition();</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 2. Define options, including the tools</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var options = new ChatCompletionsOptions(chatHistory)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Model = "gpt-4.1-mini",</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Tools = { tools[0] }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    };</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 3. Call the model  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ChatCompletions? response = await client.CompleteAsync(options);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    var content = response.Content;</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    위 코드에서는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - MCP 서버에서 도구를 가져왔습니다: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">var tools = await GetMcpTools()</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 사용자 프롬프트를 정의했습니다: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">userMessage</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 모델과 도구를 지정하는 옵션 객체를 만들었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - LLM에 요청을 보냈습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 마지막 단계로 LLM이 함수 호출이 필요하다고 판단하는지 확인합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```csharp</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    // 4. Check if the response contains a function call</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ChatCompletionsToolCall? calls = response.ToolCalls.FirstOrDefault();</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    for (int i = 0; i < response.ToolCalls.Count; i++)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    {</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var call = response.ToolCalls[i];</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine($"Tool call {i}: {call.Name} with arguments {call.Arguments}");</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        //Tool call 0: add with arguments {"a":2,"b":4}</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(call.Arguments);</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        var result = await mcpClient.CallToolAsync(</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            call.Name,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            dict!,</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">            cancellationToken: CancellationToken.None</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        );</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">        Console.WriteLine(result.Content.First(c => c.Type == "text").Text);</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    }</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    ```</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    위 코드에서는:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 함수 호출 목록을 반복했습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">    - 각 도구 호출에 대해 이름과 인수를 파싱하고, MCP 클라이언트를 통해 MCP 서버에서 도구를 호출합니다. 결과를 출력합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전체 코드는 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+using Azure;
+
+using Azure.AI.Inference;
+
+using Azure.Identity;
+
+using System.Text.Json;
+
+using ModelContextProtocol.Client;
+
+using ModelContextProtocol.Protocol;
+
+
+
+var endpoint = &quot;https://models.inference.ai.azure.com&quot;;
+
+var token = Environment.GetEnvironmentVariable(&quot;GITHUB_TOKEN&quot;); // Your GitHub Access Token
+
+var client = new ChatCompletionsClient(new Uri(endpoint), new AzureKeyCredential(token));
+
+var chatHistory = new List&lt;ChatRequestMessage&gt;
+
+{
+
+    new ChatRequestSystemMessage(&quot;You are a helpful assistant that knows about AI&quot;)
+
+};
+
+
+
+var clientTransport = new StdioClientTransport(new()
+
+{
+
+    Name = &quot;Demo Server&quot;,
+
+    Command = &quot;/workspaces/mcp-for-beginners/03-GettingStarted/02-client/solution/server/bin/Debug/net8.0/server&quot;,
+
+    Arguments = [],
+
+});
+
+
+
+Console.WriteLine(&quot;Setting up stdio transport&quot;);
+
+
+
+await using var mcpClient = await McpClient.CreateAsync(clientTransport);
+
+
+
+ChatCompletionsToolDefinition ConvertFrom(string name, string description, JsonElement jsonElement)
+
+{ 
+
+    // convert the tool to a function definition
+
+    FunctionDefinition functionDefinition = new FunctionDefinition(name)
+
+    {
+
+        Description = description,
+
+        Parameters = BinaryData.FromObjectAsJson(new
+
+        {
+
+            Type = &quot;object&quot;,
+
+            Properties = jsonElement
+
+        },
+
+        new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
+
+    };
+
+
+
+    // create a tool definition
+
+    ChatCompletionsToolDefinition toolDefinition = new ChatCompletionsToolDefinition(functionDefinition);
+
+    return toolDefinition;
+
+}
+
+
+
+
+
+
+
+async Task&lt;List&lt;ChatCompletionsToolDefinition&gt;&gt; GetMcpTools()
+
+{
+
+    Console.WriteLine(&quot;Listing tools&quot;);
+
+    var tools = await mcpClient.ListToolsAsync();
+
+
+
+    List&lt;ChatCompletionsToolDefinition&gt; toolDefinitions = new List&lt;ChatCompletionsToolDefinition&gt;();
+
+
+
+    foreach (var tool in tools)
+
+    {
+
+        Console.WriteLine($&quot;Connected to server with tools: {tool.Name}&quot;);
+
+        Console.WriteLine($&quot;Tool description: {tool.Description}&quot;);
+
+        Console.WriteLine($&quot;Tool parameters: {tool.JsonSchema}&quot;);
+
+
+
+        JsonElement propertiesElement;
+
+        tool.JsonSchema.TryGetProperty(&quot;properties&quot;, out propertiesElement);
+
+
+
+        var def = ConvertFrom(tool.Name, tool.Description, propertiesElement);
+
+        Console.WriteLine($&quot;Tool definition: {def}&quot;);
+
+        toolDefinitions.Add(def);
+
+
+
+        Console.WriteLine($&quot;Properties: {propertiesElement}&quot;);        
+
+    }
+
+
+
+    return toolDefinitions;
+
+}
+
+
+
+// 1. List tools on mcp server
+
+
+
+var tools = await GetMcpTools();
+
+for (int i = 0; i &lt; tools.Count; i++)
+
+{
+
+    var tool = tools[i];
+
+    Console.WriteLine($&quot;MCP Tools def: {i}: {tool}&quot;);
+
+}
+
+
+
+// 2. Define the chat history and the user message
+
+var userMessage = &quot;add 2 and 4&quot;;
+
+
+
+chatHistory.Add(new ChatRequestUserMessage(userMessage));
+
+
+
+
+
+// 3. Define options, including the tools
+
+var options = new ChatCompletionsOptions(chatHistory)
+
+{
+
+    Model = &quot;gpt-4.1-mini&quot;,
+
+    Tools = { tools[0] }
+
+};
+
+
+
+// 4. Call the model  
+
+
+
+ChatCompletions? response = await client.CompleteAsync(options);
+
+var content = response.Content;
+
+
+
+// 5. Check if the response contains a function call
+
+ChatCompletionsToolCall? calls = response.ToolCalls.FirstOrDefault();
+
+for (int i = 0; i &lt; response.ToolCalls.Count; i++)
+
+{
+
+    var call = response.ToolCalls[i];
+
+    Console.WriteLine($&quot;Tool call {i}: {call.Name} with arguments {call.Arguments}&quot;);
+
+    //Tool call 0: add with arguments {&quot;a&quot;:2,&quot;b&quot;:4}
+
+
+
+    var dict = JsonSerializer.Deserialize&lt;Dictionary&lt;string, object&gt;&gt;(call.Arguments);
+
+    var result = await mcpClient.CallToolAsync(
+
+        call.Name,
+
+        dict!,
+
+        cancellationToken: CancellationToken.None
+
+    );
+
+
+
+    Console.WriteLine(result.Content.OfType&lt;TextContentBlock&gt;().First().Text);
+
+
+
+}
+
+
+
+// 6. Print the generic response
+
+Console.WriteLine($&quot;Assistant response: {content}&quot;);
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Java</h5>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+try {
+
+    // MCP 도구를 자동으로 사용하는 자연어 요청 실행
+
+    String response = bot.chat(&quot;Calculate the sum of 24.5 and 17.3 using the calculator service&quot;);
+
+    System.out.println(response);
+
+
+
+    response = bot.chat(&quot;What&#x27;s the square root of 144?&quot;);
+
+    System.out.println(response);
+
+
+
+    response = bot.chat(&quot;Show me the help for the calculator service&quot;);
+
+    System.out.println(response);
+
+} finally {
+
+    mcpClient.close();
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 코드에서는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">간단한 자연어 프롬프트를 사용하여 MCP 서버 도구와 상호작용했습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">LangChain4j 프레임워크가 다음을 자동 처리합니다:</li>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - 필요 시 사용자 프롬프트를 도구 호출로 변환</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - LLM 판단에 따라 적절한 MCP 도구 호출</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  - LLM과 MCP 서버 간 대화 흐름 관리</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">bot.chat()</code> 메서드는 MCP 도구 실행 결과를 포함할 수 있는 자연어 응답을 반환합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이 접근법은 사용자가 MCP 구현을 알 필요 없이 매끄러운 사용자 경험을 제공합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전체 코드 예제:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+public class LangChain4jClient {
+
+    
+
+    public static void main(String[] args) throws Exception {        ChatLanguageModel model = OpenAiOfficialChatModel.builder()
+
+                .isGitHubModels(true)
+
+                .apiKey(System.getenv(&quot;GITHUB_TOKEN&quot;))
+
+                .timeout(Duration.ofSeconds(60))
+
+                .modelName(&quot;gpt-4.1-nano&quot;)
+
+                .timeout(Duration.ofSeconds(60))
+
+                .build();
+
+
+
+        McpTransport transport = new HttpMcpTransport.Builder()
+
+                .sseUrl(&quot;http://localhost:8080/sse&quot;)
+
+                .timeout(Duration.ofSeconds(60))
+
+                .logRequests(true)
+
+                .logResponses(true)
+
+                .build();
+
+
+
+        McpClient mcpClient = new DefaultMcpClient.Builder()
+
+                .transport(transport)
+
+                .build();
+
+
+
+        ToolProvider toolProvider = McpToolProvider.builder()
+
+                .mcpClients(List.of(mcpClient))
+
+                .build();
+
+
+
+        Bot bot = AiServices.builder(Bot.class)
+
+                .chatLanguageModel(model)
+
+                .toolProvider(toolProvider)
+
+                .build();
+
+
+
+        try {
+
+            String response = bot.chat(&quot;Calculate the sum of 24.5 and 17.3 using the calculator service&quot;);
+
+            System.out.println(response);
+
+
+
+            response = bot.chat(&quot;What&#x27;s the square root of 144?&quot;);
+
+            System.out.println(response);
+
+
+
+            response = bot.chat(&quot;Show me the help for the calculator service&quot;);
+
+            System.out.println(response);
+
+        } finally {
+
+            mcpClient.close();
+
+        }
+
+    }
+
+}
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Rust</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">여기서 대부분 작업이 일어납니다. 초기 사용자 프롬프트로 LLM을 호출한 후 응답을 처리하여 호출해야 할 도구가 있는지 확인합니다. 있다면 해당 도구들을 호출하고, 더 이상 도구 호출이 필요 없고 최종 응답이 나올 때까지 LLM과 대화를 계속합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">LLM을 여러 번 호출해야 하므로, LLM 호출을 처리하는 함수를 정의합시다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main.rs</code> 파일에 다음 함수를 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async fn call_llm(
+
+    client: &amp;Client&lt;OpenAIConfig&gt;,
+
+    messages: &amp;[Value],
+
+    tools: &amp;ListToolsResult,
+
+) -&gt; Result&lt;Value, Box&lt;dyn Error&gt;&gt; {
+
+    let response = client
+
+        .completions()
+
+        .create_byot(json!({
+
+            &quot;messages&quot;: messages,
+
+            &quot;model&quot;: &quot;openai/gpt-4.1&quot;,
+
+            &quot;tools&quot;: format_tools(tools).await?,
+
+        }))
+
+        .await?;
+
+    Ok(response)
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 함수는 LLM 클라이언트, 메시지 목록(사용자 프롬프트 포함), MCP 서버 도구를 받아 LLM에 요청을 보내고 응답을 반환합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">LLM 응답에는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">choices</code> 배열이 포함됩니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">결과를 처리하여 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tool_calls</code>가 있는지 확인해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이를 통해 LLM이 인수와 함께 특정 도구를 호출하도록 요청하는지를 알 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 코드를 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main.rs</code> 파일 하단에 추가하여 LLM 응답을 처리하는 함수를 정의하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async fn process_llm_response(
+
+    llm_response: &amp;Value,
+
+    mcp_client: &amp;RunningService&lt;RoleClient, ()&gt;,
+
+    openai_client: &amp;Client&lt;OpenAIConfig&gt;,
+
+    mcp_tools: &amp;ListToolsResult,
+
+    messages: &amp;mut Vec&lt;Value&gt;,
+
+) -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+
+    let Some(message) = llm_response
+
+        .get(&quot;choices&quot;)
+
+        .and_then(|c| c.as_array())
+
+        .and_then(|choices| choices.first())
+
+        .and_then(|choice| choice.get(&quot;message&quot;))
+
+    else {
+
+        return Ok(());
+
+    };
+
+
+
+    // 사용 가능한 경우 내용을 출력합니다
+
+    if let Some(content) = message.get(&quot;content&quot;).and_then(|c| c.as_str()) {
+
+        println!(&quot;🤖 {}&quot;, content);
+
+    }
+
+
+
+    // 도구 호출 처리
+
+    if let Some(tool_calls) = message.get(&quot;tool_calls&quot;).and_then(|tc| tc.as_array()) {
+
+        messages.push(message.clone()); // 어시스턴트 메시지 추가
+
+
+
+        // 각 도구 호출 실행
+
+        for tool_call in tool_calls {
+
+            let (tool_id, name, args) = extract_tool_call_info(tool_call)?;
+
+            println!(&quot;⚡ Calling tool: {}&quot;, name);
+
+
+
+            let result = mcp_client
+
+                .call_tool(CallToolRequestParam {
+
+                    name: name.into(),
+
+                    arguments: serde_json::from_str::&lt;Value&gt;(&amp;args)?.as_object().cloned(),
+
+                })
+
+                .await?;
+
+
+
+            // 도구 결과를 메시지에 추가
+
+            messages.push(json!({
+
+                &quot;role&quot;: &quot;tool&quot;,
+
+                &quot;tool_call_id&quot;: tool_id,
+
+                &quot;content&quot;: serde_json::to_string_pretty(&amp;result)?
+
+            }));
+
+        }
+
+
+
+        // 도구 결과로 대화 계속하기
+
+        let response = call_llm(openai_client, messages, mcp_tools).await?;
+
+        Box::pin(process_llm_response(
+
+            &amp;response,
+
+            mcp_client,
+
+            openai_client,
+
+            mcp_tools,
+
+            messages,
+
+        ))
+
+        .await?;
+
+    }
+
+    Ok(())
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tool_calls</code>가 있으면 도구 정보를 추출하고, MCP 서버에 도구 요청을 호출한 다음 결과를 대화 메시지에 추가합니다. 그런 다음 LLM과 계속 대화를 나누며, 메시지는 어시스턴트 응답과 도구 호출 결과로 업데이트됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">LLM이 MCP 호출을 위해 반환하는 도구 호출 정보를 추출하려면, 호출에 필요한 모든 정보를 추출하는 또 다른 도우미 함수를 추가합니다. 다음 코드를 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main.rs</code> 파일 하단에 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+fn extract_tool_call_info(tool_call: &amp;Value) -&gt; Result&lt;(String, String, String), Box&lt;dyn Error&gt;&gt; {
+
+    let tool_id = tool_call
+
+        .get(&quot;id&quot;)
+
+        .and_then(|id| id.as_str())
+
+        .unwrap_or(&quot;&quot;)
+
+        .to_string();
+
+    let function = tool_call.get(&quot;function&quot;).ok_or(&quot;Missing function&quot;)?;
+
+    let name = function
+
+        .get(&quot;name&quot;)
+
+        .and_then(|n| n.as_str())
+
+        .unwrap_or(&quot;&quot;)
+
+        .to_string();
+
+    let args = function
+
+        .get(&quot;arguments&quot;)
+
+        .and_then(|a| a.as_str())
+
+        .unwrap_or(&quot;{}&quot;)
+
+        .to_string();
+
+    Ok((tool_id, name, args))
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모든 부분이 준비되었으니 초기 사용자 프롬프트를 처리하고 LLM을 호출할 수 있습니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">main</code> 함수를 다음 코드로 업데이트하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// 도구 호출이 포함된 LLM 대화
+
+let response = call_llm(&amp;openai_client, &amp;messages, &amp;tools).await?;
+
+process_llm_response(
+
+    &amp;response,
+
+    &amp;mcp_client,
+
+    &amp;openai_client,
+
+    &amp;tools,
+
+    &amp;mut messages,
+
+)
+
+.await?;
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 코드는 두 숫자의 합을 요청하는 초기 사용자 프롬프트로 LLM에 질의하며, 응답을 처리하여 도구 호출을 동적으로 처리합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">잘하셨습니다!</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">과제</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">연습에서 작성한 코드를 바탕으로 더 많은 도구를 갖춘 서버를 구축하세요. 그런 다음 연습과 같이 LLM 클라이언트를 만들고, 다양한 프롬프트로 테스트하여 모든 서버 도구가 동적으로 호출되는지 확인하세요. 이렇게 클라이언트를 구축하면 최종 사용자가 정확한 클라이언트 명령 대신 프롬프트를 사용할 수 있어 훌륭한 사용자 경험을 제공합니다. MCP 서버 호출이 있는지도 인지하지 못합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">해결책</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">주요 내용 정리</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트에 LLM을 추가하면 사용자가 MCP 서버와 더 나은 방식으로 상호작용할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버 응답을 LLM이 이해할 수 있도록 변환해야 합니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">샘플</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/java/calculator/README.md" target="_blank">Java 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/csharp" target="_blank">.Net 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/javascript/README.md" target="_blank">JavaScript 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/typescript/README.md" target="_blank">TypeScript 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/python" target="_blank">Python 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/rust" target="_blank">Rust 계산기</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/04-vscode/README.md" target="_blank">Visual Studio Code를 사용하여 서버 사용하기</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER START --></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 노력하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 양지하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 오해석에 대해 당사는 책임을 지지 않습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
+<div class="lesson-nav">
+  <span><a href="m03_02-02-client.html">&larr; 02 Client</a></span>
+  <span><a href="m03_04-04-vscode.html">04 Vscode &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

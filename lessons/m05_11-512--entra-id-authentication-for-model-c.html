@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.12  Entra ID Authentication for Model Context Protocol Servers - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.12  Entra ID Authentication for Model Context Protocol Servers</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Securing AI Workflows: Entra ID Authentication for Model Context Protocol Servers</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction</h3>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Securing your Model Context Protocol (MCP) server is as important as locking the front door of your house.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Leaving your MCP server open exposes your tools and data to unauthorized access, which can lead to security breaches.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Microsoft Entra ID provides a robust cloud-based identity and access management solution, helping ensure that only authorized users and applications can interact with your MCP server.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this section, you’ll learn how to protect your AI workflows using Entra ID authentication.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this section, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the importance of securing MCP servers.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explain the basics of Microsoft Entra ID and OAuth 2.0 authentication.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Recognize the difference between public and confidential clients.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement Entra ID authentication in both local (public client) and remote (confidential client) MCP server scenarios.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply security best practices when developing AI workflows.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Security and MCP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Just as you wouldn't leave the front door of your house unlocked, you shouldn't leave your MCP server open for anyone to access.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Securing your AI workflows is essential for building robust, trustworthy, and safe applications.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This chapter will introduce you to using Microsoft Entra ID to secure your MCP servers, ensuring that only authorized users and applications can interact with your tools and data.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Why Security Matters for MCP Servers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Imagine your MCP server has a tool that can send emails or access a customer database. An unsecured server would mean anyone could potentially use that tool, leading to unauthorized data access, spam, or other malicious activities.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By implementing authentication, you ensure that every request to your server is verified, confirming the identity of the user or application making the request. This is the first and most critical step in securing your AI workflows.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction to Microsoft Entra ID</h3>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By using Entra ID, you can:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enable secure sign-in for users.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Protect APIs and services.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Manage access policies from a central location.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For MCP servers, Entra ID provides a robust and widely-trusted solution to manage who can access your server's capabilities.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Understanding the Magic: How Entra ID Authentication Works</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Entra ID uses open standards like <strong>OAuth 2.0</strong> to handle authentication. While the details can be complex, the core concept is simple and can be understood with an analogy.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">A Gentle Introduction to OAuth 2.0: The Valet Key</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Think of OAuth 2.0 like a valet service for your car.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When you arrive at a restaurant, you don't give the valet your master key.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Instead, you provide a <strong>valet key</strong> that has limited permissions—it can start the car and lock the doors, but it can't open the trunk or the glove compartment.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this analogy:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>You</strong> are the <strong>User</strong>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Your car</strong> is the <strong>MCP Server</strong> with its valuable tools and data.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The <strong>Valet</strong> is <strong>Microsoft Entra ID</strong>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The <strong>Parking Attendant</strong> is the <strong>MCP Client</strong> (the application trying to access the server).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The <strong>Valet Key</strong> is the <strong>Access Token</strong>.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The access token is a secure string of text that the MCP client receives from Entra ID after you sign in.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The client then presents this token to the MCP server with every request.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The server can verify the token to ensure the request is legitimate and that the client has the necessary permissions, all without ever needing to handle your actual credentials (like your password).</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">The Authentication Flow</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here’s how the process works in practice:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    actor User as 👤 User
+
+    participant Client as 🖥️ MCP Client
+
+    participant Entra as 🔐 Microsoft Entra ID
+
+    participant Server as 🔧 MCP Server
+
+
+
+    Client-&gt;&gt;+User: Please sign in to continue.
+
+    User-&gt;&gt;+Entra: Enters credentials (username/password).
+
+    Entra--&gt;&gt;Client: Here is your access token.
+
+    User--&gt;&gt;-Client: (Returns to the application)
+
+
+
+    Client-&gt;&gt;+Server: I need to use a tool. Here is my access token.
+
+    Server-&gt;&gt;+Entra: Is this access token valid?
+
+    Entra--&gt;&gt;-Server: Yes, it is.
+
+    Server--&gt;&gt;-Client: Token is valid. Here is the result of the tool.
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Introducing the Microsoft Authentication Library (MSAL)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before we dive into the code, it's important to introduce a key component you'll see in the examples: the <strong>Microsoft Authentication Library (MSAL)</strong>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MSAL is a library developed by Microsoft that makes it much easier for developers to handle authentication.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Instead of you having to write all the complex code to handle security tokens, manage sign-ins, and refresh sessions, MSAL takes care of the heavy lifting.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Using a library like MSAL is highly recommended because:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>It's Secure:</strong> It implements industry-standard protocols and security best practices, reducing the risk of vulnerabilities in your code.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>It Simplifies Development:</strong> It abstracts away the complexity of the OAuth 2.0 and OpenID Connect protocols, allowing you to add robust authentication to your application with just a few lines of code.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>It's Maintained:</strong> Microsoft actively maintains and updates MSAL to address new security threats and platform changes.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MSAL supports a wide variety of languages and application frameworks, including .NET, JavaScript/TypeScript, Python, Java, Go, and mobile platforms like iOS and Android.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This means you can use the same consistent authentication patterns across your entire technology stack.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To learn more about MSAL, you can check out the official <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/entra/identity-platform/msal-overview">MSAL overview documentation</a>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Securing Your MCP Server with Entra ID: A Step-by-Step Guide</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now, let's walk through how to secure a local MCP server (one that communicates over <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stdio</code>) using Entra ID.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This example uses a <strong>public client</strong>, which is suitable for applications running on a user's machine, like a desktop app or a local development server.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Scenario 1: Securing a Local MCP Server (with a Public Client)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this scenario, we'll look at an MCP server that runs locally, communicates over <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stdio</code>, and uses Entra ID to authenticate the user before allowing access to its tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The server will have a single tool that fetches the user's profile information from the Microsoft Graph API.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. Setting Up the Application in Entra ID</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before writing any code, you need to register your application in Microsoft Entra ID. This tells Entra ID about your application and grants it permission to use the authentication service.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Navigate to the <strong><a class="text-[var(--accent)] underline" href="https://entra.microsoft.com/">Microsoft Entra portal</a></strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Go to <strong>App registrations</strong> and click <strong>New registration</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Give your application a name (e.g., "My Local MCP Server").</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. For <strong>Supported account types</strong>, select <strong>Accounts in this organizational directory only</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. You can leave the <strong>Redirect URI</strong> blank for this example.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. Click <strong>Register</strong>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Once registered, take note of the <strong>Application (client) ID</strong> and <strong>Directory (tenant) ID</strong>. You'll need these in your code.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. The Code: A Breakdown</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's look at the key parts of the code that handle authentication.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The full code for this example is available in the <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers/tree/main/src/entra-id-local-wam">Entra ID - Local - WAM</a> folder of the <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers">mcp-auth-servers GitHub repository</a>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthenticationService.cs</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This class is responsible for handling the interaction with Entra ID.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">CreateAsync</code></strong>: This method initializes the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">PublicClientApplication</code> from the MSAL (Microsoft Authentication Library). It's configured with your application's <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">clientId</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tenantId</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">WithBroker</code></strong>: This enables the use of a broker (like the Windows Web Account Manager), which provides a more secure and seamless single sign-on experience.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AcquireTokenAsync</code></strong>: This is the core method. It first tries to get a token silently (meaning the user won't have to sign in again if they already have a valid session). If a silent token can't be acquired, it will prompt the user to sign in interactively.</li>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+public static async Task&lt;AuthenticationService&gt; CreateAsync(ILogger&lt;AuthenticationService&gt; logger)
+
+{
+
+    var msalClient = PublicClientApplicationBuilder
+
+        .Create(_clientId) // Your Application (client) ID
+
+        .WithAuthority(AadAuthorityAudience.AzureAdMyOrg)
+
+        .WithTenantId(_tenantId) // Your Directory (tenant) ID
+
+        .WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows))
+
+        .Build();
+
+
+
+    // ... cache registration ...
+
+
+
+    return new AuthenticationService(logger, msalClient);
+
+}
+
+
+
+public async Task&lt;string&gt; AcquireTokenAsync()
+
+{
+
+    try
+
+    {
+
+        // Try silent authentication first
+
+        var accounts = await _msalClient.GetAccountsAsync();
+
+        var account = accounts.FirstOrDefault();
+
+
+
+        AuthenticationResult? result = null;
+
+
+
+        if (account != null)
+
+        {
+
+            result = await _msalClient.AcquireTokenSilent(_scopes, account).ExecuteAsync();
+
+        }
+
+        else
+
+        {
+
+            // If no account, or silent fails, go interactive
+
+            result = await _msalClient.AcquireTokenInteractive(_scopes).ExecuteAsync();
+
+        }
+
+
+
+        return result.AccessToken;
+
+    }
+
+    catch (Exception ex)
+
+    {
+
+        _logger.LogError(ex, &quot;An error occurred while acquiring the token.&quot;);
+
+        throw; // Optionally rethrow the exception for higher-level handling
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Program.cs</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is where the MCP server is set up and the authentication service is integrated.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AddSingleton<AuthenticationService></code></strong>: This registers the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthenticationService</code> with the dependency injection container, so it can be used by other parts of the application (like our tool).</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GetUserDetailsFromGraph</code> tool</strong>: This tool requires an instance of <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthenticationService</code>. Before it does anything, it calls <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">authService.AcquireTokenAsync()</code> to get a valid access token. If authentication is successful, it uses the token to call the Microsoft Graph API and fetch the user's details.</li>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+[McpServerTool(Name = &quot;GetUserDetailsFromGraph&quot;)]
+
+public static async Task&lt;string&gt; GetUserDetailsFromGraph(
+
+    AuthenticationService authService)
+
+{
+
+    try
+
+    {
+
+        // This will trigger the authentication flow
+
+        var accessToken = await authService.AcquireTokenAsync();
+
+
+
+        // Use the token to create a GraphServiceClient
+
+        var graphClient = new GraphServiceClient(
+
+            new BaseBearerTokenAuthenticationProvider(new TokenProvider(authService)));
+
+
+
+        var user = await graphClient.Me.GetAsync();
+
+
+
+        return System.Text.Json.JsonSerializer.Serialize(user);
+
+    }
+
+    catch (Exception ex)
+
+    {
+
+        return $&quot;Error: {ex.Message}&quot;;
+
+    }
+
+}
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. How It All Works Together</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When the MCP client tries to use the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GetUserDetailsFromGraph</code> tool, the tool first calls <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AcquireTokenAsync</code>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AcquireTokenAsync</code> triggers the MSAL library to check for a valid token.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. If no token is found, MSAL, through the broker, will prompt the user to sign in with their Entra ID account.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Once the user signs in, Entra ID issues an access token.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. The tool receives the token and uses it to make a secure call to the Microsoft Graph API.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. The user's details are returned to the MCP client.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This process ensures that only authenticated users can use the tool, effectively securing your local MCP server.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Scenario 2: Securing a Remote MCP Server (with a Confidential Client)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When your MCP server is running on a remote machine (like a cloud server) and communicates over a protocol like HTTP Streaming, the security requirements are different.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this case, you should use a <strong>confidential client</strong> and the <strong>Authorization Code Flow</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This is a more secure method because the application's secrets are never exposed to the browser.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This example uses a TypeScript-based MCP server that uses Express.js to handle HTTP requests.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. Setting Up the Application in Entra ID</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The setup in Entra ID is similar to the public client, but with one key difference: you need to create a <strong>client secret</strong>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Navigate to the <strong><a class="text-[var(--accent)] underline" href="https://entra.microsoft.com/">Microsoft Entra portal</a></strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. In your app registration, go to the <strong>Certificates & secrets</strong> tab.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Click <strong>New client secret</strong>, give it a description, and click <strong>Add</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Important:</strong> Copy the secret value immediately. You will not be able to see it again.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You also need to configure a <strong>Redirect URI</strong>.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Go to the <strong>Authentication</strong> tab, click <strong>Add a platform</strong>, select <strong>Web</strong>, and enter the redirect URI for your application (e.g., <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:3001/auth/callback</code>).</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>⚠️ Important Security Note:</strong> For production applications, Microsoft strongly recommends using <strong>secretless authentication</strong> methods such as <strong>Managed Identity</strong> or <strong>Workload Identity Federation</strong> instead of client secrets.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Client secrets pose security risks as they can be exposed or compromised.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Managed identities provide a more secure approach by eliminating the need to store credentials in your code or configuration.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> For more information about managed identities and how to implement them, see the <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview">Managed identities for Azure resources overview</a>.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. The Code: A Breakdown</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This example uses a session-based approach.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When the user authenticates, the server stores the access token and refresh token in a session and gives the user a session token.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This session token is then used for subsequent requests.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The full code for this example is available in the <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers/tree/main/src/entra-id-cca-session">Entra ID - Confidential client</a> folder of the <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers">mcp-auth-servers GitHub repository</a>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Server.ts</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This file sets up the Express server and the MCP transport layer.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">requireBearerAuth</code></strong>: This is middleware that protects the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/sse</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/message</code> endpoints. It checks for a valid bearer token in the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> header of the request.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">EntraIdServerAuthProvider</code></strong>: This is a custom class that implements the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpServerAuthorizationProvider</code> interface. It's responsible for handling the OAuth 2.0 flow.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/auth/callback</code></strong>: This endpoint handles the redirect from Entra ID after the user has authenticated. It exchanges the authorization code for an access token and a refresh token.</li>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+const app = express();
+
+const { server } = createServer();
+
+const provider = new EntraIdServerAuthProvider();
+
+
+
+// Protect the SSE endpoint
+
+app.get(&quot;/sse&quot;, requireBearerAuth({
+
+  provider,
+
+  requiredScopes: [&quot;User.Read&quot;]
+
+}), async (req, res) =&gt; {
+
+  // ... connect to the transport ...
+
+});
+
+
+
+// Protect the message endpoint
+
+app.post(&quot;/message&quot;, requireBearerAuth({
+
+  provider,
+
+  requiredScopes: [&quot;User.Read&quot;]
+
+}), async (req, res) =&gt; {
+
+  // ... handle the message ...
+
+});
+
+
+
+// Handle the OAuth 2.0 callback
+
+app.get(&quot;/auth/callback&quot;, (req, res) =&gt; {
+
+  provider.handleCallback(req.query.code, req.query.state)
+
+    .then(result =&gt; {
+
+      // ... handle success or failure ...
+
+    });
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Tools.ts</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This file defines the tools that the MCP server provides.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getUserDetails</code> tool is similar to the one in the previous example, but it gets the access token from the session.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+server.setRequestHandler(CallToolRequestSchema, async (request) =&gt; {
+
+  const { name } = request.params;
+
+  const context = request.params?.context as { token?: string } | undefined;
+
+  const sessionToken = context?.token;
+
+
+
+  if (name === ToolName.GET_USER_DETAILS) {
+
+    if (!sessionToken) {
+
+      throw new AuthenticationError(&quot;Authentication token is missing or invalid. Ensure the token is provided in the request context.&quot;);
+
+    }
+
+
+
+    // Get the Entra ID token from the session store
+
+    const tokenData = tokenStore.getToken(sessionToken);
+
+    const entraIdToken = tokenData.accessToken;
+
+
+
+    const graphClient = Client.init({
+
+      authProvider: (done) =&gt; {
+
+        done(null, entraIdToken);
+
+      }
+
+    });
+
+
+
+    const user = await graphClient.api(&#x27;/me&#x27;).get();
+
+
+
+    // ... return user details ...
+
+  }
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">auth/EntraIdServerAuthProvider.ts</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This class handles the logic for:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Redirecting the user to the Entra ID sign-in page.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Exchanging the authorization code for an access token.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Storing the tokens in the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tokenStore</code>.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Refreshing the access token when it expires.</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. How It All Works Together</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When a user first tries to connect to the MCP server, the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">requireBearerAuth</code> middleware will see that they don't have a valid session and will redirect them to the Entra ID sign-in page.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. The user signs in with their Entra ID account.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Entra ID redirects the user back to the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/auth/callback</code> endpoint with an authorization code.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. The server exchanges the code for an access token and a refresh token, stores them, and creates a session token which is sent to the client.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. The client can now use this session token in the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> header for all future requests to the MCP server.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getUserDetails</code> tool is called, it uses the session token to look up the Entra ID access token and then uses that to call the Microsoft Graph API.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This flow is more complex than the public client flow, but is required for internet-facing endpoints.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Since remote MCP servers are accessible over the public internet, they need stronger security measures to protect against unauthorized access and potential attacks.</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Security Best Practices</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Always use HTTPS</strong>: Encrypt communication between the client and server to protect tokens from being intercepted.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement Role-Based Access Control (RBAC)</strong>: Don't just check *if* a user is authenticated; check *what* they are authorized to do. You can define roles in Entra ID and check for them in your MCP server.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Monitor and audit</strong>: Log all authentication events so you can detect and respond to suspicious activity.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Handle rate limiting and throttling</strong>: Microsoft Graph and other APIs implement rate limiting to prevent abuse. Implement exponential backoff and retry logic in your MCP server to gracefully handle HTTP 429 (Too Many Requests) responses. Consider caching frequently accessed data to reduce API calls.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Secure token storage</strong>: Store access tokens and refresh tokens securely. For local applications, use the system's secure storage mechanisms. For server applications, consider using encrypted storage or secure key management services like Azure Key Vault.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Token expiration handling</strong>: Access tokens have a limited lifetime. Implement automatic token refresh using refresh tokens to maintain seamless user experience without requiring re-authentication.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Consider using Azure API Management</strong>: While implementing security directly in your MCP server gives you fine-grained control, API Gateways like Azure API Management can handle many of these security concerns automatically, including authentication, authorization, rate limiting, and monitoring. They provide a centralized security layer that sits between your clients and your MCP servers. For more details on using API Gateways with MCP, see our <a class="text-[var(--accent)] underline" href="https://techcommunity.microsoft.com/blog/integrationsonazureblog/azure-api-management-your-auth-gateway-for-mcp-servers/4402690">Azure API Management Your Auth Gateway For MCP Servers</a>.</li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4"> Key Takeaways</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Securing your MCP server is crucial for protecting your data and tools.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Microsoft Entra ID provides a robust and scalable solution for authentication and authorization.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Use a <strong>public client</strong> for local applications and a <strong>confidential client</strong> for remote servers.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The <strong>Authorization Code Flow</strong> is the most secure option for web applications.</li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Exercise</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Think about an MCP server you might build. Would it be a local server or a remote server?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Based on your answer, would you use a public or confidential client?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. What permission would your MCP server request for performing actions against Microsoft Graph?</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Hands-on Exercises</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 1: Register an Application in Entra ID</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Navigate to the Microsoft Entra portal.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Register a new application for your MCP server.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Record the Application (client) ID and Directory (tenant) ID.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 2: Secure a Local MCP Server (Public Client)</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Follow the code example to integrate MSAL (Microsoft Authentication Library) for user authentication.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test the authentication flow by calling the MCP tool that fetches user details from Microsoft Graph.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 3: Secure a Remote MCP Server (Confidential Client)</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Register a confidential client in Entra ID and create a client secret.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure your Express.js MCP server to use the Authorization Code Flow.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test the protected endpoints and confirm token-based access.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exercise 4: Apply Security Best Practices</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enable HTTPS for your local or remote server.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement role-based access control (RBAC) in your server logic.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Add token expiration handling and secure token storage.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Resources</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>MSAL Overview Documentation</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Learn how the Microsoft Authentication Library (MSAL) enables secure token acquisition across platforms:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-gb/entra/msal/overview">MSAL Overview on Microsoft Learn</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Azure-Samples/mcp-auth-servers GitHub Repository</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Reference implementations of MCP servers demonstrating authentication flows:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers">Azure-Samples/mcp-auth-servers on GitHub</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Managed Identities for Azure Resources Overview</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Understand how to eliminate secrets by using system- or user-assigned managed identities:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/">Managed Identities Overview on Microsoft Learn</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Azure API Management: Your Auth Gateway for MCP Servers</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   A deep dive into using APIM as a secure OAuth2 gateway for MCP servers:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://techcommunity.microsoft.com/blog/integrationsonazureblog/azure-api-management-your-auth-gateway-for-mcp-servers/4402690">Azure API Management Your Auth Gateway For MCP Servers</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Microsoft Graph Permissions Reference</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Comprehensive list of delegated and application permissions for Microsoft Graph:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/zh-tw/graph/permissions-reference">Microsoft Graph Permissions Reference</a></p>
+
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Outcomes</h3>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this section, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Articulate why authentication is critical for MCP servers and AI workflows.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set up and configure Entra ID authentication for both local and remote MCP server scenarios.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Choose the appropriate client type (public or confidential) based on your server’s deployment.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement secure coding practices, including token storage and role-based authorization.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Confidently protect your MCP server and its tools from unauthorized access.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next </h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration/README.md" target="_blank">5.13 Model Context Protocol (MCP) Integration with Azure AI Foundry</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">AI 워크플로우 보안: 모델 컨텍스트 프로토콜 서버용 Entra ID 인증</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">소개</h3>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모델 컨텍스트 프로토콜(MCP) 서버를 보호하는 것은 집의 현관문을 잠그는 것만큼 중요합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버를 열어두면 도구와 데이터가 무단 접근에 노출되어 보안 사고로 이어질 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Microsoft Entra ID는 강력한 클라우드 기반 아이덴티티 및 접근 관리 솔루션을 제공하여, 권한이 있는 사용자와 애플리케이션만 MCP 서버와 상호작용할 수 있도록 도와줍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 섹션에서는 Entra ID 인증을 사용해 AI 워크플로우를 보호하는 방법을 배웁니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 섹션을 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버 보안의 중요성을 이해한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Microsoft Entra ID와 OAuth 2.0 인증의 기본 개념을 설명한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">공개 클라이언트와 기밀 클라이언트의 차이를 인식한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">로컬(공개 클라이언트) 및 원격(기밀 클라이언트) MCP 서버 시나리오에서 Entra ID 인증을 구현한다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI 워크플로우 개발 시 보안 모범 사례를 적용한다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">보안과 MCP</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">집의 현관문을 잠그지 않고 두지 않는 것처럼, MCP 서버도 누구나 접근할 수 있도록 열어두면 안 됩니다. AI 워크플로우를 안전하게 보호하는 것은 견고하고 신뢰할 수 있으며 안전한 애플리케이션을 만드는 데 필수적입니다. 이 장에서는 Microsoft Entra ID를 사용해 MCP 서버를 보호하는 방법을 소개하며, 권한이 있는 사용자와 애플리케이션만 도구와 데이터에 접근할 수 있도록 합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">MCP 서버 보안이 중요한 이유</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버에 이메일을 보내거나 고객 데이터베이스에 접근할 수 있는 도구가 있다고 가정해 보세요. 보안이 취약한 서버라면 누구나 그 도구를 사용할 수 있어 무단 데이터 접근, 스팸 발송, 기타 악의적 행위가 발생할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">인증을 구현하면 서버에 대한 모든 요청이 검증되어 요청을 하는 사용자나 애플리케이션의 신원을 확인할 수 있습니다. 이는 AI 워크플로우 보안의 첫 번째이자 가장 중요한 단계입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Microsoft Entra ID 소개</h3>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Entra ID를 사용하면 다음이 가능합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자에 대한 안전한 로그인 지원</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">API 및 서비스 보호</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">중앙에서 접근 정책 관리</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버의 경우, Entra ID는 서버 기능에 접근할 수 있는 사용자를 관리하는 강력하고 신뢰받는 솔루션을 제공합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">핵심 이해하기: Entra ID 인증 작동 원리</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Entra ID는 <strong>OAuth 2.0</strong> 같은 오픈 표준을 사용해 인증을 처리합니다. 세부 사항은 복잡할 수 있지만, 핵심 개념은 비유를 통해 쉽게 이해할 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">OAuth 2.0 간단 소개: 발렛 키</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">OAuth 2.0을 자동차 발렛 서비스에 비유해 보세요. 식당에 도착했을 때, 마스터 키를 발렛에게 주지 않고 제한된 권한만 가진 <strong>발렛 키</strong>를 줍니다. 이 키는 차를 시동 걸고 문을 잠글 수 있지만, 트렁크나 글러브 박스는 열 수 없습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 비유에서:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>당신</strong>은 <strong>사용자</strong>입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>당신의 차</strong>는 도구와 데이터가 있는 <strong>MCP 서버</strong>입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>발렛</strong>은 <strong>Microsoft Entra ID</strong>입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>주차 담당자</strong>는 서버에 접근하려는 <strong>MCP 클라이언트</strong>(애플리케이션)입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>발렛 키</strong>는 <strong>액세스 토큰</strong>입니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">액세스 토큰은 사용자가 로그인한 후 MCP 클라이언트가 Entra ID로부터 받는 안전한 문자열입니다. 클라이언트는 이 토큰을 매 요청 시 MCP 서버에 제시하며, 서버는 토큰을 검증해 요청이 합법적이고 필요한 권한이 있는지 확인합니다. 이 과정에서 실제 사용자 자격 증명(예: 비밀번호)을 다룰 필요가 없습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">인증 흐름</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">실제 과정은 다음과 같습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    actor User as 👤 User
+
+    participant Client as 🖥️ MCP Client
+
+    participant Entra as 🔐 Microsoft Entra ID
+
+    participant Server as 🔧 MCP Server
+
+
+
+    Client-&gt;&gt;+User: Please sign in to continue.
+
+    User-&gt;&gt;+Entra: Enters credentials (username/password).
+
+    Entra--&gt;&gt;Client: Here is your access token.
+
+    User--&gt;&gt;-Client: (Returns to the application)
+
+
+
+    Client-&gt;&gt;+Server: I need to use a tool. Here is my access token.
+
+    Server-&gt;&gt;+Entra: Is this access token valid?
+
+    Entra--&gt;&gt;-Server: Yes, it is.
+
+    Server--&gt;&gt;-Client: Token is valid. Here is the result of the tool.
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Microsoft 인증 라이브러리(MSAL) 소개</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">코드 예제를 살펴보기 전에 중요한 구성 요소인 <strong>Microsoft 인증 라이브러리(MSAL)</strong>를 소개합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MSAL은 개발자가 인증을 쉽게 처리할 수 있도록 Microsoft에서 만든 라이브러리입니다. 복잡한 보안 토큰 관리, 로그인 처리, 세션 갱신 코드를 직접 작성할 필요 없이 MSAL이 이를 대신 처리합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MSAL 사용을 권장하는 이유는:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>안전성:</strong> 업계 표준 프로토콜과 보안 모범 사례를 구현해 코드 취약점 위험을 줄입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>개발 간소화:</strong> OAuth 2.0과 OpenID Connect의 복잡함을 추상화해 몇 줄의 코드로 강력한 인증 기능을 추가할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>지속적 유지보수:</strong> Microsoft가 적극적으로 관리하며 새로운 보안 위협과 플랫폼 변화에 대응합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MSAL은 .NET, JavaScript/TypeScript, Python, Java, Go, iOS, Android 등 다양한 언어와 프레임워크를 지원해 전체 기술 스택에서 일관된 인증 패턴을 사용할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MSAL에 대해 더 알고 싶다면 공식 <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/entra/identity-platform/msal-overview">MSAL 개요 문서</a>를 참고하세요.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Entra ID로 MCP 서버 보호하기: 단계별 가이드</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 Entra ID를 사용해 로컬 MCP 서버(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stdio</code> 통신)를 보호하는 방법을 살펴보겠습니다. 이 예제는 사용자의 컴퓨터에서 실행되는 데스크톱 앱이나 로컬 개발 서버에 적합한 <strong>공개 클라이언트</strong>를 사용합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시나리오 1: 로컬 MCP 서버 보호 (공개 클라이언트)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 시나리오에서는 로컬에서 실행되고 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">stdio</code>로 통신하는 MCP 서버가 Entra ID로 사용자를 인증한 후 도구 접근을 허용하는 과정을 다룹니다. 서버에는 Microsoft Graph API에서 사용자 프로필 정보를 가져오는 단일 도구가 있습니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. Entra ID에서 애플리케이션 설정하기</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">코드를 작성하기 전에 Microsoft Entra ID에 애플리케이션을 등록해야 합니다. 이는 Entra ID에 애플리케이션 정보를 알려 인증 서비스를 사용할 권한을 부여하는 과정입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong><a class="text-[var(--accent)] underline" href="https://entra.microsoft.com/">Microsoft Entra 포털</a></strong>에 접속합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>앱 등록(App registrations)</strong>으로 이동해 <strong>새 등록(New registration)</strong>을 클릭합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 애플리케이션 이름(예: "My Local MCP Server")을 입력합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>지원되는 계정 유형(Supported account types)</strong>에서 <strong>이 조직 디렉터리의 계정만(Accounts in this organizational directory only)</strong>을 선택합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 이 예제에서는 <strong>리디렉션 URI(Redirect URI)</strong>를 비워둡니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <strong>등록(Register)</strong>을 클릭합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">등록 후 <strong>애플리케이션(클라이언트) ID</strong>와 <strong>디렉터리(테넌트) ID</strong>를 기록해 두세요. 코드에서 필요합니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. 코드 주요 부분 설명</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">인증을 처리하는 핵심 코드를 살펴보겠습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전체 코드는 <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers">mcp-auth-servers GitHub 저장소</a>의 <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers/tree/main/src/entra-id-local-wam">Entra ID - Local - WAM</a> 폴더에서 확인할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthenticationService.cs</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 클래스는 Entra ID와의 상호작용을 담당합니다.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">CreateAsync</code></strong>: MSAL의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">PublicClientApplication</code>을 초기화합니다. 애플리케이션의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">clientId</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tenantId</code>로 구성됩니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">WithBroker</code></strong>: Windows Web Account Manager 같은 브로커 사용을 활성화해 더 안전하고 원활한 싱글 사인온 경험을 제공합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AcquireTokenAsync</code></strong>: 핵심 메서드로, 먼저 조용히 토큰을 얻으려 시도합니다(이미 유효한 세션이 있으면 로그인 과정 없이 토큰 획득). 실패하면 사용자에게 로그인 창을 띄워 인증을 진행합니다.</li>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+public static async Task&lt;AuthenticationService&gt; CreateAsync(ILogger&lt;AuthenticationService&gt; logger)
+
+{
+
+    var msalClient = PublicClientApplicationBuilder
+
+        .Create(_clientId) // Your Application (client) ID
+
+        .WithAuthority(AadAuthorityAudience.AzureAdMyOrg)
+
+        .WithTenantId(_tenantId) // Your Directory (tenant) ID
+
+        .WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows))
+
+        .Build();
+
+
+
+    // ... cache registration ...
+
+
+
+    return new AuthenticationService(logger, msalClient);
+
+}
+
+
+
+public async Task&lt;string&gt; AcquireTokenAsync()
+
+{
+
+    try
+
+    {
+
+        // Try silent authentication first
+
+        var accounts = await _msalClient.GetAccountsAsync();
+
+        var account = accounts.FirstOrDefault();
+
+
+
+        AuthenticationResult? result = null;
+
+
+
+        if (account != null)
+
+        {
+
+            result = await _msalClient.AcquireTokenSilent(_scopes, account).ExecuteAsync();
+
+        }
+
+        else
+
+        {
+
+            // If no account, or silent fails, go interactive
+
+            result = await _msalClient.AcquireTokenInteractive(_scopes).ExecuteAsync();
+
+        }
+
+
+
+        return result.AccessToken;
+
+    }
+
+    catch (Exception ex)
+
+    {
+
+        _logger.LogError(ex, &quot;An error occurred while acquiring the token.&quot;);
+
+        throw; // Optionally rethrow the exception for higher-level handling
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Program.cs</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버를 설정하고 인증 서비스를 통합하는 부분입니다.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AddSingleton<AuthenticationService></code></strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthenticationService</code>를 의존성 주입 컨테이너에 등록해 다른 부분(예: 도구)에서 사용할 수 있게 합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GetUserDetailsFromGraph</code> 도구</strong>: 이 도구는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AuthenticationService</code> 인스턴스를 필요로 합니다. 실행 전에 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">authService.AcquireTokenAsync()</code>를 호출해 유효한 액세스 토큰을 얻습니다. 인증에 성공하면 토큰을 사용해 Microsoft Graph API를 호출해 사용자 정보를 가져옵니다.</li>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+[McpServerTool(Name = &quot;GetUserDetailsFromGraph&quot;)]
+
+public static async Task&lt;string&gt; GetUserDetailsFromGraph(
+
+    AuthenticationService authService)
+
+{
+
+    try
+
+    {
+
+        // This will trigger the authentication flow
+
+        var accessToken = await authService.AcquireTokenAsync();
+
+
+
+        // Use the token to create a GraphServiceClient
+
+        var graphClient = new GraphServiceClient(
+
+            new BaseBearerTokenAuthenticationProvider(new TokenProvider(authService)));
+
+
+
+        var user = await graphClient.Me.GetAsync();
+
+
+
+        return System.Text.Json.JsonSerializer.Serialize(user);
+
+    }
+
+    catch (Exception ex)
+
+    {
+
+        return $&quot;Error: {ex.Message}&quot;;
+
+    }
+
+}
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. 전체 동작 과정</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 클라이언트가 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">GetUserDetailsFromGraph</code> 도구를 사용하려 할 때, 도구는 먼저 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AcquireTokenAsync</code>를 호출합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">AcquireTokenAsync</code>는 MSAL 라이브러리를 통해 유효한 토큰이 있는지 확인합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 토큰이 없으면 MSAL이 브로커를 통해 사용자에게 Entra ID 계정으로 로그인하라는 창을 띄웁니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 사용자가 로그인하면 Entra ID가 액세스 토큰을 발급합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 도구는 토큰을 받아 Microsoft Graph API에 안전하게 요청을 보냅니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. 사용자 정보가 MCP 클라이언트에 반환됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 과정으로 인증된 사용자만 도구를 사용할 수 있어 로컬 MCP 서버가 안전하게 보호됩니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">시나리오 2: 원격 MCP 서버 보호 (기밀 클라이언트)</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버가 원격 머신(예: 클라우드 서버)에서 실행되고 HTTP 스트리밍 같은 프로토콜로 통신할 때는 보안 요구사항이 다릅니다. 이 경우 <strong>기밀 클라이언트</strong>와 <strong>Authorization Code Flow</strong>를 사용해야 합니다. 이 방법은 애플리케이션 비밀이 브라우저에 노출되지 않아 더 안전합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 예제는 Express.js를 사용해 HTTP 요청을 처리하는 TypeScript 기반 MCP 서버를 다룹니다.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. Entra ID에서 애플리케이션 설정하기</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">설정은 공개 클라이언트와 비슷하지만, <strong>클라이언트 비밀(client secret)</strong>을 생성해야 한다는 점이 다릅니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong><a class="text-[var(--accent)] underline" href="https://entra.microsoft.com/">Microsoft Entra 포털</a></strong>에 접속합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 앱 등록에서 <strong>인증서 및 비밀(Certificates & secrets)</strong> 탭으로 이동합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>새 클라이언트 비밀(New client secret)</strong>을 클릭하고 설명을 입력한 후 <strong>추가(Add)</strong>를 클릭합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>중요:</strong> 생성된 비밀 값을 즉시 복사하세요. 다시 볼 수 없습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>리디렉션 URI</strong>도 설정해야 합니다. <strong>인증(Authentication)</strong> 탭에서 <strong>플랫폼 추가(Add a platform)</strong>를 클릭하고 <strong>웹(Web)</strong>을 선택한 뒤 애플리케이션의 리디렉션 URI(예: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">http://localhost:3001/auth/callback</code>)를 입력합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> <strong>⚠️ 중요한 보안 참고:</strong> 운영 환경에서는 클라이언트 비밀 대신 <strong>Managed Identity</strong>나 <strong>Workload Identity Federation</strong> 같은 비밀 없는 인증 방식을 사용하는 것을 Microsoft가 강력히 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트 비밀은 노출되거나 탈취될 위험이 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">관리형 아이덴티티는 코드나 설정에 자격 증명을 저장할 필요가 없어 더 안전합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> 관리형 아이덴티티에 대한 자세한 내용과 구현 방법은 <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview">Azure 리소스용 관리형 아이덴티티 개요</a>를 참고하세요.</p>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. 코드 주요 부분 설명</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 예제는 세션 기반 방식을 사용합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">사용자가 인증하면 서버가 액세스 토큰과 갱신 토큰을 세션에 저장하고, 사용자에게 세션 토큰을 제공합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이후 요청에 이 세션 토큰을 사용합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">전체 코드는 <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers">mcp-auth-servers GitHub 저장소</a>의 <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers/tree/main/src/entra-id-cca-session">Entra ID - Confidential client</a> 폴더에서 확인할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Server.ts</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Express 서버와 MCP 전송 계층을 설정합니다.</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">requireBearerAuth</code></strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/sse</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/message</code> 엔드포인트를 보호하는 미들웨어입니다. 요청의 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> 헤더에 유효한 베어러 토큰이 있는지 확인합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">EntraIdServerAuthProvider</code></strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">McpServerAuthorizationProvider</code> 인터페이스를 구현한 커스텀 클래스입니다. OAuth 2.0 흐름을 처리합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/auth/callback</code></strong>: 사용자가 인증 후 Entra ID에서 리디렉션될 때 호출되는 엔드포인트입니다. 권한 코드를 액세스 토큰과 갱신 토큰으로 교환합니다.</li>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+const app = express();
+
+const { server } = createServer();
+
+const provider = new EntraIdServerAuthProvider();
+
+
+
+// Protect the SSE endpoint
+
+app.get(&quot;/sse&quot;, requireBearerAuth({
+
+  provider,
+
+  requiredScopes: [&quot;User.Read&quot;]
+
+}), async (req, res) =&gt; {
+
+  // ... connect to the transport ...
+
+});
+
+
+
+// Protect the message endpoint
+
+app.post(&quot;/message&quot;, requireBearerAuth({
+
+  provider,
+
+  requiredScopes: [&quot;User.Read&quot;]
+
+}), async (req, res) =&gt; {
+
+  // ... handle the message ...
+
+});
+
+
+
+// Handle the OAuth 2.0 callback
+
+app.get(&quot;/auth/callback&quot;, (req, res) =&gt; {
+
+  provider.handleCallback(req.query.code, req.query.state)
+
+    .then(result =&gt; {
+
+      // ... handle success or failure ...
+
+    });
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Tools.ts</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버가 제공하는 도구들을 정의합니다. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getUserDetails</code> 도구는 이전 예제와 비슷하지만, 액세스 토큰을 세션에서 가져옵니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// Simplified for clarity
+
+server.setRequestHandler(CallToolRequestSchema, async (request) =&gt; {
+
+  const { name } = request.params;
+
+  const context = request.params?.context as { token?: string } | undefined;
+
+  const sessionToken = context?.token;
+
+
+
+  if (name === ToolName.GET_USER_DETAILS) {
+
+    if (!sessionToken) {
+
+      throw new AuthenticationError(&quot;Authentication token is missing or invalid. Ensure the token is provided in the request context.&quot;);
+
+    }
+
+
+
+    // Get the Entra ID token from the session store
+
+    const tokenData = tokenStore.getToken(sessionToken);
+
+    const entraIdToken = tokenData.accessToken;
+
+
+
+    const graphClient = Client.init({
+
+      authProvider: (done) =&gt; {
+
+        done(null, entraIdToken);
+
+      }
+
+    });
+
+
+
+    const user = await graphClient.api(&#x27;/me&#x27;).get();
+
+
+
+    // ... return user details ...
+
+  }
+
+});
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">auth/EntraIdServerAuthProvider.ts</code></strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 클래스는 다음 로직을 처리합니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자를 Entra ID 로그인 페이지로 리디렉션</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">권한 코드를 액세스 토큰으로 교환</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰을 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">tokenStore</code>에 저장</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">액세스 토큰 만료 시 갱신</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. 전체 동작 과정</h5>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 사용자가 처음 MCP 서버에 연결하려 하면, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">requireBearerAuth</code> 미들웨어가 유효한 세션이 없음을 감지하고 Entra ID 로그인 페이지로 리디렉션합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 사용자가 Entra ID 계정으로 로그인합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Entra ID가 권한 코드를 포함해 사용자를 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">/auth/callback</code> 엔드포인트로 리디렉션합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. 서버는 코드를 액세스 토큰과 리프레시 토큰으로 교환하여 저장하고, 세션 토큰을 생성하여 클라이언트에 전송합니다.  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 클라이언트는 이제 이 세션 토큰을 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">Authorization</code> 헤더에 포함시켜 MCP 서버에 대한 모든 향후 요청에 사용할 수 있습니다.  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">6. <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getUserDetails</code> 도구가 호출되면 세션 토큰을 사용해 Entra ID 액세스 토큰을 조회하고, 이를 이용해 Microsoft Graph API를 호출합니다.  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 흐름은 공개 클라이언트 흐름보다 복잡하지만, 인터넷에 노출된 엔드포인트에는 필수적입니다. 원격 MCP 서버는 공용 인터넷을 통해 접근 가능하므로, 무단 접근과 잠재적 공격으로부터 보호하기 위해 더 강력한 보안 조치가 필요합니다.  </p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">보안 모범 사례</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>항상 HTTPS 사용</strong>: 클라이언트와 서버 간 통신을 암호화하여 토큰이 가로채이지 않도록 보호하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>역할 기반 접근 제어(RBAC) 구현</strong>: 사용자가 인증되었는지 여부뿐만 아니라, 어떤 권한이 있는지도 확인하세요. Entra ID에서 역할을 정의하고 MCP 서버에서 이를 검증할 수 있습니다.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>모니터링 및 감사</strong>: 모든 인증 이벤트를 기록하여 의심스러운 활동을 탐지하고 대응할 수 있도록 하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>요청 제한 및 스로틀링 처리</strong>: Microsoft Graph 및 기타 API는 남용을 방지하기 위해 요청 제한을 적용합니다. MCP 서버에서 지수 백오프 및 재시도 로직을 구현하여 HTTP 429(요청 과다) 응답을 우아하게 처리하세요. 자주 조회하는 데이터를 캐싱하여 API 호출을 줄이는 것도 고려하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>토큰 안전 저장</strong>: 액세스 토큰과 리프레시 토큰을 안전하게 저장하세요. 로컬 애플리케이션의 경우 시스템의 보안 저장소를 사용하고, 서버 애플리케이션은 암호화 저장소나 Azure Key Vault 같은 보안 키 관리 서비스를 활용하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>토큰 만료 처리</strong>: 액세스 토큰은 유효 기간이 제한되어 있습니다. 리프레시 토큰을 사용해 자동으로 토큰을 갱신하여 재인증 없이 원활한 사용자 경험을 유지하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Azure API Management 사용 고려</strong>: MCP 서버에 직접 보안을 구현하면 세밀한 제어가 가능하지만, Azure API Management 같은 API 게이트웨이는 인증, 권한 부여, 요청 제한, 모니터링 등 많은 보안 문제를 자동으로 처리해 줍니다. 클라이언트와 MCP 서버 사이에 중앙 집중식 보안 계층을 제공합니다. MCP와 API 게이트웨이 사용에 대한 자세한 내용은 <a class="text-[var(--accent)] underline" href="https://techcommunity.microsoft.com/blog/integrationsonazureblog/azure-api-management-your-auth-gateway-for-mcp-servers/4402690">Azure API Management Your Auth Gateway For MCP Servers</a>를 참고하세요.  </li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">주요 내용 정리</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버 보안은 데이터와 도구를 보호하는 데 매우 중요합니다.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Microsoft Entra ID는 강력하고 확장 가능한 인증 및 권한 부여 솔루션을 제공합니다.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">로컬 애플리케이션에는 <strong>공개 클라이언트</strong>, 원격 서버에는 <strong>비밀 클라이언트</strong>를 사용하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">웹 애플리케이션에는 <strong>Authorization Code Flow</strong>가 가장 안전한 옵션입니다.  </li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">연습 문제</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 여러분이 구축할 MCP 서버는 로컬 서버인가요, 원격 서버인가요?  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. 답변에 따라 공개 클라이언트 또는 비밀 클라이언트를 사용하시겠습니까?  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. Microsoft Graph에 대해 작업을 수행하기 위해 MCP 서버가 요청할 권한은 무엇인가요?  </p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">실습 과제</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연습 1: Entra ID에 애플리케이션 등록하기  </h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Microsoft Entra 포털로 이동하세요.  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버용 새 애플리케이션을 등록하세요.  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">애플리케이션(클라이언트) ID와 디렉터리(테넌트) ID를 기록하세요.  </p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연습 2: 로컬 MCP 서버 보안 설정 (공개 클라이언트)  </h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MSAL(Microsoft Authentication Library)을 통합하여 사용자 인증을 구현하는 코드 예제를 따라하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Microsoft Graph에서 사용자 세부 정보를 가져오는 MCP 도구를 호출하여 인증 흐름을 테스트하세요.  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연습 3: 원격 MCP 서버 보안 설정 (비밀 클라이언트)  </h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Entra ID에 비밀 클라이언트를 등록하고 클라이언트 시크릿을 생성하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Express.js MCP 서버를 Authorization Code Flow를 사용하도록 구성하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보호된 엔드포인트를 테스트하고 토큰 기반 접근을 확인하세요.  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">연습 4: 보안 모범 사례 적용하기  </h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">로컬 또는 원격 서버에 HTTPS를 활성화하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버 로직에 역할 기반 접근 제어(RBAC)를 구현하세요.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰 만료 처리 및 안전한 토큰 저장을 추가하세요.  </li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">참고 자료</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>MSAL 개요 문서</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Microsoft Authentication Library(MSAL)가 플랫폼 전반에서 안전한 토큰 획득을 어떻게 지원하는지 알아보세요:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-gb/entra/msal/overview">MSAL Overview on Microsoft Learn</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Azure-Samples/mcp-auth-servers GitHub 저장소</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   인증 흐름을 보여주는 MCP 서버 참조 구현 예제:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://github.com/Azure-Samples/mcp-auth-servers">Azure-Samples/mcp-auth-servers on GitHub</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Azure 리소스용 관리 ID 개요</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   시스템 또는 사용자 할당 관리 ID를 사용해 비밀 정보를 제거하는 방법을 이해하세요:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/">Managed Identities Overview on Microsoft Learn</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Azure API Management: MCP 서버용 인증 게이트웨이</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   MCP 서버를 위한 안전한 OAuth2 게이트웨이로 APIM을 사용하는 방법 심층 분석:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://techcommunity.microsoft.com/blog/integrationsonazureblog/azure-api-management-your-auth-gateway-for-mcp-servers/4402690">Azure API Management Your Auth Gateway For MCP Servers</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Microsoft Graph 권한 참조</strong>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   Microsoft Graph에 대한 위임 및 애플리케이션 권한의 포괄적 목록:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   <a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/zh-tw/graph/permissions-reference">Microsoft Graph Permissions Reference</a>  </p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표  </h3>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 섹션을 완료하면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버와 AI 워크플로우에서 인증이 왜 중요한지 설명할 수 있습니다.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">로컬 및 원격 MCP 서버 시나리오에 맞게 Entra ID 인증을 설정하고 구성할 수 있습니다.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버 배포 유형에 따라 적절한 클라이언트 유형(공개 또는 비밀)을 선택할 수 있습니다.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰 저장 및 역할 기반 권한 부여를 포함한 안전한 코딩 관행을 구현할 수 있습니다.  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버와 도구를 무단 접근으로부터 자신 있게 보호할 수 있습니다.  </li>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계  </h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-foundry-agent-integration/README.md" target="_blank">5.13 Model Context Protocol (MCP) Integration with Azure AI Foundry</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의하시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m05_10-511-realtime-web-search.html">&larr; 5.11 Realtime Web Search</a></span>
+  <span><a href="m05_12-513-azure-ai-foundry-agent-integration.html">5.13 Azure AI Foundry Agent Integration &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

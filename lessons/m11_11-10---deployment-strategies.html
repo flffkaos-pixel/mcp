@@ -1,0 +1,5317 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>10 - Deployment Strategies - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 10 - Deployment Strategies</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Deployment Strategies</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab provides comprehensive guidance on deploying your MCP retail server to production environments using modern containerization and cloud-native approaches.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll learn to deploy scalable, secure, and monitored MCP servers that can handle enterprise workloads.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Production deployment of MCP servers requires careful consideration of containerization, orchestration, security, scalability, and monitoring.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab covers deploying to Azure Container Apps with PostgreSQL Flexible Server, implementing CI/CD pipelines, and configuring auto-scaling for variable workloads.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The deployment strategies range from simple single-container deployments for development to sophisticated multi-region, auto-scaling production environments with comprehensive monitoring and security features.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Containerize</strong> MCP servers using Docker with multi-stage builds</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Deploy</strong> to Azure Container Apps with secure networking</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Configure</strong> production-grade PostgreSQL with high availability</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> CI/CD pipelines for automated deployment</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Scale</strong> applications automatically based on demand</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Monitor</strong> production deployments with comprehensive observability</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🐳 Docker Containerization</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Multi-Stage Dockerfile</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Dockerfile - Production-ready multi-stage build
+
+FROM python:3.11-slim AS builder
+
+
+
+# Set build environment
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+
+    PYTHONUNBUFFERED=1 \
+
+    PIP_NO_CACHE_DIR=1 \
+
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+
+
+# Install build dependencies
+
+RUN apt-get update &amp;&amp; apt-get install -y \
+
+    build-essential \
+
+    libpq-dev \
+
+    curl \
+
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+
+
+# Create virtual environment
+
+RUN python -m venv /opt/venv
+
+ENV PATH=&quot;/opt/venv/bin:$PATH&quot;
+
+
+
+# Copy requirements and install dependencies
+
+COPY requirements.lock.txt /tmp/
+
+RUN pip install --no-cache-dir -r /tmp/requirements.lock.txt
+
+
+
+# Production stage
+
+FROM python:3.11-slim AS production
+
+
+
+# Set production environment
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+
+    PYTHONUNBUFFERED=1 \
+
+    PATH=&quot;/opt/venv/bin:$PATH&quot; \
+
+    PYTHONPATH=&quot;/app&quot;
+
+
+
+# Install runtime dependencies
+
+RUN apt-get update &amp;&amp; apt-get install -y \
+
+    libpq5 \
+
+    curl \
+
+    &amp;&amp; rm -rf /var/lib/apt/lists/* \
+
+    &amp;&amp; groupadd -r mcp \
+
+    &amp;&amp; useradd -r -g mcp -d /app -s /bin/bash mcp
+
+
+
+# Copy virtual environment from builder
+
+COPY --from=builder /opt/venv /opt/venv
+
+
+
+# Set working directory and copy application
+
+WORKDIR /app
+
+COPY --chown=mcp:mcp . .
+
+
+
+# Create necessary directories with proper permissions
+
+RUN mkdir -p /app/logs /app/data /tmp/mcp \
+
+    &amp;&amp; chown -R mcp:mcp /app /tmp/mcp \
+
+    &amp;&amp; chmod -R 755 /app
+
+
+
+# Health check
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+
+    CMD python -m mcp_server.health_check || exit 1
+
+
+
+# Switch to non-root user
+
+USER mcp
+
+
+
+# Expose port
+
+EXPOSE 8000
+
+
+
+# Default command
+
+CMD [&quot;python&quot;, &quot;-m&quot;, &quot;mcp_server.main&quot;]
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Docker Compose for Development</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# docker-compose.yml - Development environment
+
+version: &#x27;3.8&#x27;
+
+
+
+services:
+
+  mcp-server:
+
+    build:
+
+      context: .
+
+      dockerfile: Dockerfile
+
+      target: production
+
+    ports:
+
+      - &quot;8000:8000&quot;
+
+    environment:
+
+      - POSTGRES_HOST=postgres
+
+      - POSTGRES_PORT=5432
+
+      - POSTGRES_DB=retail_db
+
+      - POSTGRES_USER=mcp_user
+
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      - PROJECT_ENDPOINT=${PROJECT_ENDPOINT}
+
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+
+      - LOG_LEVEL=INFO
+
+      - ENVIRONMENT=development
+
+    depends_on:
+
+      postgres:
+
+        condition: service_healthy
+
+    volumes:
+
+      - ./logs:/app/logs
+
+    networks:
+
+      - mcp-network
+
+    restart: unless-stopped
+
+    healthcheck:
+
+      test: [&quot;CMD&quot;, &quot;curl&quot;, &quot;-f&quot;, &quot;http://localhost:8000/health&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+      start_period: 60s
+
+
+
+  postgres:
+
+    image: pgvector/pgvector:pg16
+
+    environment:
+
+      - POSTGRES_DB=retail_db
+
+      - POSTGRES_USER=postgres
+
+      - POSTGRES_PASSWORD=${POSTGRES_ADMIN_PASSWORD}
+
+    ports:
+
+      - &quot;5432:5432&quot;
+
+    volumes:
+
+      - postgres_data:/var/lib/postgresql/data
+
+      - ./docker-init:/docker-entrypoint-initdb.d
+
+      - ./data:/backup
+
+    networks:
+
+      - mcp-network
+
+    restart: unless-stopped
+
+    healthcheck:
+
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U postgres -d retail_db&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+      start_period: 60s
+
+
+
+  redis:
+
+    image: redis:7-alpine
+
+    ports:
+
+      - &quot;6379:6379&quot;
+
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+    volumes:
+
+      - redis_data:/data
+
+    networks:
+
+      - mcp-network
+
+    restart: unless-stopped
+
+    healthcheck:
+
+      test: [&quot;CMD&quot;, &quot;redis-cli&quot;, &quot;--raw&quot;, &quot;incr&quot;, &quot;ping&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+
+
+volumes:
+
+  postgres_data:
+
+    driver: local
+
+  redis_data:
+
+    driver: local
+
+
+
+networks:
+
+  mcp-network:
+
+    driver: bridge
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Production Docker Compose</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# docker-compose.prod.yml - Production environment
+
+version: &#x27;3.8&#x27;
+
+
+
+services:
+
+  mcp-server:
+
+    image: ${CONTAINER_REGISTRY}/mcp-retail-server:${IMAGE_TAG}
+
+    ports:
+
+      - &quot;8000:8000&quot;
+
+    environment:
+
+      - POSTGRES_HOST=${POSTGRES_HOST}
+
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
+      - POSTGRES_DB=${POSTGRES_DB}
+
+      - POSTGRES_USER=${POSTGRES_USER}
+
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      - PROJECT_ENDPOINT=${PROJECT_ENDPOINT}
+
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+
+      - APPLICATIONINSIGHTS_CONNECTION_STRING=${APPLICATIONINSIGHTS_CONNECTION_STRING}
+
+      - LOG_LEVEL=INFO
+
+      - ENVIRONMENT=production
+
+      - REDIS_URL=${REDIS_URL}
+
+    deploy:
+
+      replicas: 3
+
+      resources:
+
+        limits:
+
+          cpus: &#x27;2.0&#x27;
+
+          memory: 2G
+
+        reservations:
+
+          cpus: &#x27;0.5&#x27;
+
+          memory: 512M
+
+      restart_policy:
+
+        condition: on-failure
+
+        delay: 5s
+
+        max_attempts: 3
+
+      update_config:
+
+        parallelism: 1
+
+        delay: 10s
+
+        failure_action: rollback
+
+    networks:
+
+      - mcp-network
+
+    healthcheck:
+
+      test: [&quot;CMD&quot;, &quot;curl&quot;, &quot;-f&quot;, &quot;http://localhost:8000/health&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+      start_period: 60s
+
+
+
+networks:
+
+  mcp-network:
+
+    external: true
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">☁️ Azure Container Apps Deployment</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Infrastructure as Code with Bicep</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// infra/container-apps.bicep - Azure Container Apps deployment
+
+@description(&#x27;Location for all resources&#x27;)
+
+param location string = resourceGroup().location
+
+
+
+@description(&#x27;Environment name&#x27;)
+
+param environmentName string
+
+
+
+@description(&#x27;Container App name&#x27;)
+
+param containerAppName string
+
+
+
+@description(&#x27;Container registry details&#x27;)
+
+param containerRegistry object
+
+
+
+@description(&#x27;Database connection details&#x27;)
+
+@secure()
+
+param databaseConnectionString string
+
+
+
+@description(&#x27;Azure OpenAI configuration&#x27;)
+
+param azureOpenAI object
+
+
+
+@description(&#x27;Application Insights workspace ID&#x27;)
+
+param workspaceId string
+
+
+
+// Container Apps Environment
+
+resource containerAppsEnvironment &#x27;Microsoft.App/managedEnvironments@2023-05-01&#x27; = {
+
+  name: &#x27;${environmentName}-env&#x27;
+
+  location: location
+
+  properties: {
+
+    appLogsConfiguration: {
+
+      destination: &#x27;log-analytics&#x27;
+
+      logAnalyticsConfiguration: {
+
+        customerId: workspaceId
+
+      }
+
+    }
+
+    infrastructureResourceGroup: &#x27;${environmentName}-infra-rg&#x27;
+
+  }
+
+}
+
+
+
+// Container App
+
+resource mcp_retail_server &#x27;Microsoft.App/containerApps@2023-05-01&#x27; = {
+
+  name: containerAppName
+
+  location: location
+
+  properties: {
+
+    managedEnvironmentId: containerAppsEnvironment.id
+
+    configuration: {
+
+      activeRevisionsMode: &#x27;Single&#x27;
+
+      ingress: {
+
+        external: false
+
+        targetPort: 8000
+
+        allowInsecure: false
+
+        traffic: [
+
+          {
+
+            weight: 100
+
+            latestRevision: true
+
+          }
+
+        ]
+
+      }
+
+      registries: [
+
+        {
+
+          server: containerRegistry.server
+
+          identity: containerRegistry.identity
+
+        }
+
+      ]
+
+      secrets: [
+
+        {
+
+          name: &#x27;database-connection-string&#x27;
+
+          value: databaseConnectionString
+
+        }
+
+        {
+
+          name: &#x27;azure-openai-key&#x27;
+
+          value: azureOpenAI.apiKey
+
+        }
+
+      ]
+
+    }
+
+    template: {
+
+      containers: [
+
+        {
+
+          name: &#x27;mcp-retail-server&#x27;
+
+          image: &#x27;${containerRegistry.server}/mcp-retail-server:latest&#x27;
+
+          resources: {
+
+            cpu: json(&#x27;1.0&#x27;)
+
+            memory: &#x27;2Gi&#x27;
+
+          }
+
+          env: [
+
+            {
+
+              name: &#x27;POSTGRES_CONNECTION_STRING&#x27;
+
+              secretRef: &#x27;database-connection-string&#x27;
+
+            }
+
+            {
+
+              name: &#x27;PROJECT_ENDPOINT&#x27;
+
+              value: azureOpenAI.endpoint
+
+            }
+
+            {
+
+              name: &#x27;AZURE_OPENAI_API_KEY&#x27;
+
+              secretRef: &#x27;azure-openai-key&#x27;
+
+            }
+
+            {
+
+              name: &#x27;LOG_LEVEL&#x27;
+
+              value: &#x27;INFO&#x27;
+
+            }
+
+            {
+
+              name: &#x27;ENVIRONMENT&#x27;
+
+              value: &#x27;production&#x27;
+
+            }
+
+          ]
+
+          probes: [
+
+            {
+
+              type: &#x27;Liveness&#x27;
+
+              httpGet: {
+
+                path: &#x27;/health&#x27;
+
+                port: 8000
+
+                scheme: &#x27;HTTP&#x27;
+
+              }
+
+              initialDelaySeconds: 60
+
+              periodSeconds: 30
+
+              timeoutSeconds: 10
+
+              failureThreshold: 3
+
+            }
+
+            {
+
+              type: &#x27;Readiness&#x27;
+
+              httpGet: {
+
+                path: &#x27;/ready&#x27;
+
+                port: 8000
+
+                scheme: &#x27;HTTP&#x27;
+
+              }
+
+              initialDelaySeconds: 30
+
+              periodSeconds: 10
+
+              timeoutSeconds: 5
+
+              failureThreshold: 3
+
+            }
+
+          ]
+
+        }
+
+      ]
+
+      scale: {
+
+        minReplicas: 2
+
+        maxReplicas: 20
+
+        rules: [
+
+          {
+
+            name: &#x27;http-scaling&#x27;
+
+            http: {
+
+              metadata: {
+
+                concurrentRequests: &#x27;10&#x27;
+
+              }
+
+            }
+
+          }
+
+          {
+
+            name: &#x27;cpu-scaling&#x27;
+
+            custom: {
+
+              type: &#x27;cpu&#x27;
+
+              metadata: {
+
+                type: &#x27;Utilization&#x27;
+
+                value: &#x27;70&#x27;
+
+              }
+
+            }
+
+          }
+
+        ]
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+// Output the FQDN
+
+output containerAppFQDN string = mcp_retail_server.properties.configuration.ingress.fqdn
+
+output containerAppId string = mcp_retail_server.id
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">PostgreSQL Flexible Server</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// infra/database.bicep - PostgreSQL Flexible Server
+
+@description(&#x27;Location for all resources&#x27;)
+
+param location string = resourceGroup().location
+
+
+
+@description(&#x27;PostgreSQL server name&#x27;)
+
+param serverName string
+
+
+
+@description(&#x27;Database administrator login&#x27;)
+
+param administratorLogin string
+
+
+
+@description(&#x27;Database administrator password&#x27;)
+
+@secure()
+
+param administratorPassword string
+
+
+
+@description(&#x27;Virtual network subnet ID&#x27;)
+
+param subnetId string
+
+
+
+@description(&#x27;Private DNS zone ID&#x27;)
+
+param privateDnsZoneId string
+
+
+
+// PostgreSQL Flexible Server
+
+resource postgresqlServer &#x27;Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview&#x27; = {
+
+  name: serverName
+
+  location: location
+
+  sku: {
+
+    name: &#x27;Standard_D4s_v3&#x27;
+
+    tier: &#x27;GeneralPurpose&#x27;
+
+  }
+
+  properties: {
+
+    administratorLogin: administratorLogin
+
+    administratorLoginPassword: administratorPassword
+
+    version: &#x27;16&#x27;
+
+    storage: {
+
+      storageSizeGB: 128
+
+      autoGrow: &#x27;Enabled&#x27;
+
+      type: &#x27;PremiumSSD&#x27;
+
+    }
+
+    backup: {
+
+      backupRetentionDays: 35
+
+      geoRedundantBackup: &#x27;Enabled&#x27;
+
+    }
+
+    highAvailability: {
+
+      mode: &#x27;ZoneRedundant&#x27;
+
+    }
+
+    network: {
+
+      delegatedSubnetResourceId: subnetId
+
+      privateDnsZoneArmResourceId: privateDnsZoneId
+
+    }
+
+    maintenanceWindow: {
+
+      dayOfWeek: 0
+
+      startHour: 2
+
+      startMinute: 0
+
+    }
+
+  }
+
+}
+
+
+
+// Database
+
+resource retailDatabase &#x27;Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-03-01-preview&#x27; = {
+
+  parent: postgresqlServer
+
+  name: &#x27;retail_db&#x27;
+
+  properties: {
+
+    charset: &#x27;UTF8&#x27;
+
+    collation: &#x27;en_US.utf8&#x27;
+
+  }
+
+}
+
+
+
+// PostgreSQL extensions
+
+resource pgvectorExtension &#x27;Microsoft.DBforPostgreSQL/flexibleServers/configurations@2023-03-01-preview&#x27; = {
+
+  parent: postgresqlServer
+
+  name: &#x27;shared_preload_libraries&#x27;
+
+  properties: {
+
+    value: &#x27;pg_stat_statements,pgaudit,vector&#x27;
+
+    source: &#x27;user-override&#x27;
+
+  }
+
+}
+
+
+
+// Output connection details
+
+output serverFQDN string = postgresqlServer.properties.fullyQualifiedDomainName
+
+output serverId string = postgresqlServer.id
+
+output databaseName string = retailDatabase.name
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 CI/CD Pipeline Configuration</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">GitHub Actions Workflow</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# .github/workflows/deploy.yml - CI/CD pipeline
+
+name: Deploy MCP Retail Server
+
+
+
+on:
+
+  push:
+
+    branches: [main]
+
+  pull_request:
+
+    branches: [main]
+
+  workflow_dispatch:
+
+    inputs:
+
+      environment:
+
+        description: &#x27;Deployment environment&#x27;
+
+        required: true
+
+        default: &#x27;development&#x27;
+
+        type: choice
+
+        options:
+
+          - development
+
+          - staging
+
+          - production
+
+
+
+env:
+
+  CONTAINER_REGISTRY: mcpretailregistry.azurecr.io
+
+  IMAGE_NAME: mcp-retail-server
+
+  AZURE_RESOURCE_GROUP: mcp-retail-rg
+
+
+
+jobs:
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    services:
+
+      postgres:
+
+        image: pgvector/pgvector:pg16
+
+        env:
+
+          POSTGRES_PASSWORD: postgres
+
+          POSTGRES_DB: retail_test
+
+        options: &gt;-
+
+          --health-cmd pg_isready
+
+          --health-interval 10s
+
+          --health-timeout 5s
+
+          --health-retries 5
+
+        ports:
+
+          - 5432:5432
+
+
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Set up Python
+
+        uses: actions/setup-python@v4
+
+        with:
+
+          python-version: &#x27;3.11&#x27;
+
+          cache: &#x27;pip&#x27;
+
+
+
+      - name: Install dependencies
+
+        run: |
+
+          python -m pip install --upgrade pip
+
+          pip install -r requirements.lock.txt
+
+          pip install pytest pytest-cov pytest-asyncio
+
+
+
+      - name: Set up test database
+
+        run: |
+
+          PGPASSWORD=postgres psql -h localhost -U postgres -d retail_test -f scripts/create_schema.sql
+
+          python scripts/generate_sample_data.py --test
+
+        env:
+
+          POSTGRES_HOST: localhost
+
+          POSTGRES_PORT: 5432
+
+          POSTGRES_DB: retail_test
+
+          POSTGRES_USER: postgres
+
+          POSTGRES_PASSWORD: postgres
+
+
+
+      - name: Run tests
+
+        run: |
+
+          pytest tests/ -v --cov=mcp_server --cov-report=xml --cov-report=html
+
+        env:
+
+          POSTGRES_HOST: localhost
+
+          POSTGRES_PORT: 5432
+
+          POSTGRES_DB: retail_test
+
+          POSTGRES_USER: postgres
+
+          POSTGRES_PASSWORD: postgres
+
+          PROJECT_ENDPOINT: ${{ secrets.TEST_PROJECT_ENDPOINT }}
+
+          AZURE_CLIENT_ID: ${{ secrets.TEST_AZURE_CLIENT_ID }}
+
+          AZURE_CLIENT_SECRET: ${{ secrets.TEST_AZURE_CLIENT_SECRET }}
+
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+
+
+      - name: Upload coverage reports
+
+        uses: codecov/codecov-action@v3
+
+        with:
+
+          file: ./coverage.xml
+
+          flags: unittests
+
+
+
+  security-scan:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Run Trivy vulnerability scanner
+
+        uses: aquasecurity/trivy-action@master
+
+        with:
+
+          scan-type: &#x27;fs&#x27;
+
+          scan-ref: &#x27;.&#x27;
+
+          format: &#x27;sarif&#x27;
+
+          output: &#x27;trivy-results.sarif&#x27;
+
+
+
+      - name: Upload Trivy scan results
+
+        uses: github/codeql-action/upload-sarif@v2
+
+        with:
+
+          sarif_file: &#x27;trivy-results.sarif&#x27;
+
+
+
+      - name: Run Bandit security linter
+
+        run: |
+
+          pip install bandit[toml]
+
+          bandit -r mcp_server/ -f json -o bandit-report.json
+
+
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    needs: [test, security-scan]
+
+    if: github.event_name == &#x27;push&#x27; || github.event_name == &#x27;workflow_dispatch&#x27;
+
+    
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Azure Login
+
+        uses: azure/login@v1
+
+        with:
+
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+
+      - name: Build and push Docker image
+
+        uses: azure/docker-login@v1
+
+        with:
+
+          login-server: ${{ env.CONTAINER_REGISTRY }}
+
+          username: ${{ secrets.REGISTRY_USERNAME }}
+
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+
+
+      - name: Build, tag, and push image
+
+        run: |
+
+          # Generate unique tag
+
+          IMAGE_TAG=&quot;${GITHUB_SHA::8}-$(date +%s)&quot;
+
+          
+
+          # Build image
+
+          docker build \
+
+            --target production \
+
+            --tag $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG \
+
+            --tag $CONTAINER_REGISTRY/$IMAGE_NAME:latest \
+
+            .
+
+          
+
+          # Push images
+
+          docker push $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+
+          docker push $CONTAINER_REGISTRY/$IMAGE_NAME:latest
+
+          
+
+          # Save tag for deployment
+
+          echo &quot;IMAGE_TAG=$IMAGE_TAG&quot; &gt;&gt; $GITHUB_ENV
+
+
+
+      - name: Output image details
+
+        run: |
+
+          echo &quot;Built and pushed image: $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG&quot;
+
+
+
+  deploy-staging:
+
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    if: github.event_name == &#x27;push&#x27; &amp;&amp; github.ref == &#x27;refs/heads/main&#x27;
+
+    environment: staging
+
+
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Azure Login
+
+        uses: azure/login@v1
+
+        with:
+
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+
+      - name: Deploy to staging
+
+        uses: azure/CLI@v1
+
+        with:
+
+          azcliversion: latest
+
+          inlineScript: |
+
+            # Deploy infrastructure
+
+            az deployment group create \
+
+              --resource-group $AZURE_RESOURCE_GROUP-staging \
+
+              --template-file infra/main.bicep \
+
+              --parameters infra/main.parameters.staging.json \
+
+              --parameters containerImageTag=$IMAGE_TAG
+
+
+
+            # Update container app
+
+            az containerapp update \
+
+              --name mcp-retail-server-staging \
+
+              --resource-group $AZURE_RESOURCE_GROUP-staging \
+
+              --image $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+
+
+
+      - name: Run integration tests
+
+        run: |
+
+          # Wait for deployment to be ready
+
+          sleep 60
+
+          
+
+          # Run integration tests against staging
+
+          pytest tests/integration/ \
+
+            --endpoint https://mcp-retail-server-staging.azurecontainerapps.io \
+
+            --timeout 300
+
+
+
+  deploy-production:
+
+    runs-on: ubuntu-latest
+
+    needs: [build, deploy-staging]
+
+    if: github.event_name == &#x27;workflow_dispatch&#x27; &amp;&amp; github.event.inputs.environment == &#x27;production&#x27;
+
+    environment: production
+
+
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Azure Login
+
+        uses: azure/login@v1
+
+        with:
+
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+
+      - name: Deploy to production
+
+        uses: azure/CLI@v1
+
+        with:
+
+          azcliversion: latest
+
+          inlineScript: |
+
+            # Deploy with blue-green strategy
+
+            az deployment group create \
+
+              --resource-group $AZURE_RESOURCE_GROUP-prod \
+
+              --template-file infra/main.bicep \
+
+              --parameters infra/main.parameters.prod.json \
+
+              --parameters containerImageTag=$IMAGE_TAG \
+
+              --parameters deploymentSlot=green
+
+
+
+            # Health check
+
+            az containerapp show \
+
+              --name mcp-retail-server-prod-green \
+
+              --resource-group $AZURE_RESOURCE_GROUP-prod
+
+
+
+            # Switch traffic (blue-green deployment)
+
+            az containerapp ingress traffic set \
+
+              --name mcp-retail-server-prod \
+
+              --resource-group $AZURE_RESOURCE_GROUP-prod \
+
+              --revision-weight latest=100
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure DevOps Pipeline</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# azure-pipelines.yml - Azure DevOps pipeline
+
+trigger:
+
+  branches:
+
+    include:
+
+      - main
+
+      - develop
+
+  paths:
+
+    exclude:
+
+      - docs/*
+
+      - README.md
+
+
+
+variables:
+
+  containerRegistry: &#x27;mcpretailregistry.azurecr.io&#x27;
+
+  imageName: &#x27;mcp-retail-server&#x27;
+
+  imageTag: &#x27;$(Build.BuildId)&#x27;
+
+  azureServiceConnection: &#x27;azure-service-connection&#x27;
+
+
+
+stages:
+
+  - stage: Build
+
+    displayName: &#x27;Build and Test&#x27;
+
+    jobs:
+
+      - job: Test
+
+        displayName: &#x27;Run Tests&#x27;
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+        
+
+        services:
+
+          postgres:
+
+            image: pgvector/pgvector:pg16
+
+            env:
+
+              POSTGRES_PASSWORD: postgres
+
+              POSTGRES_DB: retail_test
+
+            ports:
+
+              5432:5432
+
+
+
+        steps:
+
+          - task: UsePythonVersion@0
+
+            inputs:
+
+              versionSpec: &#x27;3.11&#x27;
+
+              displayName: &#x27;Use Python 3.11&#x27;
+
+
+
+          - script: |
+
+              python -m pip install --upgrade pip
+
+              pip install -r requirements.lock.txt
+
+              pip install pytest pytest-cov pytest-asyncio
+
+            displayName: &#x27;Install dependencies&#x27;
+
+
+
+          - script: |
+
+              PGPASSWORD=postgres psql -h localhost -U postgres -d retail_test -f scripts/create_schema.sql
+
+              python scripts/generate_sample_data.py --test
+
+            displayName: &#x27;Set up test database&#x27;
+
+            env:
+
+              POSTGRES_HOST: localhost
+
+              POSTGRES_PORT: 5432
+
+              POSTGRES_DB: retail_test
+
+              POSTGRES_USER: postgres
+
+              POSTGRES_PASSWORD: postgres
+
+
+
+          - script: |
+
+              pytest tests/ -v --cov=mcp_server --cov-report=xml --junitxml=test-results.xml
+
+            displayName: &#x27;Run tests&#x27;
+
+            env:
+
+              POSTGRES_HOST: localhost
+
+              POSTGRES_PORT: 5432
+
+              POSTGRES_DB: retail_test
+
+              POSTGRES_USER: postgres
+
+              POSTGRES_PASSWORD: postgres
+
+
+
+          - task: PublishTestResults@2
+
+            condition: succeededOrFailed()
+
+            inputs:
+
+              testResultsFiles: &#x27;test-results.xml&#x27;
+
+              testRunTitle: &#x27;Python Tests&#x27;
+
+
+
+          - task: PublishCodeCoverageResults@1
+
+            inputs:
+
+              codeCoverageTool: &#x27;Cobertura&#x27;
+
+              summaryFileLocation: &#x27;coverage.xml&#x27;
+
+
+
+      - job: Build
+
+        displayName: &#x27;Build Docker Image&#x27;
+
+        dependsOn: Test
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+
+
+        steps:
+
+          - task: AzureCLI@2
+
+            displayName: &#x27;Build and push Docker image&#x27;
+
+            inputs:
+
+              azureSubscription: $(azureServiceConnection)
+
+              scriptType: &#x27;bash&#x27;
+
+              scriptLocation: &#x27;inlineScript&#x27;
+
+              inlineScript: |
+
+                # Login to container registry
+
+                az acr login --name $(containerRegistry)
+
+                
+
+                # Build and push image
+
+                docker build \
+
+                  --target production \
+
+                  --tag $(containerRegistry)/$(imageName):$(imageTag) \
+
+                  --tag $(containerRegistry)/$(imageName):latest \
+
+                  .
+
+                
+
+                docker push $(containerRegistry)/$(imageName):$(imageTag)
+
+                docker push $(containerRegistry)/$(imageName):latest
+
+
+
+  - stage: Deploy_Staging
+
+    displayName: &#x27;Deploy to Staging&#x27;
+
+    dependsOn: Build
+
+    condition: and(succeeded(), eq(variables[&#x27;Build.SourceBranch&#x27;], &#x27;refs/heads/main&#x27;))
+
+    
+
+    jobs:
+
+      - deployment: DeployStaging
+
+        displayName: &#x27;Deploy to Staging Environment&#x27;
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+        environment: &#x27;staging&#x27;
+
+        
+
+        strategy:
+
+          runOnce:
+
+            deploy:
+
+              steps:
+
+                - task: AzureCLI@2
+
+                  displayName: &#x27;Deploy infrastructure&#x27;
+
+                  inputs:
+
+                    azureSubscription: $(azureServiceConnection)
+
+                    scriptType: &#x27;bash&#x27;
+
+                    scriptLocation: &#x27;inlineScript&#x27;
+
+                    inlineScript: |
+
+                      az deployment group create \
+
+                        --resource-group mcp-retail-staging-rg \
+
+                        --template-file infra/main.bicep \
+
+                        --parameters infra/main.parameters.staging.json \
+
+                        --parameters containerImageTag=$(imageTag)
+
+
+
+  - stage: Deploy_Production
+
+    displayName: &#x27;Deploy to Production&#x27;
+
+    dependsOn: Deploy_Staging
+
+    condition: and(succeeded(), eq(variables[&#x27;Build.Reason&#x27;], &#x27;Manual&#x27;))
+
+    
+
+    jobs:
+
+      - deployment: DeployProduction
+
+        displayName: &#x27;Deploy to Production Environment&#x27;
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+        environment: &#x27;production&#x27;
+
+        
+
+        strategy:
+
+          runOnce:
+
+            deploy:
+
+              steps:
+
+                - task: AzureCLI@2
+
+                  displayName: &#x27;Deploy to production&#x27;
+
+                  inputs:
+
+                    azureSubscription: $(azureServiceConnection)
+
+                    scriptType: &#x27;bash&#x27;
+
+                    scriptLocation: &#x27;inlineScript&#x27;
+
+                    inlineScript: |
+
+                      az deployment group create \
+
+                        --resource-group mcp-retail-prod-rg \
+
+                        --template-file infra/main.bicep \
+
+                        --parameters infra/main.parameters.prod.json \
+
+                        --parameters containerImageTag=$(imageTag)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 Scaling and Performance</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Auto-scaling Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# k8s/hpa.yaml - Horizontal Pod Autoscaler for Kubernetes
+
+apiVersion: autoscaling/v2
+
+kind: HorizontalPodAutoscaler
+
+metadata:
+
+  name: mcp-retail-server-hpa
+
+  namespace: mcp-retail
+
+spec:
+
+  scaleTargetRef:
+
+    apiVersion: apps/v1
+
+    kind: Deployment
+
+    name: mcp-retail-server
+
+  minReplicas: 3
+
+  maxReplicas: 50
+
+  metrics:
+
+    - type: Resource
+
+      resource:
+
+        name: cpu
+
+        target:
+
+          type: Utilization
+
+          averageUtilization: 70
+
+    - type: Resource
+
+      resource:
+
+        name: memory
+
+        target:
+
+          type: Utilization
+
+          averageUtilization: 80
+
+    - type: Pods
+
+      pods:
+
+        metric:
+
+          name: http_requests_per_second
+
+        target:
+
+          type: AverageValue
+
+          averageValue: 100
+
+  behavior:
+
+    scaleDown:
+
+      stabilizationWindowSeconds: 300
+
+      policies:
+
+        - type: Percent
+
+          value: 50
+
+          periodSeconds: 60
+
+    scaleUp:
+
+      stabilizationWindowSeconds: 60
+
+      policies:
+
+        - type: Percent
+
+          value: 100
+
+          periodSeconds: 30
+
+        - type: Pods
+
+          value: 5
+
+          periodSeconds: 30
+
+      selectPolicy: Max
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Performance Monitoring</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/monitoring/performance.py
+
+&quot;&quot;&quot;
+
+Performance monitoring and metrics collection for production deployment.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import time
+
+import psutil
+
+from typing import Dict, Any
+
+from dataclasses import dataclass
+
+from datetime import datetime, timedelta
+
+import logging
+
+
+
+@dataclass
+
+class PerformanceMetrics:
+
+    &quot;&quot;&quot;Performance metrics data structure.&quot;&quot;&quot;
+
+    timestamp: datetime
+
+    cpu_percent: float
+
+    memory_percent: float
+
+    memory_used_mb: float
+
+    active_connections: int
+
+    request_rate: float
+
+    avg_response_time: float
+
+    error_rate: float
+
+    database_connections: int
+
+
+
+class PerformanceMonitor:
+
+    &quot;&quot;&quot;Monitor and collect performance metrics.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, config):
+
+        self.config = config
+
+        self.logger = logging.getLogger(__name__)
+
+        
+
+        # Metrics collection
+
+        self.metrics_history = []
+
+        self.request_times = []
+
+        self.error_count = 0
+
+        self.request_count = 0
+
+        
+
+        # Database monitoring
+
+        self.db_pool = None
+
+        
+
+    async def start_monitoring(self):
+
+        &quot;&quot;&quot;Start continuous performance monitoring.&quot;&quot;&quot;
+
+        
+
+        self.logger.info(&quot;Starting performance monitoring&quot;)
+
+        
+
+        # Start metrics collection task
+
+        asyncio.create_task(self._collect_metrics_loop())
+
+        asyncio.create_task(self._cleanup_old_metrics())
+
+        
+
+    async def _collect_metrics_loop(self):
+
+        &quot;&quot;&quot;Continuously collect performance metrics.&quot;&quot;&quot;
+
+        
+
+        while True:
+
+            try:
+
+                metrics = await self._collect_current_metrics()
+
+                self.metrics_history.append(metrics)
+
+                
+
+                # Log critical metrics
+
+                if metrics.cpu_percent &gt; 90:
+
+                    self.logger.warning(f&quot;High CPU usage: {metrics.cpu_percent:.1f}%&quot;)
+
+                
+
+                if metrics.memory_percent &gt; 90:
+
+                    self.logger.warning(f&quot;High memory usage: {metrics.memory_percent:.1f}%&quot;)
+
+                
+
+                if metrics.error_rate &gt; 0.05:  # 5% error rate
+
+                    self.logger.warning(f&quot;High error rate: {metrics.error_rate:.2%}&quot;)
+
+                
+
+                await asyncio.sleep(30)  # Collect every 30 seconds
+
+                
+
+            except Exception as e:
+
+                self.logger.error(f&quot;Error collecting metrics: {e}&quot;)
+
+                await asyncio.sleep(60)
+
+    
+
+    async def _collect_current_metrics(self) -&gt; PerformanceMetrics:
+
+        &quot;&quot;&quot;Collect current system metrics.&quot;&quot;&quot;
+
+        
+
+        # System metrics
+
+        cpu_percent = psutil.cpu_percent(interval=1)
+
+        memory = psutil.virtual_memory()
+
+        
+
+        # Application metrics
+
+        current_time = datetime.utcnow()
+
+        recent_requests = [
+
+            req_time for req_time in self.request_times
+
+            if current_time - req_time &lt; timedelta(minutes=1)
+
+        ]
+
+        
+
+        request_rate = len(recent_requests) / 60.0  # requests per second
+
+        
+
+        # Calculate average response time
+
+        avg_response_time = 0.0
+
+        if hasattr(self, &#x27;_recent_response_times&#x27;):
+
+            recent_response_times = [
+
+                rt for rt in self._recent_response_times
+
+                if current_time - rt[&#x27;timestamp&#x27;] &lt; timedelta(minutes=5)
+
+            ]
+
+            if recent_response_times:
+
+                avg_response_time = sum(rt[&#x27;time&#x27;] for rt in recent_response_times) / len(recent_response_times)
+
+        
+
+        # Error rate calculation
+
+        error_rate = 0.0
+
+        if self.request_count &gt; 0:
+
+            error_rate = self.error_count / self.request_count
+
+        
+
+        # Database connections
+
+        db_connections = 0
+
+        if self.db_pool:
+
+            db_connections = len(self.db_pool._holders)
+
+        
+
+        return PerformanceMetrics(
+
+            timestamp=current_time,
+
+            cpu_percent=cpu_percent,
+
+            memory_percent=memory.percent,
+
+            memory_used_mb=memory.used / (1024 * 1024),
+
+            active_connections=0,  # To be implemented with connection tracking
+
+            request_rate=request_rate,
+
+            avg_response_time=avg_response_time,
+
+            error_rate=error_rate,
+
+            database_connections=db_connections
+
+        )
+
+    
+
+    async def _cleanup_old_metrics(self):
+
+        &quot;&quot;&quot;Clean up old metrics to prevent memory leaks.&quot;&quot;&quot;
+
+        
+
+        while True:
+
+            try:
+
+                cutoff_time = datetime.utcnow() - timedelta(hours=24)
+
+                
+
+                # Clean up metrics history
+
+                self.metrics_history = [
+
+                    m for m in self.metrics_history
+
+                    if m.timestamp &gt; cutoff_time
+
+                ]
+
+                
+
+                # Clean up request times
+
+                self.request_times = [
+
+                    rt for rt in self.request_times
+
+                    if rt &gt; cutoff_time
+
+                ]
+
+                
+
+                # Reset counters periodically
+
+                if datetime.utcnow().minute == 0:  # Every hour
+
+                    self.error_count = 0
+
+                    self.request_count = 0
+
+                
+
+                await asyncio.sleep(3600)  # Run every hour
+
+                
+
+            except Exception as e:
+
+                self.logger.error(f&quot;Error cleaning up metrics: {e}&quot;)
+
+                await asyncio.sleep(3600)
+
+    
+
+    def record_request(self, response_time: float, success: bool = True):
+
+        &quot;&quot;&quot;Record a request for metrics.&quot;&quot;&quot;
+
+        
+
+        current_time = datetime.utcnow()
+
+        self.request_times.append(current_time)
+
+        self.request_count += 1
+
+        
+
+        if not success:
+
+            self.error_count += 1
+
+        
+
+        # Record response time
+
+        if not hasattr(self, &#x27;_recent_response_times&#x27;):
+
+            self._recent_response_times = []
+
+        
+
+        self._recent_response_times.append({
+
+            &#x27;timestamp&#x27;: current_time,
+
+            &#x27;time&#x27;: response_time
+
+        })
+
+    
+
+    def get_current_metrics(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get current performance metrics.&quot;&quot;&quot;
+
+        
+
+        if not self.metrics_history:
+
+            return {}
+
+        
+
+        latest_metrics = self.metrics_history[-1]
+
+        
+
+        return {
+
+            &#x27;timestamp&#x27;: latest_metrics.timestamp.isoformat(),
+
+            &#x27;system&#x27;: {
+
+                &#x27;cpu_percent&#x27;: latest_metrics.cpu_percent,
+
+                &#x27;memory_percent&#x27;: latest_metrics.memory_percent,
+
+                &#x27;memory_used_mb&#x27;: latest_metrics.memory_used_mb
+
+            },
+
+            &#x27;application&#x27;: {
+
+                &#x27;active_connections&#x27;: latest_metrics.active_connections,
+
+                &#x27;request_rate&#x27;: latest_metrics.request_rate,
+
+                &#x27;avg_response_time&#x27;: latest_metrics.avg_response_time,
+
+                &#x27;error_rate&#x27;: latest_metrics.error_rate
+
+            },
+
+            &#x27;database&#x27;: {
+
+                &#x27;connections&#x27;: latest_metrics.database_connections
+
+            }
+
+        }
+
+    
+
+    def get_metrics_summary(self, hours: int = 24) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get performance metrics summary for the specified hours.&quot;&quot;&quot;
+
+        
+
+        cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+
+        recent_metrics = [
+
+            m for m in self.metrics_history
+
+            if m.timestamp &gt; cutoff_time
+
+        ]
+
+        
+
+        if not recent_metrics:
+
+            return {}
+
+        
+
+        # Calculate averages
+
+        avg_cpu = sum(m.cpu_percent for m in recent_metrics) / len(recent_metrics)
+
+        avg_memory = sum(m.memory_percent for m in recent_metrics) / len(recent_metrics)
+
+        avg_response_time = sum(m.avg_response_time for m in recent_metrics) / len(recent_metrics)
+
+        
+
+        # Calculate peaks
+
+        max_cpu = max(m.cpu_percent for m in recent_metrics)
+
+        max_memory = max(m.memory_percent for m in recent_metrics)
+
+        max_response_time = max(m.avg_response_time for m in recent_metrics)
+
+        
+
+        return {
+
+            &#x27;period_hours&#x27;: hours,
+
+            &#x27;averages&#x27;: {
+
+                &#x27;cpu_percent&#x27;: round(avg_cpu, 2),
+
+                &#x27;memory_percent&#x27;: round(avg_memory, 2),
+
+                &#x27;response_time&#x27;: round(avg_response_time, 3)
+
+            },
+
+            &#x27;peaks&#x27;: {
+
+                &#x27;cpu_percent&#x27;: round(max_cpu, 2),
+
+                &#x27;memory_percent&#x27;: round(max_memory, 2),
+
+                &#x27;response_time&#x27;: round(max_response_time, 3)
+
+            },
+
+            &#x27;data_points&#x27;: len(recent_metrics)
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔐 Production Security Configuration</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Security Hardening</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# k8s/security-policy.yaml - Kubernetes security policies
+
+apiVersion: v1
+
+kind: SecurityContext
+
+metadata:
+
+  name: mcp-retail-security-context
+
+spec:
+
+  runAsNonRoot: true
+
+  runAsUser: 1000
+
+  runAsGroup: 1000
+
+  fsGroup: 1000
+
+  seccompProfile:
+
+    type: RuntimeDefault
+
+  capabilities:
+
+    drop:
+
+      - ALL
+
+  readOnlyRootFilesystem: true
+
+  allowPrivilegeEscalation: false
+
+
+
+---
+
+apiVersion: networking.k8s.io/v1
+
+kind: NetworkPolicy
+
+metadata:
+
+  name: mcp-retail-network-policy
+
+  namespace: mcp-retail
+
+spec:
+
+  podSelector:
+
+    matchLabels:
+
+      app: mcp-retail-server
+
+  policyTypes:
+
+    - Ingress
+
+    - Egress
+
+  ingress:
+
+    - from:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              name: ingress-nginx
+
+      ports:
+
+        - protocol: TCP
+
+          port: 8000
+
+  egress:
+
+    - to:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              name: database
+
+      ports:
+
+        - protocol: TCP
+
+          port: 5432
+
+    - to: []
+
+      ports:
+
+        - protocol: TCP
+
+          port: 443  # HTTPS for Azure OpenAI
+
+        - protocol: TCP
+
+          port: 53   # DNS
+
+        - protocol: UDP
+
+          port: 53   # DNS
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Environment Configuration</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# scripts/setup-production-env.sh
+
+#!/bin/bash
+
+
+
+# Production environment setup script
+
+set -euo pipefail
+
+
+
+echo &quot;🔧 Setting up production environment...&quot;
+
+
+
+# Create resource groups
+
+az group create --name &quot;mcp-retail-prod-rg&quot; --location &quot;East US&quot;
+
+az group create --name &quot;mcp-retail-shared-rg&quot; --location &quot;East US&quot;
+
+
+
+# Create Key Vault
+
+echo &quot;🔐 Creating Azure Key Vault...&quot;
+
+az keyvault create \
+
+  --name &quot;mcp-retail-kv-prod&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --location &quot;East US&quot; \
+
+  --enable-rbac-authorization true
+
+
+
+# Set secrets
+
+echo &quot;🔑 Setting up secrets...&quot;
+
+az keyvault secret set \
+
+  --vault-name &quot;mcp-retail-kv-prod&quot; \
+
+  --name &quot;postgres-password&quot; \
+
+  --value &quot;${POSTGRES_PASSWORD}&quot;
+
+
+
+az keyvault secret set \
+
+  --vault-name &quot;mcp-retail-kv-prod&quot; \
+
+  --name &quot;azure-openai-key&quot; \
+
+  --value &quot;${AZURE_OPENAI_KEY}&quot;
+
+
+
+# Create container registry
+
+echo &quot;📦 Creating container registry...&quot;
+
+az acr create \
+
+  --name &quot;mcpretailregistry&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --sku Premium \
+
+  --admin-enabled false
+
+
+
+# Create virtual network
+
+echo &quot;🌐 Creating virtual network...&quot;
+
+az network vnet create \
+
+  --name &quot;mcp-retail-vnet&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --address-prefix &quot;10.0.0.0/16&quot; \
+
+  --subnet-name &quot;container-apps&quot; \
+
+  --subnet-prefix &quot;10.0.1.0/24&quot;
+
+
+
+az network vnet subnet create \
+
+  --name &quot;database&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --vnet-name &quot;mcp-retail-vnet&quot; \
+
+  --address-prefix &quot;10.0.2.0/24&quot; \
+
+  --delegations Microsoft.DBforPostgreSQL/flexibleServers
+
+
+
+# Deploy infrastructure
+
+echo &quot;🏗️  Deploying infrastructure...&quot;
+
+az deployment group create \
+
+  --resource-group &quot;mcp-retail-prod-rg&quot; \
+
+  --template-file &quot;infra/main.bicep&quot; \
+
+  --parameters &quot;infra/main.parameters.prod.json&quot;
+
+
+
+echo &quot;✅ Production environment setup complete!&quot;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Container Strategy</strong>: Production-ready Docker containers with security hardening  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Cloud Deployment</strong>: Azure Container Apps with auto-scaling and monitoring  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Database Deployment</strong>: PostgreSQL Flexible Server with high availability  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>CI/CD Pipelines</strong>: Automated testing, building, and deployment workflows  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Performance Monitoring</strong>: Comprehensive metrics collection and alerting  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Security Configuration</strong>: Production-grade security policies and network isolation  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/11-Monitoring/README.md" target="_blank">Lab 11: Monitoring and Observability</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set up comprehensive monitoring with Application Insights</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure structured logging and distributed tracing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement alerting and automated response systems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Monitor business metrics and performance KPIs</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Container Technologies</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.docker.com/develop/dev-best-practices/">Docker Best Practices</a> - Official Docker best practices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/container-apps/">Azure Container Apps</a> - Azure Container Apps documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://kubernetes.io/docs/">Kubernetes Documentation</a> - Kubernetes official documentation</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">CI/CD and DevOps</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.github.com/en/actions">GitHub Actions</a> - GitHub Actions documentation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/devops/">Azure DevOps</a> - Azure DevOps services</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/">Infrastructure as Code</a> - Azure Bicep documentation</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Security and Monitoring</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/security-center/">Azure Security Center</a> - Azure security recommendations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://kubernetes.io/docs/concepts/security/">Container Security</a> - Kubernetes security concepts</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview">Application Insights</a> - Azure Application Insights</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Previous</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/09-VS-Code/README.md" target="_blank">Lab 09: VS Code Integration</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/11-Monitoring/README.md" target="_blank">Lab 11: Monitoring and Observability</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">배포 전략</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 현대적인 컨테이너화 및 클라우드 네이티브 접근 방식을 사용하여 MCP 리테일 서버를 프로덕션 환경에 배포하는 포괄적인 가이드를 제공합니다. 엔터프라이즈 워크로드를 처리할 수 있는 확장 가능하고 안전하며 모니터링 가능한 MCP 서버를 배포하는 방법을 배우게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버의 프로덕션 배포는 컨테이너화, 오케스트레이션, 보안, 확장성 및 모니터링을 신중히 고려해야 합니다. 이 실습에서는 Azure Container Apps와 PostgreSQL Flexible Server를 사용한 배포, CI/CD 파이프라인 구현, 가변 워크로드를 위한 자동 확장 구성에 대해 다룹니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">배포 전략은 개발을 위한 간단한 단일 컨테이너 배포부터 다중 지역, 자동 확장 프로덕션 환경에 이르기까지 포괄적인 모니터링 및 보안 기능을 갖춘 복잡한 배포까지 다양합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨테이너화</strong>: Docker를 사용하여 MCP 서버를 멀티 스테이지 빌드로 컨테이너화  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>배포</strong>: 안전한 네트워킹을 통해 Azure Container Apps에 배포  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구성</strong>: 고가용성을 갖춘 프로덕션급 PostgreSQL 구성  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구현</strong>: 자동 배포를 위한 CI/CD 파이프라인  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>확장</strong>: 수요에 따라 애플리케이션 자동 확장  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>모니터링</strong>: 포괄적인 관측 기능을 통해 프로덕션 배포 모니터링  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🐳 Docker 컨테이너화</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">멀티 스테이지 Dockerfile</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Dockerfile - Production-ready multi-stage build
+
+FROM python:3.11-slim AS builder
+
+
+
+# Set build environment
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+
+    PYTHONUNBUFFERED=1 \
+
+    PIP_NO_CACHE_DIR=1 \
+
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+
+
+# Install build dependencies
+
+RUN apt-get update &amp;&amp; apt-get install -y \
+
+    build-essential \
+
+    libpq-dev \
+
+    curl \
+
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+
+
+# Create virtual environment
+
+RUN python -m venv /opt/venv
+
+ENV PATH=&quot;/opt/venv/bin:$PATH&quot;
+
+
+
+# Copy requirements and install dependencies
+
+COPY requirements.lock.txt /tmp/
+
+RUN pip install --no-cache-dir -r /tmp/requirements.lock.txt
+
+
+
+# Production stage
+
+FROM python:3.11-slim AS production
+
+
+
+# Set production environment
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+
+    PYTHONUNBUFFERED=1 \
+
+    PATH=&quot;/opt/venv/bin:$PATH&quot; \
+
+    PYTHONPATH=&quot;/app&quot;
+
+
+
+# Install runtime dependencies
+
+RUN apt-get update &amp;&amp; apt-get install -y \
+
+    libpq5 \
+
+    curl \
+
+    &amp;&amp; rm -rf /var/lib/apt/lists/* \
+
+    &amp;&amp; groupadd -r mcp \
+
+    &amp;&amp; useradd -r -g mcp -d /app -s /bin/bash mcp
+
+
+
+# Copy virtual environment from builder
+
+COPY --from=builder /opt/venv /opt/venv
+
+
+
+# Set working directory and copy application
+
+WORKDIR /app
+
+COPY --chown=mcp:mcp . .
+
+
+
+# Create necessary directories with proper permissions
+
+RUN mkdir -p /app/logs /app/data /tmp/mcp \
+
+    &amp;&amp; chown -R mcp:mcp /app /tmp/mcp \
+
+    &amp;&amp; chmod -R 755 /app
+
+
+
+# Health check
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+
+    CMD python -m mcp_server.health_check || exit 1
+
+
+
+# Switch to non-root user
+
+USER mcp
+
+
+
+# Expose port
+
+EXPOSE 8000
+
+
+
+# Default command
+
+CMD [&quot;python&quot;, &quot;-m&quot;, &quot;mcp_server.main&quot;]
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">개발용 Docker Compose</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# docker-compose.yml - Development environment
+
+version: &#x27;3.8&#x27;
+
+
+
+services:
+
+  mcp-server:
+
+    build:
+
+      context: .
+
+      dockerfile: Dockerfile
+
+      target: production
+
+    ports:
+
+      - &quot;8000:8000&quot;
+
+    environment:
+
+      - POSTGRES_HOST=postgres
+
+      - POSTGRES_PORT=5432
+
+      - POSTGRES_DB=retail_db
+
+      - POSTGRES_USER=mcp_user
+
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      - PROJECT_ENDPOINT=${PROJECT_ENDPOINT}
+
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+
+      - LOG_LEVEL=INFO
+
+      - ENVIRONMENT=development
+
+    depends_on:
+
+      postgres:
+
+        condition: service_healthy
+
+    volumes:
+
+      - ./logs:/app/logs
+
+    networks:
+
+      - mcp-network
+
+    restart: unless-stopped
+
+    healthcheck:
+
+      test: [&quot;CMD&quot;, &quot;curl&quot;, &quot;-f&quot;, &quot;http://localhost:8000/health&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+      start_period: 60s
+
+
+
+  postgres:
+
+    image: pgvector/pgvector:pg16
+
+    environment:
+
+      - POSTGRES_DB=retail_db
+
+      - POSTGRES_USER=postgres
+
+      - POSTGRES_PASSWORD=${POSTGRES_ADMIN_PASSWORD}
+
+    ports:
+
+      - &quot;5432:5432&quot;
+
+    volumes:
+
+      - postgres_data:/var/lib/postgresql/data
+
+      - ./docker-init:/docker-entrypoint-initdb.d
+
+      - ./data:/backup
+
+    networks:
+
+      - mcp-network
+
+    restart: unless-stopped
+
+    healthcheck:
+
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U postgres -d retail_db&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+      start_period: 60s
+
+
+
+  redis:
+
+    image: redis:7-alpine
+
+    ports:
+
+      - &quot;6379:6379&quot;
+
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+    volumes:
+
+      - redis_data:/data
+
+    networks:
+
+      - mcp-network
+
+    restart: unless-stopped
+
+    healthcheck:
+
+      test: [&quot;CMD&quot;, &quot;redis-cli&quot;, &quot;--raw&quot;, &quot;incr&quot;, &quot;ping&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+
+
+volumes:
+
+  postgres_data:
+
+    driver: local
+
+  redis_data:
+
+    driver: local
+
+
+
+networks:
+
+  mcp-network:
+
+    driver: bridge
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">프로덕션 Docker Compose</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# docker-compose.prod.yml - Production environment
+
+version: &#x27;3.8&#x27;
+
+
+
+services:
+
+  mcp-server:
+
+    image: ${CONTAINER_REGISTRY}/mcp-retail-server:${IMAGE_TAG}
+
+    ports:
+
+      - &quot;8000:8000&quot;
+
+    environment:
+
+      - POSTGRES_HOST=${POSTGRES_HOST}
+
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
+      - POSTGRES_DB=${POSTGRES_DB}
+
+      - POSTGRES_USER=${POSTGRES_USER}
+
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      - PROJECT_ENDPOINT=${PROJECT_ENDPOINT}
+
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+
+      - APPLICATIONINSIGHTS_CONNECTION_STRING=${APPLICATIONINSIGHTS_CONNECTION_STRING}
+
+      - LOG_LEVEL=INFO
+
+      - ENVIRONMENT=production
+
+      - REDIS_URL=${REDIS_URL}
+
+    deploy:
+
+      replicas: 3
+
+      resources:
+
+        limits:
+
+          cpus: &#x27;2.0&#x27;
+
+          memory: 2G
+
+        reservations:
+
+          cpus: &#x27;0.5&#x27;
+
+          memory: 512M
+
+      restart_policy:
+
+        condition: on-failure
+
+        delay: 5s
+
+        max_attempts: 3
+
+      update_config:
+
+        parallelism: 1
+
+        delay: 10s
+
+        failure_action: rollback
+
+    networks:
+
+      - mcp-network
+
+    healthcheck:
+
+      test: [&quot;CMD&quot;, &quot;curl&quot;, &quot;-f&quot;, &quot;http://localhost:8000/health&quot;]
+
+      interval: 30s
+
+      timeout: 10s
+
+      retries: 3
+
+      start_period: 60s
+
+
+
+networks:
+
+  mcp-network:
+
+    external: true
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">☁️ Azure Container Apps 배포</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Bicep을 사용한 코드형 인프라</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// infra/container-apps.bicep - Azure Container Apps deployment
+
+@description(&#x27;Location for all resources&#x27;)
+
+param location string = resourceGroup().location
+
+
+
+@description(&#x27;Environment name&#x27;)
+
+param environmentName string
+
+
+
+@description(&#x27;Container App name&#x27;)
+
+param containerAppName string
+
+
+
+@description(&#x27;Container registry details&#x27;)
+
+param containerRegistry object
+
+
+
+@description(&#x27;Database connection details&#x27;)
+
+@secure()
+
+param databaseConnectionString string
+
+
+
+@description(&#x27;Azure OpenAI configuration&#x27;)
+
+param azureOpenAI object
+
+
+
+@description(&#x27;Application Insights workspace ID&#x27;)
+
+param workspaceId string
+
+
+
+// Container Apps Environment
+
+resource containerAppsEnvironment &#x27;Microsoft.App/managedEnvironments@2023-05-01&#x27; = {
+
+  name: &#x27;${environmentName}-env&#x27;
+
+  location: location
+
+  properties: {
+
+    appLogsConfiguration: {
+
+      destination: &#x27;log-analytics&#x27;
+
+      logAnalyticsConfiguration: {
+
+        customerId: workspaceId
+
+      }
+
+    }
+
+    infrastructureResourceGroup: &#x27;${environmentName}-infra-rg&#x27;
+
+  }
+
+}
+
+
+
+// Container App
+
+resource mcp_retail_server &#x27;Microsoft.App/containerApps@2023-05-01&#x27; = {
+
+  name: containerAppName
+
+  location: location
+
+  properties: {
+
+    managedEnvironmentId: containerAppsEnvironment.id
+
+    configuration: {
+
+      activeRevisionsMode: &#x27;Single&#x27;
+
+      ingress: {
+
+        external: false
+
+        targetPort: 8000
+
+        allowInsecure: false
+
+        traffic: [
+
+          {
+
+            weight: 100
+
+            latestRevision: true
+
+          }
+
+        ]
+
+      }
+
+      registries: [
+
+        {
+
+          server: containerRegistry.server
+
+          identity: containerRegistry.identity
+
+        }
+
+      ]
+
+      secrets: [
+
+        {
+
+          name: &#x27;database-connection-string&#x27;
+
+          value: databaseConnectionString
+
+        }
+
+        {
+
+          name: &#x27;azure-openai-key&#x27;
+
+          value: azureOpenAI.apiKey
+
+        }
+
+      ]
+
+    }
+
+    template: {
+
+      containers: [
+
+        {
+
+          name: &#x27;mcp-retail-server&#x27;
+
+          image: &#x27;${containerRegistry.server}/mcp-retail-server:latest&#x27;
+
+          resources: {
+
+            cpu: json(&#x27;1.0&#x27;)
+
+            memory: &#x27;2Gi&#x27;
+
+          }
+
+          env: [
+
+            {
+
+              name: &#x27;POSTGRES_CONNECTION_STRING&#x27;
+
+              secretRef: &#x27;database-connection-string&#x27;
+
+            }
+
+            {
+
+              name: &#x27;PROJECT_ENDPOINT&#x27;
+
+              value: azureOpenAI.endpoint
+
+            }
+
+            {
+
+              name: &#x27;AZURE_OPENAI_API_KEY&#x27;
+
+              secretRef: &#x27;azure-openai-key&#x27;
+
+            }
+
+            {
+
+              name: &#x27;LOG_LEVEL&#x27;
+
+              value: &#x27;INFO&#x27;
+
+            }
+
+            {
+
+              name: &#x27;ENVIRONMENT&#x27;
+
+              value: &#x27;production&#x27;
+
+            }
+
+          ]
+
+          probes: [
+
+            {
+
+              type: &#x27;Liveness&#x27;
+
+              httpGet: {
+
+                path: &#x27;/health&#x27;
+
+                port: 8000
+
+                scheme: &#x27;HTTP&#x27;
+
+              }
+
+              initialDelaySeconds: 60
+
+              periodSeconds: 30
+
+              timeoutSeconds: 10
+
+              failureThreshold: 3
+
+            }
+
+            {
+
+              type: &#x27;Readiness&#x27;
+
+              httpGet: {
+
+                path: &#x27;/ready&#x27;
+
+                port: 8000
+
+                scheme: &#x27;HTTP&#x27;
+
+              }
+
+              initialDelaySeconds: 30
+
+              periodSeconds: 10
+
+              timeoutSeconds: 5
+
+              failureThreshold: 3
+
+            }
+
+          ]
+
+        }
+
+      ]
+
+      scale: {
+
+        minReplicas: 2
+
+        maxReplicas: 20
+
+        rules: [
+
+          {
+
+            name: &#x27;http-scaling&#x27;
+
+            http: {
+
+              metadata: {
+
+                concurrentRequests: &#x27;10&#x27;
+
+              }
+
+            }
+
+          }
+
+          {
+
+            name: &#x27;cpu-scaling&#x27;
+
+            custom: {
+
+              type: &#x27;cpu&#x27;
+
+              metadata: {
+
+                type: &#x27;Utilization&#x27;
+
+                value: &#x27;70&#x27;
+
+              }
+
+            }
+
+          }
+
+        ]
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+// Output the FQDN
+
+output containerAppFQDN string = mcp_retail_server.properties.configuration.ingress.fqdn
+
+output containerAppId string = mcp_retail_server.id
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">PostgreSQL Flexible Server</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+// infra/database.bicep - PostgreSQL Flexible Server
+
+@description(&#x27;Location for all resources&#x27;)
+
+param location string = resourceGroup().location
+
+
+
+@description(&#x27;PostgreSQL server name&#x27;)
+
+param serverName string
+
+
+
+@description(&#x27;Database administrator login&#x27;)
+
+param administratorLogin string
+
+
+
+@description(&#x27;Database administrator password&#x27;)
+
+@secure()
+
+param administratorPassword string
+
+
+
+@description(&#x27;Virtual network subnet ID&#x27;)
+
+param subnetId string
+
+
+
+@description(&#x27;Private DNS zone ID&#x27;)
+
+param privateDnsZoneId string
+
+
+
+// PostgreSQL Flexible Server
+
+resource postgresqlServer &#x27;Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview&#x27; = {
+
+  name: serverName
+
+  location: location
+
+  sku: {
+
+    name: &#x27;Standard_D4s_v3&#x27;
+
+    tier: &#x27;GeneralPurpose&#x27;
+
+  }
+
+  properties: {
+
+    administratorLogin: administratorLogin
+
+    administratorLoginPassword: administratorPassword
+
+    version: &#x27;16&#x27;
+
+    storage: {
+
+      storageSizeGB: 128
+
+      autoGrow: &#x27;Enabled&#x27;
+
+      type: &#x27;PremiumSSD&#x27;
+
+    }
+
+    backup: {
+
+      backupRetentionDays: 35
+
+      geoRedundantBackup: &#x27;Enabled&#x27;
+
+    }
+
+    highAvailability: {
+
+      mode: &#x27;ZoneRedundant&#x27;
+
+    }
+
+    network: {
+
+      delegatedSubnetResourceId: subnetId
+
+      privateDnsZoneArmResourceId: privateDnsZoneId
+
+    }
+
+    maintenanceWindow: {
+
+      dayOfWeek: 0
+
+      startHour: 2
+
+      startMinute: 0
+
+    }
+
+  }
+
+}
+
+
+
+// Database
+
+resource retailDatabase &#x27;Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-03-01-preview&#x27; = {
+
+  parent: postgresqlServer
+
+  name: &#x27;retail_db&#x27;
+
+  properties: {
+
+    charset: &#x27;UTF8&#x27;
+
+    collation: &#x27;en_US.utf8&#x27;
+
+  }
+
+}
+
+
+
+// PostgreSQL extensions
+
+resource pgvectorExtension &#x27;Microsoft.DBforPostgreSQL/flexibleServers/configurations@2023-03-01-preview&#x27; = {
+
+  parent: postgresqlServer
+
+  name: &#x27;shared_preload_libraries&#x27;
+
+  properties: {
+
+    value: &#x27;pg_stat_statements,pgaudit,vector&#x27;
+
+    source: &#x27;user-override&#x27;
+
+  }
+
+}
+
+
+
+// Output connection details
+
+output serverFQDN string = postgresqlServer.properties.fullyQualifiedDomainName
+
+output serverId string = postgresqlServer.id
+
+output databaseName string = retailDatabase.name
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 CI/CD 파이프라인 구성</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">GitHub Actions 워크플로우</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# .github/workflows/deploy.yml - CI/CD pipeline
+
+name: Deploy MCP Retail Server
+
+
+
+on:
+
+  push:
+
+    branches: [main]
+
+  pull_request:
+
+    branches: [main]
+
+  workflow_dispatch:
+
+    inputs:
+
+      environment:
+
+        description: &#x27;Deployment environment&#x27;
+
+        required: true
+
+        default: &#x27;development&#x27;
+
+        type: choice
+
+        options:
+
+          - development
+
+          - staging
+
+          - production
+
+
+
+env:
+
+  CONTAINER_REGISTRY: mcpretailregistry.azurecr.io
+
+  IMAGE_NAME: mcp-retail-server
+
+  AZURE_RESOURCE_GROUP: mcp-retail-rg
+
+
+
+jobs:
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    services:
+
+      postgres:
+
+        image: pgvector/pgvector:pg16
+
+        env:
+
+          POSTGRES_PASSWORD: postgres
+
+          POSTGRES_DB: retail_test
+
+        options: &gt;-
+
+          --health-cmd pg_isready
+
+          --health-interval 10s
+
+          --health-timeout 5s
+
+          --health-retries 5
+
+        ports:
+
+          - 5432:5432
+
+
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Set up Python
+
+        uses: actions/setup-python@v4
+
+        with:
+
+          python-version: &#x27;3.11&#x27;
+
+          cache: &#x27;pip&#x27;
+
+
+
+      - name: Install dependencies
+
+        run: |
+
+          python -m pip install --upgrade pip
+
+          pip install -r requirements.lock.txt
+
+          pip install pytest pytest-cov pytest-asyncio
+
+
+
+      - name: Set up test database
+
+        run: |
+
+          PGPASSWORD=postgres psql -h localhost -U postgres -d retail_test -f scripts/create_schema.sql
+
+          python scripts/generate_sample_data.py --test
+
+        env:
+
+          POSTGRES_HOST: localhost
+
+          POSTGRES_PORT: 5432
+
+          POSTGRES_DB: retail_test
+
+          POSTGRES_USER: postgres
+
+          POSTGRES_PASSWORD: postgres
+
+
+
+      - name: Run tests
+
+        run: |
+
+          pytest tests/ -v --cov=mcp_server --cov-report=xml --cov-report=html
+
+        env:
+
+          POSTGRES_HOST: localhost
+
+          POSTGRES_PORT: 5432
+
+          POSTGRES_DB: retail_test
+
+          POSTGRES_USER: postgres
+
+          POSTGRES_PASSWORD: postgres
+
+          PROJECT_ENDPOINT: ${{ secrets.TEST_PROJECT_ENDPOINT }}
+
+          AZURE_CLIENT_ID: ${{ secrets.TEST_AZURE_CLIENT_ID }}
+
+          AZURE_CLIENT_SECRET: ${{ secrets.TEST_AZURE_CLIENT_SECRET }}
+
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+
+
+      - name: Upload coverage reports
+
+        uses: codecov/codecov-action@v3
+
+        with:
+
+          file: ./coverage.xml
+
+          flags: unittests
+
+
+
+  security-scan:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Run Trivy vulnerability scanner
+
+        uses: aquasecurity/trivy-action@master
+
+        with:
+
+          scan-type: &#x27;fs&#x27;
+
+          scan-ref: &#x27;.&#x27;
+
+          format: &#x27;sarif&#x27;
+
+          output: &#x27;trivy-results.sarif&#x27;
+
+
+
+      - name: Upload Trivy scan results
+
+        uses: github/codeql-action/upload-sarif@v2
+
+        with:
+
+          sarif_file: &#x27;trivy-results.sarif&#x27;
+
+
+
+      - name: Run Bandit security linter
+
+        run: |
+
+          pip install bandit[toml]
+
+          bandit -r mcp_server/ -f json -o bandit-report.json
+
+
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    needs: [test, security-scan]
+
+    if: github.event_name == &#x27;push&#x27; || github.event_name == &#x27;workflow_dispatch&#x27;
+
+    
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Azure Login
+
+        uses: azure/login@v1
+
+        with:
+
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+
+      - name: Build and push Docker image
+
+        uses: azure/docker-login@v1
+
+        with:
+
+          login-server: ${{ env.CONTAINER_REGISTRY }}
+
+          username: ${{ secrets.REGISTRY_USERNAME }}
+
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+
+
+      - name: Build, tag, and push image
+
+        run: |
+
+          # Generate unique tag
+
+          IMAGE_TAG=&quot;${GITHUB_SHA::8}-$(date +%s)&quot;
+
+          
+
+          # Build image
+
+          docker build \
+
+            --target production \
+
+            --tag $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG \
+
+            --tag $CONTAINER_REGISTRY/$IMAGE_NAME:latest \
+
+            .
+
+          
+
+          # Push images
+
+          docker push $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+
+          docker push $CONTAINER_REGISTRY/$IMAGE_NAME:latest
+
+          
+
+          # Save tag for deployment
+
+          echo &quot;IMAGE_TAG=$IMAGE_TAG&quot; &gt;&gt; $GITHUB_ENV
+
+
+
+      - name: Output image details
+
+        run: |
+
+          echo &quot;Built and pushed image: $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG&quot;
+
+
+
+  deploy-staging:
+
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    if: github.event_name == &#x27;push&#x27; &amp;&amp; github.ref == &#x27;refs/heads/main&#x27;
+
+    environment: staging
+
+
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Azure Login
+
+        uses: azure/login@v1
+
+        with:
+
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+
+      - name: Deploy to staging
+
+        uses: azure/CLI@v1
+
+        with:
+
+          azcliversion: latest
+
+          inlineScript: |
+
+            # Deploy infrastructure
+
+            az deployment group create \
+
+              --resource-group $AZURE_RESOURCE_GROUP-staging \
+
+              --template-file infra/main.bicep \
+
+              --parameters infra/main.parameters.staging.json \
+
+              --parameters containerImageTag=$IMAGE_TAG
+
+
+
+            # Update container app
+
+            az containerapp update \
+
+              --name mcp-retail-server-staging \
+
+              --resource-group $AZURE_RESOURCE_GROUP-staging \
+
+              --image $CONTAINER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+
+
+
+      - name: Run integration tests
+
+        run: |
+
+          # Wait for deployment to be ready
+
+          sleep 60
+
+          
+
+          # Run integration tests against staging
+
+          pytest tests/integration/ \
+
+            --endpoint https://mcp-retail-server-staging.azurecontainerapps.io \
+
+            --timeout 300
+
+
+
+  deploy-production:
+
+    runs-on: ubuntu-latest
+
+    needs: [build, deploy-staging]
+
+    if: github.event_name == &#x27;workflow_dispatch&#x27; &amp;&amp; github.event.inputs.environment == &#x27;production&#x27;
+
+    environment: production
+
+
+
+    steps:
+
+      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+
+
+      - name: Azure Login
+
+        uses: azure/login@v1
+
+        with:
+
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+
+      - name: Deploy to production
+
+        uses: azure/CLI@v1
+
+        with:
+
+          azcliversion: latest
+
+          inlineScript: |
+
+            # Deploy with blue-green strategy
+
+            az deployment group create \
+
+              --resource-group $AZURE_RESOURCE_GROUP-prod \
+
+              --template-file infra/main.bicep \
+
+              --parameters infra/main.parameters.prod.json \
+
+              --parameters containerImageTag=$IMAGE_TAG \
+
+              --parameters deploymentSlot=green
+
+
+
+            # Health check
+
+            az containerapp show \
+
+              --name mcp-retail-server-prod-green \
+
+              --resource-group $AZURE_RESOURCE_GROUP-prod
+
+
+
+            # Switch traffic (blue-green deployment)
+
+            az containerapp ingress traffic set \
+
+              --name mcp-retail-server-prod \
+
+              --resource-group $AZURE_RESOURCE_GROUP-prod \
+
+              --revision-weight latest=100
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Azure DevOps 파이프라인</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# azure-pipelines.yml - Azure DevOps pipeline
+
+trigger:
+
+  branches:
+
+    include:
+
+      - main
+
+      - develop
+
+  paths:
+
+    exclude:
+
+      - docs/*
+
+      - README.md
+
+
+
+variables:
+
+  containerRegistry: &#x27;mcpretailregistry.azurecr.io&#x27;
+
+  imageName: &#x27;mcp-retail-server&#x27;
+
+  imageTag: &#x27;$(Build.BuildId)&#x27;
+
+  azureServiceConnection: &#x27;azure-service-connection&#x27;
+
+
+
+stages:
+
+  - stage: Build
+
+    displayName: &#x27;Build and Test&#x27;
+
+    jobs:
+
+      - job: Test
+
+        displayName: &#x27;Run Tests&#x27;
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+        
+
+        services:
+
+          postgres:
+
+            image: pgvector/pgvector:pg16
+
+            env:
+
+              POSTGRES_PASSWORD: postgres
+
+              POSTGRES_DB: retail_test
+
+            ports:
+
+              5432:5432
+
+
+
+        steps:
+
+          - task: UsePythonVersion@0
+
+            inputs:
+
+              versionSpec: &#x27;3.11&#x27;
+
+              displayName: &#x27;Use Python 3.11&#x27;
+
+
+
+          - script: |
+
+              python -m pip install --upgrade pip
+
+              pip install -r requirements.lock.txt
+
+              pip install pytest pytest-cov pytest-asyncio
+
+            displayName: &#x27;Install dependencies&#x27;
+
+
+
+          - script: |
+
+              PGPASSWORD=postgres psql -h localhost -U postgres -d retail_test -f scripts/create_schema.sql
+
+              python scripts/generate_sample_data.py --test
+
+            displayName: &#x27;Set up test database&#x27;
+
+            env:
+
+              POSTGRES_HOST: localhost
+
+              POSTGRES_PORT: 5432
+
+              POSTGRES_DB: retail_test
+
+              POSTGRES_USER: postgres
+
+              POSTGRES_PASSWORD: postgres
+
+
+
+          - script: |
+
+              pytest tests/ -v --cov=mcp_server --cov-report=xml --junitxml=test-results.xml
+
+            displayName: &#x27;Run tests&#x27;
+
+            env:
+
+              POSTGRES_HOST: localhost
+
+              POSTGRES_PORT: 5432
+
+              POSTGRES_DB: retail_test
+
+              POSTGRES_USER: postgres
+
+              POSTGRES_PASSWORD: postgres
+
+
+
+          - task: PublishTestResults@2
+
+            condition: succeededOrFailed()
+
+            inputs:
+
+              testResultsFiles: &#x27;test-results.xml&#x27;
+
+              testRunTitle: &#x27;Python Tests&#x27;
+
+
+
+          - task: PublishCodeCoverageResults@1
+
+            inputs:
+
+              codeCoverageTool: &#x27;Cobertura&#x27;
+
+              summaryFileLocation: &#x27;coverage.xml&#x27;
+
+
+
+      - job: Build
+
+        displayName: &#x27;Build Docker Image&#x27;
+
+        dependsOn: Test
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+
+
+        steps:
+
+          - task: AzureCLI@2
+
+            displayName: &#x27;Build and push Docker image&#x27;
+
+            inputs:
+
+              azureSubscription: $(azureServiceConnection)
+
+              scriptType: &#x27;bash&#x27;
+
+              scriptLocation: &#x27;inlineScript&#x27;
+
+              inlineScript: |
+
+                # Login to container registry
+
+                az acr login --name $(containerRegistry)
+
+                
+
+                # Build and push image
+
+                docker build \
+
+                  --target production \
+
+                  --tag $(containerRegistry)/$(imageName):$(imageTag) \
+
+                  --tag $(containerRegistry)/$(imageName):latest \
+
+                  .
+
+                
+
+                docker push $(containerRegistry)/$(imageName):$(imageTag)
+
+                docker push $(containerRegistry)/$(imageName):latest
+
+
+
+  - stage: Deploy_Staging
+
+    displayName: &#x27;Deploy to Staging&#x27;
+
+    dependsOn: Build
+
+    condition: and(succeeded(), eq(variables[&#x27;Build.SourceBranch&#x27;], &#x27;refs/heads/main&#x27;))
+
+    
+
+    jobs:
+
+      - deployment: DeployStaging
+
+        displayName: &#x27;Deploy to Staging Environment&#x27;
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+        environment: &#x27;staging&#x27;
+
+        
+
+        strategy:
+
+          runOnce:
+
+            deploy:
+
+              steps:
+
+                - task: AzureCLI@2
+
+                  displayName: &#x27;Deploy infrastructure&#x27;
+
+                  inputs:
+
+                    azureSubscription: $(azureServiceConnection)
+
+                    scriptType: &#x27;bash&#x27;
+
+                    scriptLocation: &#x27;inlineScript&#x27;
+
+                    inlineScript: |
+
+                      az deployment group create \
+
+                        --resource-group mcp-retail-staging-rg \
+
+                        --template-file infra/main.bicep \
+
+                        --parameters infra/main.parameters.staging.json \
+
+                        --parameters containerImageTag=$(imageTag)
+
+
+
+  - stage: Deploy_Production
+
+    displayName: &#x27;Deploy to Production&#x27;
+
+    dependsOn: Deploy_Staging
+
+    condition: and(succeeded(), eq(variables[&#x27;Build.Reason&#x27;], &#x27;Manual&#x27;))
+
+    
+
+    jobs:
+
+      - deployment: DeployProduction
+
+        displayName: &#x27;Deploy to Production Environment&#x27;
+
+        pool:
+
+          vmImage: &#x27;ubuntu-latest&#x27;
+
+        environment: &#x27;production&#x27;
+
+        
+
+        strategy:
+
+          runOnce:
+
+            deploy:
+
+              steps:
+
+                - task: AzureCLI@2
+
+                  displayName: &#x27;Deploy to production&#x27;
+
+                  inputs:
+
+                    azureSubscription: $(azureServiceConnection)
+
+                    scriptType: &#x27;bash&#x27;
+
+                    scriptLocation: &#x27;inlineScript&#x27;
+
+                    inlineScript: |
+
+                      az deployment group create \
+
+                        --resource-group mcp-retail-prod-rg \
+
+                        --template-file infra/main.bicep \
+
+                        --parameters infra/main.parameters.prod.json \
+
+                        --parameters containerImageTag=$(imageTag)
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 확장 및 성능</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">자동 확장 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# k8s/hpa.yaml - Horizontal Pod Autoscaler for Kubernetes
+
+apiVersion: autoscaling/v2
+
+kind: HorizontalPodAutoscaler
+
+metadata:
+
+  name: mcp-retail-server-hpa
+
+  namespace: mcp-retail
+
+spec:
+
+  scaleTargetRef:
+
+    apiVersion: apps/v1
+
+    kind: Deployment
+
+    name: mcp-retail-server
+
+  minReplicas: 3
+
+  maxReplicas: 50
+
+  metrics:
+
+    - type: Resource
+
+      resource:
+
+        name: cpu
+
+        target:
+
+          type: Utilization
+
+          averageUtilization: 70
+
+    - type: Resource
+
+      resource:
+
+        name: memory
+
+        target:
+
+          type: Utilization
+
+          averageUtilization: 80
+
+    - type: Pods
+
+      pods:
+
+        metric:
+
+          name: http_requests_per_second
+
+        target:
+
+          type: AverageValue
+
+          averageValue: 100
+
+  behavior:
+
+    scaleDown:
+
+      stabilizationWindowSeconds: 300
+
+      policies:
+
+        - type: Percent
+
+          value: 50
+
+          periodSeconds: 60
+
+    scaleUp:
+
+      stabilizationWindowSeconds: 60
+
+      policies:
+
+        - type: Percent
+
+          value: 100
+
+          periodSeconds: 30
+
+        - type: Pods
+
+          value: 5
+
+          periodSeconds: 30
+
+      selectPolicy: Max
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">성능 모니터링</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/monitoring/performance.py
+
+&quot;&quot;&quot;
+
+Performance monitoring and metrics collection for production deployment.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import time
+
+import psutil
+
+from typing import Dict, Any
+
+from dataclasses import dataclass
+
+from datetime import datetime, timedelta
+
+import logging
+
+
+
+@dataclass
+
+class PerformanceMetrics:
+
+    &quot;&quot;&quot;Performance metrics data structure.&quot;&quot;&quot;
+
+    timestamp: datetime
+
+    cpu_percent: float
+
+    memory_percent: float
+
+    memory_used_mb: float
+
+    active_connections: int
+
+    request_rate: float
+
+    avg_response_time: float
+
+    error_rate: float
+
+    database_connections: int
+
+
+
+class PerformanceMonitor:
+
+    &quot;&quot;&quot;Monitor and collect performance metrics.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, config):
+
+        self.config = config
+
+        self.logger = logging.getLogger(__name__)
+
+        
+
+        # Metrics collection
+
+        self.metrics_history = []
+
+        self.request_times = []
+
+        self.error_count = 0
+
+        self.request_count = 0
+
+        
+
+        # Database monitoring
+
+        self.db_pool = None
+
+        
+
+    async def start_monitoring(self):
+
+        &quot;&quot;&quot;Start continuous performance monitoring.&quot;&quot;&quot;
+
+        
+
+        self.logger.info(&quot;Starting performance monitoring&quot;)
+
+        
+
+        # Start metrics collection task
+
+        asyncio.create_task(self._collect_metrics_loop())
+
+        asyncio.create_task(self._cleanup_old_metrics())
+
+        
+
+    async def _collect_metrics_loop(self):
+
+        &quot;&quot;&quot;Continuously collect performance metrics.&quot;&quot;&quot;
+
+        
+
+        while True:
+
+            try:
+
+                metrics = await self._collect_current_metrics()
+
+                self.metrics_history.append(metrics)
+
+                
+
+                # Log critical metrics
+
+                if metrics.cpu_percent &gt; 90:
+
+                    self.logger.warning(f&quot;High CPU usage: {metrics.cpu_percent:.1f}%&quot;)
+
+                
+
+                if metrics.memory_percent &gt; 90:
+
+                    self.logger.warning(f&quot;High memory usage: {metrics.memory_percent:.1f}%&quot;)
+
+                
+
+                if metrics.error_rate &gt; 0.05:  # 5% error rate
+
+                    self.logger.warning(f&quot;High error rate: {metrics.error_rate:.2%}&quot;)
+
+                
+
+                await asyncio.sleep(30)  # Collect every 30 seconds
+
+                
+
+            except Exception as e:
+
+                self.logger.error(f&quot;Error collecting metrics: {e}&quot;)
+
+                await asyncio.sleep(60)
+
+    
+
+    async def _collect_current_metrics(self) -&gt; PerformanceMetrics:
+
+        &quot;&quot;&quot;Collect current system metrics.&quot;&quot;&quot;
+
+        
+
+        # System metrics
+
+        cpu_percent = psutil.cpu_percent(interval=1)
+
+        memory = psutil.virtual_memory()
+
+        
+
+        # Application metrics
+
+        current_time = datetime.utcnow()
+
+        recent_requests = [
+
+            req_time for req_time in self.request_times
+
+            if current_time - req_time &lt; timedelta(minutes=1)
+
+        ]
+
+        
+
+        request_rate = len(recent_requests) / 60.0  # requests per second
+
+        
+
+        # Calculate average response time
+
+        avg_response_time = 0.0
+
+        if hasattr(self, &#x27;_recent_response_times&#x27;):
+
+            recent_response_times = [
+
+                rt for rt in self._recent_response_times
+
+                if current_time - rt[&#x27;timestamp&#x27;] &lt; timedelta(minutes=5)
+
+            ]
+
+            if recent_response_times:
+
+                avg_response_time = sum(rt[&#x27;time&#x27;] for rt in recent_response_times) / len(recent_response_times)
+
+        
+
+        # Error rate calculation
+
+        error_rate = 0.0
+
+        if self.request_count &gt; 0:
+
+            error_rate = self.error_count / self.request_count
+
+        
+
+        # Database connections
+
+        db_connections = 0
+
+        if self.db_pool:
+
+            db_connections = len(self.db_pool._holders)
+
+        
+
+        return PerformanceMetrics(
+
+            timestamp=current_time,
+
+            cpu_percent=cpu_percent,
+
+            memory_percent=memory.percent,
+
+            memory_used_mb=memory.used / (1024 * 1024),
+
+            active_connections=0,  # To be implemented with connection tracking
+
+            request_rate=request_rate,
+
+            avg_response_time=avg_response_time,
+
+            error_rate=error_rate,
+
+            database_connections=db_connections
+
+        )
+
+    
+
+    async def _cleanup_old_metrics(self):
+
+        &quot;&quot;&quot;Clean up old metrics to prevent memory leaks.&quot;&quot;&quot;
+
+        
+
+        while True:
+
+            try:
+
+                cutoff_time = datetime.utcnow() - timedelta(hours=24)
+
+                
+
+                # Clean up metrics history
+
+                self.metrics_history = [
+
+                    m for m in self.metrics_history
+
+                    if m.timestamp &gt; cutoff_time
+
+                ]
+
+                
+
+                # Clean up request times
+
+                self.request_times = [
+
+                    rt for rt in self.request_times
+
+                    if rt &gt; cutoff_time
+
+                ]
+
+                
+
+                # Reset counters periodically
+
+                if datetime.utcnow().minute == 0:  # Every hour
+
+                    self.error_count = 0
+
+                    self.request_count = 0
+
+                
+
+                await asyncio.sleep(3600)  # Run every hour
+
+                
+
+            except Exception as e:
+
+                self.logger.error(f&quot;Error cleaning up metrics: {e}&quot;)
+
+                await asyncio.sleep(3600)
+
+    
+
+    def record_request(self, response_time: float, success: bool = True):
+
+        &quot;&quot;&quot;Record a request for metrics.&quot;&quot;&quot;
+
+        
+
+        current_time = datetime.utcnow()
+
+        self.request_times.append(current_time)
+
+        self.request_count += 1
+
+        
+
+        if not success:
+
+            self.error_count += 1
+
+        
+
+        # Record response time
+
+        if not hasattr(self, &#x27;_recent_response_times&#x27;):
+
+            self._recent_response_times = []
+
+        
+
+        self._recent_response_times.append({
+
+            &#x27;timestamp&#x27;: current_time,
+
+            &#x27;time&#x27;: response_time
+
+        })
+
+    
+
+    def get_current_metrics(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get current performance metrics.&quot;&quot;&quot;
+
+        
+
+        if not self.metrics_history:
+
+            return {}
+
+        
+
+        latest_metrics = self.metrics_history[-1]
+
+        
+
+        return {
+
+            &#x27;timestamp&#x27;: latest_metrics.timestamp.isoformat(),
+
+            &#x27;system&#x27;: {
+
+                &#x27;cpu_percent&#x27;: latest_metrics.cpu_percent,
+
+                &#x27;memory_percent&#x27;: latest_metrics.memory_percent,
+
+                &#x27;memory_used_mb&#x27;: latest_metrics.memory_used_mb
+
+            },
+
+            &#x27;application&#x27;: {
+
+                &#x27;active_connections&#x27;: latest_metrics.active_connections,
+
+                &#x27;request_rate&#x27;: latest_metrics.request_rate,
+
+                &#x27;avg_response_time&#x27;: latest_metrics.avg_response_time,
+
+                &#x27;error_rate&#x27;: latest_metrics.error_rate
+
+            },
+
+            &#x27;database&#x27;: {
+
+                &#x27;connections&#x27;: latest_metrics.database_connections
+
+            }
+
+        }
+
+    
+
+    def get_metrics_summary(self, hours: int = 24) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get performance metrics summary for the specified hours.&quot;&quot;&quot;
+
+        
+
+        cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+
+        recent_metrics = [
+
+            m for m in self.metrics_history
+
+            if m.timestamp &gt; cutoff_time
+
+        ]
+
+        
+
+        if not recent_metrics:
+
+            return {}
+
+        
+
+        # Calculate averages
+
+        avg_cpu = sum(m.cpu_percent for m in recent_metrics) / len(recent_metrics)
+
+        avg_memory = sum(m.memory_percent for m in recent_metrics) / len(recent_metrics)
+
+        avg_response_time = sum(m.avg_response_time for m in recent_metrics) / len(recent_metrics)
+
+        
+
+        # Calculate peaks
+
+        max_cpu = max(m.cpu_percent for m in recent_metrics)
+
+        max_memory = max(m.memory_percent for m in recent_metrics)
+
+        max_response_time = max(m.avg_response_time for m in recent_metrics)
+
+        
+
+        return {
+
+            &#x27;period_hours&#x27;: hours,
+
+            &#x27;averages&#x27;: {
+
+                &#x27;cpu_percent&#x27;: round(avg_cpu, 2),
+
+                &#x27;memory_percent&#x27;: round(avg_memory, 2),
+
+                &#x27;response_time&#x27;: round(avg_response_time, 3)
+
+            },
+
+            &#x27;peaks&#x27;: {
+
+                &#x27;cpu_percent&#x27;: round(max_cpu, 2),
+
+                &#x27;memory_percent&#x27;: round(max_memory, 2),
+
+                &#x27;response_time&#x27;: round(max_response_time, 3)
+
+            },
+
+            &#x27;data_points&#x27;: len(recent_metrics)
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔐 프로덕션 보안 구성</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">보안 강화</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# k8s/security-policy.yaml - Kubernetes security policies
+
+apiVersion: v1
+
+kind: SecurityContext
+
+metadata:
+
+  name: mcp-retail-security-context
+
+spec:
+
+  runAsNonRoot: true
+
+  runAsUser: 1000
+
+  runAsGroup: 1000
+
+  fsGroup: 1000
+
+  seccompProfile:
+
+    type: RuntimeDefault
+
+  capabilities:
+
+    drop:
+
+      - ALL
+
+  readOnlyRootFilesystem: true
+
+  allowPrivilegeEscalation: false
+
+
+
+---
+
+apiVersion: networking.k8s.io/v1
+
+kind: NetworkPolicy
+
+metadata:
+
+  name: mcp-retail-network-policy
+
+  namespace: mcp-retail
+
+spec:
+
+  podSelector:
+
+    matchLabels:
+
+      app: mcp-retail-server
+
+  policyTypes:
+
+    - Ingress
+
+    - Egress
+
+  ingress:
+
+    - from:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              name: ingress-nginx
+
+      ports:
+
+        - protocol: TCP
+
+          port: 8000
+
+  egress:
+
+    - to:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              name: database
+
+      ports:
+
+        - protocol: TCP
+
+          port: 5432
+
+    - to: []
+
+      ports:
+
+        - protocol: TCP
+
+          port: 443  # HTTPS for Azure OpenAI
+
+        - protocol: TCP
+
+          port: 53   # DNS
+
+        - protocol: UDP
+
+          port: 53   # DNS
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">환경 구성</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# scripts/setup-production-env.sh
+
+#!/bin/bash
+
+
+
+# Production environment setup script
+
+set -euo pipefail
+
+
+
+echo &quot;🔧 Setting up production environment...&quot;
+
+
+
+# Create resource groups
+
+az group create --name &quot;mcp-retail-prod-rg&quot; --location &quot;East US&quot;
+
+az group create --name &quot;mcp-retail-shared-rg&quot; --location &quot;East US&quot;
+
+
+
+# Create Key Vault
+
+echo &quot;🔐 Creating Azure Key Vault...&quot;
+
+az keyvault create \
+
+  --name &quot;mcp-retail-kv-prod&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --location &quot;East US&quot; \
+
+  --enable-rbac-authorization true
+
+
+
+# Set secrets
+
+echo &quot;🔑 Setting up secrets...&quot;
+
+az keyvault secret set \
+
+  --vault-name &quot;mcp-retail-kv-prod&quot; \
+
+  --name &quot;postgres-password&quot; \
+
+  --value &quot;${POSTGRES_PASSWORD}&quot;
+
+
+
+az keyvault secret set \
+
+  --vault-name &quot;mcp-retail-kv-prod&quot; \
+
+  --name &quot;azure-openai-key&quot; \
+
+  --value &quot;${AZURE_OPENAI_KEY}&quot;
+
+
+
+# Create container registry
+
+echo &quot;📦 Creating container registry...&quot;
+
+az acr create \
+
+  --name &quot;mcpretailregistry&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --sku Premium \
+
+  --admin-enabled false
+
+
+
+# Create virtual network
+
+echo &quot;🌐 Creating virtual network...&quot;
+
+az network vnet create \
+
+  --name &quot;mcp-retail-vnet&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --address-prefix &quot;10.0.0.0/16&quot; \
+
+  --subnet-name &quot;container-apps&quot; \
+
+  --subnet-prefix &quot;10.0.1.0/24&quot;
+
+
+
+az network vnet subnet create \
+
+  --name &quot;database&quot; \
+
+  --resource-group &quot;mcp-retail-shared-rg&quot; \
+
+  --vnet-name &quot;mcp-retail-vnet&quot; \
+
+  --address-prefix &quot;10.0.2.0/24&quot; \
+
+  --delegations Microsoft.DBforPostgreSQL/flexibleServers
+
+
+
+# Deploy infrastructure
+
+echo &quot;🏗️  Deploying infrastructure...&quot;
+
+az deployment group create \
+
+  --resource-group &quot;mcp-retail-prod-rg&quot; \
+
+  --template-file &quot;infra/main.bicep&quot; \
+
+  --parameters &quot;infra/main.parameters.prod.json&quot;
+
+
+
+echo &quot;✅ Production environment setup complete!&quot;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 갖추게 됩니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>컨테이너 전략</strong>: 보안이 강화된 프로덕션 준비 Docker 컨테이너  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>클라우드 배포</strong>: 자동 확장 및 모니터링이 포함된 Azure Container Apps  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>데이터베이스 배포</strong>: 고가용성을 갖춘 PostgreSQL Flexible Server  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>CI/CD 파이프라인</strong>: 자동화된 테스트, 빌드 및 배포 워크플로우  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>성능 모니터링</strong>: 포괄적인 메트릭 수집 및 경고  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>보안 구성</strong>: 프로덕션급 보안 정책 및 네트워크 격리  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/11-Monitoring/README.md" target="_blank">Lab 11: 모니터링 및 관측</a></strong>을 계속 진행하여:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Application Insights를 사용한 포괄적인 모니터링 설정  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">구조화된 로깅 및 분산 추적 구성  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">경고 및 자동 응답 시스템 구현  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비즈니스 메트릭 및 성능 KPI 모니터링  </li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">컨테이너 기술</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.docker.com/develop/dev-best-practices/">Docker Best Practices</a> - Docker 공식 모범 사례  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/container-apps/">Azure Container Apps</a> - Azure Container Apps 문서  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://kubernetes.io/docs/">Kubernetes Documentation</a> - Kubernetes 공식 문서  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">CI/CD 및 DevOps</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.github.com/en/actions">GitHub Actions</a> - GitHub Actions 문서  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/devops/">Azure DevOps</a> - Azure DevOps 서비스  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/">Infrastructure as Code</a> - Azure Bicep 문서  </li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">보안 및 모니터링</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/security-center/">Azure Security Center</a> - Azure 보안 권장 사항  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://kubernetes.io/docs/concepts/security/">Container Security</a> - Kubernetes 보안 개념  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview">Application Insights</a> - Azure Application Insights  </li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>이전</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/09-VS-Code/README.md" target="_blank">Lab 09: VS Code 통합</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/11-Monitoring/README.md" target="_blank">Lab 11: 모니터링 및 관측</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전을 권위 있는 자료로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_10-09---vs-code-integration.html">&larr; 09 - VS Code Integration</a></span>
+  <span><a href="m11_12-11---monitoring-and-observability.html">11 - Monitoring and Observability &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Python sample - Practical Implementation - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 04: Practical Implementation</span> &rsaquo; Python sample</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Model Context Protocol (MCP) Python Implementation</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This repository contains a Python implementation of the Model Context Protocol (MCP), demonstrating how to create both a server and client application that communicate using the MCP standard.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The MCP implementation consists of two main components:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>MCP Server (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">server.py</code>)</strong> - A server that exposes:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Tools</strong>: Functions that can be called remotely</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Resources</strong>: Data that can be retrieved</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Prompts</strong>: Templates for generating prompts for language models</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>MCP Client (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">client.py</code>)</strong> - A client application that connects to the server and uses its features</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Features</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This implementation demonstrates several key MCP features:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Tools</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">completion</code> - Generates text completions from AI models (simulated)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">add</code> - Simple calculator that adds two numbers</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Resources</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">models://</code> - Returns information about available AI models</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">greeting://{name}</code> - Returns a personalized greeting for a given name</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Prompts</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">review_code</code> - Generates a prompt for reviewing code</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Installation</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To use this MCP implementation, install the required packages:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+pip install mcp-server mcp-client
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Running the Server and Client</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Starting the Server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Run the server in one terminal window:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python server.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The server can also be run in development mode using the MCP CLI:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp dev server.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Or installed in Claude Desktop (if available):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp install server.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Running the Client</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Run the client in another terminal window:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python client.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This will connect to the server and demonstrate all available features.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Client Usage</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The client (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">client.py</code>) demonstrates all the MCP capabilities:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python client.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This will connect to the server and exercise all features including tools, resources, and prompts. The output will show:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Calculator tool result (5 + 7 = 12)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. Completion tool response to "What is the meaning of life?"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. List of available AI models</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. Personalized greeting for "MCP Explorer"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. Code review prompt template</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Implementation Details</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The server is implemented using the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">FastMCP</code> API, which provides high-level abstractions for defining MCP services.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's a simplified example of how tools are defined:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool()
+
+def add(a: int, b: int) -&gt; int:
+
+    &quot;&quot;&quot;Add two numbers together
+
+    
+
+    Args:
+
+        a: First number
+
+        b: Second number
+
+    
+
+    Returns:
+
+        The sum of the two numbers
+
+    &quot;&quot;&quot;
+
+    logger.info(f&quot;Adding {a} and {b}&quot;)
+
+    return a + b
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The client uses the MCP client library to connect to and call the server:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async with stdio_client(server_params) as (reader, writer):
+
+    async with ClientSession(reader, writer) as session:
+
+        await session.initialize()
+
+        result = await session.call_tool(&quot;add&quot;, arguments={&quot;a&quot;: 5, &quot;b&quot;: 7})
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learn More</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For more information about MCP, visit: https://modelcontextprotocol.io/</p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Model Context Protocol (MCP) Python 구현</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 저장소에는 Model Context Protocol (MCP)의 Python 구현이 포함되어 있으며, MCP 표준을 사용하여 통신하는 서버와 클라이언트 애플리케이션을 만드는 방법을 보여줍니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 구현은 두 가지 주요 구성 요소로 이루어져 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>MCP 서버 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">server.py</code>)</strong> - 다음을 제공하는 서버:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Tools</strong>: 원격으로 호출할 수 있는 함수들</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Resources</strong>: 가져올 수 있는 데이터</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Prompts</strong>: 언어 모델용 프롬프트 템플릿</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>MCP 클라이언트 (<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">client.py</code>)</strong> - 서버에 연결하여 기능을 사용하는 클라이언트 애플리케이션</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">기능</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 구현은 여러 주요 MCP 기능을 보여줍니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Tools</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">completion</code> - AI 모델로부터 텍스트 완성을 생성 (시뮬레이션)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">add</code> - 두 숫자를 더하는 간단한 계산기</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Resources</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">models://</code> - 사용 가능한 AI 모델에 대한 정보 반환</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">greeting://{name}</code> - 주어진 이름에 대한 맞춤 인사 반환</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Prompts</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">review_code</code> - 코드 리뷰용 프롬프트 생성</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">설치</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 MCP 구현을 사용하려면 필요한 패키지를 설치하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+pip install mcp-server mcp-client
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">서버 및 클라이언트 실행</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">서버 시작</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">한 터미널 창에서 서버를 실행하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python server.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버는 MCP CLI를 사용하여 개발 모드로도 실행할 수 있습니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp dev server.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">또는 Claude Desktop에 설치하여 실행할 수도 있습니다 (사용 가능한 경우):</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+mcp install server.py
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">클라이언트 실행</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다른 터미널 창에서 클라이언트를 실행하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python client.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이렇게 하면 서버에 연결되어 모든 기능을 시연합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">클라이언트 사용법</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트(<code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">client.py</code>)는 MCP의 모든 기능을 보여줍니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+python client.py
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버에 연결하여 tools, resources, prompts를 포함한 모든 기능을 사용합니다. 출력 결과는 다음을 보여줍니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 계산기 도구 결과 (5 + 7 = 12)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. "What is the meaning of life?"에 대한 completion 도구 응답</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 사용 가능한 AI 모델 목록</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. "MCP Explorer"에 대한 맞춤 인사</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. 코드 리뷰 프롬프트 템플릿</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">구현 세부사항</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">서버는 MCP 서비스를 정의하기 위한 고수준 추상화를 제공하는 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">FastMCP</code> API를 사용하여 구현되었습니다. 다음은 도구가 정의되는 간단한 예시입니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+@mcp.tool()
+
+def add(a: int, b: int) -&gt; int:
+
+    &quot;&quot;&quot;Add two numbers together
+
+    
+
+    Args:
+
+        a: First number
+
+        b: Second number
+
+    
+
+    Returns:
+
+        The sum of the two numbers
+
+    &quot;&quot;&quot;
+
+    logger.info(f&quot;Adding {a} and {b}&quot;)
+
+    return a + b
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">클라이언트는 MCP 클라이언트 라이브러리를 사용하여 서버에 연결하고 호출합니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+async with stdio_client(server_params) as (reader, writer):
+
+    async with ClientSession(reader, writer) as session:
+
+        await session.initialize()
+
+        result = await session.call_tool(&quot;add&quot;, arguments={&quot;a&quot;: 5, &quot;b&quot;: 7})
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">더 알아보기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP에 대한 자세한 정보는 다음을 방문하세요: https://modelcontextprotocol.io/</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m04_08-javascript-sample.html">&larr; JavaScript sample</a></span>
+  <span></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

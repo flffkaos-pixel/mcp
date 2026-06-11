@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>04 Vscode - Getting Started - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../getting-started.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 03: Getting Started</span> &rsaquo; 04 Vscode</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Consuming a server from GitHub Copilot Agent mode</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Visual Studio Code and GitHub Copilot can act as a client and consume an MCP Server.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Why would we want to do that you might ask?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Well, that means whatever features the MCP Server has can now be used from within your IDE.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Imagine you adding for example GitHub's MCP server, this would allow for controlling GitHub via prompts over typing specific commands in the terminal.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Or imagine anything in general that could improve your developer experience all controlled by natural language.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now you start to see the win right?</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lesson covers how to use Visual Studio Code and GitHub Copilot's Agent mode as a client for your MCP Server.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lesson, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Consume an MCP Server via Visual Studio Code.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Run capabilities like tools via GitHub Copilot.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure Visual Studio Code to find and manage your MCP Server.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Usage</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You can control your MCP server in two different ways:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">User interface, you will see how this is done later in this chapter.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Terminal, it's possible to control things from the terminal using the <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">code</code> exectuable:</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  To add an MCP server to your user profile, use the --add-mcp command line option, and provide the JSON server configuration in the form {\"name\":\"server-name\",\"command\":...}.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  code --add-mcp "{\"name\":\"my-server\",\"command\": \"uvx\",\"args\": [\"mcp-server-fetch\"]}"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Screenshots</h4>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Let's talk more about how we use the visual interface in the next sections.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Approach</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's how we need to approach this at high level:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure a file to find our MCP Server.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Start up/Connect to said server to have it list its capabilities.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Use said capabilities through GitHub Copilot Chat interface.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Great, now that we understand the flow, let's try use an MCP Server through Visual Studio Code through an exercise.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Exercise: Consuming a server</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In this exercise, we will configure Visual Studio Code to find your MCP server so that it can be used from GitHub Copilot Chat interface.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-0- Prestep, enable MCP Server discovery</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You may need to enable discovery of MCP Servers.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Go to <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">File -> Preferences -> Settings</code> in Visual Studio Code.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Search for "MCP" and enable <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">chat.mcp.discovery.enabled</code> in the settings.json file.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- Create config file</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Start by creating a config file in your project root, you will need a file called MCP.json and to place it in a folder called .vscode. It should look like so:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+.vscode
+
+|-- mcp.json
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Next, let's see how we can add a server entry.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- Configure a server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Add the following content to *mcp.json*:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+    &quot;inputs&quot;: [],
+
+    &quot;servers&quot;: {
+
+       &quot;hello-mcp&quot;: {
+
+           &quot;command&quot;: &quot;node&quot;,
+
+           &quot;args&quot;: [
+
+               &quot;build/index.js&quot;
+
+           ]
+
+       }
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Here's a simple example above how to start a server written in Node.js, for other runtimes point out the proper command for starting the server using <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">command</code> and <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">args</code>.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- Start the server</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now that you've added an entry, let's start the server:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Locate your entry in *mcp.json* and make sure you find the "play" icon:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/04-vscode/assets/vscode-start-server.png" target="_blank">Starting server in Visual Studio Code</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Click the "play" icon, you should see the tools icon in the GitHub Copilot Chat increase the number of available tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">If you click said tools icon, you will see a list of registered tools.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You can check/uncheck each tool depending if you want GitHub Copilot to use them as context:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/04-vscode/assets/vscode-tool.png" target="_blank">Starting server in Visual Studio Code</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. To run a tool, type a prompt that you know will match the description of one of your tools, for example a prompt like so "add 22 to 1":</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/04-vscode/assets/vscode-agent.png" target="_blank">Running a tool from GitHub Copilot</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  You should see a response saying 23.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Assignment</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Try adding a server entry to your *mcp.json* file and make sure you can start/stop the server. Make sure you can also communicate with the tools on your server via GitHub Copilot Chat interface.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Solution</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The takeaways from this chapter is the following:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Visual Studio Code is a great client that lets you consume several MCP Servers and their tools.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub Copilot Chat interface is how you interact with the servers.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">You can prompt the user for inputs like API keys that can be passed to the MCP Server when configuring the server entry in *mcp.json* file.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Samples</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/java/calculator/README.md" target="_blank">Java Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/csharp/" target="_blank">.Net Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/javascript/README.md" target="_blank">JavaScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/typescript/README.md" target="_blank">TypeScript Calculator</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/python/" target="_blank">Python Calculator</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Additional Resources</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/copilot/chat/mcp-servers">Visual Studio docs</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/05-stdio-server/README.md" target="_blank">Creating a stdio Server</a></li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">GitHub Copilot 에이전트 모드에서 서버 사용하기</h2>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Visual Studio Code와 GitHub Copilot은 클라이언트 역할을 하며 MCP 서버를 사용할 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">왜 이런 기능이 필요할까요?</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버의 모든 기능을 IDE 내에서 사용할 수 있다는 뜻입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">예를 들어 GitHub의 MCP 서버를 추가하면 터미널에서 특정 명령어를 입력하는 대신 프롬프트를 통해 GitHub을 제어할 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">또는 개발자 경험을 개선할 수 있는 모든 것을 자연어로 제어할 수 있다고 상상해 보세요.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이제 이 기능의 장점을 이해할 수 있겠죠?</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 강의에서는 Visual Studio Code와 GitHub Copilot의 에이전트 모드를 사용하여 MCP 서버를 클라이언트로 활용하는 방법을 다룹니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 강의를 마치면 다음을 할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Visual Studio Code를 통해 MCP 서버를 사용할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub Copilot을 통해 도구와 같은 기능을 실행할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Visual Studio Code를 설정하여 MCP 서버를 찾고 관리할 수 있습니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">사용법</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버를 제어하는 방법은 두 가지가 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자 인터페이스: 이 방법은 이후 챕터에서 다룹니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">터미널: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">code</code> 실행 파일을 사용하여 터미널에서 제어할 수 있습니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  사용자 프로필에 MCP 서버를 추가하려면 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">--add-mcp</code> 명령줄 옵션을 사용하고 JSON 서버 설정을 다음 형식으로 제공하세요: {\"name\":\"server-name\",\"command\":...}.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  code --add-mcp "{\"name\":\"my-server\",\"command\": \"uvx\",\"args\": [\"mcp-server-fetch\"]}"</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  ```</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">스크린샷</h4>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음 섹션에서 시각적 인터페이스를 사용하는 방법에 대해 더 알아보겠습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">접근 방식</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음은 고수준에서 접근해야 할 방법입니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버를 찾기 위한 파일을 설정합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">서버를 시작하거나 연결하여 서버의 기능을 나열합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub Copilot 채팅 인터페이스를 통해 해당 기능을 사용합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">좋습니다, 이제 흐름을 이해했으니 Visual Studio Code를 통해 MCP 서버를 사용하는 연습을 해봅시다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">연습: 서버 사용하기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 연습에서는 Visual Studio Code를 설정하여 MCP 서버를 찾아 GitHub Copilot 채팅 인터페이스에서 사용할 수 있도록 합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-0- 사전 단계: MCP 서버 검색 활성화</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버 검색을 활성화해야 할 수도 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Visual Studio Code에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">파일 -> 기본 설정 -> 설정</code>으로 이동합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. "MCP"를 검색하고 settings.json 파일에서 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">chat.mcp.discovery.enabled</code>를 활성화합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-1- 설정 파일 생성</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">프로젝트 루트에 설정 파일을 생성하세요. MCP.json이라는 파일을 생성하고 .vscode 폴더에 배치해야 합니다. 다음과 같이 보일 것입니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+.vscode
+
+|-- mcp.json
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다음으로 서버 항목을 추가하는 방법을 알아봅시다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-2- 서버 설정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*mcp.json*에 다음 내용을 추가하세요:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+{
+
+    &quot;inputs&quot;: [],
+
+    &quot;servers&quot;: {
+
+       &quot;hello-mcp&quot;: {
+
+           &quot;command&quot;: &quot;node&quot;,
+
+           &quot;args&quot;: [
+
+               &quot;build/index.js&quot;
+
+           ]
+
+       }
+
+    }
+
+}
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위의 예는 Node.js로 작성된 서버를 시작하는 간단한 예입니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다른 런타임의 경우 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">command</code>와 <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">args</code>를 사용하여 서버를 시작하는 적절한 명령을 지정하세요.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">-3- 서버 시작</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">항목을 추가했으니 이제 서버를 시작해봅시다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. *mcp.json*에서 항목을 찾아 "재생" 아이콘을 확인하세요:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/translated_images/ko/vscode-start-server.8e3c986612e3555d.webp" target="_blank">Visual Studio Code에서 서버 시작</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. "재생" 아이콘을 클릭하면 GitHub Copilot 채팅의 도구 아이콘에 사용 가능한 도구 수가 증가하는 것을 볼 수 있습니다. 해당 도구 아이콘을 클릭하면 등록된 도구 목록이 표시됩니다. 각 도구를 체크하거나 체크 해제하여 GitHub Copilot이 이를 컨텍스트로 사용할지 여부를 결정할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/translated_images/ko/vscode-tool.0b3bbea2fb7d8c26.webp" target="_blank">Visual Studio Code에서 도구 시작</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. 도구를 실행하려면 도구 설명과 일치하는 프롬프트를 입력하세요. 예를 들어 "22에 1을 더해줘"와 같은 프롬프트를 입력합니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  !<a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/translated_images/ko/vscode-agent.d5a0e0b897331060.webp" target="_blank">GitHub Copilot에서 도구 실행</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">  응답으로 23이 표시될 것입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">과제</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">*mcp.json* 파일에 서버 항목을 추가하고 서버를 시작/중지할 수 있는지 확인하세요. GitHub Copilot 채팅 인터페이스를 통해 서버의 도구와 통신할 수 있는지도 확인하세요.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">솔루션</h3>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">주요 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 챕터의 주요 내용은 다음과 같습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Visual Studio Code는 여러 MCP 서버와 그 도구를 사용할 수 있는 훌륭한 클라이언트입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">GitHub Copilot 채팅 인터페이스는 서버와 상호작용하는 방법입니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">API 키와 같은 입력을 사용자에게 요청하여 *mcp.json* 파일에서 서버 항목을 설정할 때 MCP 서버에 전달할 수 있습니다.</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">샘플</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/java/calculator/README.md" target="_blank">Java 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/csharp" target="_blank">.Net 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/javascript/README.md" target="_blank">JavaScript 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/typescript/README.md" target="_blank">TypeScript 계산기</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/samples/python" target="_blank">Python 계산기</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">추가 자료</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://code.visualstudio.com/docs/copilot/chat/mcp-servers">Visual Studio 문서</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다음: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/05-stdio-server/README.md" target="_blank">Stdio 서버 생성하기</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있지만, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전을 권위 있는 출처로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m03_03-03-llm-client.html">&larr; 03 Llm Client</a></span>
+  <span><a href="m03_05-05-stdio-server.html">05 Stdio Server &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

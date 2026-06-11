@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>5.14 Context Engineering - Advanced Topics - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../intermediate.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../intermediate.html">Intermediate</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 05: Advanced Topics</span> &rsaquo; 5.14 Context Engineering</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Context Engineering: An Emerging Concept in the MCP Ecosystem</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context engineering is an emerging concept in the AI space that explores how information is structured, delivered, and maintained throughout interactions between clients and AI services.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As the Model Context Protocol (MCP) ecosystem evolves, understanding how to effectively manage context becomes increasingly important.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This module introduces the concept of context engineering and explores its potential applications in MCP implementations.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this module, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Understand the emerging concept of context engineering and its potential role in MCP applications</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Identify key challenges in context management that the MCP protocol design addresses</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Explore techniques for improving model performance through better context handling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Consider approaches to measure and evaluate context effectiveness</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Apply these emerging concepts to improve AI experiences through the MCP framework</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Introduction to Context Engineering</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context engineering is an emerging concept focused on the deliberate design and management of information flow between users, applications, and AI models.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Unlike established fields such as prompt engineering, context engineering is still being defined by practitioners as they work to solve the unique challenges of providing AI models with the right information at the right time.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As large language models (LLMs) have evolved, the importance of context has become increasingly apparent.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The quality, relevance, and structure of the context we provide directly impacts model outputs.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context engineering explores this relationship and seeks to develop principles for effective context management.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> "In 2025, the models out there are extremely intelligent.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">But even the smartest human won't be able to do their job effectively without the context of what they're being asked to do... 'Context engineering' is the next level of prompt engineering.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">It is about doing this automatically in a dynamic system." — Walden Yan, Cognition AI</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context engineering might encompass:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Context Selection</strong>: Determining what information is relevant for a given task</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Context Structuring</strong>: Organizing information to maximize model comprehension</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Context Delivery</strong>: Optimizing how and when information is sent to models</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Context Maintenance</strong>: Managing state and evolution of context over time</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Context Evaluation</strong>: Measuring and improving the effectiveness of context</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These areas of focus are particularly relevant to the MCP ecosystem, which provides a standardized way for applications to provide context to LLMs.</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">The Context Journey Perspective</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">One way to visualize context engineering is to trace the journey information takes through an MCP system:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    A[User Input] --&gt; B[Context Assembly]
+
+    B --&gt; C[Model Processing]
+
+    C --&gt; D[Response Generation]
+
+    D --&gt; E[State Management]
+
+    E --&gt;|Next Interaction| A
+
+    
+
+    style A fill:#A8D5BA,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B fill:#7FB3D5,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C fill:#F5CBA7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D fill:#C39BD3,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style E fill:#F9E79F,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Key Stages in the Context Journey:</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>User Input</strong>: Raw information from the user (text, images, documents)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Context Assembly</strong>: Combining user input with system context, conversation history, and other retrieved information</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Model Processing</strong>: The AI model processes the assembled context</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Response Generation</strong>: The model produces outputs based on the provided context</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>State Management</strong>: The system updates its internal state based on the interaction</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This perspective highlights the dynamic nature of context in AI systems and raises important questions about how to best manage information at each stage.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Emerging Principles in Context Engineering</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As the field of context engineering takes shape, some early principles are beginning to emerge from practitioners. These principles may help inform MCP implementation choices:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Principle 1: Share Context Completely</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context should be shared completely between all components of a system rather than fragmented across multiple agents or processes. When context is distributed, decisions made in one part of the system may conflict with those made elsewhere.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    subgraph &quot;Fragmented Context Approach&quot;
+
+    A1[Agent 1] --- C1[Context 1]
+
+    A2[Agent 2] --- C2[Context 2]
+
+    A3[Agent 3] --- C3[Context 3]
+
+    end
+
+    
+
+    subgraph &quot;Unified Context Approach&quot;
+
+    B1[Agent] --- D1[Shared Complete Context]
+
+    end
+
+    
+
+    style A1 fill:#AED6F1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style A2 fill:#AED6F1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style A3 fill:#AED6F1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B1 fill:#A9DFBF,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C1 fill:#F5B7B1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C2 fill:#F5B7B1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C3 fill:#F5B7B1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D1 fill:#D7BDE2,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In MCP applications, this suggests designing systems where context flows seamlessly through the entire pipeline rather than being compartmentalized.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Principle 2: Recognize That Actions Carry Implicit Decisions</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Each action a model takes embodies implicit decisions about how to interpret the context. When multiple components act on different contexts, these implicit decisions can conflict, leading to inconsistent outcomes.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This principle has important implications for MCP applications:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Prefer linear processing of complex tasks over parallel execution with fragmented context</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Ensure that all decision points have access to the same contextual information</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Design systems where later steps can see the full context of earlier decisions</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Principle 3: Balance Context Depth with Window Limitations</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As conversations and processes grow longer, context windows eventually overflow. Effective context engineering explores approaches to manage this tension between comprehensive context and technical limitations.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Potential approaches being explored include:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Context compression that maintains essential information while reducing token usage</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Progressive loading of context based on relevance to current needs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Summarization of previous interactions while preserving key decisions and facts</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Context Challenges and MCP Protocol Design</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The Model Context Protocol (MCP) was designed with an awareness of the unique challenges of context management. Understanding these challenges helps explain key aspects of the MCP protocol design:</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenge 1: Context Window Limitations</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Most AI models have fixed context window sizes, limiting how much information they can process at once.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP Design Response:</strong> </p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The protocol supports structured, resource-based context that can be referenced efficiently</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Resources can be paginated and loaded progressively</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenge 2: Relevance Determination</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Determining which information is most relevant to include in context is difficult.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP Design Response:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Flexible tooling allows dynamic retrieval of information based on need</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Structured prompts enable consistent context organization</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenge 3: Context Persistence</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Managing state across interactions requires careful tracking of context.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP Design Response:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Standardized session management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Clearly defined interaction patterns for context evolution</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenge 4: Multi-Modal Context</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Different types of data (text, images, structured data) require different handling.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP Design Response:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Protocol design accommodates various content types</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Standardized representation of multi-modal information</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Challenge 5: Security and Privacy</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context often contains sensitive information that must be protected.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP Design Response:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Clear boundaries between client and server responsibilities</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Local processing options to minimize data exposure</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Understanding these challenges and how MCP addresses them provides a foundation for exploring more advanced context engineering techniques.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Emerging Context Engineering Approaches</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As the field of context engineering develops, several promising approaches are emerging. These represent current thinking rather than established best practices, and will likely evolve as we gain more experience with MCP implementations.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. Single-Threaded Linear Processing</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In contrast to multi-agent architectures that distribute context, some practitioners are finding that single-threaded linear processing produces more consistent results. This aligns with the principle of maintaining unified context.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    A[Task Start] --&gt; B[Process Step 1]
+
+    B --&gt; C[Process Step 2]
+
+    C --&gt; D[Process Step 3]
+
+    D --&gt; E[Result]
+
+    
+
+    style A fill:#A9CCE3,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B fill:#A3E4D7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C fill:#F9E79F,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D fill:#F5CBA7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style E fill:#D2B4DE,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">While this approach may seem less efficient than parallel processing, it often produces more coherent and reliable results because each step builds on a complete understanding of previous decisions.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. Context Chunking and Prioritization</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Breaking large contexts into manageable pieces and prioritizing what's most important.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Conceptual Example: Context Chunking and Prioritization
+
+def process_with_chunked_context(documents, query):
+
+    # 1. Break documents into smaller chunks
+
+    chunks = chunk_documents(documents)
+
+    
+
+    # 2. Calculate relevance scores for each chunk
+
+    scored_chunks = [(chunk, calculate_relevance(chunk, query)) for chunk in chunks]
+
+    
+
+    # 3. Sort chunks by relevance score
+
+    sorted_chunks = sorted(scored_chunks, key=lambda x: x[1], reverse=True)
+
+    
+
+    # 4. Use the most relevant chunks as context
+
+    context = create_context_from_chunks([chunk for chunk, score in sorted_chunks[:5]])
+
+    
+
+    # 5. Process with the prioritized context
+
+    return generate_response(context, query)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The concept above illustrates how we might break large documents into manageable pieces and select only the most relevant parts for context. This approach can help work within context window limitations while still leveraging large knowledge bases.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. Progressive Context Loading</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Loading context progressively as needed rather than all at once.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    participant User
+
+    participant App
+
+    participant MCP Server
+
+    participant AI Model
+
+
+
+    User-&gt;&gt;App: Ask Question
+
+    App-&gt;&gt;MCP Server: Initial Request
+
+    MCP Server-&gt;&gt;AI Model: Minimal Context
+
+    AI Model-&gt;&gt;MCP Server: Initial Response
+
+    
+
+    alt Needs More Context
+
+        MCP Server-&gt;&gt;MCP Server: Identify Missing Context
+
+        MCP Server-&gt;&gt;MCP Server: Load Additional Context
+
+        MCP Server-&gt;&gt;AI Model: Enhanced Context
+
+        AI Model-&gt;&gt;MCP Server: Final Response
+
+    end
+
+    
+
+    MCP Server-&gt;&gt;App: Response
+
+    App-&gt;&gt;User: Answer
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Progressive context loading starts with minimal context and expands only when necessary. This can significantly reduce token usage for simple queries while maintaining the ability to handle complex questions.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. Context Compression and Summarization</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Reducing context size while preserving essential information.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    A[Full Context] --&gt; B[Compression Model]
+
+    B --&gt; C[Compressed Context]
+
+    C --&gt; D[Main Processing Model]
+
+    D --&gt; E[Response]
+
+    
+
+    style A fill:#A9CCE3,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B fill:#A3E4D7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C fill:#F5CBA7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D fill:#D2B4DE,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style E fill:#F9E79F,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context compression focuses on:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Removing redundant information</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Summarizing lengthy content</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Extracting key facts and details</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Preserving critical context elements</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Optimizing for token efficiency</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This approach can be particularly valuable for maintaining long conversations within context windows or for processing large documents efficiently.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Some practitioners are using specialized models specifically for context compression and summarization of conversation history.</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Exploratory Context Engineering Considerations</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As we explore the emerging field of context engineering, several considerations are worth keeping in mind when working with MCP implementations.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These are not prescriptive best practices but rather areas of exploration that may yield improvements in your specific use case.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Consider Your Context Goals</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Before implementing complex context management solutions, clearly articulate what you're trying to achieve:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">What specific information does the model need to be successful?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Which information is essential versus supplementary?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">What are your performance constraints (latency, token limits, costs)?</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Explore Layered Context Approaches</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Some practitioners are finding success with context arranged in conceptual layers:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Core Layer</strong>: Essential information the model always needs</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Situational Layer</strong>: Context specific to the current interaction</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Supporting Layer</strong>: Additional information that may be helpful</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Fallback Layer</strong>: Information accessed only when needed</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Investigate Retrieval Strategies</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The effectiveness of your context often depends on how you retrieve information:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Semantic search and embeddings for finding conceptually relevant information</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Keyword-based search for specific factual details</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Hybrid approaches that combine multiple retrieval methods</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Metadata filtering to narrow scope based on categories, dates, or sources</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Experiment with Context Coherence</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The structure and flow of your context may affect model comprehension:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Grouping related information together</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Using consistent formatting and organization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Maintaining logical or chronological ordering where appropriate</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Avoiding contradictory information</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Weigh the Tradeoffs of Multi-Agent Architectures</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">While multi-agent architectures are popular in many AI frameworks, they come with significant challenges for context management:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Context fragmentation can lead to inconsistent decisions across agents</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Parallel processing may introduce conflicts that are difficult to reconcile</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Communication overhead between agents can offset performance gains</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Complex state management is required to maintain coherence</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In many cases, a single-agent approach with comprehensive context management may produce more reliable results than multiple specialized agents with fragmented context.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Develop Evaluation Methods</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">To improve context engineering over time, consider how you'll measure success:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">A/B testing different context structures</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Monitoring token usage and response times</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Tracking user satisfaction and task completion rates</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Analyzing when and why context strategies fail</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">These considerations represent active areas of exploration in the context engineering space. As the field matures, more definitive patterns and practices will likely emerge.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Measuring Context Effectiveness: An Evolving Framework</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">As context engineering emerges as a concept, practitioners are beginning to explore how we might measure its effectiveness. No established framework exists yet, but various metrics are being considered that could help guide future work.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Potential Measurement Dimensions</h4>
+
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. Input Efficiency Considerations</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Context-to-Response Ratio</strong>: How much context is needed relative to the response size?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Token Utilization</strong>: What percentage of provided context tokens appear to influence the response?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Context Reduction</strong>: How effectively might we compress raw information?</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. Performance Considerations</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Latency Impact</strong>: How does context management affect response time?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Token Economy</strong>: Are we optimizing token usage effectively?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Retrieval Precision</strong>: How relevant is the retrieved information?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Resource Utilization</strong>: What computational resources are required?</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. Quality Considerations</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Response Relevance</strong>: How well does the response address the query?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Factual Accuracy</strong>: Does context management improve factual correctness?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Consistency</strong>: Are responses consistent across similar queries?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Hallucination Rate</strong>: Does better context reduce model hallucinations?</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4. User Experience Considerations</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Follow-up Rate</strong>: How often do users need clarification?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Task Completion</strong>: Do users successfully accomplish their goals?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Satisfaction Indicators</strong>: How do users rate their experience?</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Exploratory Approaches to Measurement</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">When experimenting with context engineering in MCP implementations, consider these exploratory approaches:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Baseline Comparisons</strong>: Establish a baseline with simple context approaches before testing more sophisticated methods</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Incremental Changes</strong>: Change one aspect of context management at a time to isolate its effects</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>User-Centered Evaluation</strong>: Combine quantitative metrics with qualitative user feedback</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>Failure Analysis</strong>: Examine cases where context strategies fail to understand potential improvements</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>Multi-Dimensional Assessment</strong>: Consider trade-offs between efficiency, quality, and user experience</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This experimental, multi-faceted approach to measurement aligns with the emerging nature of context engineering.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Closing Thoughts</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context engineering is an emerging area of exploration that may prove central to effective MCP applications.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By thoughtfully considering how information flows through your system, you can potentially create AI experiences that are more efficient, accurate, and valuable to users.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The techniques and approaches outlined in this module represent early thinking in this space, not established practices.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Context engineering may develop into a more defined discipline as AI capabilities evolve and our understanding deepens.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">For now, experimentation combined with careful measurement seems to be the most productive approach.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Potential Future Directions</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">The field of context engineering is still in its early stages, but several promising directions are emerging:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Context engineering principles may significantly impact model performance, efficiency, user experience, and reliability</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Single-threaded approaches with comprehensive context management may outperform multi-agent architectures for many use cases</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Specialized context compression models may become standard components in AI pipelines</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">The tension between context completeness and token limitations will likely drive innovation in context handling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">As models become more capable at efficient human-like communication, true multi-agent collaboration may become more viable</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP implementations may evolve to standardize context management patterns that emerge from current experimentation</li>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    A[Early Explorations] --&gt;|Experimentation| B[Emerging Patterns]
+
+    B --&gt;|Validation| C[Established Practices]
+
+    C --&gt;|Application| D[New Challenges]
+
+    D --&gt;|Innovation| A
+
+    
+
+    style A fill:#AED6F1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B fill:#A9DFBF,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C fill:#F4D03F,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D fill:#F5B7B1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Official MCP Resources</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">Model Context Protocol Website</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/modelcontextprotocol">Model Context Protocol Specification</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs">MCP Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/csharp-sdk">MCP C# SDK</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">MCP Python SDK</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">MCP TypeScript SDK</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/inspector">MCP Inspector</a> - Visual testing tool for MCP servers</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Context Engineering Articles</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://cognition.ai/blog/dont-build-multi-agents">Don't Build Multi-Agents: Principles of Context Engineering</a> - Walden Yan's insights on context engineering principles</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf">A Practical Guide to Building Agents</a> - OpenAI's guide on effective agent design</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.anthropic.com/engineering/building-effective-agents">Building Effective Agents</a> - Anthropic's approach to agent development</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Related Research</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2310.01487">Dynamic Retrieval Augmentation for Large Language Models</a> - Research on dynamic retrieval approaches</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2307.03172">Lost in the Middle: How Language Models Use Long Contexts</a> - Important research on context processing patterns</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2204.06125">Hierarchical Text-Conditioned Image Generation with CLIP Latents</a> - DALL-E 2 paper with insights on context structuring</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://aclanthology.org/2023.findings-emnlp.124/">Exploring the Role of Context in Large Language Model Architectures</a> - Recent research on context handling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2304.03442">Multi-Agent Collaboration: A Survey</a> - Research on multi-agent systems and their challenges</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Additional Resources</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/context-window">Context Window Optimization Techniques</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.microsoft.com/en-us/research/blog/retrieval-augmented-generation-rag-and-frontier-models/">Advanced RAG Techniques</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/semantic-kernel">Semantic Kernel Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/aitoolkit">AI Toolkit for Context Management</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's next </h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-transport/README.md" target="_blank">5.15 MCP Custom Transport</a></li></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">컨텍스트 엔지니어링: MCP 생태계에서 떠오르는 개념</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링은 AI 분야에서 새롭게 떠오르는 개념으로, 클라이언트와 AI 서비스 간의 상호작용에서 정보가 어떻게 구조화되고 전달되며 유지되는지를 탐구합니다. 모델 컨텍스트 프로토콜(MCP) 생태계가 발전함에 따라, 컨텍스트를 효과적으로 관리하는 방법을 이해하는 것이 점점 더 중요해지고 있습니다. 이 모듈은 컨텍스트 엔지니어링의 개념을 소개하고 MCP 구현에서의 잠재적 응용을 탐구합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 엔지니어링의 개념과 MCP 응용에서의 잠재적 역할을 이해하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 프로토콜 설계가 해결하는 컨텍스트 관리의 주요 과제를 식별하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">더 나은 컨텍스트 처리를 통해 모델 성능을 향상시키는 기술 탐구하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 효과성을 측정하고 평가하는 접근법 고려하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 프레임워크를 통해 AI 경험을 개선하기 위해 이러한 새로운 개념 적용하기</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">컨텍스트 엔지니어링 소개</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링은 사용자, 애플리케이션, AI 모델 간의 정보 흐름을 의도적으로 설계하고 관리하는 데 초점을 맞춘 새로운 개념입니다. 프롬프트 엔지니어링과 같은 기존 분야와 달리, 컨텍스트 엔지니어링은 AI 모델에 적시에 적절한 정보를 제공하는 독특한 과제를 해결하려는 실무자들에 의해 아직 정의되고 있는 단계입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">대규모 언어 모델(LLM)이 발전함에 따라 컨텍스트의 중요성이 점점 더 명확해지고 있습니다. 우리가 제공하는 컨텍스트의 품질, 관련성, 구조는 모델 출력에 직접적인 영향을 미칩니다. 컨텍스트 엔지니어링은 이 관계를 탐구하고 효과적인 컨텍스트 관리를 위한 원칙을 개발하려고 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">> "2025년에는 모델들이 매우 지능적입니다. 하지만 가장 똑똑한 사람이라도 자신이 해야 할 일을 이해하는 컨텍스트 없이는 효과적으로 일을 수행할 수 없습니다... '컨텍스트 엔지니어링'은 프롬프트 엔지니어링의 다음 단계입니다. 이는 동적 시스템에서 이를 자동으로 수행하는 것입니다." — Walden Yan, Cognition AI</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링은 다음을 포함할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>컨텍스트 선택</strong>: 특정 작업에 적합한 정보를 결정하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>컨텍스트 구조화</strong>: 모델 이해를 극대화하기 위해 정보를 조직화하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>컨텍스트 전달</strong>: 정보가 모델에 전달되는 방식과 시점을 최적화하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>컨텍스트 유지</strong>: 시간에 따라 컨텍스트의 상태와 진화를 관리하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>컨텍스트 평가</strong>: 컨텍스트의 효과성을 측정하고 개선하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이러한 초점 영역은 특히 LLM에 컨텍스트를 제공하는 표준화된 방법을 제공하는 MCP 생태계와 관련이 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">컨텍스트 여정 관점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링을 시각화하는 한 가지 방법은 MCP 시스템을 통해 정보가 이동하는 여정을 추적하는 것입니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph LR
+
+    A[User Input] --&gt; B[Context Assembly]
+
+    B --&gt; C[Model Processing]
+
+    C --&gt; D[Response Generation]
+
+    D --&gt; E[State Management]
+
+    E --&gt;|Next Interaction| A
+
+    
+
+    style A fill:#A8D5BA,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B fill:#7FB3D5,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C fill:#F5CBA7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D fill:#C39BD3,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style E fill:#F9E79F,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">컨텍스트 여정의 주요 단계:</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>사용자 입력</strong>: 사용자로부터의 원시 정보(텍스트, 이미지, 문서)</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>컨텍스트 조립</strong>: 사용자 입력을 시스템 컨텍스트, 대화 기록 및 기타 검색된 정보와 결합하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>모델 처리</strong>: AI 모델이 조립된 컨텍스트를 처리하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>응답 생성</strong>: 모델이 제공된 컨텍스트를 기반으로 출력 생성하기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>상태 관리</strong>: 시스템이 상호작용을 기반으로 내부 상태를 업데이트하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 관점은 AI 시스템에서 컨텍스트의 역동적인 특성을 강조하며 각 단계에서 정보를 최적으로 관리하는 방법에 대한 중요한 질문을 제기합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">컨텍스트 엔지니어링의 떠오르는 원칙</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링 분야가 형성됨에 따라 실무자들로부터 몇 가지 초기 원칙이 나타나고 있습니다. 이러한 원칙은 MCP 구현 선택에 정보를 제공하는 데 도움이 될 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">원칙 1: 컨텍스트를 완전히 공유하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트는 시스템의 모든 구성 요소 간에 완전히 공유되어야 하며, 여러 에이전트나 프로세스에 분산되지 않아야 합니다. 컨텍스트가 분산되면 시스템의 한 부분에서 내린 결정이 다른 곳에서 내린 결정과 충돌할 수 있습니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    subgraph &quot;Fragmented Context Approach&quot;
+
+    A1[Agent 1] --- C1[Context 1]
+
+    A2[Agent 2] --- C2[Context 2]
+
+    A3[Agent 3] --- C3[Context 3]
+
+    end
+
+    
+
+    subgraph &quot;Unified Context Approach&quot;
+
+    B1[Agent] --- D1[Shared Complete Context]
+
+    end
+
+    
+
+    style A1 fill:#AED6F1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style A2 fill:#AED6F1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style A3 fill:#AED6F1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B1 fill:#A9DFBF,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C1 fill:#F5B7B1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C2 fill:#F5B7B1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C3 fill:#F5B7B1,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D1 fill:#D7BDE2,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 응용에서는 컨텍스트가 여러 부분으로 나뉘는 대신 전체 파이프라인을 통해 원활하게 흐르도록 설계하는 것이 좋습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">원칙 2: 행동이 암묵적 결정을 포함한다는 점을 인식하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모델이 취하는 각 행동은 컨텍스트를 해석하는 방법에 대한 암묵적 결정을 포함합니다. 여러 구성 요소가 서로 다른 컨텍스트에서 작동하면 이러한 암묵적 결정이 충돌하여 일관되지 않은 결과를 초래할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 원칙은 MCP 응용에 중요한 영향을 미칩니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">복잡한 작업의 병렬 실행 대신 선형 처리를 선호하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모든 의사 결정 지점이 동일한 컨텍스트 정보를 사용할 수 있도록 보장하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">후속 단계가 이전 결정의 전체 컨텍스트를 볼 수 있도록 시스템 설계하기</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">원칙 3: 컨텍스트 깊이와 윈도우 제한 간의 균형 유지하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">대화와 프로세스가 길어질수록 컨텍스트 윈도우가 결국 넘쳐납니다. 효과적인 컨텍스트 엔지니어링은 포괄적인 컨텍스트와 기술적 제한 간의 긴장을 관리하는 접근법을 탐구합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">탐구 중인 잠재적 접근법은 다음을 포함합니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰 사용을 줄이면서 필수 정보를 유지하는 컨텍스트 압축</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">현재 필요에 따라 관련성을 기준으로 컨텍스트를 점진적으로 로드하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">이전 상호작용을 요약하면서 주요 결정과 사실을 보존하기</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">컨텍스트 과제와 MCP 프로토콜 설계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모델 컨텍스트 프로토콜(MCP)은 컨텍스트 관리의 독특한 과제를 인식하여 설계되었습니다. 이러한 과제를 이해하면 MCP 프로토콜 설계의 주요 측면을 설명하는 데 도움이 됩니다:</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 1: 컨텍스트 윈도우 제한</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">대부분의 AI 모델은 고정된 컨텍스트 윈도우 크기를 가지며, 한 번에 처리할 수 있는 정보의 양이 제한됩니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 설계 응답:</strong> </p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">프로토콜은 효율적으로 참조할 수 있는 구조화된 리소스 기반 컨텍스트를 지원합니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">리소스는 페이지로 나뉘어 점진적으로 로드될 수 있습니다.</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 2: 관련성 결정</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트에 포함할 정보 중 가장 관련성이 높은 것을 결정하는 것은 어렵습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 설계 응답:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">필요에 따라 정보를 동적으로 검색할 수 있는 유연한 도구 제공</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">일관된 컨텍스트 조직을 가능하게 하는 구조화된 프롬프트 제공</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 3: 컨텍스트 지속성</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">상호작용 간 상태를 관리하려면 컨텍스트를 신중하게 추적해야 합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 설계 응답:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">표준화된 세션 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 진화를 위한 명확히 정의된 상호작용 패턴</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 4: 멀티모달 컨텍스트</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">텍스트, 이미지, 구조화된 데이터와 같은 다양한 유형의 데이터는 서로 다른 처리가 필요합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 설계 응답:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 콘텐츠 유형을 수용하는 프로토콜 설계</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">멀티모달 정보를 표준화된 방식으로 표현</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">과제 5: 보안 및 개인정보 보호</h4>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트는 종종 보호해야 할 민감한 정보를 포함합니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 설계 응답:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라이언트와 서버 간 책임의 명확한 경계 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">데이터 노출을 최소화하기 위한 로컬 처리 옵션 제공</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이러한 과제를 이해하고 MCP가 이를 해결하는 방법을 알면 더 발전된 컨텍스트 엔지니어링 기술을 탐구할 수 있는 기반을 제공합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">떠오르는 컨텍스트 엔지니어링 접근법</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링 분야가 발전함에 따라 몇 가지 유망한 접근법이 나타나고 있습니다. 이는 현재의 사고를 반영하며, 확립된 모범 사례가 아니라 MCP 구현 경험이 축적됨에 따라 진화할 가능성이 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">1. 단일 스레드 선형 처리</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트를 분산하는 멀티 에이전트 아키텍처와는 달리, 일부 실무자들은 단일 스레드 선형 처리가 더 일관된 결과를 생성한다고 보고 있습니다. 이는 통합된 컨텍스트를 유지하는 원칙과 일치합니다.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    A[Task Start] --&gt; B[Process Step 1]
+
+    B --&gt; C[Process Step 2]
+
+    C --&gt; D[Process Step 3]
+
+    D --&gt; E[Result]
+
+    
+
+    style A fill:#A9CCE3,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B fill:#A3E4D7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C fill:#F9E79F,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D fill:#F5CBA7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style E fill:#D2B4DE,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 접근법은 병렬 처리보다 덜 효율적으로 보일 수 있지만, 각 단계가 이전 결정의 완전한 이해를 기반으로 구축되기 때문에 더 일관되고 신뢰할 수 있는 결과를 생성하는 경우가 많습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">2. 컨텍스트 청킹 및 우선순위 설정</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">큰 컨텍스트를 관리 가능한 조각으로 나누고 가장 중요한 부분에 우선순위를 부여하기.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Conceptual Example: Context Chunking and Prioritization
+
+def process_with_chunked_context(documents, query):
+
+    # 1. Break documents into smaller chunks
+
+    chunks = chunk_documents(documents)
+
+    
+
+    # 2. Calculate relevance scores for each chunk
+
+    scored_chunks = [(chunk, calculate_relevance(chunk, query)) for chunk in chunks]
+
+    
+
+    # 3. Sort chunks by relevance score
+
+    sorted_chunks = sorted(scored_chunks, key=lambda x: x[1], reverse=True)
+
+    
+
+    # 4. Use the most relevant chunks as context
+
+    context = create_context_from_chunks([chunk for chunk, score in sorted_chunks[:5]])
+
+    
+
+    # 5. Process with the prioritized context
+
+    return generate_response(context, query)
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">위 개념은 큰 문서를 관리 가능한 조각으로 나누고 컨텍스트에 가장 관련성이 높은 부분만 선택하는 방법을 보여줍니다. 이 접근법은 컨텍스트 윈도우 제한 내에서 작업하면서도 대규모 지식 기반을 활용하는 데 도움이 될 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">3. 점진적 컨텍스트 로딩</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트를 한 번에 모두 로드하지 않고 필요에 따라 점진적으로 로드하기.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+sequenceDiagram
+
+    participant User
+
+    participant App
+
+    participant MCP Server
+
+    participant AI Model
+
+
+
+    User-&gt;&gt;App: Ask Question
+
+    App-&gt;&gt;MCP Server: Initial Request
+
+    MCP Server-&gt;&gt;AI Model: Minimal Context
+
+    AI Model-&gt;&gt;MCP Server: Initial Response
+
+    
+
+    alt Needs More Context
+
+        MCP Server-&gt;&gt;MCP Server: Identify Missing Context
+
+        MCP Server-&gt;&gt;MCP Server: Load Additional Context
+
+        MCP Server-&gt;&gt;AI Model: Enhanced Context
+
+        AI Model-&gt;&gt;MCP Server: Final Response
+
+    end
+
+    
+
+    MCP Server-&gt;&gt;App: Response
+
+    App-&gt;&gt;User: Answer
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">점진적 컨텍스트 로딩은 최소한의 컨텍스트로 시작하여 필요할 때만 확장합니다. 이는 간단한 쿼리에 대해 토큰 사용을 크게 줄이면서 복잡한 질문을 처리할 수 있는 능력을 유지할 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">4. 컨텍스트 압축 및 요약</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">필수 정보를 보존하면서 컨텍스트 크기를 줄이기.</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TD
+
+    A[Full Context] --&gt; B[Compression Model]
+
+    B --&gt; C[Compressed Context]
+
+    C --&gt; D[Main Processing Model]
+
+    D --&gt; E[Response]
+
+    
+
+    style A fill:#A9CCE3,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style B fill:#A3E4D7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style C fill:#F5CBA7,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style D fill:#D2B4DE,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+    style E fill:#F9E79F,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 압축은 다음에 초점을 맞춥니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">중복 정보 제거</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">긴 콘텐츠 요약</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">주요 사실과 세부 사항 추출</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">중요한 컨텍스트 요소 보존</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰 효율성을 최적화</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 접근법은 긴 대화를 컨텍스트 윈도우 내에서 유지하거나 대규모 문서를 효율적으로 처리하는 데 특히 유용할 수 있습니다. 일부 실무자들은 대화 기록의 컨텍스트 압축 및 요약을 위해 전문화된 모델을 사용하고 있습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">탐구적 컨텍스트 엔지니어링 고려사항</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 구현에서 컨텍스트 엔지니어링의 새로운 분야를 탐구할 때, 특정 사용 사례에서 개선을 가져올 수 있는 몇 가지 고려사항을 염두에 두는 것이 좋습니다. 이는 규범적인 모범 사례가 아니라 탐구 영역으로, 개선 가능성을 제시합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">컨텍스트 목표를 고려하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">복잡한 컨텍스트 관리 솔루션을 구현하기 전에 달성하려는 목표를 명확히 표현하십시오:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모델이 성공하기 위해 필요한 특정 정보는 무엇인가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">필수 정보와 보조 정보는 무엇인가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">성능 제약(지연 시간, 토큰 제한, 비용)은 무엇인가?</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">계층화된 컨텍스트 접근법 탐구하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">일부 실무자들은 개념적 계층으로 배열된 컨텍스트에서 성공을 찾고 있습니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>핵심 계층</strong>: 모델이 항상 필요로 하는 필수 정보</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상황 계층</strong>: 현재 상호작용에 특정한 컨텍스트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>지원 계층</strong>: 도움이 될 수 있는 추가 정보</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>백업 계층</strong>: 필요할 때만 접근하는 정보</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">검색 전략 조사하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트의 효과는 정보를 검색하는 방법에 따라 달라질 수 있습니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">개념적으로 관련성이 높은 정보를 찾기 위한 의미적 검색 및 임베딩</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">특정 사실적 세부 정보를 위한 키워드 기반 검색</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">여러 검색 방법을 결합한 하이브리드 접근법</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">범주, 날짜 또는 출처를 기준으로 범위를 좁히기 위한 메타데이터 필터링</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">컨텍스트 일관성 실험하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트의 구조와 흐름은 모델 이해에 영향을 미칠 수 있습니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">관련 정보를 함께 그룹화하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">일관된 형식과 조직 사용하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">적절한 경우 논리적 또는 연대기적 순서를 유지하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모순된 정보 피하기</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">멀티 에이전트 아키텍처의 트레이드오프 평가하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">멀티 에이전트 아키텍처는 많은 AI 프레임워크에서 인기가 있지만, 컨텍스트 관리에 상당한 과제를 수반합니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 분산은 에이전트 간의 결정 불일치를 초래할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">병렬 처리는 조정하기 어려운 충돌을 초래할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">에이전트 간의 통신 오버헤드는 성능 이점을 상쇄할 수 있습니다.</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">일관성을 유지하기 위해 복잡한 상태 관리가 필요합니다.</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">많은 경우, 단일 에이전트 접근법과 포괄적인 컨텍스트 관리가 분산된 컨텍스트를 가진 여러 전문 에이전트보다 더 신뢰할 수 있는 결과를 생성할 수 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">평가 방법 개발하기</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">시간이 지남에 따라 컨텍스트 엔지니어링을 개선하려면 성공을 측정할 방법을 고려하십시오:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">다양한 컨텍스트 구조를 A/B 테스트하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">토큰 사용 및 응답 시간 모니터링하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자 만족도 및 작업 완료율 추적하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">컨텍스트 전략이 실패하는 시점과 이유 분석하기</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이러한 고려사항은 컨텍스트 엔지니어링 공간에서의 적극적인 탐구 영역을 나타냅니다. 분야가 성숙해지면 더 명확한 패턴과 관행이 나타날 가능성이 높습니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">컨텍스트 효과성 측정: 진화하는 프레임워크</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링이 개념으로 떠오르면서 실무자들은 효과성을 측정할 방법을 탐구하기 시작했습니다. 아직 확립된 프레임워크는 없지만, 미래 작업을 안내할 수 있는 다양한 지표가 고려되고 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">잠재적 측정 차원</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. 입력 효율성 고려사항</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨텍스트 대 응답 비율</strong>: 응답 크기에 비해 얼마나 많은 컨텍스트가 필요한가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>토큰 활용도</strong>: 제공된 컨텍스트 토큰 중 응답에 영향을 미치는 비율은 얼마인가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>컨텍스트 축소</strong>: 원시 정보를 얼마나 효과적으로 압축할 수 있는가?</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. 성능 고려사항</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>지연 시간 영향</strong>: 컨텍스트 관리가 응답 시간에 어떤 영향을 미치는가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>토큰 경제성</strong>: 토큰 사용을 효과적으로 최적화하고 있는가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>검색 정확도</strong>: 검색된 정보의 관련성은 얼마나 높은가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>자원 활용도</strong>: 필요한 계산 자원은 무엇인가?</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. 품질 고려사항</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>응답 관련성</strong>: 응답이 쿼리를 얼마나 잘 해결하는가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>사실적 정확성</strong>: 컨텍스트 관리가 사실적 정확성을 개선하는가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>일관성</strong>: 유사한 쿼리에서 응답이 일관적인가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>환각률</strong>: 더 나은 컨텍스트가 모델 환각을 줄이는가?</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4. 사용자 경험 고려사항</h5>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>후속 요청 비율</strong>: 사용자가 얼마나 자주 명확성을 요구하는가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>작업 완료율</strong>: 사용자가 목표를 성공적으로 달성하는가?</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>만족도 지표</strong>: 사용자가 경험을 어떻게 평가하는가?</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">측정에 대한 탐구적 접근법</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 구현에서 컨텍스트 엔지니어링을 실험할 때, 다음 탐구적 접근법을 고려하십시오:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>기준 비교</strong>: 간단한 컨텍스트 접근법으로 기준을 설정한 후 더 정교한 방법을 테스트하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>점진적 변화</strong>: 컨텍스트 관리의 한 측면만 변경하여 그 효과를 분리하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>사용자 중심 평가</strong>: 정량적 지표와 사용자 피드백을 결합하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">4. <strong>실패 분석</strong>: 컨텍스트 전략이 실패하는 사례를 조사하여 잠재적 개선 사항 이해하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">5. <strong>다차원 평가</strong>: 효율성, 품질, 사용자 경험 간의 트레이드오프 고려하기</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실험적이고 다각적인 측정 접근법은 컨텍스트 엔지니어링의 떠오르는 특성과 일치합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">마무리 생각</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔지니어링은 MCP 응용을 효과적으로 구현하는 데 중심이 될 수 있는 새로운 탐구 영역입니다. 시스템을 통해 정보가 흐르는 방식을 신중히 고려함으로써 더 효율적이고 정확하며 사용자에게 가치 있는 AI 경험을 창출할 수 있습니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈에서 설명한 기술과 접근법은 이 공간에서 초기 사고를 나타내며, 확립된 관행이 아닙니다. 컨텍스트 엔지니어링은 AI 능력이 발전하고 우리의 이해가 깊어짐에 따라 더 정의된 학문으로 발전할 수 있습니다. 현재로서는 신중한 측정과 실험이 가장 생산적인 접근법으로 보입니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">잠재적 미래 방향</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">컨텍스트 엔</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">Model Context Protocol Website</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/modelcontextprotocol">Model Context Protocol Specification</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs">MCP Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/csharp-sdk">MCP C# SDK</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/python-sdk">MCP Python SDK</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/typescript-sdk">MCP TypeScript SDK</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/inspector">MCP Inspector</a> - MCP 서버를 위한 시각적 테스트 도구</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">컨텍스트 엔지니어링 관련 글</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://cognition.ai/blog/dont-build-multi-agents">Don't Build Multi-Agents: Principles of Context Engineering</a> - 컨텍스트 엔지니어링 원칙에 대한 Walden Yan의 통찰</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf">A Practical Guide to Building Agents</a> - 효과적인 에이전트 설계에 대한 OpenAI의 가이드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.anthropic.com/engineering/building-effective-agents">Building Effective Agents</a> - 에이전트 개발에 대한 Anthropic의 접근법</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">관련 연구</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2310.01487">Dynamic Retrieval Augmentation for Large Language Models</a> - 동적 검색 접근법에 대한 연구</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2307.03172">Lost in the Middle: How Language Models Use Long Contexts</a> - 컨텍스트 처리 패턴에 대한 중요한 연구</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2204.06125">Hierarchical Text-Conditioned Image Generation with CLIP Latents</a> - 컨텍스트 구조화에 대한 통찰을 제공하는 DALL-E 2 논문</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://aclanthology.org/2023.findings-emnlp.124/">Exploring the Role of Context in Large Language Model Architectures</a> - 컨텍스트 처리에 대한 최신 연구</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://arxiv.org/abs/2304.03442">Multi-Agent Collaboration: A Survey</a> - 다중 에이전트 시스템과 그 도전에 대한 연구</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">추가 자료</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/context-window">Context Window Optimization Techniques</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.microsoft.com/en-us/research/blog/retrieval-augmented-generation-rag-and-frontier-models/">Advanced RAG Techniques</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/semantic-kernel">Semantic Kernel Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/aitoolkit">AI Toolkit for Context Management</a></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">다음 단계</h3>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/05-AdvancedTopics/mcp-transport/README.md" target="_blank">5.15 MCP Custom Transport</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 내용이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m05_12-513-azure-ai-foundry-agent-integration.html">&larr; 5.13 Azure AI Foundry Agent Integration</a></span>
+  <span><a href="m05_14-515-mcp-custom-transport.html">5.15 MCP Custom Transport &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,5624 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>08 - Testing and Debugging - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 08 - Testing and Debugging</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Testing and Debugging</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab provides comprehensive guidance on testing and debugging MCP servers in production environments.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll learn to implement robust testing strategies, debug complex issues, and ensure your MCP server performs reliably under various conditions.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Testing MCP servers requires a multi-layered approach covering unit tests, integration tests, performance validation, and real-world scenario testing. This lab covers the complete testing lifecycle from development to production monitoring.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our testing strategy emphasizes reliability, security, and performance, ensuring your MCP server can handle production workloads while maintaining data integrity and user experience quality.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> comprehensive unit and integration test suites</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Design</strong> effective testing strategies for MCP tools and database operations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Debug</strong> complex issues using advanced debugging techniques</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Validate</strong> performance under load with realistic testing scenarios</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Monitor</strong> production systems with effective alerting and observability</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Automate</strong> testing workflows for continuous integration</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 Testing Architecture</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Testing Strategy Overview</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────┐
+
+│                Unit Tests                       │
+
+│   • Tool execution logic                       │
+
+│   • Database query validation                  │
+
+│   • Authentication/authorization               │
+
+│   • Embedding generation                       │
+
+└─────────────────┬───────────────────────────────┘
+
+                  │
+
+┌─────────────────▼───────────────────────────────┐
+
+│             Integration Tests                   │
+
+│   • End-to-end MCP workflows                  │
+
+│   • Database schema validation                 │
+
+│   • API endpoint testing                       │
+
+│   • Multi-tool interactions                    │
+
+└─────────────────┬───────────────────────────────┘
+
+                  │
+
+┌─────────────────▼───────────────────────────────┐
+
+│            Performance Tests                    │
+
+│   • Load testing under realistic conditions    │
+
+│   • Database performance validation            │
+
+│   • Memory and resource usage                  │
+
+│   • Embedding generation performance           │
+
+└─────────────────┬───────────────────────────────┘
+
+                  │
+
+┌─────────────────▼───────────────────────────────┐
+
+│              E2E Tests                         │
+
+│   • Complete user workflows                    │
+
+│   • VS Code integration testing               │
+
+│   • Real-world scenario validation            │
+
+│   • Cross-browser compatibility               │
+
+└─────────────────────────────────────────────────┘
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Test Environment Setup</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/conftest.py
+
+&quot;&quot;&quot;
+
+Pytest configuration and shared fixtures for MCP server testing.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+import asyncpg
+
+import os
+
+from typing import AsyncGenerator, Dict, Any
+
+from unittest.mock import AsyncMock, Mock
+
+import tempfile
+
+import shutil
+
+from datetime import datetime
+
+
+
+# Test configuration
+
+TEST_DATABASE_URL = &quot;postgresql://test_user:test_pass@localhost:5432/test_retail_db&quot;
+
+TEST_STORE_IDS = [&#x27;test_seattle&#x27;, &#x27;test_redmond&#x27;, &#x27;test_bellevue&#x27;]
+
+
+
+@pytest.fixture(scope=&quot;session&quot;)
+
+def event_loop():
+
+    &quot;&quot;&quot;Create an instance of the default event loop for the test session.&quot;&quot;&quot;
+
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+
+    yield loop
+
+    loop.close()
+
+
+
+@pytest.fixture(scope=&quot;session&quot;)
+
+async def test_database():
+
+    &quot;&quot;&quot;Set up test database with schema and sample data.&quot;&quot;&quot;
+
+    
+
+    # Create test database connection
+
+    sys_conn = await asyncpg.connect(
+
+        &quot;postgresql://postgres:password@localhost:5432/postgres&quot;
+
+    )
+
+    
+
+    try:
+
+        # Create test database
+
+        await sys_conn.execute(&quot;DROP DATABASE IF EXISTS test_retail_db&quot;)
+
+        await sys_conn.execute(&quot;CREATE DATABASE test_retail_db&quot;)
+
+    finally:
+
+        await sys_conn.close()
+
+    
+
+    # Connect to test database and set up schema
+
+    test_conn = await asyncpg.connect(TEST_DATABASE_URL)
+
+    
+
+    try:
+
+        # Load schema
+
+        schema_sql = await load_sql_file(&quot;../scripts/create_schema.sql&quot;)
+
+        await test_conn.execute(schema_sql)
+
+        
+
+        # Load sample data
+
+        sample_data_sql = await load_sql_file(&quot;../scripts/sample_data.sql&quot;)
+
+        await test_conn.execute(sample_data_sql)
+
+        
+
+        yield test_conn
+
+        
+
+    finally:
+
+        await test_conn.close()
+
+        
+
+        # Cleanup test database
+
+        sys_conn = await asyncpg.connect(
+
+            &quot;postgresql://postgres:password@localhost:5432/postgres&quot;
+
+        )
+
+        try:
+
+            await sys_conn.execute(&quot;DROP DATABASE IF EXISTS test_retail_db&quot;)
+
+        finally:
+
+            await sys_conn.close()
+
+
+
+@pytest.fixture
+
+async def db_connection(test_database):
+
+    &quot;&quot;&quot;Provide a clean database connection for each test.&quot;&quot;&quot;
+
+    
+
+    conn = await asyncpg.connect(TEST_DATABASE_URL)
+
+    
+
+    # Start transaction for test isolation
+
+    tx = conn.transaction()
+
+    await tx.start()
+
+    
+
+    try:
+
+        yield conn
+
+    finally:
+
+        # Rollback transaction to maintain test isolation
+
+        await tx.rollback()
+
+        await conn.close()
+
+
+
+@pytest.fixture
+
+async def mock_embedding_manager():
+
+    &quot;&quot;&quot;Mock embedding manager for testing without Azure OpenAI calls.&quot;&quot;&quot;
+
+    
+
+    mock_manager = AsyncMock()
+
+    
+
+    # Mock embedding generation
+
+    mock_manager.generate_embedding.return_value = [0.1] * 1536  # Mock embedding
+
+    mock_manager.generate_embeddings_batch.return_value = [[0.1] * 1536] * 10
+
+    
+
+    # Mock initialization
+
+    mock_manager.initialize.return_value = None
+
+    mock_manager.cleanup.return_value = None
+
+    
+
+    return mock_manager
+
+
+
+@pytest.fixture
+
+async def test_mcp_server(db_connection, mock_embedding_manager):
+
+    &quot;&quot;&quot;Set up test MCP server instance.&quot;&quot;&quot;
+
+    
+
+    from mcp_server.server import MCPServer
+
+    from mcp_server.database import DatabaseProvider
+
+    from mcp_server.config import Config
+
+    
+
+    # Create test configuration
+
+    config = Config()
+
+    config.database.connection_string = TEST_DATABASE_URL
+
+    config.server.enable_debug = True
+
+    
+
+    # Create database provider
+
+    db_provider = DatabaseProvider(config.database.connection_string)
+
+    await db_provider.initialize()
+
+    
+
+    # Create MCP server
+
+    server = MCPServer(config, db_provider)
+
+    server.embedding_manager = mock_embedding_manager
+
+    
+
+    await server.initialize()
+
+    
+
+    yield server
+
+    
+
+    await server.cleanup()
+
+
+
+@pytest.fixture
+
+def sample_products():
+
+    &quot;&quot;&quot;Sample product data for testing.&quot;&quot;&quot;
+
+    
+
+    return [
+
+        {
+
+            &#x27;product_id&#x27;: &#x27;test-product-1&#x27;,
+
+            &#x27;product_name&#x27;: &#x27;Test Running Shoes&#x27;,
+
+            &#x27;brand&#x27;: &#x27;TestBrand&#x27;,
+
+            &#x27;price&#x27;: 99.99,
+
+            &#x27;product_description&#x27;: &#x27;Comfortable running shoes for daily training&#x27;,
+
+            &#x27;category_name&#x27;: &#x27;Electronics&#x27;,
+
+            &#x27;current_stock&#x27;: 50
+
+        },
+
+        {
+
+            &#x27;product_id&#x27;: &#x27;test-product-2&#x27;,
+
+            &#x27;product_name&#x27;: &#x27;Test Laptop&#x27;,
+
+            &#x27;brand&#x27;: &#x27;TestTech&#x27;,
+
+            &#x27;price&#x27;: 1299.99,
+
+            &#x27;product_description&#x27;: &#x27;High-performance laptop for professional use&#x27;,
+
+            &#x27;category_name&#x27;: &#x27;Electronics&#x27;,
+
+            &#x27;current_stock&#x27;: 25
+
+        }
+
+    ]
+
+
+
+async def load_sql_file(file_path: str) -&gt; str:
+
+    &quot;&quot;&quot;Load SQL file content.&quot;&quot;&quot;
+
+    
+
+    with open(file_path, &#x27;r&#x27;) as file:
+
+        return file.read()
+
+
+
+# Test data helpers
+
+class TestDataHelper:
+
+    &quot;&quot;&quot;Helper class for managing test data.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    async def create_test_store(conn: asyncpg.Connection, store_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Create a test store.&quot;&quot;&quot;
+
+        
+
+        store_data = {
+
+            &#x27;store_id&#x27;: store_id,
+
+            &#x27;store_name&#x27;: f&#x27;Test Store {store_id}&#x27;,
+
+            &#x27;store_location&#x27;: &#x27;Test Location&#x27;,
+
+            &#x27;store_type&#x27;: &#x27;test&#x27;,
+
+            &#x27;region&#x27;: &#x27;test&#x27;
+
+        }
+
+        
+
+        await conn.execute(&quot;&quot;&quot;
+
+            INSERT INTO retail.stores (store_id, store_name, store_location, store_type, region)
+
+            VALUES ($1, $2, $3, $4, $5)
+
+            ON CONFLICT (store_id) DO NOTHING
+
+        &quot;&quot;&quot;, *store_data.values())
+
+        
+
+        return store_data
+
+    
+
+    @staticmethod
+
+    async def create_test_customer(conn: asyncpg.Connection, store_id: str) -&gt; str:
+
+        &quot;&quot;&quot;Create a test customer.&quot;&quot;&quot;
+
+        
+
+        customer_id = await conn.fetchval(&quot;&quot;&quot;
+
+            INSERT INTO retail.customers (
+
+                store_id, first_name, last_name, email, loyalty_tier
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+            RETURNING customer_id
+
+        &quot;&quot;&quot;, store_id, &#x27;Test&#x27;, &#x27;Customer&#x27;, &#x27;test@example.com&#x27;, &#x27;bronze&#x27;)
+
+        
+
+        return customer_id
+
+    
+
+    @staticmethod
+
+    async def create_test_product(
+
+        conn: asyncpg.Connection, 
+
+        store_id: str, 
+
+        product_data: Dict[str, Any]
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Create a test product.&quot;&quot;&quot;
+
+        
+
+        product_id = await conn.fetchval(&quot;&quot;&quot;
+
+            INSERT INTO retail.products (
+
+                store_id, sku, product_name, brand, price, product_description, current_stock
+
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+
+            RETURNING product_id
+
+        &quot;&quot;&quot;, 
+
+            store_id, 
+
+            f&quot;TEST-{product_data[&#x27;product_name&#x27;][:10]}&quot;,
+
+            product_data[&#x27;product_name&#x27;],
+
+            product_data[&#x27;brand&#x27;],
+
+            product_data[&#x27;price&#x27;],
+
+            product_data[&#x27;product_description&#x27;],
+
+            product_data[&#x27;current_stock&#x27;]
+
+        )
+
+        
+
+        return product_id
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 Unit Testing</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Tool Testing Framework</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_tools.py
+
+&quot;&quot;&quot;
+
+Comprehensive unit tests for MCP tools.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+from unittest.mock import AsyncMock, patch
+
+from datetime import datetime, timedelta
+
+
+
+from mcp_server.tools.sales_analysis import SalesAnalysisTool
+
+from mcp_server.tools.semantic_search import SemanticProductSearchTool
+
+from mcp_server.tools.schema_introspection import SchemaIntrospectionTool
+
+from tests.conftest import TestDataHelper
+
+
+
+class TestSalesAnalysisTool:
+
+    &quot;&quot;&quot;Test sales analysis tool functionality.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def sales_tool(self, test_mcp_server):
+
+        &quot;&quot;&quot;Create sales analysis tool for testing.&quot;&quot;&quot;
+
+        return SalesAnalysisTool(test_mcp_server.db_provider)
+
+    
+
+    async def test_daily_sales_query(self, sales_tool, db_connection):
+
+        &quot;&quot;&quot;Test daily sales analysis query.&quot;&quot;&quot;
+
+        
+
+        # Set up test data
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        customer_id = await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Create test transaction
+
+        await db_connection.execute(&quot;&quot;&quot;
+
+            INSERT INTO retail.sales_transactions (
+
+                store_id, customer_id, transaction_date, total_amount, transaction_type
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+        &quot;&quot;&quot;, store_id, customer_id, datetime.now(), 150.00, &#x27;sale&#x27;)
+
+        
+
+        # Execute tool
+
+        result = await sales_tool.execute(
+
+            query_type=&#x27;daily_sales&#x27;,
+
+            store_id=store_id,
+
+            start_date=(datetime.now() - timedelta(days=7)).date(),
+
+            end_date=datetime.now().date()
+
+        )
+
+        
+
+        # Validate results
+
+        assert result.success is True
+
+        assert len(result.data) &gt; 0
+
+        assert &#x27;total_revenue&#x27; in result.data[0]
+
+        assert result.metadata[&#x27;query_type&#x27;] == &#x27;daily_sales&#x27;
+
+    
+
+    async def test_custom_query_validation(self, sales_tool, db_connection):
+
+        &quot;&quot;&quot;Test custom query validation.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Test valid query
+
+        valid_query = &quot;SELECT COUNT(*) as customer_count FROM retail.customers&quot;
+
+        result = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store_id,
+
+            query=valid_query
+
+        )
+
+        
+
+        assert result.success is True
+
+        
+
+        # Test invalid query (should be blocked)
+
+        invalid_query = &quot;DROP TABLE retail.customers&quot;
+
+        result = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store_id,
+
+            query=invalid_query
+
+        )
+
+        
+
+        assert result.success is False
+
+        assert &#x27;validation failed&#x27; in result.error.lower()
+
+    
+
+    async def test_store_isolation(self, sales_tool, db_connection):
+
+        &quot;&quot;&quot;Test that store isolation works correctly.&quot;&quot;&quot;
+
+        
+
+        # Create two different stores
+
+        store1 = &#x27;test_store1&#x27;
+
+        store2 = &#x27;test_store2&#x27;
+
+        
+
+        await TestDataHelper.create_test_store(db_connection, store1)
+
+        await TestDataHelper.create_test_store(db_connection, store2)
+
+        
+
+        # Create customers in different stores
+
+        customer1 = await TestDataHelper.create_test_customer(db_connection, store1)
+
+        customer2 = await TestDataHelper.create_test_customer(db_connection, store2)
+
+        
+
+        # Query from store1 should only see store1 data
+
+        result1 = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store1,
+
+            query=&quot;SELECT COUNT(*) as count FROM retail.customers&quot;
+
+        )
+
+        
+
+        # Query from store2 should only see store2 data
+
+        result2 = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store2,
+
+            query=&quot;SELECT COUNT(*) as count FROM retail.customers&quot;
+
+        )
+
+        
+
+        assert result1.success is True
+
+        assert result2.success is True
+
+        assert result1.data[0][&#x27;count&#x27;] == 1
+
+        assert result2.data[0][&#x27;count&#x27;] == 1
+
+
+
+class TestSemanticSearchTool:
+
+    &quot;&quot;&quot;Test semantic search tool functionality.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def search_tool(self, test_mcp_server):
+
+        &quot;&quot;&quot;Create semantic search tool for testing.&quot;&quot;&quot;
+
+        return SemanticProductSearchTool(test_mcp_server.db_provider)
+
+    
+
+    async def test_semantic_search_execution(self, search_tool, db_connection, sample_products):
+
+        &quot;&quot;&quot;Test semantic search with mock embeddings.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test products
+
+        for product_data in sample_products:
+
+            product_id = await TestDataHelper.create_test_product(
+
+                db_connection, store_id, product_data
+
+            )
+
+            
+
+            # Create mock embedding
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.product_embeddings (
+
+                    product_id, store_id, embedding_text, embedding
+
+                ) VALUES ($1, $2, $3, $4)
+
+            &quot;&quot;&quot;, 
+
+                product_id, store_id, 
+
+                f&quot;{product_data[&#x27;product_name&#x27;]} {product_data[&#x27;brand&#x27;]}&quot;, 
+
+                &#x27;[0.1,0.2,0.3]&#x27;  # Mock embedding
+
+            )
+
+        
+
+        # Execute search
+
+        result = await search_tool.execute(
+
+            query=&#x27;running shoes&#x27;,
+
+            store_id=store_id,
+
+            limit=10,
+
+            similarity_threshold=0.0
+
+        )
+
+        
+
+        # Validate results
+
+        assert result.success is True
+
+        assert len(result.data) &gt; 0
+
+        assert &#x27;similarity_score&#x27; in result.data[0]
+
+        assert result.metadata[&#x27;search_type&#x27;] == &#x27;semantic&#x27;
+
+    
+
+    async def test_search_parameter_validation(self, search_tool):
+
+        &quot;&quot;&quot;Test search parameter validation.&quot;&quot;&quot;
+
+        
+
+        # Test missing query
+
+        result = await search_tool.execute(store_id=&#x27;test_store&#x27;)
+
+        assert result.success is False
+
+        assert &#x27;query is required&#x27; in result.error.lower()
+
+        
+
+        # Test missing store_id
+
+        result = await search_tool.execute(query=&#x27;test query&#x27;)
+
+        assert result.success is False
+
+        assert &#x27;store_id is required&#x27; in result.error.lower()
+
+
+
+class TestSchemaIntrospectionTool:
+
+    &quot;&quot;&quot;Test schema introspection tool.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def schema_tool(self, test_mcp_server):
+
+        &quot;&quot;&quot;Create schema introspection tool for testing.&quot;&quot;&quot;
+
+        return SchemaIntrospectionTool(test_mcp_server.db_provider)
+
+    
+
+    async def test_single_table_schema(self, schema_tool, db_connection):
+
+        &quot;&quot;&quot;Test getting schema for a single table.&quot;&quot;&quot;
+
+        
+
+        result = await schema_tool.execute(
+
+            table_name=&#x27;customers&#x27;,
+
+            include_constraints=True,
+
+            include_indexes=True
+
+        )
+
+        
+
+        assert result.success is True
+
+        assert result.data[&#x27;table_name&#x27;] == &#x27;customers&#x27;
+
+        assert len(result.data[&#x27;columns&#x27;]) &gt; 0
+
+        assert &#x27;customer_id&#x27; in [col[&#x27;column_name&#x27;] for col in result.data[&#x27;columns&#x27;]]
+
+    
+
+    async def test_all_tables_schema(self, schema_tool, db_connection):
+
+        &quot;&quot;&quot;Test getting schema for all tables.&quot;&quot;&quot;
+
+        
+
+        result = await schema_tool.execute()
+
+        
+
+        assert result.success is True
+
+        assert result.data[&#x27;schema_name&#x27;] == &#x27;retail&#x27;
+
+        assert len(result.data[&#x27;tables&#x27;]) &gt; 0
+
+        
+
+        table_names = [table[&#x27;table_name&#x27;] for table in result.data[&#x27;tables&#x27;]]
+
+        expected_tables = [&#x27;customers&#x27;, &#x27;products&#x27;, &#x27;sales_transactions&#x27;]
+
+        
+
+        for expected_table in expected_tables:
+
+            assert expected_table in table_names
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Database Testing</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_database.py
+
+&quot;&quot;&quot;
+
+Database layer testing including RLS and security.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncpg
+
+from datetime import datetime
+
+
+
+from mcp_server.database import DatabaseProvider
+
+from tests.conftest import TestDataHelper
+
+
+
+class TestRowLevelSecurity:
+
+    &quot;&quot;&quot;Test Row Level Security implementation.&quot;&quot;&quot;
+
+    
+
+    async def test_store_context_setting(self, db_connection):
+
+        &quot;&quot;&quot;Test that store context is set correctly.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Set store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+        
+
+        # Verify context is set
+
+        current_store = await db_connection.fetchval(
+
+            &quot;SELECT current_setting(&#x27;app.current_store_id&#x27;, true)&quot;
+
+        )
+
+        
+
+        assert current_store == store_id
+
+    
+
+    async def test_customer_isolation(self, db_connection):
+
+        &quot;&quot;&quot;Test that customers are properly isolated by store.&quot;&quot;&quot;
+
+        
+
+        # Create two stores
+
+        store1 = &#x27;test_store1&#x27;
+
+        store2 = &#x27;test_store2&#x27;
+
+        
+
+        await TestDataHelper.create_test_store(db_connection, store1)
+
+        await TestDataHelper.create_test_store(db_connection, store2)
+
+        
+
+        # Create customers in different stores
+
+        await TestDataHelper.create_test_customer(db_connection, store1)
+
+        await TestDataHelper.create_test_customer(db_connection, store2)
+
+        
+
+        # Set context to store1 and count customers
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store1)
+
+        store1_count = await db_connection.fetchval(&quot;SELECT COUNT(*) FROM retail.customers&quot;)
+
+        
+
+        # Set context to store2 and count customers
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store2)
+
+        store2_count = await db_connection.fetchval(&quot;SELECT COUNT(*) FROM retail.customers&quot;)
+
+        
+
+        # Each store should only see its own customers
+
+        assert store1_count == 1
+
+        assert store2_count == 1
+
+    
+
+    async def test_invalid_store_context(self, db_connection):
+
+        &quot;&quot;&quot;Test that invalid store context raises error.&quot;&quot;&quot;
+
+        
+
+        with pytest.raises(Exception) as exc_info:
+
+            await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, &#x27;invalid_store&#x27;)
+
+        
+
+        assert &quot;Store not found&quot; in str(exc_info.value)
+
+    
+
+    async def test_cross_store_data_insertion_blocked(self, db_connection):
+
+        &quot;&quot;&quot;Test that users cannot insert data for other stores.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Set store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+        
+
+        # Try to insert customer for different store (should fail)
+
+        with pytest.raises(Exception):
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.customers (store_id, first_name, last_name, email)
+
+                VALUES ($1, $2, $3, $4)
+
+            &quot;&quot;&quot;, &#x27;different_store&#x27;, &#x27;Test&#x27;, &#x27;Customer&#x27;, &#x27;test@example.com&#x27;)
+
+
+
+class TestDatabaseProvider:
+
+    &quot;&quot;&quot;Test database provider functionality.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def db_provider(self):
+
+        &quot;&quot;&quot;Create database provider for testing.&quot;&quot;&quot;
+
+        
+
+        provider = DatabaseProvider(TEST_DATABASE_URL)
+
+        await provider.initialize()
+
+        yield provider
+
+        await provider.cleanup()
+
+    
+
+    async def test_connection_pooling(self, db_provider):
+
+        &quot;&quot;&quot;Test connection pool functionality.&quot;&quot;&quot;
+
+        
+
+        # Get multiple connections
+
+        conn1 = await db_provider.get_connection()
+
+        conn2 = await db_provider.get_connection()
+
+        
+
+        assert conn1 is not None
+
+        assert conn2 is not None
+
+        assert conn1 != conn2  # Should be different connection objects
+
+        
+
+        # Release connections
+
+        await db_provider.release_connection(conn1)
+
+        await db_provider.release_connection(conn2)
+
+    
+
+    async def test_health_check(self, db_provider):
+
+        &quot;&quot;&quot;Test database health check.&quot;&quot;&quot;
+
+        
+
+        health_status = await db_provider.health_check()
+
+        
+
+        assert health_status[&#x27;status&#x27;] == &#x27;healthy&#x27;
+
+        assert &#x27;connection_pool_size&#x27; in health_status
+
+        assert &#x27;database_version&#x27; in health_status
+
+    
+
+    async def test_connection_recovery(self, db_provider):
+
+        &quot;&quot;&quot;Test connection recovery after database issues.&quot;&quot;&quot;
+
+        
+
+        # This would test connection recovery scenarios
+
+        # In a real test, you might temporarily break the connection
+
+        # and verify that the pool recovers
+
+        
+
+        # For now, just verify health check works
+
+        health_status = await db_provider.health_check()
+
+        assert health_status[&#x27;status&#x27;] == &#x27;healthy&#x27;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 Integration Testing</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">End-to-End Workflow Testing</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_integration.py
+
+&quot;&quot;&quot;
+
+Integration tests for complete MCP workflows.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import json
+
+from datetime import datetime, timedelta
+
+
+
+from mcp_server.server import MCPServer
+
+from tests.conftest import TestDataHelper
+
+
+
+class TestMCPWorkflows:
+
+    &quot;&quot;&quot;Test complete MCP server workflows.&quot;&quot;&quot;
+
+    
+
+    async def test_product_search_workflow(self, test_mcp_server, db_connection, sample_products):
+
+        &quot;&quot;&quot;Test complete product search workflow.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test products with embeddings
+
+        for product_data in sample_products:
+
+            product_id = await TestDataHelper.create_test_product(
+
+                db_connection, store_id, product_data
+
+            )
+
+            
+
+            # Create embedding for product
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.product_embeddings (
+
+                    product_id, store_id, embedding_text, embedding
+
+                ) VALUES ($1, $2, $3, $4)
+
+            &quot;&quot;&quot;, 
+
+                product_id, store_id, 
+
+                f&quot;{product_data[&#x27;product_name&#x27;]} {product_data[&#x27;brand&#x27;]}&quot;, 
+
+                &#x27;[&#x27; + &#x27;,&#x27;.join([&#x27;0.1&#x27;] * 1536) + &#x27;]&#x27;  # Mock embedding
+
+            )
+
+        
+
+        # Test semantic search
+
+        search_result = await test_mcp_server.execute_tool(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {
+
+                &#x27;query&#x27;: &#x27;running shoes&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;limit&#x27;: 10
+
+            }
+
+        )
+
+        
+
+        assert search_result[&#x27;success&#x27;] is True
+
+        assert len(search_result[&#x27;data&#x27;]) &gt; 0
+
+        
+
+        # Test schema introspection
+
+        schema_result = await test_mcp_server.execute_tool(
+
+            &#x27;get_table_schema&#x27;,
+
+            {&#x27;table_name&#x27;: &#x27;products&#x27;}
+
+        )
+
+        
+
+        assert schema_result[&#x27;success&#x27;] is True
+
+        assert schema_result[&#x27;data&#x27;][&#x27;table_name&#x27;] == &#x27;products&#x27;
+
+    
+
+    async def test_sales_analysis_workflow(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test sales analysis workflow.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test customer and product
+
+        customer_id = await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        product_id = await TestDataHelper.create_test_product(
+
+            db_connection, store_id, {
+
+                &#x27;product_name&#x27;: &#x27;Test Product&#x27;,
+
+                &#x27;brand&#x27;: &#x27;TestBrand&#x27;,
+
+                &#x27;price&#x27;: 99.99,
+
+                &#x27;product_description&#x27;: &#x27;Test product description&#x27;,
+
+                &#x27;current_stock&#x27;: 50
+
+            }
+
+        )
+
+        
+
+        # Create test transaction
+
+        transaction_id = await db_connection.fetchval(&quot;&quot;&quot;
+
+            INSERT INTO retail.sales_transactions (
+
+                store_id, customer_id, transaction_date, total_amount, 
+
+                subtotal, tax_amount, transaction_type
+
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+
+            RETURNING transaction_id
+
+        &quot;&quot;&quot;, store_id, customer_id, datetime.now(), 107.99, 99.99, 8.00, &#x27;sale&#x27;)
+
+        
+
+        # Create transaction item
+
+        await db_connection.execute(&quot;&quot;&quot;
+
+            INSERT INTO retail.sales_transaction_items (
+
+                transaction_id, product_id, quantity, unit_price, total_price
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+        &quot;&quot;&quot;, transaction_id, product_id, 1, 99.99, 99.99)
+
+        
+
+        # Test daily sales analysis
+
+        sales_result = await test_mcp_server.execute_tool(
+
+            &#x27;execute_sales_query&#x27;,
+
+            {
+
+                &#x27;query_type&#x27;: &#x27;daily_sales&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;start_date&#x27;: (datetime.now() - timedelta(days=1)).date().isoformat(),
+
+                &#x27;end_date&#x27;: datetime.now().date().isoformat()
+
+            }
+
+        )
+
+        
+
+        assert sales_result[&#x27;success&#x27;] is True
+
+        assert len(sales_result[&#x27;data&#x27;]) &gt; 0
+
+        assert sales_result[&#x27;data&#x27;][0][&#x27;total_revenue&#x27;] == 107.99
+
+    
+
+    async def test_multi_store_workflow(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test workflows across multiple stores.&quot;&quot;&quot;
+
+        
+
+        # Create multiple stores
+
+        stores = [&#x27;test_seattle&#x27;, &#x27;test_redmond&#x27;, &#x27;test_bellevue&#x27;]
+
+        
+
+        for store_id in stores:
+
+            await TestDataHelper.create_test_store(db_connection, store_id)
+
+            
+
+            # Create customer in each store
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Test that each store sees only its own data
+
+        for store_id in stores:
+
+            schema_result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT COUNT(*) as customer_count FROM retail.customers&#x27;
+
+                }
+
+            )
+
+            
+
+            assert schema_result[&#x27;success&#x27;] is True
+
+            assert schema_result[&#x27;data&#x27;][0][&#x27;customer_count&#x27;] == 1
+
+
+
+class TestErrorHandling:
+
+    &quot;&quot;&quot;Test error handling and edge cases.&quot;&quot;&quot;
+
+    
+
+    async def test_database_connection_failure(self, test_mcp_server):
+
+        &quot;&quot;&quot;Test behavior when database connection fails.&quot;&quot;&quot;
+
+        
+
+        # Simulate database failure by using invalid connection
+
+        with patch.object(test_mcp_server.db_provider, &#x27;get_connection&#x27;) as mock_conn:
+
+            mock_conn.side_effect = Exception(&quot;Database connection failed&quot;)
+
+            
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;get_table_schema&#x27;,
+
+                {&#x27;table_name&#x27;: &#x27;customers&#x27;}
+
+            )
+
+            
+
+            assert result[&#x27;success&#x27;] is False
+
+            assert &#x27;connection failed&#x27; in result[&#x27;error&#x27;].lower()
+
+    
+
+    async def test_invalid_tool_parameters(self, test_mcp_server):
+
+        &quot;&quot;&quot;Test handling of invalid tool parameters.&quot;&quot;&quot;
+
+        
+
+        # Missing required parameter
+
+        result = await test_mcp_server.execute_tool(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {&#x27;query&#x27;: &#x27;test query&#x27;}  # Missing store_id
+
+        )
+
+        
+
+        assert result[&#x27;success&#x27;] is False
+
+        assert &#x27;store_id is required&#x27; in result[&#x27;error&#x27;].lower()
+
+        
+
+        # Invalid parameter type
+
+        result = await test_mcp_server.execute_tool(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {
+
+                &#x27;query&#x27;: &#x27;test query&#x27;,
+
+                &#x27;store_id&#x27;: &#x27;test_store&#x27;,
+
+                &#x27;limit&#x27;: &#x27;invalid&#x27;  # Should be integer
+
+            }
+
+        )
+
+        
+
+        assert result[&#x27;success&#x27;] is False
+
+    
+
+    async def test_sql_injection_prevention(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test that SQL injection attempts are blocked.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Attempt SQL injection
+
+        malicious_query = &quot;SELECT * FROM retail.customers; DROP TABLE retail.customers; --&quot;
+
+        
+
+        result = await test_mcp_server.execute_tool(
+
+            &#x27;execute_sales_query&#x27;,
+
+            {
+
+                &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;query&#x27;: malicious_query
+
+            }
+
+        )
+
+        
+
+        assert result[&#x27;success&#x27;] is False
+
+        assert &#x27;validation failed&#x27; in result[&#x27;error&#x27;].lower()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 Performance Testing</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Load Testing Framework</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_performance.py
+
+&quot;&quot;&quot;
+
+Performance and load testing for MCP server.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+import time
+
+import statistics
+
+from concurrent.futures import ThreadPoolExecutor
+
+from typing import List, Dict, Any
+
+
+
+class TestPerformance:
+
+    &quot;&quot;&quot;Performance testing for MCP server operations.&quot;&quot;&quot;
+
+    
+
+    async def test_concurrent_tool_execution(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test performance under concurrent tool execution.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test data
+
+        for i in range(100):
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Define test scenarios
+
+        async def execute_tool_scenario():
+
+            &quot;&quot;&quot;Execute a tool and measure performance.&quot;&quot;&quot;
+
+            start_time = time.time()
+
+            
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT COUNT(*) as count FROM retail.customers&#x27;
+
+                }
+
+            )
+
+            
+
+            execution_time = time.time() - start_time
+
+            return {
+
+                &#x27;success&#x27;: result[&#x27;success&#x27;],
+
+                &#x27;execution_time&#x27;: execution_time
+
+            }
+
+        
+
+        # Run concurrent executions
+
+        concurrent_tasks = 20
+
+        tasks = [execute_tool_scenario() for _ in range(concurrent_tasks)]
+
+        
+
+        start_time = time.time()
+
+        results = await asyncio.gather(*tasks)
+
+        total_time = time.time() - start_time
+
+        
+
+        # Analyze results
+
+        successful_executions = [r for r in results if r[&#x27;success&#x27;]]
+
+        execution_times = [r[&#x27;execution_time&#x27;] for r in successful_executions]
+
+        
+
+        assert len(successful_executions) == concurrent_tasks
+
+        assert statistics.mean(execution_times) &lt; 1.0  # Average under 1 second
+
+        assert max(execution_times) &lt; 5.0  # No execution over 5 seconds
+
+        assert total_time &lt; 10.0  # All executions under 10 seconds
+
+        
+
+        print(f&quot;Concurrent execution stats:&quot;)
+
+        print(f&quot;  Total time: {total_time:.2f}s&quot;)
+
+        print(f&quot;  Average execution time: {statistics.mean(execution_times):.3f}s&quot;)
+
+        print(f&quot;  Max execution time: {max(execution_times):.3f}s&quot;)
+
+        print(f&quot;  Min execution time: {min(execution_times):.3f}s&quot;)
+
+    
+
+    async def test_database_query_performance(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test database query performance with large datasets.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create large dataset
+
+        print(&quot;Creating test dataset...&quot;)
+
+        for i in range(1000):
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Test various query patterns
+
+        query_tests = [
+
+            {
+
+                &#x27;name&#x27;: &#x27;Simple COUNT&#x27;,
+
+                &#x27;query&#x27;: &#x27;SELECT COUNT(*) FROM retail.customers&#x27;,
+
+                &#x27;expected_max_time&#x27;: 0.1
+
+            },
+
+            {
+
+                &#x27;name&#x27;: &#x27;Filtered SELECT&#x27;,
+
+                &#x27;query&#x27;: &quot;SELECT * FROM retail.customers WHERE loyalty_tier = &#x27;bronze&#x27; LIMIT 100&quot;,
+
+                &#x27;expected_max_time&#x27;: 0.5
+
+            },
+
+            {
+
+                &#x27;name&#x27;: &#x27;Aggregation&#x27;,
+
+                &#x27;query&#x27;: &#x27;SELECT loyalty_tier, COUNT(*) FROM retail.customers GROUP BY loyalty_tier&#x27;,
+
+                &#x27;expected_max_time&#x27;: 0.5
+
+            }
+
+        ]
+
+        
+
+        for test_case in query_tests:
+
+            start_time = time.time()
+
+            
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: test_case[&#x27;query&#x27;]
+
+                }
+
+            )
+
+            
+
+            execution_time = time.time() - start_time
+
+            
+
+            assert result[&#x27;success&#x27;] is True
+
+            assert execution_time &lt; test_case[&#x27;expected_max_time&#x27;]
+
+            
+
+            print(f&quot;Query &#x27;{test_case[&#x27;name&#x27;]}&#x27;: {execution_time:.3f}s&quot;)
+
+    
+
+    async def test_embedding_generation_performance(self, test_mcp_server):
+
+        &quot;&quot;&quot;Test embedding generation performance.&quot;&quot;&quot;
+
+        
+
+        from mcp_server.embeddings.product_embedder import ProductEmbedder
+
+        
+
+        # Test with mock embedding manager (no actual API calls)
+
+        embedder = ProductEmbedder(test_mcp_server.db_provider)
+
+        embedder.embedding_manager = test_mcp_server.embedding_manager
+
+        
+
+        # Test batch embedding generation
+
+        test_texts = [f&quot;Test product {i} description&quot; for i in range(100)]
+
+        
+
+        start_time = time.time()
+
+        embeddings = await embedder.embedding_manager.generate_embeddings_batch(test_texts)
+
+        batch_time = time.time() - start_time
+
+        
+
+        assert len(embeddings) == 100
+
+        assert batch_time &lt; 5.0  # Should complete in under 5 seconds with mocks
+
+        
+
+        print(f&quot;Batch embedding generation (100 items): {batch_time:.3f}s&quot;)
+
+        print(f&quot;Average per embedding: {batch_time/100:.4f}s&quot;)
+
+    
+
+    @pytest.mark.slow
+
+    async def test_memory_usage(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test memory usage under load.&quot;&quot;&quot;
+
+        
+
+        import psutil
+
+        import os
+
+        
+
+        process = psutil.Process(os.getpid())
+
+        initial_memory = process.memory_info().rss / 1024 / 1024  # MB
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create substantial dataset
+
+        for i in range(500):
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Execute multiple operations
+
+        for i in range(50):
+
+            await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT * FROM retail.customers LIMIT 100&#x27;
+
+                }
+
+            )
+
+        
+
+        final_memory = process.memory_info().rss / 1024 / 1024  # MB
+
+        memory_increase = final_memory - initial_memory
+
+        
+
+        # Memory increase should be reasonable (under 100MB for this test)
+
+        assert memory_increase &lt; 100
+
+        
+
+        print(f&quot;Memory usage:&quot;)
+
+        print(f&quot;  Initial: {initial_memory:.1f} MB&quot;)
+
+        print(f&quot;  Final: {final_memory:.1f} MB&quot;)
+
+        print(f&quot;  Increase: {memory_increase:.1f} MB&quot;)
+
+
+
+class TestScalability:
+
+    &quot;&quot;&quot;Test scalability characteristics.&quot;&quot;&quot;
+
+    
+
+    async def test_response_time_scaling(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test how response time scales with data size.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Test with different data sizes
+
+        data_sizes = [100, 500, 1000, 2000]
+
+        response_times = []
+
+        
+
+        for size in data_sizes:
+
+            # Clear existing data
+
+            await db_connection.execute(&quot;DELETE FROM retail.customers WHERE store_id = $1&quot;, store_id)
+
+            
+
+            # Create dataset of specified size
+
+            for i in range(size):
+
+                await TestDataHelper.create_test_customer(db_connection, store_id)
+
+            
+
+            # Measure query time
+
+            start_time = time.time()
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT COUNT(*) FROM retail.customers&#x27;
+
+                }
+
+            )
+
+            execution_time = time.time() - start_time
+
+            
+
+            assert result[&#x27;success&#x27;] is True
+
+            response_times.append(execution_time)
+
+            
+
+            print(f&quot;Data size {size}: {execution_time:.3f}s&quot;)
+
+        
+
+        # Response time should scale reasonably (not exponentially)
+
+        # Simple count queries should remain fast even with larger datasets
+
+        for time_val in response_times:
+
+            assert time_val &lt; 1.0  # All queries under 1 second
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 Debugging Tools</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Advanced Debugging Framework</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/debugging/debug_tools.py
+
+&quot;&quot;&quot;
+
+Advanced debugging tools for MCP server troubleshooting.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import json
+
+import time
+
+import traceback
+
+from typing import Dict, Any, List, Optional
+
+from datetime import datetime
+
+import logging
+
+from contextlib import asynccontextmanager
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class MCPDebugger:
+
+    &quot;&quot;&quot;Comprehensive debugging utilities for MCP server.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, server_instance):
+
+        self.server = server_instance
+
+        self.debug_logs = []
+
+        self.performance_metrics = {}
+
+        self.active_traces = {}
+
+        
+
+    @asynccontextmanager
+
+    async def trace_execution(self, operation_name: str, context: Dict[str, Any] = None):
+
+        &quot;&quot;&quot;Trace operation execution with detailed logging.&quot;&quot;&quot;
+
+        
+
+        trace_id = f&quot;{operation_name}_{int(time.time() * 1000)}&quot;
+
+        start_time = time.time()
+
+        
+
+        trace_info = {
+
+            &#x27;trace_id&#x27;: trace_id,
+
+            &#x27;operation&#x27;: operation_name,
+
+            &#x27;start_time&#x27;: start_time,
+
+            &#x27;context&#x27;: context or {},
+
+            &#x27;status&#x27;: &#x27;running&#x27;
+
+        }
+
+        
+
+        self.active_traces[trace_id] = trace_info
+
+        
+
+        logger.debug(f&quot;Starting trace: {trace_id} - {operation_name}&quot;)
+
+        
+
+        try:
+
+            yield trace_info
+
+            
+
+            # Success
+
+            execution_time = time.time() - start_time
+
+            trace_info.update({
+
+                &#x27;status&#x27;: &#x27;completed&#x27;,
+
+                &#x27;execution_time&#x27;: execution_time
+
+            })
+
+            
+
+            logger.debug(f&quot;Completed trace: {trace_id} in {execution_time:.3f}s&quot;)
+
+            
+
+        except Exception as e:
+
+            # Error
+
+            execution_time = time.time() - start_time
+
+            trace_info.update({
+
+                &#x27;status&#x27;: &#x27;error&#x27;,
+
+                &#x27;execution_time&#x27;: execution_time,
+
+                &#x27;error&#x27;: str(e),
+
+                &#x27;traceback&#x27;: traceback.format_exc()
+
+            })
+
+            
+
+            logger.error(f&quot;Error in trace: {trace_id} - {str(e)}&quot;)
+
+            raise
+
+            
+
+        finally:
+
+            # Store completed trace
+
+            self.debug_logs.append(trace_info.copy())
+
+            del self.active_traces[trace_id]
+
+            
+
+            # Limit debug log size
+
+            if len(self.debug_logs) &gt; 1000:
+
+                self.debug_logs = self.debug_logs[-500:]
+
+    
+
+    async def debug_tool_execution(self, tool_name: str, parameters: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Debug tool execution with comprehensive logging.&quot;&quot;&quot;
+
+        
+
+        async with self.trace_execution(f&quot;tool_execution_{tool_name}&quot;, {&#x27;parameters&#x27;: parameters}) as trace:
+
+            
+
+            # Pre-execution validation
+
+            validation_result = await self._validate_tool_parameters(tool_name, parameters)
+
+            trace[&#x27;validation&#x27;] = validation_result
+
+            
+
+            if not validation_result[&#x27;valid&#x27;]:
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: f&quot;Parameter validation failed: {validation_result[&#x27;errors&#x27;]}&quot;,
+
+                    &#x27;debug_info&#x27;: trace
+
+                }
+
+            
+
+            # Database connection check
+
+            db_health = await self._check_database_health()
+
+            trace[&#x27;database_health&#x27;] = db_health
+
+            
+
+            # Execute tool with monitoring
+
+            try:
+
+                tool_instance = self.server.get_tool(tool_name)
+
+                if not tool_instance:
+
+                    return {
+
+                        &#x27;success&#x27;: False,
+
+                        &#x27;error&#x27;: f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;,
+
+                        &#x27;debug_info&#x27;: trace
+
+                    }
+
+                
+
+                # Monitor resource usage during execution
+
+                start_memory = await self._get_memory_usage()
+
+                
+
+                result = await tool_instance.call(**parameters)
+
+                
+
+                end_memory = await self._get_memory_usage()
+
+                
+
+                trace.update({
+
+                    &#x27;memory_start_mb&#x27;: start_memory,
+
+                    &#x27;memory_end_mb&#x27;: end_memory,
+
+                    &#x27;memory_used_mb&#x27;: end_memory - start_memory,
+
+                    &#x27;result_success&#x27;: result.success,
+
+                    &#x27;result_row_count&#x27;: result.row_count
+
+                })
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: result.success,
+
+                    &#x27;data&#x27;: result.data,
+
+                    &#x27;error&#x27;: result.error,
+
+                    &#x27;metadata&#x27;: result.metadata,
+
+                    &#x27;debug_info&#x27;: trace
+
+                }
+
+                
+
+            except Exception as e:
+
+                trace[&#x27;exception&#x27;] = {
+
+                    &#x27;type&#x27;: type(e).__name__,
+
+                    &#x27;message&#x27;: str(e),
+
+                    &#x27;traceback&#x27;: traceback.format_exc()
+
+                }
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: f&quot;Tool execution failed: {str(e)}&quot;,
+
+                    &#x27;debug_info&#x27;: trace
+
+                }
+
+    
+
+    async def analyze_performance_bottlenecks(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Analyze performance bottlenecks from debug logs.&quot;&quot;&quot;
+
+        
+
+        if not self.debug_logs:
+
+            return {&#x27;message&#x27;: &#x27;No debug data available&#x27;}
+
+        
+
+        # Analyze execution times
+
+        execution_times = {}
+
+        error_rates = {}
+
+        memory_usage = {}
+
+        
+
+        for log_entry in self.debug_logs[-100:]:  # Last 100 entries
+
+            operation = log_entry[&#x27;operation&#x27;]
+
+            
+
+            # Execution time analysis
+
+            if &#x27;execution_time&#x27; in log_entry:
+
+                if operation not in execution_times:
+
+                    execution_times[operation] = []
+
+                execution_times[operation].append(log_entry[&#x27;execution_time&#x27;])
+
+            
+
+            # Error rate analysis
+
+            if operation not in error_rates:
+
+                error_rates[operation] = {&#x27;total&#x27;: 0, &#x27;errors&#x27;: 0}
+
+            
+
+            error_rates[operation][&#x27;total&#x27;] += 1
+
+            if log_entry[&#x27;status&#x27;] == &#x27;error&#x27;:
+
+                error_rates[operation][&#x27;errors&#x27;] += 1
+
+            
+
+            # Memory usage analysis
+
+            if &#x27;memory_used_mb&#x27; in log_entry:
+
+                if operation not in memory_usage:
+
+                    memory_usage[operation] = []
+
+                memory_usage[operation].append(log_entry[&#x27;memory_used_mb&#x27;])
+
+        
+
+        # Calculate statistics
+
+        performance_stats = {}
+
+        
+
+        for operation, times in execution_times.items():
+
+            if times:
+
+                performance_stats[operation] = {
+
+                    &#x27;avg_execution_time&#x27;: sum(times) / len(times),
+
+                    &#x27;max_execution_time&#x27;: max(times),
+
+                    &#x27;min_execution_time&#x27;: min(times),
+
+                    &#x27;execution_count&#x27;: len(times),
+
+                    &#x27;error_rate&#x27;: (error_rates[operation][&#x27;errors&#x27;] / 
+
+                                 error_rates[operation][&#x27;total&#x27;] * 100),
+
+                    &#x27;avg_memory_usage&#x27;: (sum(memory_usage.get(operation, [0])) / 
+
+                                       len(memory_usage.get(operation, [1])))
+
+                }
+
+        
+
+        # Identify bottlenecks
+
+        bottlenecks = []
+
+        
+
+        for operation, stats in performance_stats.items():
+
+            if stats[&#x27;avg_execution_time&#x27;] &gt; 2.0:  # Slow operations
+
+                bottlenecks.append({
+
+                    &#x27;type&#x27;: &#x27;slow_execution&#x27;,
+
+                    &#x27;operation&#x27;: operation,
+
+                    &#x27;avg_time&#x27;: stats[&#x27;avg_execution_time&#x27;]
+
+                })
+
+            
+
+            if stats[&#x27;error_rate&#x27;] &gt; 5.0:  # High error rate
+
+                bottlenecks.append({
+
+                    &#x27;type&#x27;: &#x27;high_error_rate&#x27;,
+
+                    &#x27;operation&#x27;: operation,
+
+                    &#x27;error_rate&#x27;: stats[&#x27;error_rate&#x27;]
+
+                })
+
+            
+
+            if stats[&#x27;avg_memory_usage&#x27;] &gt; 100:  # High memory usage
+
+                bottlenecks.append({
+
+                    &#x27;type&#x27;: &#x27;high_memory_usage&#x27;,
+
+                    &#x27;operation&#x27;: operation,
+
+                    &#x27;memory_mb&#x27;: stats[&#x27;avg_memory_usage&#x27;]
+
+                })
+
+        
+
+        return {
+
+            &#x27;performance_stats&#x27;: performance_stats,
+
+            &#x27;bottlenecks&#x27;: bottlenecks,
+
+            &#x27;total_operations&#x27;: len(self.debug_logs),
+
+            &#x27;analysis_timestamp&#x27;: datetime.now().isoformat()
+
+        }
+
+    
+
+    async def _validate_tool_parameters(self, tool_name: str, parameters: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Validate tool parameters against schema.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            tool_instance = self.server.get_tool(tool_name)
+
+            if not tool_instance:
+
+                return {
+
+                    &#x27;valid&#x27;: False,
+
+                    &#x27;errors&#x27;: [f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;]
+
+                }
+
+            
+
+            schema = tool_instance.get_input_schema()
+
+            
+
+            # Basic validation (in production, use jsonschema library)
+
+            errors = []
+
+            required_props = schema.get(&#x27;required&#x27;, [])
+
+            
+
+            for prop in required_props:
+
+                if prop not in parameters:
+
+                    errors.append(f&quot;Missing required parameter: {prop}&quot;)
+
+            
+
+            return {
+
+                &#x27;valid&#x27;: len(errors) == 0,
+
+                &#x27;errors&#x27;: errors,
+
+                &#x27;schema&#x27;: schema
+
+            }
+
+            
+
+        except Exception as e:
+
+            return {
+
+                &#x27;valid&#x27;: False,
+
+                &#x27;errors&#x27;: [f&quot;Validation error: {str(e)}&quot;]
+
+            }
+
+    
+
+    async def _check_database_health(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Check database health and connectivity.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            health_status = await self.server.db_provider.health_check()
+
+            return {
+
+                &#x27;healthy&#x27;: health_status.get(&#x27;status&#x27;) == &#x27;healthy&#x27;,
+
+                &#x27;details&#x27;: health_status
+
+            }
+
+        except Exception as e:
+
+            return {
+
+                &#x27;healthy&#x27;: False,
+
+                &#x27;error&#x27;: str(e)
+
+            }
+
+    
+
+    async def _get_memory_usage(self) -&gt; float:
+
+        &quot;&quot;&quot;Get current memory usage in MB.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            import psutil
+
+            import os
+
+            process = psutil.Process(os.getpid())
+
+            return process.memory_info().rss / 1024 / 1024
+
+        except:
+
+            return 0.0
+
+    
+
+    def get_debug_summary(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get summary of debug information.&quot;&quot;&quot;
+
+        
+
+        recent_logs = self.debug_logs[-50:] if self.debug_logs else []
+
+        
+
+        return {
+
+            &#x27;total_operations&#x27;: len(self.debug_logs),
+
+            &#x27;active_traces&#x27;: len(self.active_traces),
+
+            &#x27;recent_operations&#x27;: [
+
+                {
+
+                    &#x27;operation&#x27;: log[&#x27;operation&#x27;],
+
+                    &#x27;status&#x27;: log[&#x27;status&#x27;],
+
+                    &#x27;execution_time&#x27;: log.get(&#x27;execution_time&#x27;, 0),
+
+                    &#x27;timestamp&#x27;: log.get(&#x27;start_time&#x27;, 0)
+
+                }
+
+                for log in recent_logs
+
+            ],
+
+            &#x27;current_traces&#x27;: list(self.active_traces.keys())
+
+        }
+
+
+
+# Debug tool for direct use
+
+class DebugTool:
+
+    &quot;&quot;&quot;Interactive debugging tool for MCP server.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, server_instance):
+
+        self.debugger = MCPDebugger(server_instance)
+
+    
+
+    async def debug_query(self, query: str, store_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Debug a specific database query.&quot;&quot;&quot;
+
+        
+
+        return await self.debugger.debug_tool_execution(
+
+            &#x27;execute_sales_query&#x27;,
+
+            {
+
+                &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;query&#x27;: query
+
+            }
+
+        )
+
+    
+
+    async def debug_search(self, query: str, store_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Debug a semantic search query.&quot;&quot;&quot;
+
+        
+
+        return await self.debugger.debug_tool_execution(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {
+
+                &#x27;query&#x27;: query,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;limit&#x27;: 10
+
+            }
+
+        )
+
+    
+
+    async def get_performance_report(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get comprehensive performance report.&quot;&quot;&quot;
+
+        
+
+        return await self.debugger.analyze_performance_bottlenecks()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Comprehensive Testing Framework</strong>: Unit, integration, and performance tests for all components  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Advanced Debugging Tools</strong>: Sophisticated debugging utilities with execution tracing  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Performance Validation</strong>: Load testing and scalability analysis capabilities  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Security Testing</strong>: SQL injection prevention and RLS validation  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Monitoring Integration</strong>: Performance metrics and bottleneck analysis  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>CI/CD Ready</strong>: Automated testing workflows for continuous integration  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/09-VS-Code/README.md" target="_blank">Lab 09: VS Code Integration</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure VS Code for MCP server development</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set up debugging environments in VS Code</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integrate MCP server with VS Code Chat</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Test the complete VS Code workflow</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Testing Frameworks</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.pytest.org/">pytest Documentation</a> - Python testing framework</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://magicstack.github.io/asyncpg/current/index.html">AsyncPG Testing</a> - Async PostgreSQL testing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI Testing</a> - API testing patterns</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Performance Testing</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">Load Testing Best Practices</a> - Async performance testing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/performance-tips.html">Database Performance Testing</a> - PostgreSQL optimization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/tracemalloc.html">Memory Profiling</a> - Python memory analysis</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Debugging Tools</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/pdb.html">Python Debugging</a> - Python debugger</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio-dev.html">Async Debugging</a> - Asyncio debugging</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-logging.html">SQL Debugging</a> - PostgreSQL logging</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Previous</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/07-Semantic-Search/README.md" target="_blank">Lab 07: Semantic Search Integration</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/09-VS-Code/README.md" target="_blank">Lab 09: VS Code Integration</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">테스트 및 디버깅</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습은 MCP 서버를 프로덕션 환경에서 테스트하고 디버깅하는 방법에 대한 포괄적인 지침을 제공합니다. 강력한 테스트 전략을 구현하고 복잡한 문제를 디버깅하며 다양한 조건에서 MCP 서버가 안정적으로 작동하도록 보장하는 방법을 배우게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 서버 테스트는 단위 테스트, 통합 테스트, 성능 검증, 실제 시나리오 테스트를 포함하는 다층적인 접근 방식이 필요합니다. 이 실습은 개발부터 프로덕션 모니터링까지의 전체 테스트 라이프사이클을 다룹니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리의 테스트 전략은 신뢰성, 보안, 성능을 강조하며, MCP 서버가 데이터 무결성과 사용자 경험 품질을 유지하면서 프로덕션 워크로드를 처리할 수 있도록 보장합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>포괄적인 단위 및 통합 테스트 스위트 구현</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP 도구 및 데이터베이스 작업을 위한 효과적인 테스트 전략 설계</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>고급 디버깅 기술을 사용하여 복잡한 문제 디버깅</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>현실적인 테스트 시나리오를 통해 부하 상태에서 성능 검증</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>효과적인 경고 및 관찰 기능을 통해 프로덕션 시스템 모니터링</strong></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>지속적 통합을 위한 테스트 워크플로 자동화</strong></li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧪 테스트 아키텍처</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">테스트 전략 개요</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+┌─────────────────────────────────────────────────┐
+
+│                Unit Tests                       │
+
+│   • Tool execution logic                       │
+
+│   • Database query validation                  │
+
+│   • Authentication/authorization               │
+
+│   • Embedding generation                       │
+
+└─────────────────┬───────────────────────────────┘
+
+                  │
+
+┌─────────────────▼───────────────────────────────┐
+
+│             Integration Tests                   │
+
+│   • End-to-end MCP workflows                  │
+
+│   • Database schema validation                 │
+
+│   • API endpoint testing                       │
+
+│   • Multi-tool interactions                    │
+
+└─────────────────┬───────────────────────────────┘
+
+                  │
+
+┌─────────────────▼───────────────────────────────┐
+
+│            Performance Tests                    │
+
+│   • Load testing under realistic conditions    │
+
+│   • Database performance validation            │
+
+│   • Memory and resource usage                  │
+
+│   • Embedding generation performance           │
+
+└─────────────────┬───────────────────────────────┘
+
+                  │
+
+┌─────────────────▼───────────────────────────────┐
+
+│              E2E Tests                         │
+
+│   • Complete user workflows                    │
+
+│   • VS Code integration testing               │
+
+│   • Real-world scenario validation            │
+
+│   • Cross-browser compatibility               │
+
+└─────────────────────────────────────────────────┘
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">테스트 환경 설정</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/conftest.py
+
+&quot;&quot;&quot;
+
+Pytest configuration and shared fixtures for MCP server testing.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+import asyncpg
+
+import os
+
+from typing import AsyncGenerator, Dict, Any
+
+from unittest.mock import AsyncMock, Mock
+
+import tempfile
+
+import shutil
+
+from datetime import datetime
+
+
+
+# Test configuration
+
+TEST_DATABASE_URL = &quot;postgresql://test_user:test_pass@localhost:5432/test_retail_db&quot;
+
+TEST_STORE_IDS = [&#x27;test_seattle&#x27;, &#x27;test_redmond&#x27;, &#x27;test_bellevue&#x27;]
+
+
+
+@pytest.fixture(scope=&quot;session&quot;)
+
+def event_loop():
+
+    &quot;&quot;&quot;Create an instance of the default event loop for the test session.&quot;&quot;&quot;
+
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+
+    yield loop
+
+    loop.close()
+
+
+
+@pytest.fixture(scope=&quot;session&quot;)
+
+async def test_database():
+
+    &quot;&quot;&quot;Set up test database with schema and sample data.&quot;&quot;&quot;
+
+    
+
+    # Create test database connection
+
+    sys_conn = await asyncpg.connect(
+
+        &quot;postgresql://postgres:password@localhost:5432/postgres&quot;
+
+    )
+
+    
+
+    try:
+
+        # Create test database
+
+        await sys_conn.execute(&quot;DROP DATABASE IF EXISTS test_retail_db&quot;)
+
+        await sys_conn.execute(&quot;CREATE DATABASE test_retail_db&quot;)
+
+    finally:
+
+        await sys_conn.close()
+
+    
+
+    # Connect to test database and set up schema
+
+    test_conn = await asyncpg.connect(TEST_DATABASE_URL)
+
+    
+
+    try:
+
+        # Load schema
+
+        schema_sql = await load_sql_file(&quot;../scripts/create_schema.sql&quot;)
+
+        await test_conn.execute(schema_sql)
+
+        
+
+        # Load sample data
+
+        sample_data_sql = await load_sql_file(&quot;../scripts/sample_data.sql&quot;)
+
+        await test_conn.execute(sample_data_sql)
+
+        
+
+        yield test_conn
+
+        
+
+    finally:
+
+        await test_conn.close()
+
+        
+
+        # Cleanup test database
+
+        sys_conn = await asyncpg.connect(
+
+            &quot;postgresql://postgres:password@localhost:5432/postgres&quot;
+
+        )
+
+        try:
+
+            await sys_conn.execute(&quot;DROP DATABASE IF EXISTS test_retail_db&quot;)
+
+        finally:
+
+            await sys_conn.close()
+
+
+
+@pytest.fixture
+
+async def db_connection(test_database):
+
+    &quot;&quot;&quot;Provide a clean database connection for each test.&quot;&quot;&quot;
+
+    
+
+    conn = await asyncpg.connect(TEST_DATABASE_URL)
+
+    
+
+    # Start transaction for test isolation
+
+    tx = conn.transaction()
+
+    await tx.start()
+
+    
+
+    try:
+
+        yield conn
+
+    finally:
+
+        # Rollback transaction to maintain test isolation
+
+        await tx.rollback()
+
+        await conn.close()
+
+
+
+@pytest.fixture
+
+async def mock_embedding_manager():
+
+    &quot;&quot;&quot;Mock embedding manager for testing without Azure OpenAI calls.&quot;&quot;&quot;
+
+    
+
+    mock_manager = AsyncMock()
+
+    
+
+    # Mock embedding generation
+
+    mock_manager.generate_embedding.return_value = [0.1] * 1536  # Mock embedding
+
+    mock_manager.generate_embeddings_batch.return_value = [[0.1] * 1536] * 10
+
+    
+
+    # Mock initialization
+
+    mock_manager.initialize.return_value = None
+
+    mock_manager.cleanup.return_value = None
+
+    
+
+    return mock_manager
+
+
+
+@pytest.fixture
+
+async def test_mcp_server(db_connection, mock_embedding_manager):
+
+    &quot;&quot;&quot;Set up test MCP server instance.&quot;&quot;&quot;
+
+    
+
+    from mcp_server.server import MCPServer
+
+    from mcp_server.database import DatabaseProvider
+
+    from mcp_server.config import Config
+
+    
+
+    # Create test configuration
+
+    config = Config()
+
+    config.database.connection_string = TEST_DATABASE_URL
+
+    config.server.enable_debug = True
+
+    
+
+    # Create database provider
+
+    db_provider = DatabaseProvider(config.database.connection_string)
+
+    await db_provider.initialize()
+
+    
+
+    # Create MCP server
+
+    server = MCPServer(config, db_provider)
+
+    server.embedding_manager = mock_embedding_manager
+
+    
+
+    await server.initialize()
+
+    
+
+    yield server
+
+    
+
+    await server.cleanup()
+
+
+
+@pytest.fixture
+
+def sample_products():
+
+    &quot;&quot;&quot;Sample product data for testing.&quot;&quot;&quot;
+
+    
+
+    return [
+
+        {
+
+            &#x27;product_id&#x27;: &#x27;test-product-1&#x27;,
+
+            &#x27;product_name&#x27;: &#x27;Test Running Shoes&#x27;,
+
+            &#x27;brand&#x27;: &#x27;TestBrand&#x27;,
+
+            &#x27;price&#x27;: 99.99,
+
+            &#x27;product_description&#x27;: &#x27;Comfortable running shoes for daily training&#x27;,
+
+            &#x27;category_name&#x27;: &#x27;Electronics&#x27;,
+
+            &#x27;current_stock&#x27;: 50
+
+        },
+
+        {
+
+            &#x27;product_id&#x27;: &#x27;test-product-2&#x27;,
+
+            &#x27;product_name&#x27;: &#x27;Test Laptop&#x27;,
+
+            &#x27;brand&#x27;: &#x27;TestTech&#x27;,
+
+            &#x27;price&#x27;: 1299.99,
+
+            &#x27;product_description&#x27;: &#x27;High-performance laptop for professional use&#x27;,
+
+            &#x27;category_name&#x27;: &#x27;Electronics&#x27;,
+
+            &#x27;current_stock&#x27;: 25
+
+        }
+
+    ]
+
+
+
+async def load_sql_file(file_path: str) -&gt; str:
+
+    &quot;&quot;&quot;Load SQL file content.&quot;&quot;&quot;
+
+    
+
+    with open(file_path, &#x27;r&#x27;) as file:
+
+        return file.read()
+
+
+
+# Test data helpers
+
+class TestDataHelper:
+
+    &quot;&quot;&quot;Helper class for managing test data.&quot;&quot;&quot;
+
+    
+
+    @staticmethod
+
+    async def create_test_store(conn: asyncpg.Connection, store_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Create a test store.&quot;&quot;&quot;
+
+        
+
+        store_data = {
+
+            &#x27;store_id&#x27;: store_id,
+
+            &#x27;store_name&#x27;: f&#x27;Test Store {store_id}&#x27;,
+
+            &#x27;store_location&#x27;: &#x27;Test Location&#x27;,
+
+            &#x27;store_type&#x27;: &#x27;test&#x27;,
+
+            &#x27;region&#x27;: &#x27;test&#x27;
+
+        }
+
+        
+
+        await conn.execute(&quot;&quot;&quot;
+
+            INSERT INTO retail.stores (store_id, store_name, store_location, store_type, region)
+
+            VALUES ($1, $2, $3, $4, $5)
+
+            ON CONFLICT (store_id) DO NOTHING
+
+        &quot;&quot;&quot;, *store_data.values())
+
+        
+
+        return store_data
+
+    
+
+    @staticmethod
+
+    async def create_test_customer(conn: asyncpg.Connection, store_id: str) -&gt; str:
+
+        &quot;&quot;&quot;Create a test customer.&quot;&quot;&quot;
+
+        
+
+        customer_id = await conn.fetchval(&quot;&quot;&quot;
+
+            INSERT INTO retail.customers (
+
+                store_id, first_name, last_name, email, loyalty_tier
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+            RETURNING customer_id
+
+        &quot;&quot;&quot;, store_id, &#x27;Test&#x27;, &#x27;Customer&#x27;, &#x27;test@example.com&#x27;, &#x27;bronze&#x27;)
+
+        
+
+        return customer_id
+
+    
+
+    @staticmethod
+
+    async def create_test_product(
+
+        conn: asyncpg.Connection, 
+
+        store_id: str, 
+
+        product_data: Dict[str, Any]
+
+    ) -&gt; str:
+
+        &quot;&quot;&quot;Create a test product.&quot;&quot;&quot;
+
+        
+
+        product_id = await conn.fetchval(&quot;&quot;&quot;
+
+            INSERT INTO retail.products (
+
+                store_id, sku, product_name, brand, price, product_description, current_stock
+
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+
+            RETURNING product_id
+
+        &quot;&quot;&quot;, 
+
+            store_id, 
+
+            f&quot;TEST-{product_data[&#x27;product_name&#x27;][:10]}&quot;,
+
+            product_data[&#x27;product_name&#x27;],
+
+            product_data[&#x27;brand&#x27;],
+
+            product_data[&#x27;price&#x27;],
+
+            product_data[&#x27;product_description&#x27;],
+
+            product_data[&#x27;current_stock&#x27;]
+
+        )
+
+        
+
+        return product_id
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔧 단위 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">도구 테스트 프레임워크</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_tools.py
+
+&quot;&quot;&quot;
+
+Comprehensive unit tests for MCP tools.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+from unittest.mock import AsyncMock, patch
+
+from datetime import datetime, timedelta
+
+
+
+from mcp_server.tools.sales_analysis import SalesAnalysisTool
+
+from mcp_server.tools.semantic_search import SemanticProductSearchTool
+
+from mcp_server.tools.schema_introspection import SchemaIntrospectionTool
+
+from tests.conftest import TestDataHelper
+
+
+
+class TestSalesAnalysisTool:
+
+    &quot;&quot;&quot;Test sales analysis tool functionality.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def sales_tool(self, test_mcp_server):
+
+        &quot;&quot;&quot;Create sales analysis tool for testing.&quot;&quot;&quot;
+
+        return SalesAnalysisTool(test_mcp_server.db_provider)
+
+    
+
+    async def test_daily_sales_query(self, sales_tool, db_connection):
+
+        &quot;&quot;&quot;Test daily sales analysis query.&quot;&quot;&quot;
+
+        
+
+        # Set up test data
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        customer_id = await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Create test transaction
+
+        await db_connection.execute(&quot;&quot;&quot;
+
+            INSERT INTO retail.sales_transactions (
+
+                store_id, customer_id, transaction_date, total_amount, transaction_type
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+        &quot;&quot;&quot;, store_id, customer_id, datetime.now(), 150.00, &#x27;sale&#x27;)
+
+        
+
+        # Execute tool
+
+        result = await sales_tool.execute(
+
+            query_type=&#x27;daily_sales&#x27;,
+
+            store_id=store_id,
+
+            start_date=(datetime.now() - timedelta(days=7)).date(),
+
+            end_date=datetime.now().date()
+
+        )
+
+        
+
+        # Validate results
+
+        assert result.success is True
+
+        assert len(result.data) &gt; 0
+
+        assert &#x27;total_revenue&#x27; in result.data[0]
+
+        assert result.metadata[&#x27;query_type&#x27;] == &#x27;daily_sales&#x27;
+
+    
+
+    async def test_custom_query_validation(self, sales_tool, db_connection):
+
+        &quot;&quot;&quot;Test custom query validation.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Test valid query
+
+        valid_query = &quot;SELECT COUNT(*) as customer_count FROM retail.customers&quot;
+
+        result = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store_id,
+
+            query=valid_query
+
+        )
+
+        
+
+        assert result.success is True
+
+        
+
+        # Test invalid query (should be blocked)
+
+        invalid_query = &quot;DROP TABLE retail.customers&quot;
+
+        result = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store_id,
+
+            query=invalid_query
+
+        )
+
+        
+
+        assert result.success is False
+
+        assert &#x27;validation failed&#x27; in result.error.lower()
+
+    
+
+    async def test_store_isolation(self, sales_tool, db_connection):
+
+        &quot;&quot;&quot;Test that store isolation works correctly.&quot;&quot;&quot;
+
+        
+
+        # Create two different stores
+
+        store1 = &#x27;test_store1&#x27;
+
+        store2 = &#x27;test_store2&#x27;
+
+        
+
+        await TestDataHelper.create_test_store(db_connection, store1)
+
+        await TestDataHelper.create_test_store(db_connection, store2)
+
+        
+
+        # Create customers in different stores
+
+        customer1 = await TestDataHelper.create_test_customer(db_connection, store1)
+
+        customer2 = await TestDataHelper.create_test_customer(db_connection, store2)
+
+        
+
+        # Query from store1 should only see store1 data
+
+        result1 = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store1,
+
+            query=&quot;SELECT COUNT(*) as count FROM retail.customers&quot;
+
+        )
+
+        
+
+        # Query from store2 should only see store2 data
+
+        result2 = await sales_tool.execute(
+
+            query_type=&#x27;custom&#x27;,
+
+            store_id=store2,
+
+            query=&quot;SELECT COUNT(*) as count FROM retail.customers&quot;
+
+        )
+
+        
+
+        assert result1.success is True
+
+        assert result2.success is True
+
+        assert result1.data[0][&#x27;count&#x27;] == 1
+
+        assert result2.data[0][&#x27;count&#x27;] == 1
+
+
+
+class TestSemanticSearchTool:
+
+    &quot;&quot;&quot;Test semantic search tool functionality.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def search_tool(self, test_mcp_server):
+
+        &quot;&quot;&quot;Create semantic search tool for testing.&quot;&quot;&quot;
+
+        return SemanticProductSearchTool(test_mcp_server.db_provider)
+
+    
+
+    async def test_semantic_search_execution(self, search_tool, db_connection, sample_products):
+
+        &quot;&quot;&quot;Test semantic search with mock embeddings.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test products
+
+        for product_data in sample_products:
+
+            product_id = await TestDataHelper.create_test_product(
+
+                db_connection, store_id, product_data
+
+            )
+
+            
+
+            # Create mock embedding
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.product_embeddings (
+
+                    product_id, store_id, embedding_text, embedding
+
+                ) VALUES ($1, $2, $3, $4)
+
+            &quot;&quot;&quot;, 
+
+                product_id, store_id, 
+
+                f&quot;{product_data[&#x27;product_name&#x27;]} {product_data[&#x27;brand&#x27;]}&quot;, 
+
+                &#x27;[0.1,0.2,0.3]&#x27;  # Mock embedding
+
+            )
+
+        
+
+        # Execute search
+
+        result = await search_tool.execute(
+
+            query=&#x27;running shoes&#x27;,
+
+            store_id=store_id,
+
+            limit=10,
+
+            similarity_threshold=0.0
+
+        )
+
+        
+
+        # Validate results
+
+        assert result.success is True
+
+        assert len(result.data) &gt; 0
+
+        assert &#x27;similarity_score&#x27; in result.data[0]
+
+        assert result.metadata[&#x27;search_type&#x27;] == &#x27;semantic&#x27;
+
+    
+
+    async def test_search_parameter_validation(self, search_tool):
+
+        &quot;&quot;&quot;Test search parameter validation.&quot;&quot;&quot;
+
+        
+
+        # Test missing query
+
+        result = await search_tool.execute(store_id=&#x27;test_store&#x27;)
+
+        assert result.success is False
+
+        assert &#x27;query is required&#x27; in result.error.lower()
+
+        
+
+        # Test missing store_id
+
+        result = await search_tool.execute(query=&#x27;test query&#x27;)
+
+        assert result.success is False
+
+        assert &#x27;store_id is required&#x27; in result.error.lower()
+
+
+
+class TestSchemaIntrospectionTool:
+
+    &quot;&quot;&quot;Test schema introspection tool.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def schema_tool(self, test_mcp_server):
+
+        &quot;&quot;&quot;Create schema introspection tool for testing.&quot;&quot;&quot;
+
+        return SchemaIntrospectionTool(test_mcp_server.db_provider)
+
+    
+
+    async def test_single_table_schema(self, schema_tool, db_connection):
+
+        &quot;&quot;&quot;Test getting schema for a single table.&quot;&quot;&quot;
+
+        
+
+        result = await schema_tool.execute(
+
+            table_name=&#x27;customers&#x27;,
+
+            include_constraints=True,
+
+            include_indexes=True
+
+        )
+
+        
+
+        assert result.success is True
+
+        assert result.data[&#x27;table_name&#x27;] == &#x27;customers&#x27;
+
+        assert len(result.data[&#x27;columns&#x27;]) &gt; 0
+
+        assert &#x27;customer_id&#x27; in [col[&#x27;column_name&#x27;] for col in result.data[&#x27;columns&#x27;]]
+
+    
+
+    async def test_all_tables_schema(self, schema_tool, db_connection):
+
+        &quot;&quot;&quot;Test getting schema for all tables.&quot;&quot;&quot;
+
+        
+
+        result = await schema_tool.execute()
+
+        
+
+        assert result.success is True
+
+        assert result.data[&#x27;schema_name&#x27;] == &#x27;retail&#x27;
+
+        assert len(result.data[&#x27;tables&#x27;]) &gt; 0
+
+        
+
+        table_names = [table[&#x27;table_name&#x27;] for table in result.data[&#x27;tables&#x27;]]
+
+        expected_tables = [&#x27;customers&#x27;, &#x27;products&#x27;, &#x27;sales_transactions&#x27;]
+
+        
+
+        for expected_table in expected_tables:
+
+            assert expected_table in table_names
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">데이터베이스 테스트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_database.py
+
+&quot;&quot;&quot;
+
+Database layer testing including RLS and security.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncpg
+
+from datetime import datetime
+
+
+
+from mcp_server.database import DatabaseProvider
+
+from tests.conftest import TestDataHelper
+
+
+
+class TestRowLevelSecurity:
+
+    &quot;&quot;&quot;Test Row Level Security implementation.&quot;&quot;&quot;
+
+    
+
+    async def test_store_context_setting(self, db_connection):
+
+        &quot;&quot;&quot;Test that store context is set correctly.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Set store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+        
+
+        # Verify context is set
+
+        current_store = await db_connection.fetchval(
+
+            &quot;SELECT current_setting(&#x27;app.current_store_id&#x27;, true)&quot;
+
+        )
+
+        
+
+        assert current_store == store_id
+
+    
+
+    async def test_customer_isolation(self, db_connection):
+
+        &quot;&quot;&quot;Test that customers are properly isolated by store.&quot;&quot;&quot;
+
+        
+
+        # Create two stores
+
+        store1 = &#x27;test_store1&#x27;
+
+        store2 = &#x27;test_store2&#x27;
+
+        
+
+        await TestDataHelper.create_test_store(db_connection, store1)
+
+        await TestDataHelper.create_test_store(db_connection, store2)
+
+        
+
+        # Create customers in different stores
+
+        await TestDataHelper.create_test_customer(db_connection, store1)
+
+        await TestDataHelper.create_test_customer(db_connection, store2)
+
+        
+
+        # Set context to store1 and count customers
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store1)
+
+        store1_count = await db_connection.fetchval(&quot;SELECT COUNT(*) FROM retail.customers&quot;)
+
+        
+
+        # Set context to store2 and count customers
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store2)
+
+        store2_count = await db_connection.fetchval(&quot;SELECT COUNT(*) FROM retail.customers&quot;)
+
+        
+
+        # Each store should only see its own customers
+
+        assert store1_count == 1
+
+        assert store2_count == 1
+
+    
+
+    async def test_invalid_store_context(self, db_connection):
+
+        &quot;&quot;&quot;Test that invalid store context raises error.&quot;&quot;&quot;
+
+        
+
+        with pytest.raises(Exception) as exc_info:
+
+            await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, &#x27;invalid_store&#x27;)
+
+        
+
+        assert &quot;Store not found&quot; in str(exc_info.value)
+
+    
+
+    async def test_cross_store_data_insertion_blocked(self, db_connection):
+
+        &quot;&quot;&quot;Test that users cannot insert data for other stores.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Set store context
+
+        await db_connection.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+        
+
+        # Try to insert customer for different store (should fail)
+
+        with pytest.raises(Exception):
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.customers (store_id, first_name, last_name, email)
+
+                VALUES ($1, $2, $3, $4)
+
+            &quot;&quot;&quot;, &#x27;different_store&#x27;, &#x27;Test&#x27;, &#x27;Customer&#x27;, &#x27;test@example.com&#x27;)
+
+
+
+class TestDatabaseProvider:
+
+    &quot;&quot;&quot;Test database provider functionality.&quot;&quot;&quot;
+
+    
+
+    @pytest.fixture
+
+    async def db_provider(self):
+
+        &quot;&quot;&quot;Create database provider for testing.&quot;&quot;&quot;
+
+        
+
+        provider = DatabaseProvider(TEST_DATABASE_URL)
+
+        await provider.initialize()
+
+        yield provider
+
+        await provider.cleanup()
+
+    
+
+    async def test_connection_pooling(self, db_provider):
+
+        &quot;&quot;&quot;Test connection pool functionality.&quot;&quot;&quot;
+
+        
+
+        # Get multiple connections
+
+        conn1 = await db_provider.get_connection()
+
+        conn2 = await db_provider.get_connection()
+
+        
+
+        assert conn1 is not None
+
+        assert conn2 is not None
+
+        assert conn1 != conn2  # Should be different connection objects
+
+        
+
+        # Release connections
+
+        await db_provider.release_connection(conn1)
+
+        await db_provider.release_connection(conn2)
+
+    
+
+    async def test_health_check(self, db_provider):
+
+        &quot;&quot;&quot;Test database health check.&quot;&quot;&quot;
+
+        
+
+        health_status = await db_provider.health_check()
+
+        
+
+        assert health_status[&#x27;status&#x27;] == &#x27;healthy&#x27;
+
+        assert &#x27;connection_pool_size&#x27; in health_status
+
+        assert &#x27;database_version&#x27; in health_status
+
+    
+
+    async def test_connection_recovery(self, db_provider):
+
+        &quot;&quot;&quot;Test connection recovery after database issues.&quot;&quot;&quot;
+
+        
+
+        # This would test connection recovery scenarios
+
+        # In a real test, you might temporarily break the connection
+
+        # and verify that the pool recovers
+
+        
+
+        # For now, just verify health check works
+
+        health_status = await db_provider.health_check()
+
+        assert health_status[&#x27;status&#x27;] == &#x27;healthy&#x27;
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 통합 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">엔드 투 엔드 워크플로 테스트</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_integration.py
+
+&quot;&quot;&quot;
+
+Integration tests for complete MCP workflows.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import json
+
+from datetime import datetime, timedelta
+
+
+
+from mcp_server.server import MCPServer
+
+from tests.conftest import TestDataHelper
+
+
+
+class TestMCPWorkflows:
+
+    &quot;&quot;&quot;Test complete MCP server workflows.&quot;&quot;&quot;
+
+    
+
+    async def test_product_search_workflow(self, test_mcp_server, db_connection, sample_products):
+
+        &quot;&quot;&quot;Test complete product search workflow.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test products with embeddings
+
+        for product_data in sample_products:
+
+            product_id = await TestDataHelper.create_test_product(
+
+                db_connection, store_id, product_data
+
+            )
+
+            
+
+            # Create embedding for product
+
+            await db_connection.execute(&quot;&quot;&quot;
+
+                INSERT INTO retail.product_embeddings (
+
+                    product_id, store_id, embedding_text, embedding
+
+                ) VALUES ($1, $2, $3, $4)
+
+            &quot;&quot;&quot;, 
+
+                product_id, store_id, 
+
+                f&quot;{product_data[&#x27;product_name&#x27;]} {product_data[&#x27;brand&#x27;]}&quot;, 
+
+                &#x27;[&#x27; + &#x27;,&#x27;.join([&#x27;0.1&#x27;] * 1536) + &#x27;]&#x27;  # Mock embedding
+
+            )
+
+        
+
+        # Test semantic search
+
+        search_result = await test_mcp_server.execute_tool(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {
+
+                &#x27;query&#x27;: &#x27;running shoes&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;limit&#x27;: 10
+
+            }
+
+        )
+
+        
+
+        assert search_result[&#x27;success&#x27;] is True
+
+        assert len(search_result[&#x27;data&#x27;]) &gt; 0
+
+        
+
+        # Test schema introspection
+
+        schema_result = await test_mcp_server.execute_tool(
+
+            &#x27;get_table_schema&#x27;,
+
+            {&#x27;table_name&#x27;: &#x27;products&#x27;}
+
+        )
+
+        
+
+        assert schema_result[&#x27;success&#x27;] is True
+
+        assert schema_result[&#x27;data&#x27;][&#x27;table_name&#x27;] == &#x27;products&#x27;
+
+    
+
+    async def test_sales_analysis_workflow(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test sales analysis workflow.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test customer and product
+
+        customer_id = await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        product_id = await TestDataHelper.create_test_product(
+
+            db_connection, store_id, {
+
+                &#x27;product_name&#x27;: &#x27;Test Product&#x27;,
+
+                &#x27;brand&#x27;: &#x27;TestBrand&#x27;,
+
+                &#x27;price&#x27;: 99.99,
+
+                &#x27;product_description&#x27;: &#x27;Test product description&#x27;,
+
+                &#x27;current_stock&#x27;: 50
+
+            }
+
+        )
+
+        
+
+        # Create test transaction
+
+        transaction_id = await db_connection.fetchval(&quot;&quot;&quot;
+
+            INSERT INTO retail.sales_transactions (
+
+                store_id, customer_id, transaction_date, total_amount, 
+
+                subtotal, tax_amount, transaction_type
+
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+
+            RETURNING transaction_id
+
+        &quot;&quot;&quot;, store_id, customer_id, datetime.now(), 107.99, 99.99, 8.00, &#x27;sale&#x27;)
+
+        
+
+        # Create transaction item
+
+        await db_connection.execute(&quot;&quot;&quot;
+
+            INSERT INTO retail.sales_transaction_items (
+
+                transaction_id, product_id, quantity, unit_price, total_price
+
+            ) VALUES ($1, $2, $3, $4, $5)
+
+        &quot;&quot;&quot;, transaction_id, product_id, 1, 99.99, 99.99)
+
+        
+
+        # Test daily sales analysis
+
+        sales_result = await test_mcp_server.execute_tool(
+
+            &#x27;execute_sales_query&#x27;,
+
+            {
+
+                &#x27;query_type&#x27;: &#x27;daily_sales&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;start_date&#x27;: (datetime.now() - timedelta(days=1)).date().isoformat(),
+
+                &#x27;end_date&#x27;: datetime.now().date().isoformat()
+
+            }
+
+        )
+
+        
+
+        assert sales_result[&#x27;success&#x27;] is True
+
+        assert len(sales_result[&#x27;data&#x27;]) &gt; 0
+
+        assert sales_result[&#x27;data&#x27;][0][&#x27;total_revenue&#x27;] == 107.99
+
+    
+
+    async def test_multi_store_workflow(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test workflows across multiple stores.&quot;&quot;&quot;
+
+        
+
+        # Create multiple stores
+
+        stores = [&#x27;test_seattle&#x27;, &#x27;test_redmond&#x27;, &#x27;test_bellevue&#x27;]
+
+        
+
+        for store_id in stores:
+
+            await TestDataHelper.create_test_store(db_connection, store_id)
+
+            
+
+            # Create customer in each store
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Test that each store sees only its own data
+
+        for store_id in stores:
+
+            schema_result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT COUNT(*) as customer_count FROM retail.customers&#x27;
+
+                }
+
+            )
+
+            
+
+            assert schema_result[&#x27;success&#x27;] is True
+
+            assert schema_result[&#x27;data&#x27;][0][&#x27;customer_count&#x27;] == 1
+
+
+
+class TestErrorHandling:
+
+    &quot;&quot;&quot;Test error handling and edge cases.&quot;&quot;&quot;
+
+    
+
+    async def test_database_connection_failure(self, test_mcp_server):
+
+        &quot;&quot;&quot;Test behavior when database connection fails.&quot;&quot;&quot;
+
+        
+
+        # Simulate database failure by using invalid connection
+
+        with patch.object(test_mcp_server.db_provider, &#x27;get_connection&#x27;) as mock_conn:
+
+            mock_conn.side_effect = Exception(&quot;Database connection failed&quot;)
+
+            
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;get_table_schema&#x27;,
+
+                {&#x27;table_name&#x27;: &#x27;customers&#x27;}
+
+            )
+
+            
+
+            assert result[&#x27;success&#x27;] is False
+
+            assert &#x27;connection failed&#x27; in result[&#x27;error&#x27;].lower()
+
+    
+
+    async def test_invalid_tool_parameters(self, test_mcp_server):
+
+        &quot;&quot;&quot;Test handling of invalid tool parameters.&quot;&quot;&quot;
+
+        
+
+        # Missing required parameter
+
+        result = await test_mcp_server.execute_tool(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {&#x27;query&#x27;: &#x27;test query&#x27;}  # Missing store_id
+
+        )
+
+        
+
+        assert result[&#x27;success&#x27;] is False
+
+        assert &#x27;store_id is required&#x27; in result[&#x27;error&#x27;].lower()
+
+        
+
+        # Invalid parameter type
+
+        result = await test_mcp_server.execute_tool(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {
+
+                &#x27;query&#x27;: &#x27;test query&#x27;,
+
+                &#x27;store_id&#x27;: &#x27;test_store&#x27;,
+
+                &#x27;limit&#x27;: &#x27;invalid&#x27;  # Should be integer
+
+            }
+
+        )
+
+        
+
+        assert result[&#x27;success&#x27;] is False
+
+    
+
+    async def test_sql_injection_prevention(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test that SQL injection attempts are blocked.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Attempt SQL injection
+
+        malicious_query = &quot;SELECT * FROM retail.customers; DROP TABLE retail.customers; --&quot;
+
+        
+
+        result = await test_mcp_server.execute_tool(
+
+            &#x27;execute_sales_query&#x27;,
+
+            {
+
+                &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;query&#x27;: malicious_query
+
+            }
+
+        )
+
+        
+
+        assert result[&#x27;success&#x27;] is False
+
+        assert &#x27;validation failed&#x27; in result[&#x27;error&#x27;].lower()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 성능 테스트</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">부하 테스트 프레임워크</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# tests/test_performance.py
+
+&quot;&quot;&quot;
+
+Performance and load testing for MCP server.
+
+&quot;&quot;&quot;
+
+import pytest
+
+import asyncio
+
+import time
+
+import statistics
+
+from concurrent.futures import ThreadPoolExecutor
+
+from typing import List, Dict, Any
+
+
+
+class TestPerformance:
+
+    &quot;&quot;&quot;Performance testing for MCP server operations.&quot;&quot;&quot;
+
+    
+
+    async def test_concurrent_tool_execution(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test performance under concurrent tool execution.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create test data
+
+        for i in range(100):
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Define test scenarios
+
+        async def execute_tool_scenario():
+
+            &quot;&quot;&quot;Execute a tool and measure performance.&quot;&quot;&quot;
+
+            start_time = time.time()
+
+            
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT COUNT(*) as count FROM retail.customers&#x27;
+
+                }
+
+            )
+
+            
+
+            execution_time = time.time() - start_time
+
+            return {
+
+                &#x27;success&#x27;: result[&#x27;success&#x27;],
+
+                &#x27;execution_time&#x27;: execution_time
+
+            }
+
+        
+
+        # Run concurrent executions
+
+        concurrent_tasks = 20
+
+        tasks = [execute_tool_scenario() for _ in range(concurrent_tasks)]
+
+        
+
+        start_time = time.time()
+
+        results = await asyncio.gather(*tasks)
+
+        total_time = time.time() - start_time
+
+        
+
+        # Analyze results
+
+        successful_executions = [r for r in results if r[&#x27;success&#x27;]]
+
+        execution_times = [r[&#x27;execution_time&#x27;] for r in successful_executions]
+
+        
+
+        assert len(successful_executions) == concurrent_tasks
+
+        assert statistics.mean(execution_times) &lt; 1.0  # Average under 1 second
+
+        assert max(execution_times) &lt; 5.0  # No execution over 5 seconds
+
+        assert total_time &lt; 10.0  # All executions under 10 seconds
+
+        
+
+        print(f&quot;Concurrent execution stats:&quot;)
+
+        print(f&quot;  Total time: {total_time:.2f}s&quot;)
+
+        print(f&quot;  Average execution time: {statistics.mean(execution_times):.3f}s&quot;)
+
+        print(f&quot;  Max execution time: {max(execution_times):.3f}s&quot;)
+
+        print(f&quot;  Min execution time: {min(execution_times):.3f}s&quot;)
+
+    
+
+    async def test_database_query_performance(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test database query performance with large datasets.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create large dataset
+
+        print(&quot;Creating test dataset...&quot;)
+
+        for i in range(1000):
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Test various query patterns
+
+        query_tests = [
+
+            {
+
+                &#x27;name&#x27;: &#x27;Simple COUNT&#x27;,
+
+                &#x27;query&#x27;: &#x27;SELECT COUNT(*) FROM retail.customers&#x27;,
+
+                &#x27;expected_max_time&#x27;: 0.1
+
+            },
+
+            {
+
+                &#x27;name&#x27;: &#x27;Filtered SELECT&#x27;,
+
+                &#x27;query&#x27;: &quot;SELECT * FROM retail.customers WHERE loyalty_tier = &#x27;bronze&#x27; LIMIT 100&quot;,
+
+                &#x27;expected_max_time&#x27;: 0.5
+
+            },
+
+            {
+
+                &#x27;name&#x27;: &#x27;Aggregation&#x27;,
+
+                &#x27;query&#x27;: &#x27;SELECT loyalty_tier, COUNT(*) FROM retail.customers GROUP BY loyalty_tier&#x27;,
+
+                &#x27;expected_max_time&#x27;: 0.5
+
+            }
+
+        ]
+
+        
+
+        for test_case in query_tests:
+
+            start_time = time.time()
+
+            
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: test_case[&#x27;query&#x27;]
+
+                }
+
+            )
+
+            
+
+            execution_time = time.time() - start_time
+
+            
+
+            assert result[&#x27;success&#x27;] is True
+
+            assert execution_time &lt; test_case[&#x27;expected_max_time&#x27;]
+
+            
+
+            print(f&quot;Query &#x27;{test_case[&#x27;name&#x27;]}&#x27;: {execution_time:.3f}s&quot;)
+
+    
+
+    async def test_embedding_generation_performance(self, test_mcp_server):
+
+        &quot;&quot;&quot;Test embedding generation performance.&quot;&quot;&quot;
+
+        
+
+        from mcp_server.embeddings.product_embedder import ProductEmbedder
+
+        
+
+        # Test with mock embedding manager (no actual API calls)
+
+        embedder = ProductEmbedder(test_mcp_server.db_provider)
+
+        embedder.embedding_manager = test_mcp_server.embedding_manager
+
+        
+
+        # Test batch embedding generation
+
+        test_texts = [f&quot;Test product {i} description&quot; for i in range(100)]
+
+        
+
+        start_time = time.time()
+
+        embeddings = await embedder.embedding_manager.generate_embeddings_batch(test_texts)
+
+        batch_time = time.time() - start_time
+
+        
+
+        assert len(embeddings) == 100
+
+        assert batch_time &lt; 5.0  # Should complete in under 5 seconds with mocks
+
+        
+
+        print(f&quot;Batch embedding generation (100 items): {batch_time:.3f}s&quot;)
+
+        print(f&quot;Average per embedding: {batch_time/100:.4f}s&quot;)
+
+    
+
+    @pytest.mark.slow
+
+    async def test_memory_usage(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test memory usage under load.&quot;&quot;&quot;
+
+        
+
+        import psutil
+
+        import os
+
+        
+
+        process = psutil.Process(os.getpid())
+
+        initial_memory = process.memory_info().rss / 1024 / 1024  # MB
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Create substantial dataset
+
+        for i in range(500):
+
+            await TestDataHelper.create_test_customer(db_connection, store_id)
+
+        
+
+        # Execute multiple operations
+
+        for i in range(50):
+
+            await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT * FROM retail.customers LIMIT 100&#x27;
+
+                }
+
+            )
+
+        
+
+        final_memory = process.memory_info().rss / 1024 / 1024  # MB
+
+        memory_increase = final_memory - initial_memory
+
+        
+
+        # Memory increase should be reasonable (under 100MB for this test)
+
+        assert memory_increase &lt; 100
+
+        
+
+        print(f&quot;Memory usage:&quot;)
+
+        print(f&quot;  Initial: {initial_memory:.1f} MB&quot;)
+
+        print(f&quot;  Final: {final_memory:.1f} MB&quot;)
+
+        print(f&quot;  Increase: {memory_increase:.1f} MB&quot;)
+
+
+
+class TestScalability:
+
+    &quot;&quot;&quot;Test scalability characteristics.&quot;&quot;&quot;
+
+    
+
+    async def test_response_time_scaling(self, test_mcp_server, db_connection):
+
+        &quot;&quot;&quot;Test how response time scales with data size.&quot;&quot;&quot;
+
+        
+
+        store_id = &#x27;test_seattle&#x27;
+
+        await TestDataHelper.create_test_store(db_connection, store_id)
+
+        
+
+        # Test with different data sizes
+
+        data_sizes = [100, 500, 1000, 2000]
+
+        response_times = []
+
+        
+
+        for size in data_sizes:
+
+            # Clear existing data
+
+            await db_connection.execute(&quot;DELETE FROM retail.customers WHERE store_id = $1&quot;, store_id)
+
+            
+
+            # Create dataset of specified size
+
+            for i in range(size):
+
+                await TestDataHelper.create_test_customer(db_connection, store_id)
+
+            
+
+            # Measure query time
+
+            start_time = time.time()
+
+            result = await test_mcp_server.execute_tool(
+
+                &#x27;execute_sales_query&#x27;,
+
+                {
+
+                    &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                    &#x27;store_id&#x27;: store_id,
+
+                    &#x27;query&#x27;: &#x27;SELECT COUNT(*) FROM retail.customers&#x27;
+
+                }
+
+            )
+
+            execution_time = time.time() - start_time
+
+            
+
+            assert result[&#x27;success&#x27;] is True
+
+            response_times.append(execution_time)
+
+            
+
+            print(f&quot;Data size {size}: {execution_time:.3f}s&quot;)
+
+        
+
+        # Response time should scale reasonably (not exponentially)
+
+        # Simple count queries should remain fast even with larger datasets
+
+        for time_val in response_times:
+
+            assert time_val &lt; 1.0  # All queries under 1 second
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🔍 디버깅 도구</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">고급 디버깅 프레임워크</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/debugging/debug_tools.py
+
+&quot;&quot;&quot;
+
+Advanced debugging tools for MCP server troubleshooting.
+
+&quot;&quot;&quot;
+
+import asyncio
+
+import json
+
+import time
+
+import traceback
+
+from typing import Dict, Any, List, Optional
+
+from datetime import datetime
+
+import logging
+
+from contextlib import asynccontextmanager
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class MCPDebugger:
+
+    &quot;&quot;&quot;Comprehensive debugging utilities for MCP server.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, server_instance):
+
+        self.server = server_instance
+
+        self.debug_logs = []
+
+        self.performance_metrics = {}
+
+        self.active_traces = {}
+
+        
+
+    @asynccontextmanager
+
+    async def trace_execution(self, operation_name: str, context: Dict[str, Any] = None):
+
+        &quot;&quot;&quot;Trace operation execution with detailed logging.&quot;&quot;&quot;
+
+        
+
+        trace_id = f&quot;{operation_name}_{int(time.time() * 1000)}&quot;
+
+        start_time = time.time()
+
+        
+
+        trace_info = {
+
+            &#x27;trace_id&#x27;: trace_id,
+
+            &#x27;operation&#x27;: operation_name,
+
+            &#x27;start_time&#x27;: start_time,
+
+            &#x27;context&#x27;: context or {},
+
+            &#x27;status&#x27;: &#x27;running&#x27;
+
+        }
+
+        
+
+        self.active_traces[trace_id] = trace_info
+
+        
+
+        logger.debug(f&quot;Starting trace: {trace_id} - {operation_name}&quot;)
+
+        
+
+        try:
+
+            yield trace_info
+
+            
+
+            # Success
+
+            execution_time = time.time() - start_time
+
+            trace_info.update({
+
+                &#x27;status&#x27;: &#x27;completed&#x27;,
+
+                &#x27;execution_time&#x27;: execution_time
+
+            })
+
+            
+
+            logger.debug(f&quot;Completed trace: {trace_id} in {execution_time:.3f}s&quot;)
+
+            
+
+        except Exception as e:
+
+            # Error
+
+            execution_time = time.time() - start_time
+
+            trace_info.update({
+
+                &#x27;status&#x27;: &#x27;error&#x27;,
+
+                &#x27;execution_time&#x27;: execution_time,
+
+                &#x27;error&#x27;: str(e),
+
+                &#x27;traceback&#x27;: traceback.format_exc()
+
+            })
+
+            
+
+            logger.error(f&quot;Error in trace: {trace_id} - {str(e)}&quot;)
+
+            raise
+
+            
+
+        finally:
+
+            # Store completed trace
+
+            self.debug_logs.append(trace_info.copy())
+
+            del self.active_traces[trace_id]
+
+            
+
+            # Limit debug log size
+
+            if len(self.debug_logs) &gt; 1000:
+
+                self.debug_logs = self.debug_logs[-500:]
+
+    
+
+    async def debug_tool_execution(self, tool_name: str, parameters: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Debug tool execution with comprehensive logging.&quot;&quot;&quot;
+
+        
+
+        async with self.trace_execution(f&quot;tool_execution_{tool_name}&quot;, {&#x27;parameters&#x27;: parameters}) as trace:
+
+            
+
+            # Pre-execution validation
+
+            validation_result = await self._validate_tool_parameters(tool_name, parameters)
+
+            trace[&#x27;validation&#x27;] = validation_result
+
+            
+
+            if not validation_result[&#x27;valid&#x27;]:
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: f&quot;Parameter validation failed: {validation_result[&#x27;errors&#x27;]}&quot;,
+
+                    &#x27;debug_info&#x27;: trace
+
+                }
+
+            
+
+            # Database connection check
+
+            db_health = await self._check_database_health()
+
+            trace[&#x27;database_health&#x27;] = db_health
+
+            
+
+            # Execute tool with monitoring
+
+            try:
+
+                tool_instance = self.server.get_tool(tool_name)
+
+                if not tool_instance:
+
+                    return {
+
+                        &#x27;success&#x27;: False,
+
+                        &#x27;error&#x27;: f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;,
+
+                        &#x27;debug_info&#x27;: trace
+
+                    }
+
+                
+
+                # Monitor resource usage during execution
+
+                start_memory = await self._get_memory_usage()
+
+                
+
+                result = await tool_instance.call(**parameters)
+
+                
+
+                end_memory = await self._get_memory_usage()
+
+                
+
+                trace.update({
+
+                    &#x27;memory_start_mb&#x27;: start_memory,
+
+                    &#x27;memory_end_mb&#x27;: end_memory,
+
+                    &#x27;memory_used_mb&#x27;: end_memory - start_memory,
+
+                    &#x27;result_success&#x27;: result.success,
+
+                    &#x27;result_row_count&#x27;: result.row_count
+
+                })
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: result.success,
+
+                    &#x27;data&#x27;: result.data,
+
+                    &#x27;error&#x27;: result.error,
+
+                    &#x27;metadata&#x27;: result.metadata,
+
+                    &#x27;debug_info&#x27;: trace
+
+                }
+
+                
+
+            except Exception as e:
+
+                trace[&#x27;exception&#x27;] = {
+
+                    &#x27;type&#x27;: type(e).__name__,
+
+                    &#x27;message&#x27;: str(e),
+
+                    &#x27;traceback&#x27;: traceback.format_exc()
+
+                }
+
+                
+
+                return {
+
+                    &#x27;success&#x27;: False,
+
+                    &#x27;error&#x27;: f&quot;Tool execution failed: {str(e)}&quot;,
+
+                    &#x27;debug_info&#x27;: trace
+
+                }
+
+    
+
+    async def analyze_performance_bottlenecks(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Analyze performance bottlenecks from debug logs.&quot;&quot;&quot;
+
+        
+
+        if not self.debug_logs:
+
+            return {&#x27;message&#x27;: &#x27;No debug data available&#x27;}
+
+        
+
+        # Analyze execution times
+
+        execution_times = {}
+
+        error_rates = {}
+
+        memory_usage = {}
+
+        
+
+        for log_entry in self.debug_logs[-100:]:  # Last 100 entries
+
+            operation = log_entry[&#x27;operation&#x27;]
+
+            
+
+            # Execution time analysis
+
+            if &#x27;execution_time&#x27; in log_entry:
+
+                if operation not in execution_times:
+
+                    execution_times[operation] = []
+
+                execution_times[operation].append(log_entry[&#x27;execution_time&#x27;])
+
+            
+
+            # Error rate analysis
+
+            if operation not in error_rates:
+
+                error_rates[operation] = {&#x27;total&#x27;: 0, &#x27;errors&#x27;: 0}
+
+            
+
+            error_rates[operation][&#x27;total&#x27;] += 1
+
+            if log_entry[&#x27;status&#x27;] == &#x27;error&#x27;:
+
+                error_rates[operation][&#x27;errors&#x27;] += 1
+
+            
+
+            # Memory usage analysis
+
+            if &#x27;memory_used_mb&#x27; in log_entry:
+
+                if operation not in memory_usage:
+
+                    memory_usage[operation] = []
+
+                memory_usage[operation].append(log_entry[&#x27;memory_used_mb&#x27;])
+
+        
+
+        # Calculate statistics
+
+        performance_stats = {}
+
+        
+
+        for operation, times in execution_times.items():
+
+            if times:
+
+                performance_stats[operation] = {
+
+                    &#x27;avg_execution_time&#x27;: sum(times) / len(times),
+
+                    &#x27;max_execution_time&#x27;: max(times),
+
+                    &#x27;min_execution_time&#x27;: min(times),
+
+                    &#x27;execution_count&#x27;: len(times),
+
+                    &#x27;error_rate&#x27;: (error_rates[operation][&#x27;errors&#x27;] / 
+
+                                 error_rates[operation][&#x27;total&#x27;] * 100),
+
+                    &#x27;avg_memory_usage&#x27;: (sum(memory_usage.get(operation, [0])) / 
+
+                                       len(memory_usage.get(operation, [1])))
+
+                }
+
+        
+
+        # Identify bottlenecks
+
+        bottlenecks = []
+
+        
+
+        for operation, stats in performance_stats.items():
+
+            if stats[&#x27;avg_execution_time&#x27;] &gt; 2.0:  # Slow operations
+
+                bottlenecks.append({
+
+                    &#x27;type&#x27;: &#x27;slow_execution&#x27;,
+
+                    &#x27;operation&#x27;: operation,
+
+                    &#x27;avg_time&#x27;: stats[&#x27;avg_execution_time&#x27;]
+
+                })
+
+            
+
+            if stats[&#x27;error_rate&#x27;] &gt; 5.0:  # High error rate
+
+                bottlenecks.append({
+
+                    &#x27;type&#x27;: &#x27;high_error_rate&#x27;,
+
+                    &#x27;operation&#x27;: operation,
+
+                    &#x27;error_rate&#x27;: stats[&#x27;error_rate&#x27;]
+
+                })
+
+            
+
+            if stats[&#x27;avg_memory_usage&#x27;] &gt; 100:  # High memory usage
+
+                bottlenecks.append({
+
+                    &#x27;type&#x27;: &#x27;high_memory_usage&#x27;,
+
+                    &#x27;operation&#x27;: operation,
+
+                    &#x27;memory_mb&#x27;: stats[&#x27;avg_memory_usage&#x27;]
+
+                })
+
+        
+
+        return {
+
+            &#x27;performance_stats&#x27;: performance_stats,
+
+            &#x27;bottlenecks&#x27;: bottlenecks,
+
+            &#x27;total_operations&#x27;: len(self.debug_logs),
+
+            &#x27;analysis_timestamp&#x27;: datetime.now().isoformat()
+
+        }
+
+    
+
+    async def _validate_tool_parameters(self, tool_name: str, parameters: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Validate tool parameters against schema.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            tool_instance = self.server.get_tool(tool_name)
+
+            if not tool_instance:
+
+                return {
+
+                    &#x27;valid&#x27;: False,
+
+                    &#x27;errors&#x27;: [f&quot;Tool &#x27;{tool_name}&#x27; not found&quot;]
+
+                }
+
+            
+
+            schema = tool_instance.get_input_schema()
+
+            
+
+            # Basic validation (in production, use jsonschema library)
+
+            errors = []
+
+            required_props = schema.get(&#x27;required&#x27;, [])
+
+            
+
+            for prop in required_props:
+
+                if prop not in parameters:
+
+                    errors.append(f&quot;Missing required parameter: {prop}&quot;)
+
+            
+
+            return {
+
+                &#x27;valid&#x27;: len(errors) == 0,
+
+                &#x27;errors&#x27;: errors,
+
+                &#x27;schema&#x27;: schema
+
+            }
+
+            
+
+        except Exception as e:
+
+            return {
+
+                &#x27;valid&#x27;: False,
+
+                &#x27;errors&#x27;: [f&quot;Validation error: {str(e)}&quot;]
+
+            }
+
+    
+
+    async def _check_database_health(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Check database health and connectivity.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            health_status = await self.server.db_provider.health_check()
+
+            return {
+
+                &#x27;healthy&#x27;: health_status.get(&#x27;status&#x27;) == &#x27;healthy&#x27;,
+
+                &#x27;details&#x27;: health_status
+
+            }
+
+        except Exception as e:
+
+            return {
+
+                &#x27;healthy&#x27;: False,
+
+                &#x27;error&#x27;: str(e)
+
+            }
+
+    
+
+    async def _get_memory_usage(self) -&gt; float:
+
+        &quot;&quot;&quot;Get current memory usage in MB.&quot;&quot;&quot;
+
+        
+
+        try:
+
+            import psutil
+
+            import os
+
+            process = psutil.Process(os.getpid())
+
+            return process.memory_info().rss / 1024 / 1024
+
+        except:
+
+            return 0.0
+
+    
+
+    def get_debug_summary(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get summary of debug information.&quot;&quot;&quot;
+
+        
+
+        recent_logs = self.debug_logs[-50:] if self.debug_logs else []
+
+        
+
+        return {
+
+            &#x27;total_operations&#x27;: len(self.debug_logs),
+
+            &#x27;active_traces&#x27;: len(self.active_traces),
+
+            &#x27;recent_operations&#x27;: [
+
+                {
+
+                    &#x27;operation&#x27;: log[&#x27;operation&#x27;],
+
+                    &#x27;status&#x27;: log[&#x27;status&#x27;],
+
+                    &#x27;execution_time&#x27;: log.get(&#x27;execution_time&#x27;, 0),
+
+                    &#x27;timestamp&#x27;: log.get(&#x27;start_time&#x27;, 0)
+
+                }
+
+                for log in recent_logs
+
+            ],
+
+            &#x27;current_traces&#x27;: list(self.active_traces.keys())
+
+        }
+
+
+
+# Debug tool for direct use
+
+class DebugTool:
+
+    &quot;&quot;&quot;Interactive debugging tool for MCP server.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, server_instance):
+
+        self.debugger = MCPDebugger(server_instance)
+
+    
+
+    async def debug_query(self, query: str, store_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Debug a specific database query.&quot;&quot;&quot;
+
+        
+
+        return await self.debugger.debug_tool_execution(
+
+            &#x27;execute_sales_query&#x27;,
+
+            {
+
+                &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;query&#x27;: query
+
+            }
+
+        )
+
+    
+
+    async def debug_search(self, query: str, store_id: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Debug a semantic search query.&quot;&quot;&quot;
+
+        
+
+        return await self.debugger.debug_tool_execution(
+
+            &#x27;semantic_search_products&#x27;,
+
+            {
+
+                &#x27;query&#x27;: query,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;limit&#x27;: 10
+
+            }
+
+        )
+
+    
+
+    async def get_performance_report(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get comprehensive performance report.&quot;&quot;&quot;
+
+        
+
+        return await self.debugger.analyze_performance_bottlenecks()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 갖추게 됩니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>포괄적인 테스트 프레임워크</strong>: 모든 구성 요소에 대한 단위, 통합, 성능 테스트  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>고급 디버깅 도구</strong>: 실행 추적 기능을 갖춘 정교한 디버깅 유틸리티  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>성능 검증</strong>: 부하 테스트 및 확장성 분석 기능  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>보안 테스트</strong>: SQL 인젝션 방지 및 RLS 검증  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>모니터링 통합</strong>: 성능 메트릭 및 병목 현상 분석  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>CI/CD 준비 완료</strong>: 지속적 통합을 위한 자동화된 테스트 워크플로  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/09-VS-Code/README.md" target="_blank">Lab 09: VS Code Integration</a></strong>을 계속 진행하여:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버 개발을 위한 VS Code 구성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">VS Code에서 디버깅 환경 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 서버를 VS Code Chat과 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">VS Code 워크플로 전체 테스트</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">테스트 프레임워크</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.pytest.org/">pytest Documentation</a> - Python 테스트 프레임워크</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://magicstack.github.io/asyncpg/current/index.html">AsyncPG Testing</a> - Async PostgreSQL 테스트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI Testing</a> - API 테스트 패턴</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">성능 테스트</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">Load Testing Best Practices</a> - Async 성능 테스트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/performance-tips.html">Database Performance Testing</a> - PostgreSQL 최적화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/tracemalloc.html">Memory Profiling</a> - Python 메모리 분석</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">디버깅 도구</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/pdb.html">Python Debugging</a> - Python 디버거</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio-dev.html">Async Debugging</a> - Asyncio 디버깅</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-logging.html">SQL Debugging</a> - PostgreSQL 로깅</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>이전</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/07-Semantic-Search/README.md" target="_blank">Lab 07: Semantic Search Integration</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/09-VS-Code/README.md" target="_blank">Lab 09: VS Code Integration</a></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전을 신뢰할 수 있는 권위 있는 자료로 간주해야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_08-07---semantic-search-integration.html">&larr; 07 - Semantic Search Integration</a></span>
+  <span><a href="m11_10-09---vs-code-integration.html">09 - VS Code Integration &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

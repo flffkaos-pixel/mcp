@@ -1,0 +1,5186 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>06 - Tool Development - PostgreSQL - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 11: PostgreSQL</span> &rsaquo; 06 - Tool Development</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Tool Development</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 What This Lab Covers</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab dives deep into creating sophisticated MCP tools that provide AI assistants with powerful database query capabilities, schema introspection, and analytics functions.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">You'll learn to build tools that are both powerful and safe, with comprehensive error handling and performance optimization.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Overview</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP tools are the interface between AI assistants and your data systems.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Well-designed tools provide structured, validated access to complex operations while maintaining security and performance.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">This lab covers the complete lifecycle of tool development from design to deployment.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Our retail MCP server implements a comprehensive suite of tools that enable natural language querying of sales data, product catalogs, and business analytics while maintaining strict security boundaries and optimal performance.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this lab, you will be able to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Design</strong> advanced MCP tools with complex parameter validation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Implement</strong> secure database query tools with SQL injection protection</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Create</strong> schema introspection capabilities for dynamic queries</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Build</strong> custom analytics tools for business intelligence</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Apply</strong> comprehensive error handling and graceful degradation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Optimize</strong> tool performance for production workloads</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ Core Tool Architecture</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Tool Design Principles</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/base.py
+
+&quot;&quot;&quot;
+
+Base classes and patterns for MCP tool development.
+
+&quot;&quot;&quot;
+
+from abc import ABC, abstractmethod
+
+from typing import Any, Dict, List, Optional, Union
+
+from dataclasses import dataclass
+
+from enum import Enum
+
+import asyncio
+
+import time
+
+import logging
+
+from contextlib import asynccontextmanager
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class ToolCategory(Enum):
+
+    &quot;&quot;&quot;Tool categorization for organization and discovery.&quot;&quot;&quot;
+
+    DATABASE_QUERY = &quot;database_query&quot;
+
+    SCHEMA_INTROSPECTION = &quot;schema_introspection&quot;
+
+    ANALYTICS = &quot;analytics&quot;
+
+    UTILITY = &quot;utility&quot;
+
+    ADMINISTRATIVE = &quot;administrative&quot;
+
+
+
+@dataclass
+
+class ToolResult:
+
+    &quot;&quot;&quot;Standardized tool result structure.&quot;&quot;&quot;
+
+    success: bool
+
+    data: Any = None
+
+    error: Optional[str] = None
+
+    metadata: Optional[Dict[str, Any]] = None
+
+    execution_time_ms: Optional[float] = None
+
+    row_count: Optional[int] = None
+
+
+
+class BaseTool(ABC):
+
+    &quot;&quot;&quot;Abstract base class for all MCP tools.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, name: str, description: str, category: ToolCategory):
+
+        self.name = name
+
+        self.description = description
+
+        self.category = category
+
+        self.call_count = 0
+
+        self.total_execution_time = 0.0
+
+        
+
+    @abstractmethod
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute the tool with given parameters.&quot;&quot;&quot;
+
+        pass
+
+    
+
+    @abstractmethod
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get JSON schema for tool input validation.&quot;&quot;&quot;
+
+        pass
+
+    
+
+    async def call(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Wrapper for tool execution with metrics and error handling.&quot;&quot;&quot;
+
+        
+
+        start_time = time.time()
+
+        self.call_count += 1
+
+        
+
+        try:
+
+            # Validate input parameters
+
+            self._validate_input(kwargs)
+
+            
+
+            # Log tool execution
+
+            logger.info(
+
+                f&quot;Executing tool: {self.name}&quot;,
+
+                extra={
+
+                    &#x27;tool_name&#x27;: self.name,
+
+                    &#x27;tool_category&#x27;: self.category.value,
+
+                    &#x27;parameters&#x27;: self._sanitize_parameters(kwargs)
+
+                }
+
+            )
+
+            
+
+            # Execute the tool
+
+            result = await self.execute(**kwargs)
+
+            
+
+            # Record execution time
+
+            execution_time = (time.time() - start_time) * 1000
+
+            result.execution_time_ms = execution_time
+
+            self.total_execution_time += execution_time
+
+            
+
+            # Log success
+
+            logger.info(
+
+                f&quot;Tool execution completed: {self.name}&quot;,
+
+                extra={
+
+                    &#x27;tool_name&#x27;: self.name,
+
+                    &#x27;execution_time_ms&#x27;: execution_time,
+
+                    &#x27;success&#x27;: result.success,
+
+                    &#x27;row_count&#x27;: result.row_count
+
+                }
+
+            )
+
+            
+
+            return result
+
+            
+
+        except Exception as e:
+
+            execution_time = (time.time() - start_time) * 1000
+
+            
+
+            logger.error(
+
+                f&quot;Tool execution failed: {self.name}&quot;,
+
+                extra={
+
+                    &#x27;tool_name&#x27;: self.name,
+
+                    &#x27;execution_time_ms&#x27;: execution_time,
+
+                    &#x27;error&#x27;: str(e)
+
+                },
+
+                exc_info=True
+
+            )
+
+            
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Tool execution failed: {str(e)}&quot;,
+
+                execution_time_ms=execution_time
+
+            )
+
+    
+
+    def _validate_input(self, kwargs: Dict[str, Any]):
+
+        &quot;&quot;&quot;Validate input parameters against schema.&quot;&quot;&quot;
+
+        
+
+        schema = self.get_input_schema()
+
+        required_props = schema.get(&#x27;required&#x27;, [])
+
+        properties = schema.get(&#x27;properties&#x27;, {})
+
+        
+
+        # Check required parameters
+
+        missing_required = [prop for prop in required_props if prop not in kwargs]
+
+        if missing_required:
+
+            raise ValueError(f&quot;Missing required parameters: {missing_required}&quot;)
+
+        
+
+        # Type validation would go here
+
+        # For production, use jsonschema library for comprehensive validation
+
+    
+
+    def _sanitize_parameters(self, kwargs: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Sanitize parameters for logging (remove sensitive data).&quot;&quot;&quot;
+
+        
+
+        # Remove or mask sensitive parameters
+
+        sanitized = kwargs.copy()
+
+        sensitive_keys = [&#x27;password&#x27;, &#x27;token&#x27;, &#x27;secret&#x27;, &#x27;key&#x27;]
+
+        
+
+        for key in sanitized:
+
+            if any(sensitive in key.lower() for sensitive in sensitive_keys):
+
+                sanitized[key] = &quot;***MASKED***&quot;
+
+        
+
+        return sanitized
+
+    
+
+    def get_statistics(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get tool usage statistics.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &#x27;name&#x27;: self.name,
+
+            &#x27;category&#x27;: self.category.value,
+
+            &#x27;call_count&#x27;: self.call_count,
+
+            &#x27;total_execution_time_ms&#x27;: self.total_execution_time,
+
+            &#x27;average_execution_time_ms&#x27;: (
+
+                self.total_execution_time / self.call_count 
+
+                if self.call_count &gt; 0 else 0
+
+            )
+
+        }
+
+
+
+class DatabaseTool(BaseTool):
+
+    &quot;&quot;&quot;Base class for database-related tools.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, name: str, description: str, db_provider):
+
+        super().__init__(name, description, ToolCategory.DATABASE_QUERY)
+
+        self.db_provider = db_provider
+
+    
+
+    @asynccontextmanager
+
+    async def get_connection(self):
+
+        &quot;&quot;&quot;Get database connection with proper context management.&quot;&quot;&quot;
+
+        
+
+        conn = None
+
+        try:
+
+            conn = await self.db_provider.get_connection()
+
+            yield conn
+
+        finally:
+
+            if conn:
+
+                await self.db_provider.release_connection(conn)
+
+    
+
+    async def execute_query(
+
+        self, 
+
+        query: str, 
+
+        params: tuple = None,
+
+        store_id: str = None
+
+    ) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute database query with security and performance monitoring.&quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            try:
+
+                # Set store context if provided
+
+                if store_id:
+
+                    await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+                
+
+                # Execute query
+
+                start_time = time.time()
+
+                
+
+                if params:
+
+                    rows = await conn.fetch(query, *params)
+
+                else:
+
+                    rows = await conn.fetch(query)
+
+                
+
+                execution_time = (time.time() - start_time) * 1000
+
+                
+
+                # Convert rows to dictionaries
+
+                data = [dict(row) for row in rows]
+
+                
+
+                return ToolResult(
+
+                    success=True,
+
+                    data=data,
+
+                    row_count=len(data),
+
+                    execution_time_ms=execution_time
+
+                )
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Database query failed: {str(e)}&quot;)
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Query execution failed: {str(e)}&quot;
+
+                )
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Query Validation and Security</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/query_validator.py
+
+&quot;&quot;&quot;
+
+SQL query validation and security for MCP tools.
+
+&quot;&quot;&quot;
+
+import re
+
+import sqlparse
+
+from typing import List, Dict, Any, Set
+
+from enum import Enum
+
+
+
+class QueryRisk(Enum):
+
+    &quot;&quot;&quot;Query risk levels.&quot;&quot;&quot;
+
+    LOW = &quot;low&quot;
+
+    MEDIUM = &quot;medium&quot;
+
+    HIGH = &quot;high&quot;
+
+    CRITICAL = &quot;critical&quot;
+
+
+
+class QueryValidator:
+
+    &quot;&quot;&quot;Validate and analyze SQL queries for security risks.&quot;&quot;&quot;
+
+    
+
+    # Dangerous SQL keywords and patterns
+
+    DANGEROUS_KEYWORDS = {
+
+        &#x27;DROP&#x27;, &#x27;DELETE&#x27;, &#x27;TRUNCATE&#x27;, &#x27;ALTER&#x27;, &#x27;CREATE&#x27;, &#x27;INSERT&#x27;,
+
+        &#x27;UPDATE&#x27;, &#x27;GRANT&#x27;, &#x27;REVOKE&#x27;, &#x27;EXEC&#x27;, &#x27;EXECUTE&#x27;, &#x27;sp_&#x27;,
+
+        &#x27;xp_&#x27;, &#x27;BULK&#x27;, &#x27;OPENROWSET&#x27;, &#x27;OPENDATASOURCE&#x27;
+
+    }
+
+    
+
+    # Allowed read-only operations
+
+    SAFE_KEYWORDS = {
+
+        &#x27;SELECT&#x27;, &#x27;WITH&#x27;, &#x27;UNION&#x27;, &#x27;ORDER&#x27;, &#x27;GROUP&#x27;, &#x27;HAVING&#x27;,
+
+        &#x27;WHERE&#x27;, &#x27;FROM&#x27;, &#x27;JOIN&#x27;, &#x27;AS&#x27;, &#x27;ON&#x27;, &#x27;IN&#x27;, &#x27;EXISTS&#x27;,
+
+        &#x27;CASE&#x27;, &#x27;WHEN&#x27;, &#x27;THEN&#x27;, &#x27;ELSE&#x27;, &#x27;END&#x27;, &#x27;AND&#x27;, &#x27;OR&#x27;, &#x27;NOT&#x27;
+
+    }
+
+    
+
+    # Allowed schemas and tables
+
+    ALLOWED_SCHEMAS = {&#x27;retail&#x27;, &#x27;information_schema&#x27;, &#x27;pg_catalog&#x27;}
+
+    ALLOWED_TABLES = {
+
+        &#x27;customers&#x27;, &#x27;products&#x27;, &#x27;sales_transactions&#x27;, 
+
+        &#x27;sales_transaction_items&#x27;, &#x27;product_categories&#x27;,
+
+        &#x27;product_embeddings&#x27;, &#x27;stores&#x27;
+
+    }
+
+    
+
+    def __init__(self):
+
+        self.injection_patterns = [
+
+            # SQL injection patterns
+
+            r&quot;(\b(UNION|union)\s+(ALL\s+)?(SELECT|select))&quot;,
+
+            r&quot;(\b(DROP|drop)\s+(TABLE|table|DATABASE|database))&quot;,
+
+            r&quot;(\b(DELETE|delete)\s+(FROM|from))&quot;,
+
+            r&quot;(\b(INSERT|insert)\s+(INTO|into))&quot;,
+
+            r&quot;(\b(UPDATE|update)\s+\w+\s+(SET|set))&quot;,
+
+            r&quot;(\b(EXEC|exec|EXECUTE|execute)\s*\()&quot;,
+
+            r&quot;(\b(sp_|xp_)\w+)&quot;,
+
+            r&quot;(--\s*$)&quot;,  # SQL comments
+
+            r&quot;(/\*.*?\*/)&quot;,  # Block comments
+
+            r&quot;(;\s*(DROP|DELETE|INSERT|UPDATE|CREATE|ALTER))&quot;,
+
+            r&quot;(\bOR\b\s+[&#x27;\&quot;]?\w+[&#x27;\&quot;]?\s*=\s*[&#x27;\&quot;]?\w+[&#x27;\&quot;]?)&quot;,  # OR injection
+
+            r&quot;(\bAND\b\s+[&#x27;\&quot;]?\w+[&#x27;\&quot;]?\s*=\s*[&#x27;\&quot;]?\w+[&#x27;\&quot;]?)&quot;,  # AND injection
+
+        ]
+
+        
+
+        self.compiled_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in self.injection_patterns]
+
+    
+
+    def validate_query(self, query: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Comprehensive query validation.&quot;&quot;&quot;
+
+        
+
+        validation_result = {
+
+            &#x27;is_safe&#x27;: True,
+
+            &#x27;risk_level&#x27;: QueryRisk.LOW,
+
+            &#x27;issues&#x27;: [],
+
+            &#x27;warnings&#x27;: [],
+
+            &#x27;allowed_operations&#x27;: [],
+
+            &#x27;metadata&#x27;: {}
+
+        }
+
+        
+
+        try:
+
+            # Parse the query
+
+            parsed = sqlparse.parse(query)
+
+            
+
+            if not parsed:
+
+                validation_result[&#x27;is_safe&#x27;] = False
+
+                validation_result[&#x27;issues&#x27;].append(&quot;Unable to parse query&quot;)
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.HIGH
+
+                return validation_result
+
+            
+
+            # Analyze each statement
+
+            for statement in parsed:
+
+                self._analyze_statement(statement, validation_result)
+
+            
+
+            # Check for injection patterns
+
+            self._check_injection_patterns(query, validation_result)
+
+            
+
+            # Validate table/schema access
+
+            self._validate_table_access(query, validation_result)
+
+            
+
+            # Determine final risk level
+
+            self._determine_risk_level(validation_result)
+
+            
+
+        except Exception as e:
+
+            validation_result[&#x27;is_safe&#x27;] = False
+
+            validation_result[&#x27;issues&#x27;].append(f&quot;Query analysis failed: {str(e)}&quot;)
+
+            validation_result[&#x27;risk_level&#x27;] = QueryRisk.CRITICAL
+
+        
+
+        return validation_result
+
+    
+
+    def _analyze_statement(self, statement, validation_result):
+
+        &quot;&quot;&quot;Analyze individual SQL statement.&quot;&quot;&quot;
+
+        
+
+        # Get statement type
+
+        stmt_type = statement.get_type()
+
+        
+
+        # Check if statement type is allowed
+
+        if stmt_type and stmt_type.upper() not in [&#x27;SELECT&#x27;, &#x27;WITH&#x27;]:
+
+            validation_result[&#x27;issues&#x27;].append(f&quot;Disallowed statement type: {stmt_type}&quot;)
+
+            validation_result[&#x27;is_safe&#x27;] = False
+
+            return
+
+        
+
+        # Extract tokens and analyze
+
+        for token in statement.flatten():
+
+            if token.ttype is sqlparse.tokens.Keyword:
+
+                keyword = token.value.upper()
+
+                
+
+                if keyword in self.DANGEROUS_KEYWORDS:
+
+                    validation_result[&#x27;issues&#x27;].append(f&quot;Dangerous keyword detected: {keyword}&quot;)
+
+                    validation_result[&#x27;is_safe&#x27;] = False
+
+                elif keyword in self.SAFE_KEYWORDS:
+
+                    if keyword not in validation_result[&#x27;allowed_operations&#x27;]:
+
+                        validation_result[&#x27;allowed_operations&#x27;].append(keyword)
+
+    
+
+    def _check_injection_patterns(self, query: str, validation_result):
+
+        &quot;&quot;&quot;Check for SQL injection patterns.&quot;&quot;&quot;
+
+        
+
+        for pattern in self.compiled_patterns:
+
+            matches = pattern.findall(query)
+
+            if matches:
+
+                validation_result[&#x27;issues&#x27;].append(f&quot;Potential injection pattern detected&quot;)
+
+                validation_result[&#x27;is_safe&#x27;] = False
+
+    
+
+    def _validate_table_access(self, query: str, validation_result):
+
+        &quot;&quot;&quot;Validate that only allowed tables/schemas are accessed.&quot;&quot;&quot;
+
+        
+
+        # Extract table names (simplified approach)
+
+        # In production, use proper SQL parsing
+
+        from_match = re.findall(r&#x27;FROM\s+(\w+\.?\w*)&#x27;, query, re.IGNORECASE)
+
+        join_match = re.findall(r&#x27;JOIN\s+(\w+\.?\w*)&#x27;, query, re.IGNORECASE)
+
+        
+
+        all_tables = from_match + join_match
+
+        
+
+        for table_ref in all_tables:
+
+            if &#x27;.&#x27; in table_ref:
+
+                schema, table = table_ref.split(&#x27;.&#x27;, 1)
+
+                if schema.lower() not in self.ALLOWED_SCHEMAS:
+
+                    validation_result[&#x27;issues&#x27;].append(f&quot;Access to unauthorized schema: {schema}&quot;)
+
+                    validation_result[&#x27;is_safe&#x27;] = False
+
+                if table.lower() not in self.ALLOWED_TABLES:
+
+                    validation_result[&#x27;warnings&#x27;].append(f&quot;Access to table: {table}&quot;)
+
+            else:
+
+                # Assume retail schema if not specified
+
+                if table_ref.lower() not in self.ALLOWED_TABLES:
+
+                    validation_result[&#x27;warnings&#x27;].append(f&quot;Access to table: {table_ref}&quot;)
+
+    
+
+    def _determine_risk_level(self, validation_result):
+
+        &quot;&quot;&quot;Determine overall risk level.&quot;&quot;&quot;
+
+        
+
+        if not validation_result[&#x27;is_safe&#x27;]:
+
+            if any(&#x27;injection&#x27; in issue.lower() for issue in validation_result[&#x27;issues&#x27;]):
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.CRITICAL
+
+            elif any(&#x27;DROP&#x27; in issue or &#x27;DELETE&#x27; in issue for issue in validation_result[&#x27;issues&#x27;]):
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.HIGH
+
+            else:
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.MEDIUM
+
+        elif validation_result[&#x27;warnings&#x27;]:
+
+            validation_result[&#x27;risk_level&#x27;] = QueryRisk.LOW
+
+        else:
+
+            validation_result[&#x27;risk_level&#x27;] = QueryRisk.LOW
+
+
+
+# Global validator instance
+
+query_validator = QueryValidator()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🗃️ Database Query Tools</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Sales Analysis Tool</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/sales_analysis.py
+
+&quot;&quot;&quot;
+
+Comprehensive sales analysis tool for retail data querying.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List, Optional
+
+from datetime import datetime, timedelta
+
+from .base import DatabaseTool, ToolResult
+
+from .query_validator import query_validator
+
+
+
+class SalesAnalysisTool(DatabaseTool):
+
+    &quot;&quot;&quot;Advanced sales analysis and reporting tool.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;execute_sales_query&quot;,
+
+            description=&quot;Execute sophisticated sales analysis queries with natural language support&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        
+
+        # Pre-built query templates for common analysis
+
+        self.query_templates = {
+
+            &#x27;daily_sales&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    DATE(transaction_date) as sales_date,
+
+                    COUNT(*) as transaction_count,
+
+                    SUM(total_amount) as total_revenue,
+
+                    AVG(total_amount) as avg_transaction_value,
+
+                    COUNT(DISTINCT customer_id) as unique_customers
+
+                FROM retail.sales_transactions 
+
+                WHERE transaction_date &gt;= $1 AND transaction_date &lt;= $2
+
+                  AND transaction_type = &#x27;sale&#x27;
+
+                GROUP BY DATE(transaction_date)
+
+                ORDER BY sales_date DESC
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;top_products&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    p.product_name,
+
+                    p.brand,
+
+                    SUM(sti.quantity) as total_quantity_sold,
+
+                    SUM(sti.total_price) as total_revenue,
+
+                    COUNT(DISTINCT st.transaction_id) as transaction_count,
+
+                    AVG(sti.unit_price) as avg_price
+
+                FROM retail.sales_transaction_items sti
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                JOIN retail.products p ON sti.product_id = p.product_id
+
+                WHERE st.transaction_date &gt;= $1 AND st.transaction_date &lt;= $2
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY p.product_id, p.product_name, p.brand
+
+                ORDER BY total_revenue DESC
+
+                LIMIT $3
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;customer_analysis&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    c.customer_id,
+
+                    c.first_name || &#x27; &#x27; || c.last_name as customer_name,
+
+                    c.loyalty_tier,
+
+                    COUNT(st.transaction_id) as transaction_count,
+
+                    SUM(st.total_amount) as total_spent,
+
+                    AVG(st.total_amount) as avg_transaction_value,
+
+                    MAX(st.transaction_date) as last_purchase_date,
+
+                    DATE_PART(&#x27;day&#x27;, CURRENT_DATE - MAX(st.transaction_date)) as days_since_last_purchase
+
+                FROM retail.customers c
+
+                LEFT JOIN retail.sales_transactions st ON c.customer_id = st.customer_id
+
+                WHERE st.transaction_date &gt;= $1 AND st.transaction_date &lt;= $2
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY c.customer_id, c.first_name, c.last_name, c.loyalty_tier
+
+                HAVING COUNT(st.transaction_id) &gt; 0
+
+                ORDER BY total_spent DESC
+
+                LIMIT $3
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;category_performance&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    pc.category_name,
+
+                    COUNT(DISTINCT p.product_id) as unique_products,
+
+                    SUM(sti.quantity) as total_quantity_sold,
+
+                    SUM(sti.total_price) as total_revenue,
+
+                    AVG(sti.unit_price) as avg_price,
+
+                    COUNT(DISTINCT st.transaction_id) as transaction_count
+
+                FROM retail.product_categories pc
+
+                JOIN retail.products p ON pc.category_id = p.category_id
+
+                JOIN retail.sales_transaction_items sti ON p.product_id = sti.product_id
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                WHERE st.transaction_date &gt;= $1 AND st.transaction_date &lt;= $2
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY pc.category_id, pc.category_name
+
+                ORDER BY total_revenue DESC
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;sales_trends&#x27;: &quot;&quot;&quot;
+
+                WITH daily_sales AS (
+
+                    SELECT 
+
+                        DATE(transaction_date) as sales_date,
+
+                        SUM(total_amount) as daily_revenue,
+
+                        COUNT(*) as daily_transactions
+
+                    FROM retail.sales_transactions 
+
+                    WHERE transaction_date &gt;= $1 AND transaction_date &lt;= $2
+
+                      AND transaction_type = &#x27;sale&#x27;
+
+                    GROUP BY DATE(transaction_date)
+
+                ),
+
+                trend_analysis AS (
+
+                    SELECT 
+
+                        sales_date,
+
+                        daily_revenue,
+
+                        daily_transactions,
+
+                        LAG(daily_revenue, 1) OVER (ORDER BY sales_date) as prev_day_revenue,
+
+                        LAG(daily_revenue, 7) OVER (ORDER BY sales_date) as prev_week_revenue,
+
+                        AVG(daily_revenue) OVER (
+
+                            ORDER BY sales_date 
+
+                            ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+
+                        ) as rolling_7day_avg
+
+                    FROM daily_sales
+
+                )
+
+                SELECT 
+
+                    sales_date,
+
+                    daily_revenue,
+
+                    daily_transactions,
+
+                    rolling_7day_avg,
+
+                    CASE 
+
+                        WHEN prev_day_revenue IS NOT NULL THEN
+
+                            ROUND(((daily_revenue - prev_day_revenue) / prev_day_revenue * 100)::numeric, 2)
+
+                        ELSE NULL
+
+                    END as day_over_day_growth_pct,
+
+                    CASE 
+
+                        WHEN prev_week_revenue IS NOT NULL THEN
+
+                            ROUND(((daily_revenue - prev_week_revenue) / prev_week_revenue * 100)::numeric, 2)
+
+                        ELSE NULL
+
+                    END as week_over_week_growth_pct
+
+                FROM trend_analysis
+
+                ORDER BY sales_date DESC
+
+            &quot;&quot;&quot;
+
+        }
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute sales analysis query.&quot;&quot;&quot;
+
+        
+
+        query_type = kwargs.get(&#x27;query_type&#x27;, &#x27;custom&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for sales analysis&quot;
+
+            )
+
+        
+
+        try:
+
+            if query_type in self.query_templates:
+
+                return await self._execute_template_query(query_type, kwargs)
+
+            elif query_type == &#x27;custom&#x27;:
+
+                return await self._execute_custom_query(kwargs)
+
+            else:
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Unknown query type: {query_type}&quot;
+
+                )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Sales analysis failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _execute_template_query(self, query_type: str, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute pre-built template query.&quot;&quot;&quot;
+
+        
+
+        query = self.query_templates[query_type]
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        
+
+        # Default parameters for template queries
+
+        start_date = kwargs.get(&#x27;start_date&#x27;, (datetime.now() - timedelta(days=30)).date())
+
+        end_date = kwargs.get(&#x27;end_date&#x27;, datetime.now().date())
+
+        limit = kwargs.get(&#x27;limit&#x27;, 20)
+
+        
+
+        # Convert string dates if needed
+
+        if isinstance(start_date, str):
+
+            start_date = datetime.fromisoformat(start_date).date()
+
+        if isinstance(end_date, str):
+
+            end_date = datetime.fromisoformat(end_date).date()
+
+        
+
+        # Execute query with parameters
+
+        params = (start_date, end_date, limit) if &#x27;$3&#x27; in query else (start_date, end_date)
+
+        
+
+        result = await self.execute_query(query, params, store_id)
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;query_type&#x27;: query_type,
+
+                &#x27;date_range&#x27;: f&quot;{start_date} to {end_date}&quot;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;analysis_type&#x27;: &#x27;template&#x27;
+
+            }
+
+        
+
+        return result
+
+    
+
+    async def _execute_custom_query(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute custom SQL query with validation.&quot;&quot;&quot;
+
+        
+
+        custom_query = kwargs.get(&#x27;query&#x27;)
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        
+
+        if not custom_query:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;Custom query is required when query_type is &#x27;custom&#x27;&quot;
+
+            )
+
+        
+
+        # Validate the query for security
+
+        validation = query_validator.validate_query(custom_query)
+
+        
+
+        if not validation[&#x27;is_safe&#x27;]:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Query validation failed: {&#x27;, &#x27;.join(validation[&#x27;issues&#x27;])}&quot;,
+
+                metadata={
+
+                    &#x27;validation_result&#x27;: validation,
+
+                    &#x27;risk_level&#x27;: validation[&#x27;risk_level&#x27;].value
+
+                }
+
+            )
+
+        
+
+        # Execute validated query
+
+        result = await self.execute_query(custom_query, None, store_id)
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;validation_warnings&#x27;: validation.get(&#x27;warnings&#x27;, []),
+
+                &#x27;analysis_type&#x27;: &#x27;custom&#x27;
+
+            }
+
+        
+
+        return result
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for the sales analysis tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;query_type&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: list(self.query_templates.keys()) + [&quot;custom&quot;],
+
+                    &quot;description&quot;: &quot;Type of sales analysis to perform&quot;,
+
+                    &quot;default&quot;: &quot;daily_sales&quot;
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for data isolation&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;start_date&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;format&quot;: &quot;date&quot;,
+
+                    &quot;description&quot;: &quot;Start date for analysis (YYYY-MM-DD)&quot;
+
+                },
+
+                &quot;end_date&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;format&quot;: &quot;date&quot;,
+
+                    &quot;description&quot;: &quot;End date for analysis (YYYY-MM-DD)&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 1000,
+
+                    &quot;description&quot;: &quot;Maximum number of results to return&quot;,
+
+                    &quot;default&quot;: 20
+
+                },
+
+                &quot;query&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Custom SQL query (required when query_type is &#x27;custom&#x27;)&quot;
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Schema Introspection Tool</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/schema_introspection.py
+
+&quot;&quot;&quot;
+
+Database schema introspection and metadata tools.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List
+
+from .base import DatabaseTool, ToolResult, ToolCategory
+
+
+
+class SchemaIntrospectionTool(DatabaseTool):
+
+    &quot;&quot;&quot;Tool for exploring database schema and metadata.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_table_schema&quot;,
+
+            description=&quot;Get detailed schema information for database tables&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.SCHEMA_INTROSPECTION
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute schema introspection.&quot;&quot;&quot;
+
+        
+
+        table_name = kwargs.get(&#x27;table_name&#x27;)
+
+        include_constraints = kwargs.get(&#x27;include_constraints&#x27;, True)
+
+        include_indexes = kwargs.get(&#x27;include_indexes&#x27;, True)
+
+        include_statistics = kwargs.get(&#x27;include_statistics&#x27;, False)
+
+        
+
+        try:
+
+            if table_name:
+
+                return await self._get_single_table_schema(
+
+                    table_name, include_constraints, include_indexes, include_statistics
+
+                )
+
+            else:
+
+                return await self._get_all_tables_schema(include_constraints, include_indexes)
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Schema introspection failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _get_single_table_schema(
+
+        self, 
+
+        table_name: str, 
+
+        include_constraints: bool,
+
+        include_indexes: bool,
+
+        include_statistics: bool
+
+    ) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get detailed schema for a single table.&quot;&quot;&quot;
+
+        
+
+        schema_info = {
+
+            &#x27;table_name&#x27;: table_name,
+
+            &#x27;columns&#x27;: [],
+
+            &#x27;constraints&#x27;: [],
+
+            &#x27;indexes&#x27;: [],
+
+            &#x27;statistics&#x27;: {}
+
+        }
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Get column information
+
+            columns_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    column_name,
+
+                    data_type,
+
+                    is_nullable,
+
+                    column_default,
+
+                    character_maximum_length,
+
+                    numeric_precision,
+
+                    numeric_scale,
+
+                    ordinal_position,
+
+                    udt_name
+
+                FROM information_schema.columns
+
+                WHERE table_schema = &#x27;retail&#x27; AND table_name = $1
+
+                ORDER BY ordinal_position
+
+            &quot;&quot;&quot;
+
+            
+
+            columns = await conn.fetch(columns_query, table_name)
+
+            schema_info[&#x27;columns&#x27;] = [dict(col) for col in columns]
+
+            
+
+            # Get constraints if requested
+
+            if include_constraints:
+
+                constraints_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        constraint_name,
+
+                        constraint_type,
+
+                        column_name,
+
+                        foreign_table_name,
+
+                        foreign_column_name
+
+                    FROM information_schema.table_constraints tc
+
+                    LEFT JOIN information_schema.key_column_usage kcu 
+
+                        ON tc.constraint_name = kcu.constraint_name
+
+                    LEFT JOIN information_schema.referential_constraints rc
+
+                        ON tc.constraint_name = rc.constraint_name
+
+                    LEFT JOIN information_schema.key_column_usage fkcu
+
+                        ON rc.unique_constraint_name = fkcu.constraint_name
+
+                    WHERE tc.table_schema = &#x27;retail&#x27; AND tc.table_name = $1
+
+                &quot;&quot;&quot;
+
+                
+
+                constraints = await conn.fetch(constraints_query, table_name)
+
+                schema_info[&#x27;constraints&#x27;] = [dict(const) for const in constraints]
+
+            
+
+            # Get indexes if requested
+
+            if include_indexes:
+
+                indexes_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        indexname as index_name,
+
+                        indexdef as index_definition,
+
+                        tablespace
+
+                    FROM pg_indexes
+
+                    WHERE schemaname = &#x27;retail&#x27; AND tablename = $1
+
+                &quot;&quot;&quot;
+
+                
+
+                indexes = await conn.fetch(indexes_query, table_name)
+
+                schema_info[&#x27;indexes&#x27;] = [dict(idx) for idx in indexes]
+
+            
+
+            # Get table statistics if requested
+
+            if include_statistics:
+
+                stats_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        n_tup_ins as inserts,
+
+                        n_tup_upd as updates,
+
+                        n_tup_del as deletes,
+
+                        n_live_tup as live_tuples,
+
+                        n_dead_tup as dead_tuples,
+
+                        last_vacuum,
+
+                        last_autovacuum,
+
+                        last_analyze,
+
+                        last_autoanalyze
+
+                    FROM pg_stat_user_tables
+
+                    WHERE schemaname = &#x27;retail&#x27; AND relname = $1
+
+                &quot;&quot;&quot;
+
+                
+
+                stats = await conn.fetchrow(stats_query, table_name)
+
+                if stats:
+
+                    schema_info[&#x27;statistics&#x27;] = dict(stats)
+
+        
+
+        return ToolResult(
+
+            success=True,
+
+            data=schema_info,
+
+            metadata={
+
+                &#x27;table_name&#x27;: table_name,
+
+                &#x27;schema&#x27;: &#x27;retail&#x27;,
+
+                &#x27;introspection_type&#x27;: &#x27;single_table&#x27;
+
+            }
+
+        )
+
+    
+
+    async def _get_all_tables_schema(
+
+        self, 
+
+        include_constraints: bool,
+
+        include_indexes: bool
+
+    ) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get schema information for all tables.&quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Get all tables in retail schema
+
+            tables_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    table_name,
+
+                    table_type
+
+                FROM information_schema.tables
+
+                WHERE table_schema = &#x27;retail&#x27;
+
+                ORDER BY table_name
+
+            &quot;&quot;&quot;
+
+            
+
+            tables = await conn.fetch(tables_query)
+
+            schema_info = {
+
+                &#x27;schema_name&#x27;: &#x27;retail&#x27;,
+
+                &#x27;tables&#x27;: []
+
+            }
+
+            
+
+            for table in tables:
+
+                table_info = {
+
+                    &#x27;table_name&#x27;: table[&#x27;table_name&#x27;],
+
+                    &#x27;table_type&#x27;: table[&#x27;table_type&#x27;],
+
+                    &#x27;columns&#x27;: []
+
+                }
+
+                
+
+                # Get columns for each table
+
+                columns_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        column_name,
+
+                        data_type,
+
+                        is_nullable,
+
+                        column_default
+
+                    FROM information_schema.columns
+
+                    WHERE table_schema = &#x27;retail&#x27; AND table_name = $1
+
+                    ORDER BY ordinal_position
+
+                &quot;&quot;&quot;
+
+                
+
+                columns = await conn.fetch(columns_query, table[&#x27;table_name&#x27;])
+
+                table_info[&#x27;columns&#x27;] = [dict(col) for col in columns]
+
+                
+
+                schema_info[&#x27;tables&#x27;].append(table_info)
+
+        
+
+        return ToolResult(
+
+            success=True,
+
+            data=schema_info,
+
+            metadata={
+
+                &#x27;schema&#x27;: &#x27;retail&#x27;,
+
+                &#x27;table_count&#x27;: len(schema_info[&#x27;tables&#x27;]),
+
+                &#x27;introspection_type&#x27;: &#x27;all_tables&#x27;
+
+            }
+
+        )
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for schema introspection tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;table_name&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Specific table name to introspect (optional - if not provided, all tables are returned)&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z_][a-zA-Z0-9_]*$&quot;
+
+                },
+
+                &quot;include_constraints&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include constraint information&quot;,
+
+                    &quot;default&quot;: True
+
+                },
+
+                &quot;include_indexes&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include index information&quot;,
+
+                    &quot;default&quot;: True
+
+                },
+
+                &quot;include_statistics&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include table statistics&quot;,
+
+                    &quot;default&quot;: False
+
+                }
+
+            },
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+
+
+class MultiTableSchemaTool(DatabaseTool):
+
+    &quot;&quot;&quot;Tool for getting schema information for multiple tables at once.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_multiple_table_schemas&quot;,
+
+            description=&quot;Get schema information for multiple tables efficiently&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.SCHEMA_INTROSPECTION
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute multi-table schema introspection.&quot;&quot;&quot;
+
+        
+
+        table_names = kwargs.get(&#x27;table_names&#x27;, [])
+
+        
+
+        if not table_names:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;At least one table name is required&quot;
+
+            )
+
+        
+
+        try:
+
+            schemas = {}
+
+            
+
+            async with self.get_connection() as conn:
+
+                for table_name in table_names:
+
+                    # Get table schema
+
+                    schema_query = &quot;&quot;&quot;
+
+                        SELECT 
+
+                            c.column_name,
+
+                            c.data_type,
+
+                            c.is_nullable,
+
+                            c.column_default,
+
+                            c.character_maximum_length,
+
+                            tc.constraint_type,
+
+                            kcu.constraint_name
+
+                        FROM information_schema.columns c
+
+                        LEFT JOIN information_schema.key_column_usage kcu
+
+                            ON c.table_name = kcu.table_name 
+
+                            AND c.column_name = kcu.column_name
+
+                            AND c.table_schema = kcu.table_schema
+
+                        LEFT JOIN information_schema.table_constraints tc
+
+                            ON kcu.constraint_name = tc.constraint_name
+
+                            AND kcu.table_schema = tc.table_schema
+
+                        WHERE c.table_schema = &#x27;retail&#x27; AND c.table_name = $1
+
+                        ORDER BY c.ordinal_position
+
+                    &quot;&quot;&quot;
+
+                    
+
+                    columns = await conn.fetch(schema_query, table_name)
+
+                    
+
+                    if columns:
+
+                        schemas[table_name] = {
+
+                            &#x27;table_name&#x27;: table_name,
+
+                            &#x27;columns&#x27;: [dict(col) for col in columns]
+
+                        }
+
+                    else:
+
+                        schemas[table_name] = {
+
+                            &#x27;table_name&#x27;: table_name,
+
+                            &#x27;error&#x27;: &#x27;Table not found or not accessible&#x27;
+
+                        }
+
+            
+
+            return ToolResult(
+
+                success=True,
+
+                data=schemas,
+
+                metadata={
+
+                    &#x27;requested_tables&#x27;: table_names,
+
+                    &#x27;found_tables&#x27;: [name for name, info in schemas.items() if &#x27;error&#x27; not in info],
+
+                    &#x27;missing_tables&#x27;: [name for name, info in schemas.items() if &#x27;error&#x27; in info]
+
+                }
+
+            )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Multi-table schema introspection failed: {str(e)}&quot;
+
+            )
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for multi-table schema tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;table_names&quot;: {
+
+                    &quot;type&quot;: &quot;array&quot;,
+
+                    &quot;items&quot;: {
+
+                        &quot;type&quot;: &quot;string&quot;,
+
+                        &quot;pattern&quot;: &quot;^[a-zA-Z_][a-zA-Z0-9_]*$&quot;
+
+                    },
+
+                    &quot;description&quot;: &quot;List of table names to get schema information for&quot;,
+
+                    &quot;minItems&quot;: 1,
+
+                    &quot;maxItems&quot;: 20
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;table_names&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 Analytics and Utility Tools</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Business Intelligence Tool</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/business_intelligence.py
+
+&quot;&quot;&quot;
+
+Advanced business intelligence and analytics tools.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List
+
+from datetime import datetime, timedelta
+
+from .base import DatabaseTool, ToolResult, ToolCategory
+
+
+
+class BusinessIntelligenceTool(DatabaseTool):
+
+    &quot;&quot;&quot;Advanced analytics tool for business intelligence queries.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;generate_business_insights&quot;,
+
+            description=&quot;Generate comprehensive business intelligence reports and insights&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.ANALYTICS
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute business intelligence analysis.&quot;&quot;&quot;
+
+        
+
+        analysis_type = kwargs.get(&#x27;analysis_type&#x27;, &#x27;summary&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for business intelligence analysis&quot;
+
+            )
+
+        
+
+        try:
+
+            if analysis_type == &#x27;summary&#x27;:
+
+                return await self._generate_business_summary(kwargs)
+
+            elif analysis_type == &#x27;customer_segmentation&#x27;:
+
+                return await self._analyze_customer_segmentation(kwargs)
+
+            elif analysis_type == &#x27;product_performance&#x27;:
+
+                return await self._analyze_product_performance(kwargs)
+
+            elif analysis_type == &#x27;seasonal_trends&#x27;:
+
+                return await self._analyze_seasonal_trends(kwargs)
+
+            else:
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Unknown analysis type: {analysis_type}&quot;
+
+                )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Business intelligence analysis failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _generate_business_summary(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Generate comprehensive business summary.&quot;&quot;&quot;
+
+        
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        days = kwargs.get(&#x27;days&#x27;, 30)
+
+        
+
+        summary_query = &quot;&quot;&quot;
+
+            WITH date_range AS (
+
+                SELECT CURRENT_DATE - INTERVAL &#x27;%s days&#x27; as start_date,
+
+                       CURRENT_DATE as end_date
+
+            ),
+
+            sales_summary AS (
+
+                SELECT 
+
+                    COUNT(*) as total_transactions,
+
+                    COUNT(DISTINCT customer_id) as unique_customers,
+
+                    SUM(total_amount) as total_revenue,
+
+                    AVG(total_amount) as avg_transaction_value,
+
+                    COUNT(DISTINCT DATE(transaction_date)) as active_days
+
+                FROM retail.sales_transactions st, date_range dr
+
+                WHERE st.transaction_date &gt;= dr.start_date 
+
+                  AND st.transaction_date &lt;= dr.end_date
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+            ),
+
+            product_summary AS (
+
+                SELECT 
+
+                    COUNT(DISTINCT p.product_id) as products_sold,
+
+                    SUM(sti.quantity) as total_items_sold
+
+                FROM retail.sales_transaction_items sti
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                JOIN retail.products p ON sti.product_id = p.product_id
+
+                CROSS JOIN date_range dr
+
+                WHERE st.transaction_date &gt;= dr.start_date 
+
+                  AND st.transaction_date &lt;= dr.end_date
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+            ),
+
+            top_category AS (
+
+                SELECT 
+
+                    pc.category_name,
+
+                    SUM(sti.total_price) as category_revenue
+
+                FROM retail.product_categories pc
+
+                JOIN retail.products p ON pc.category_id = p.category_id
+
+                JOIN retail.sales_transaction_items sti ON p.product_id = sti.product_id
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                CROSS JOIN date_range dr
+
+                WHERE st.transaction_date &gt;= dr.start_date 
+
+                  AND st.transaction_date &lt;= dr.end_date
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY pc.category_name
+
+                ORDER BY category_revenue DESC
+
+                LIMIT 1
+
+            )
+
+            SELECT 
+
+                ss.*,
+
+                ps.products_sold,
+
+                ps.total_items_sold,
+
+                tc.category_name as top_category,
+
+                tc.category_revenue as top_category_revenue,
+
+                CASE 
+
+                    WHEN ss.active_days &gt; 0 THEN ss.total_revenue / ss.active_days
+
+                    ELSE 0
+
+                END as avg_daily_revenue
+
+            FROM sales_summary ss
+
+            CROSS JOIN product_summary ps
+
+            CROSS JOIN top_category tc
+
+        &quot;&quot;&quot; % days
+
+        
+
+        result = await self.execute_query(summary_query, None, store_id)
+
+        
+
+        if result.success and result.data:
+
+            summary = result.data[0]
+
+            
+
+            # Add derived insights
+
+            insights = {
+
+                &#x27;revenue_trend&#x27;: &#x27;stable&#x27;,  # Would calculate based on historical data
+
+                &#x27;customer_retention&#x27;: f&quot;{summary.get(&#x27;unique_customers&#x27;, 0)} active customers&quot;,
+
+                &#x27;performance_indicators&#x27;: {
+
+                    &#x27;transactions_per_day&#x27;: round(summary.get(&#x27;total_transactions&#x27;, 0) / max(summary.get(&#x27;active_days&#x27;, 1), 1), 2),
+
+                    &#x27;revenue_per_customer&#x27;: round(summary.get(&#x27;total_revenue&#x27;, 0) / max(summary.get(&#x27;unique_customers&#x27;, 1), 1), 2),
+
+                    &#x27;items_per_transaction&#x27;: round(summary.get(&#x27;total_items_sold&#x27;, 0) / max(summary.get(&#x27;total_transactions&#x27;, 1), 1), 2)
+
+                }
+
+            }
+
+            
+
+            summary[&#x27;insights&#x27;] = insights
+
+            
+
+            result.data = [summary]
+
+            result.metadata = {
+
+                &#x27;analysis_type&#x27;: &#x27;business_summary&#x27;,
+
+                &#x27;period_days&#x27;: days,
+
+                &#x27;store_id&#x27;: store_id
+
+            }
+
+        
+
+        return result
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for business intelligence tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;analysis_type&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;summary&quot;, &quot;customer_segmentation&quot;, &quot;product_performance&quot;, &quot;seasonal_trends&quot;],
+
+                    &quot;description&quot;: &quot;Type of business intelligence analysis to perform&quot;,
+
+                    &quot;default&quot;: &quot;summary&quot;
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for analysis&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;days&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 365,
+
+                    &quot;description&quot;: &quot;Number of days to analyze&quot;,
+
+                    &quot;default&quot;: 30
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+
+
+class UtilityTool(DatabaseTool):
+
+    &quot;&quot;&quot;Utility tool for common operations.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_current_utc_date&quot;,
+
+            description=&quot;Get current UTC date and time for reference&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.UTILITY
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute utility operation.&quot;&quot;&quot;
+
+        
+
+        format_type = kwargs.get(&#x27;format&#x27;, &#x27;iso&#x27;)
+
+        
+
+        try:
+
+            async with self.get_connection() as conn:
+
+                if format_type == &#x27;iso&#x27;:
+
+                    query = &quot;SELECT CURRENT_TIMESTAMP AT TIME ZONE &#x27;UTC&#x27; as current_utc_datetime&quot;
+
+                elif format_type == &#x27;epoch&#x27;:
+
+                    query = &quot;SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP AT TIME ZONE &#x27;UTC&#x27;) as current_utc_epoch&quot;
+
+                elif format_type == &#x27;date_only&#x27;:
+
+                    query = &quot;SELECT CURRENT_DATE as current_date&quot;
+
+                else:
+
+                    return ToolResult(
+
+                        success=False,
+
+                        error=f&quot;Unknown format type: {format_type}&quot;
+
+                    )
+
+                
+
+                result = await conn.fetchrow(query)
+
+                
+
+                return ToolResult(
+
+                    success=True,
+
+                    data=dict(result),
+
+                    metadata={
+
+                        &#x27;format_type&#x27;: format_type,
+
+                        &#x27;timezone&#x27;: &#x27;UTC&#x27;
+
+                    }
+
+                )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Utility operation failed: {str(e)}&quot;
+
+            )
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for utility tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;format&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;iso&quot;, &quot;epoch&quot;, &quot;date_only&quot;],
+
+                    &quot;description&quot;: &quot;Format for the returned date/time&quot;,
+
+                    &quot;default&quot;: &quot;iso&quot;
+
+                }
+
+            },
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Key Takeaways</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">After completing this lab, you should have:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Advanced Tool Architecture</strong>: Implemented sophisticated MCP tools with comprehensive error handling  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Query Validation</strong>: Built secure SQL validation to prevent injection attacks  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Database Tools</strong>: Created powerful sales analysis and schema introspection capabilities  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Business Intelligence</strong>: Developed analytics tools for comprehensive business insights  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Performance Optimization</strong>: Applied caching, connection pooling, and query optimization  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>Security Integration</strong>: Implemented role-based access control and audit logging  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 What's Next</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Continue with <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/07-Semantic-Search/README.md" target="_blank">Lab 07: Semantic Search Integration</a></strong> to:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Integrate vector search capabilities with MCP tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Build semantic product search functionality</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Implement AI-powered query understanding</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create hybrid search combining traditional and vector queries</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 Additional Resources</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP Tool Development</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs">Model Context Protocol Documentation</a> - Official MCP specification</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/jlowin/fastmcp">FastMCP Framework</a> - Python MCP implementation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP Tool Patterns</a> - Example tool implementations</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Database Security</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-community/attacks/SQL_Injection">SQL Injection Prevention</a> - OWASP security guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/security.html">PostgreSQL Security</a> - Database security best practices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html">Query Validation Techniques</a> - Secure query patterns</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">Performance Optimization</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/performance-tips.html">Database Query Optimization</a> - PostgreSQL performance guide</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-connection.html">Connection Pooling Best Practices</a> - Connection management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">Async Python Patterns</a> - Asynchronous programming guide</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Previous</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/05-MCP-Server/README.md" target="_blank">Lab 05: MCP Server Implementation</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Next</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/07-Semantic-Search/README.md" target="_blank">Lab 07: Semantic Search Integration</a></p></div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">도구 개발</h2>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 이 실습에서 다루는 내용</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습에서는 AI 어시스턴트에게 강력한 데이터베이스 쿼리 기능, 스키마 탐색, 분석 기능을 제공하는 고급 MCP 도구를 만드는 방법을 깊이 탐구합니다. 강력하면서도 안전한 도구를 설계하고, 포괄적인 오류 처리와 성능 최적화를 구현하는 방법을 배우게 됩니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">개요</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 도구는 AI 어시스턴트와 데이터 시스템 간의 인터페이스 역할을 합니다. 잘 설계된 도구는 복잡한 작업에 대해 구조화되고 검증된 접근을 제공하며, 보안과 성능을 유지합니다. 이 실습에서는 설계부터 배포까지 도구 개발의 전체 라이프사이클을 다룹니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">우리의 소매 MCP 서버는 판매 데이터, 제품 카탈로그, 비즈니스 분석을 자연어로 쿼리할 수 있는 포괄적인 도구 세트를 구현하며, 엄격한 보안 경계와 최적의 성능을 유지합니다.</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료하면 다음을 수행할 수 있습니다:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>설계</strong>: 복잡한 매개변수 검증을 포함한 고급 MCP 도구 설계</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구현</strong>: SQL 인젝션 방지 기능을 갖춘 안전한 데이터베이스 쿼리 도구 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>생성</strong>: 동적 쿼리를 위한 스키마 탐색 기능 개발</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>구축</strong>: 비즈니스 인텔리전스를 위한 맞춤형 분석 도구 제작</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>적용</strong>: 포괄적인 오류 처리 및 우아한 성능 저하 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>최적화</strong>: 프로덕션 워크로드를 위한 도구 성능 최적화</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ 핵심 도구 아키텍처</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">도구 설계 원칙</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/base.py
+
+&quot;&quot;&quot;
+
+Base classes and patterns for MCP tool development.
+
+&quot;&quot;&quot;
+
+from abc import ABC, abstractmethod
+
+from typing import Any, Dict, List, Optional, Union
+
+from dataclasses import dataclass
+
+from enum import Enum
+
+import asyncio
+
+import time
+
+import logging
+
+from contextlib import asynccontextmanager
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class ToolCategory(Enum):
+
+    &quot;&quot;&quot;Tool categorization for organization and discovery.&quot;&quot;&quot;
+
+    DATABASE_QUERY = &quot;database_query&quot;
+
+    SCHEMA_INTROSPECTION = &quot;schema_introspection&quot;
+
+    ANALYTICS = &quot;analytics&quot;
+
+    UTILITY = &quot;utility&quot;
+
+    ADMINISTRATIVE = &quot;administrative&quot;
+
+
+
+@dataclass
+
+class ToolResult:
+
+    &quot;&quot;&quot;Standardized tool result structure.&quot;&quot;&quot;
+
+    success: bool
+
+    data: Any = None
+
+    error: Optional[str] = None
+
+    metadata: Optional[Dict[str, Any]] = None
+
+    execution_time_ms: Optional[float] = None
+
+    row_count: Optional[int] = None
+
+
+
+class BaseTool(ABC):
+
+    &quot;&quot;&quot;Abstract base class for all MCP tools.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, name: str, description: str, category: ToolCategory):
+
+        self.name = name
+
+        self.description = description
+
+        self.category = category
+
+        self.call_count = 0
+
+        self.total_execution_time = 0.0
+
+        
+
+    @abstractmethod
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute the tool with given parameters.&quot;&quot;&quot;
+
+        pass
+
+    
+
+    @abstractmethod
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get JSON schema for tool input validation.&quot;&quot;&quot;
+
+        pass
+
+    
+
+    async def call(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Wrapper for tool execution with metrics and error handling.&quot;&quot;&quot;
+
+        
+
+        start_time = time.time()
+
+        self.call_count += 1
+
+        
+
+        try:
+
+            # Validate input parameters
+
+            self._validate_input(kwargs)
+
+            
+
+            # Log tool execution
+
+            logger.info(
+
+                f&quot;Executing tool: {self.name}&quot;,
+
+                extra={
+
+                    &#x27;tool_name&#x27;: self.name,
+
+                    &#x27;tool_category&#x27;: self.category.value,
+
+                    &#x27;parameters&#x27;: self._sanitize_parameters(kwargs)
+
+                }
+
+            )
+
+            
+
+            # Execute the tool
+
+            result = await self.execute(**kwargs)
+
+            
+
+            # Record execution time
+
+            execution_time = (time.time() - start_time) * 1000
+
+            result.execution_time_ms = execution_time
+
+            self.total_execution_time += execution_time
+
+            
+
+            # Log success
+
+            logger.info(
+
+                f&quot;Tool execution completed: {self.name}&quot;,
+
+                extra={
+
+                    &#x27;tool_name&#x27;: self.name,
+
+                    &#x27;execution_time_ms&#x27;: execution_time,
+
+                    &#x27;success&#x27;: result.success,
+
+                    &#x27;row_count&#x27;: result.row_count
+
+                }
+
+            )
+
+            
+
+            return result
+
+            
+
+        except Exception as e:
+
+            execution_time = (time.time() - start_time) * 1000
+
+            
+
+            logger.error(
+
+                f&quot;Tool execution failed: {self.name}&quot;,
+
+                extra={
+
+                    &#x27;tool_name&#x27;: self.name,
+
+                    &#x27;execution_time_ms&#x27;: execution_time,
+
+                    &#x27;error&#x27;: str(e)
+
+                },
+
+                exc_info=True
+
+            )
+
+            
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Tool execution failed: {str(e)}&quot;,
+
+                execution_time_ms=execution_time
+
+            )
+
+    
+
+    def _validate_input(self, kwargs: Dict[str, Any]):
+
+        &quot;&quot;&quot;Validate input parameters against schema.&quot;&quot;&quot;
+
+        
+
+        schema = self.get_input_schema()
+
+        required_props = schema.get(&#x27;required&#x27;, [])
+
+        properties = schema.get(&#x27;properties&#x27;, {})
+
+        
+
+        # Check required parameters
+
+        missing_required = [prop for prop in required_props if prop not in kwargs]
+
+        if missing_required:
+
+            raise ValueError(f&quot;Missing required parameters: {missing_required}&quot;)
+
+        
+
+        # Type validation would go here
+
+        # For production, use jsonschema library for comprehensive validation
+
+    
+
+    def _sanitize_parameters(self, kwargs: Dict[str, Any]) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Sanitize parameters for logging (remove sensitive data).&quot;&quot;&quot;
+
+        
+
+        # Remove or mask sensitive parameters
+
+        sanitized = kwargs.copy()
+
+        sensitive_keys = [&#x27;password&#x27;, &#x27;token&#x27;, &#x27;secret&#x27;, &#x27;key&#x27;]
+
+        
+
+        for key in sanitized:
+
+            if any(sensitive in key.lower() for sensitive in sensitive_keys):
+
+                sanitized[key] = &quot;***MASKED***&quot;
+
+        
+
+        return sanitized
+
+    
+
+    def get_statistics(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get tool usage statistics.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &#x27;name&#x27;: self.name,
+
+            &#x27;category&#x27;: self.category.value,
+
+            &#x27;call_count&#x27;: self.call_count,
+
+            &#x27;total_execution_time_ms&#x27;: self.total_execution_time,
+
+            &#x27;average_execution_time_ms&#x27;: (
+
+                self.total_execution_time / self.call_count 
+
+                if self.call_count &gt; 0 else 0
+
+            )
+
+        }
+
+
+
+class DatabaseTool(BaseTool):
+
+    &quot;&quot;&quot;Base class for database-related tools.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, name: str, description: str, db_provider):
+
+        super().__init__(name, description, ToolCategory.DATABASE_QUERY)
+
+        self.db_provider = db_provider
+
+    
+
+    @asynccontextmanager
+
+    async def get_connection(self):
+
+        &quot;&quot;&quot;Get database connection with proper context management.&quot;&quot;&quot;
+
+        
+
+        conn = None
+
+        try:
+
+            conn = await self.db_provider.get_connection()
+
+            yield conn
+
+        finally:
+
+            if conn:
+
+                await self.db_provider.release_connection(conn)
+
+    
+
+    async def execute_query(
+
+        self, 
+
+        query: str, 
+
+        params: tuple = None,
+
+        store_id: str = None
+
+    ) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute database query with security and performance monitoring.&quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            try:
+
+                # Set store context if provided
+
+                if store_id:
+
+                    await conn.execute(&quot;SELECT retail.set_store_context($1)&quot;, store_id)
+
+                
+
+                # Execute query
+
+                start_time = time.time()
+
+                
+
+                if params:
+
+                    rows = await conn.fetch(query, *params)
+
+                else:
+
+                    rows = await conn.fetch(query)
+
+                
+
+                execution_time = (time.time() - start_time) * 1000
+
+                
+
+                # Convert rows to dictionaries
+
+                data = [dict(row) for row in rows]
+
+                
+
+                return ToolResult(
+
+                    success=True,
+
+                    data=data,
+
+                    row_count=len(data),
+
+                    execution_time_ms=execution_time
+
+                )
+
+                
+
+            except Exception as e:
+
+                logger.error(f&quot;Database query failed: {str(e)}&quot;)
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Query execution failed: {str(e)}&quot;
+
+                )
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">쿼리 검증 및 보안</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/query_validator.py
+
+&quot;&quot;&quot;
+
+SQL query validation and security for MCP tools.
+
+&quot;&quot;&quot;
+
+import re
+
+import sqlparse
+
+from typing import List, Dict, Any, Set
+
+from enum import Enum
+
+
+
+class QueryRisk(Enum):
+
+    &quot;&quot;&quot;Query risk levels.&quot;&quot;&quot;
+
+    LOW = &quot;low&quot;
+
+    MEDIUM = &quot;medium&quot;
+
+    HIGH = &quot;high&quot;
+
+    CRITICAL = &quot;critical&quot;
+
+
+
+class QueryValidator:
+
+    &quot;&quot;&quot;Validate and analyze SQL queries for security risks.&quot;&quot;&quot;
+
+    
+
+    # Dangerous SQL keywords and patterns
+
+    DANGEROUS_KEYWORDS = {
+
+        &#x27;DROP&#x27;, &#x27;DELETE&#x27;, &#x27;TRUNCATE&#x27;, &#x27;ALTER&#x27;, &#x27;CREATE&#x27;, &#x27;INSERT&#x27;,
+
+        &#x27;UPDATE&#x27;, &#x27;GRANT&#x27;, &#x27;REVOKE&#x27;, &#x27;EXEC&#x27;, &#x27;EXECUTE&#x27;, &#x27;sp_&#x27;,
+
+        &#x27;xp_&#x27;, &#x27;BULK&#x27;, &#x27;OPENROWSET&#x27;, &#x27;OPENDATASOURCE&#x27;
+
+    }
+
+    
+
+    # Allowed read-only operations
+
+    SAFE_KEYWORDS = {
+
+        &#x27;SELECT&#x27;, &#x27;WITH&#x27;, &#x27;UNION&#x27;, &#x27;ORDER&#x27;, &#x27;GROUP&#x27;, &#x27;HAVING&#x27;,
+
+        &#x27;WHERE&#x27;, &#x27;FROM&#x27;, &#x27;JOIN&#x27;, &#x27;AS&#x27;, &#x27;ON&#x27;, &#x27;IN&#x27;, &#x27;EXISTS&#x27;,
+
+        &#x27;CASE&#x27;, &#x27;WHEN&#x27;, &#x27;THEN&#x27;, &#x27;ELSE&#x27;, &#x27;END&#x27;, &#x27;AND&#x27;, &#x27;OR&#x27;, &#x27;NOT&#x27;
+
+    }
+
+    
+
+    # Allowed schemas and tables
+
+    ALLOWED_SCHEMAS = {&#x27;retail&#x27;, &#x27;information_schema&#x27;, &#x27;pg_catalog&#x27;}
+
+    ALLOWED_TABLES = {
+
+        &#x27;customers&#x27;, &#x27;products&#x27;, &#x27;sales_transactions&#x27;, 
+
+        &#x27;sales_transaction_items&#x27;, &#x27;product_categories&#x27;,
+
+        &#x27;product_embeddings&#x27;, &#x27;stores&#x27;
+
+    }
+
+    
+
+    def __init__(self):
+
+        self.injection_patterns = [
+
+            # SQL injection patterns
+
+            r&quot;(\b(UNION|union)\s+(ALL\s+)?(SELECT|select))&quot;,
+
+            r&quot;(\b(DROP|drop)\s+(TABLE|table|DATABASE|database))&quot;,
+
+            r&quot;(\b(DELETE|delete)\s+(FROM|from))&quot;,
+
+            r&quot;(\b(INSERT|insert)\s+(INTO|into))&quot;,
+
+            r&quot;(\b(UPDATE|update)\s+\w+\s+(SET|set))&quot;,
+
+            r&quot;(\b(EXEC|exec|EXECUTE|execute)\s*\()&quot;,
+
+            r&quot;(\b(sp_|xp_)\w+)&quot;,
+
+            r&quot;(--\s*$)&quot;,  # SQL comments
+
+            r&quot;(/\*.*?\*/)&quot;,  # Block comments
+
+            r&quot;(;\s*(DROP|DELETE|INSERT|UPDATE|CREATE|ALTER))&quot;,
+
+            r&quot;(\bOR\b\s+[&#x27;\&quot;]?\w+[&#x27;\&quot;]?\s*=\s*[&#x27;\&quot;]?\w+[&#x27;\&quot;]?)&quot;,  # OR injection
+
+            r&quot;(\bAND\b\s+[&#x27;\&quot;]?\w+[&#x27;\&quot;]?\s*=\s*[&#x27;\&quot;]?\w+[&#x27;\&quot;]?)&quot;,  # AND injection
+
+        ]
+
+        
+
+        self.compiled_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in self.injection_patterns]
+
+    
+
+    def validate_query(self, query: str) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Comprehensive query validation.&quot;&quot;&quot;
+
+        
+
+        validation_result = {
+
+            &#x27;is_safe&#x27;: True,
+
+            &#x27;risk_level&#x27;: QueryRisk.LOW,
+
+            &#x27;issues&#x27;: [],
+
+            &#x27;warnings&#x27;: [],
+
+            &#x27;allowed_operations&#x27;: [],
+
+            &#x27;metadata&#x27;: {}
+
+        }
+
+        
+
+        try:
+
+            # Parse the query
+
+            parsed = sqlparse.parse(query)
+
+            
+
+            if not parsed:
+
+                validation_result[&#x27;is_safe&#x27;] = False
+
+                validation_result[&#x27;issues&#x27;].append(&quot;Unable to parse query&quot;)
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.HIGH
+
+                return validation_result
+
+            
+
+            # Analyze each statement
+
+            for statement in parsed:
+
+                self._analyze_statement(statement, validation_result)
+
+            
+
+            # Check for injection patterns
+
+            self._check_injection_patterns(query, validation_result)
+
+            
+
+            # Validate table/schema access
+
+            self._validate_table_access(query, validation_result)
+
+            
+
+            # Determine final risk level
+
+            self._determine_risk_level(validation_result)
+
+            
+
+        except Exception as e:
+
+            validation_result[&#x27;is_safe&#x27;] = False
+
+            validation_result[&#x27;issues&#x27;].append(f&quot;Query analysis failed: {str(e)}&quot;)
+
+            validation_result[&#x27;risk_level&#x27;] = QueryRisk.CRITICAL
+
+        
+
+        return validation_result
+
+    
+
+    def _analyze_statement(self, statement, validation_result):
+
+        &quot;&quot;&quot;Analyze individual SQL statement.&quot;&quot;&quot;
+
+        
+
+        # Get statement type
+
+        stmt_type = statement.get_type()
+
+        
+
+        # Check if statement type is allowed
+
+        if stmt_type and stmt_type.upper() not in [&#x27;SELECT&#x27;, &#x27;WITH&#x27;]:
+
+            validation_result[&#x27;issues&#x27;].append(f&quot;Disallowed statement type: {stmt_type}&quot;)
+
+            validation_result[&#x27;is_safe&#x27;] = False
+
+            return
+
+        
+
+        # Extract tokens and analyze
+
+        for token in statement.flatten():
+
+            if token.ttype is sqlparse.tokens.Keyword:
+
+                keyword = token.value.upper()
+
+                
+
+                if keyword in self.DANGEROUS_KEYWORDS:
+
+                    validation_result[&#x27;issues&#x27;].append(f&quot;Dangerous keyword detected: {keyword}&quot;)
+
+                    validation_result[&#x27;is_safe&#x27;] = False
+
+                elif keyword in self.SAFE_KEYWORDS:
+
+                    if keyword not in validation_result[&#x27;allowed_operations&#x27;]:
+
+                        validation_result[&#x27;allowed_operations&#x27;].append(keyword)
+
+    
+
+    def _check_injection_patterns(self, query: str, validation_result):
+
+        &quot;&quot;&quot;Check for SQL injection patterns.&quot;&quot;&quot;
+
+        
+
+        for pattern in self.compiled_patterns:
+
+            matches = pattern.findall(query)
+
+            if matches:
+
+                validation_result[&#x27;issues&#x27;].append(f&quot;Potential injection pattern detected&quot;)
+
+                validation_result[&#x27;is_safe&#x27;] = False
+
+    
+
+    def _validate_table_access(self, query: str, validation_result):
+
+        &quot;&quot;&quot;Validate that only allowed tables/schemas are accessed.&quot;&quot;&quot;
+
+        
+
+        # Extract table names (simplified approach)
+
+        # In production, use proper SQL parsing
+
+        from_match = re.findall(r&#x27;FROM\s+(\w+\.?\w*)&#x27;, query, re.IGNORECASE)
+
+        join_match = re.findall(r&#x27;JOIN\s+(\w+\.?\w*)&#x27;, query, re.IGNORECASE)
+
+        
+
+        all_tables = from_match + join_match
+
+        
+
+        for table_ref in all_tables:
+
+            if &#x27;.&#x27; in table_ref:
+
+                schema, table = table_ref.split(&#x27;.&#x27;, 1)
+
+                if schema.lower() not in self.ALLOWED_SCHEMAS:
+
+                    validation_result[&#x27;issues&#x27;].append(f&quot;Access to unauthorized schema: {schema}&quot;)
+
+                    validation_result[&#x27;is_safe&#x27;] = False
+
+                if table.lower() not in self.ALLOWED_TABLES:
+
+                    validation_result[&#x27;warnings&#x27;].append(f&quot;Access to table: {table}&quot;)
+
+            else:
+
+                # Assume retail schema if not specified
+
+                if table_ref.lower() not in self.ALLOWED_TABLES:
+
+                    validation_result[&#x27;warnings&#x27;].append(f&quot;Access to table: {table_ref}&quot;)
+
+    
+
+    def _determine_risk_level(self, validation_result):
+
+        &quot;&quot;&quot;Determine overall risk level.&quot;&quot;&quot;
+
+        
+
+        if not validation_result[&#x27;is_safe&#x27;]:
+
+            if any(&#x27;injection&#x27; in issue.lower() for issue in validation_result[&#x27;issues&#x27;]):
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.CRITICAL
+
+            elif any(&#x27;DROP&#x27; in issue or &#x27;DELETE&#x27; in issue for issue in validation_result[&#x27;issues&#x27;]):
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.HIGH
+
+            else:
+
+                validation_result[&#x27;risk_level&#x27;] = QueryRisk.MEDIUM
+
+        elif validation_result[&#x27;warnings&#x27;]:
+
+            validation_result[&#x27;risk_level&#x27;] = QueryRisk.LOW
+
+        else:
+
+            validation_result[&#x27;risk_level&#x27;] = QueryRisk.LOW
+
+
+
+# Global validator instance
+
+query_validator = QueryValidator()
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🗃️ 데이터베이스 쿼리 도구</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">판매 분석 도구</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/sales_analysis.py
+
+&quot;&quot;&quot;
+
+Comprehensive sales analysis tool for retail data querying.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List, Optional
+
+from datetime import datetime, timedelta
+
+from .base import DatabaseTool, ToolResult
+
+from .query_validator import query_validator
+
+
+
+class SalesAnalysisTool(DatabaseTool):
+
+    &quot;&quot;&quot;Advanced sales analysis and reporting tool.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;execute_sales_query&quot;,
+
+            description=&quot;Execute sophisticated sales analysis queries with natural language support&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        
+
+        # Pre-built query templates for common analysis
+
+        self.query_templates = {
+
+            &#x27;daily_sales&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    DATE(transaction_date) as sales_date,
+
+                    COUNT(*) as transaction_count,
+
+                    SUM(total_amount) as total_revenue,
+
+                    AVG(total_amount) as avg_transaction_value,
+
+                    COUNT(DISTINCT customer_id) as unique_customers
+
+                FROM retail.sales_transactions 
+
+                WHERE transaction_date &gt;= $1 AND transaction_date &lt;= $2
+
+                  AND transaction_type = &#x27;sale&#x27;
+
+                GROUP BY DATE(transaction_date)
+
+                ORDER BY sales_date DESC
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;top_products&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    p.product_name,
+
+                    p.brand,
+
+                    SUM(sti.quantity) as total_quantity_sold,
+
+                    SUM(sti.total_price) as total_revenue,
+
+                    COUNT(DISTINCT st.transaction_id) as transaction_count,
+
+                    AVG(sti.unit_price) as avg_price
+
+                FROM retail.sales_transaction_items sti
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                JOIN retail.products p ON sti.product_id = p.product_id
+
+                WHERE st.transaction_date &gt;= $1 AND st.transaction_date &lt;= $2
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY p.product_id, p.product_name, p.brand
+
+                ORDER BY total_revenue DESC
+
+                LIMIT $3
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;customer_analysis&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    c.customer_id,
+
+                    c.first_name || &#x27; &#x27; || c.last_name as customer_name,
+
+                    c.loyalty_tier,
+
+                    COUNT(st.transaction_id) as transaction_count,
+
+                    SUM(st.total_amount) as total_spent,
+
+                    AVG(st.total_amount) as avg_transaction_value,
+
+                    MAX(st.transaction_date) as last_purchase_date,
+
+                    DATE_PART(&#x27;day&#x27;, CURRENT_DATE - MAX(st.transaction_date)) as days_since_last_purchase
+
+                FROM retail.customers c
+
+                LEFT JOIN retail.sales_transactions st ON c.customer_id = st.customer_id
+
+                WHERE st.transaction_date &gt;= $1 AND st.transaction_date &lt;= $2
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY c.customer_id, c.first_name, c.last_name, c.loyalty_tier
+
+                HAVING COUNT(st.transaction_id) &gt; 0
+
+                ORDER BY total_spent DESC
+
+                LIMIT $3
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;category_performance&#x27;: &quot;&quot;&quot;
+
+                SELECT 
+
+                    pc.category_name,
+
+                    COUNT(DISTINCT p.product_id) as unique_products,
+
+                    SUM(sti.quantity) as total_quantity_sold,
+
+                    SUM(sti.total_price) as total_revenue,
+
+                    AVG(sti.unit_price) as avg_price,
+
+                    COUNT(DISTINCT st.transaction_id) as transaction_count
+
+                FROM retail.product_categories pc
+
+                JOIN retail.products p ON pc.category_id = p.category_id
+
+                JOIN retail.sales_transaction_items sti ON p.product_id = sti.product_id
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                WHERE st.transaction_date &gt;= $1 AND st.transaction_date &lt;= $2
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY pc.category_id, pc.category_name
+
+                ORDER BY total_revenue DESC
+
+            &quot;&quot;&quot;,
+
+            
+
+            &#x27;sales_trends&#x27;: &quot;&quot;&quot;
+
+                WITH daily_sales AS (
+
+                    SELECT 
+
+                        DATE(transaction_date) as sales_date,
+
+                        SUM(total_amount) as daily_revenue,
+
+                        COUNT(*) as daily_transactions
+
+                    FROM retail.sales_transactions 
+
+                    WHERE transaction_date &gt;= $1 AND transaction_date &lt;= $2
+
+                      AND transaction_type = &#x27;sale&#x27;
+
+                    GROUP BY DATE(transaction_date)
+
+                ),
+
+                trend_analysis AS (
+
+                    SELECT 
+
+                        sales_date,
+
+                        daily_revenue,
+
+                        daily_transactions,
+
+                        LAG(daily_revenue, 1) OVER (ORDER BY sales_date) as prev_day_revenue,
+
+                        LAG(daily_revenue, 7) OVER (ORDER BY sales_date) as prev_week_revenue,
+
+                        AVG(daily_revenue) OVER (
+
+                            ORDER BY sales_date 
+
+                            ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+
+                        ) as rolling_7day_avg
+
+                    FROM daily_sales
+
+                )
+
+                SELECT 
+
+                    sales_date,
+
+                    daily_revenue,
+
+                    daily_transactions,
+
+                    rolling_7day_avg,
+
+                    CASE 
+
+                        WHEN prev_day_revenue IS NOT NULL THEN
+
+                            ROUND(((daily_revenue - prev_day_revenue) / prev_day_revenue * 100)::numeric, 2)
+
+                        ELSE NULL
+
+                    END as day_over_day_growth_pct,
+
+                    CASE 
+
+                        WHEN prev_week_revenue IS NOT NULL THEN
+
+                            ROUND(((daily_revenue - prev_week_revenue) / prev_week_revenue * 100)::numeric, 2)
+
+                        ELSE NULL
+
+                    END as week_over_week_growth_pct
+
+                FROM trend_analysis
+
+                ORDER BY sales_date DESC
+
+            &quot;&quot;&quot;
+
+        }
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute sales analysis query.&quot;&quot;&quot;
+
+        
+
+        query_type = kwargs.get(&#x27;query_type&#x27;, &#x27;custom&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for sales analysis&quot;
+
+            )
+
+        
+
+        try:
+
+            if query_type in self.query_templates:
+
+                return await self._execute_template_query(query_type, kwargs)
+
+            elif query_type == &#x27;custom&#x27;:
+
+                return await self._execute_custom_query(kwargs)
+
+            else:
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Unknown query type: {query_type}&quot;
+
+                )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Sales analysis failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _execute_template_query(self, query_type: str, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute pre-built template query.&quot;&quot;&quot;
+
+        
+
+        query = self.query_templates[query_type]
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        
+
+        # Default parameters for template queries
+
+        start_date = kwargs.get(&#x27;start_date&#x27;, (datetime.now() - timedelta(days=30)).date())
+
+        end_date = kwargs.get(&#x27;end_date&#x27;, datetime.now().date())
+
+        limit = kwargs.get(&#x27;limit&#x27;, 20)
+
+        
+
+        # Convert string dates if needed
+
+        if isinstance(start_date, str):
+
+            start_date = datetime.fromisoformat(start_date).date()
+
+        if isinstance(end_date, str):
+
+            end_date = datetime.fromisoformat(end_date).date()
+
+        
+
+        # Execute query with parameters
+
+        params = (start_date, end_date, limit) if &#x27;$3&#x27; in query else (start_date, end_date)
+
+        
+
+        result = await self.execute_query(query, params, store_id)
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;query_type&#x27;: query_type,
+
+                &#x27;date_range&#x27;: f&quot;{start_date} to {end_date}&quot;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;analysis_type&#x27;: &#x27;template&#x27;
+
+            }
+
+        
+
+        return result
+
+    
+
+    async def _execute_custom_query(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute custom SQL query with validation.&quot;&quot;&quot;
+
+        
+
+        custom_query = kwargs.get(&#x27;query&#x27;)
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        
+
+        if not custom_query:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;Custom query is required when query_type is &#x27;custom&#x27;&quot;
+
+            )
+
+        
+
+        # Validate the query for security
+
+        validation = query_validator.validate_query(custom_query)
+
+        
+
+        if not validation[&#x27;is_safe&#x27;]:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Query validation failed: {&#x27;, &#x27;.join(validation[&#x27;issues&#x27;])}&quot;,
+
+                metadata={
+
+                    &#x27;validation_result&#x27;: validation,
+
+                    &#x27;risk_level&#x27;: validation[&#x27;risk_level&#x27;].value
+
+                }
+
+            )
+
+        
+
+        # Execute validated query
+
+        result = await self.execute_query(custom_query, None, store_id)
+
+        
+
+        if result.success:
+
+            result.metadata = {
+
+                &#x27;query_type&#x27;: &#x27;custom&#x27;,
+
+                &#x27;store_id&#x27;: store_id,
+
+                &#x27;validation_warnings&#x27;: validation.get(&#x27;warnings&#x27;, []),
+
+                &#x27;analysis_type&#x27;: &#x27;custom&#x27;
+
+            }
+
+        
+
+        return result
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for the sales analysis tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;query_type&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: list(self.query_templates.keys()) + [&quot;custom&quot;],
+
+                    &quot;description&quot;: &quot;Type of sales analysis to perform&quot;,
+
+                    &quot;default&quot;: &quot;daily_sales&quot;
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for data isolation&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;start_date&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;format&quot;: &quot;date&quot;,
+
+                    &quot;description&quot;: &quot;Start date for analysis (YYYY-MM-DD)&quot;
+
+                },
+
+                &quot;end_date&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;format&quot;: &quot;date&quot;,
+
+                    &quot;description&quot;: &quot;End date for analysis (YYYY-MM-DD)&quot;
+
+                },
+
+                &quot;limit&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 1000,
+
+                    &quot;description&quot;: &quot;Maximum number of results to return&quot;,
+
+                    &quot;default&quot;: 20
+
+                },
+
+                &quot;query&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Custom SQL query (required when query_type is &#x27;custom&#x27;)&quot;
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">스키마 탐색 도구</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/schema_introspection.py
+
+&quot;&quot;&quot;
+
+Database schema introspection and metadata tools.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List
+
+from .base import DatabaseTool, ToolResult, ToolCategory
+
+
+
+class SchemaIntrospectionTool(DatabaseTool):
+
+    &quot;&quot;&quot;Tool for exploring database schema and metadata.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_table_schema&quot;,
+
+            description=&quot;Get detailed schema information for database tables&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.SCHEMA_INTROSPECTION
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute schema introspection.&quot;&quot;&quot;
+
+        
+
+        table_name = kwargs.get(&#x27;table_name&#x27;)
+
+        include_constraints = kwargs.get(&#x27;include_constraints&#x27;, True)
+
+        include_indexes = kwargs.get(&#x27;include_indexes&#x27;, True)
+
+        include_statistics = kwargs.get(&#x27;include_statistics&#x27;, False)
+
+        
+
+        try:
+
+            if table_name:
+
+                return await self._get_single_table_schema(
+
+                    table_name, include_constraints, include_indexes, include_statistics
+
+                )
+
+            else:
+
+                return await self._get_all_tables_schema(include_constraints, include_indexes)
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Schema introspection failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _get_single_table_schema(
+
+        self, 
+
+        table_name: str, 
+
+        include_constraints: bool,
+
+        include_indexes: bool,
+
+        include_statistics: bool
+
+    ) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get detailed schema for a single table.&quot;&quot;&quot;
+
+        
+
+        schema_info = {
+
+            &#x27;table_name&#x27;: table_name,
+
+            &#x27;columns&#x27;: [],
+
+            &#x27;constraints&#x27;: [],
+
+            &#x27;indexes&#x27;: [],
+
+            &#x27;statistics&#x27;: {}
+
+        }
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Get column information
+
+            columns_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    column_name,
+
+                    data_type,
+
+                    is_nullable,
+
+                    column_default,
+
+                    character_maximum_length,
+
+                    numeric_precision,
+
+                    numeric_scale,
+
+                    ordinal_position,
+
+                    udt_name
+
+                FROM information_schema.columns
+
+                WHERE table_schema = &#x27;retail&#x27; AND table_name = $1
+
+                ORDER BY ordinal_position
+
+            &quot;&quot;&quot;
+
+            
+
+            columns = await conn.fetch(columns_query, table_name)
+
+            schema_info[&#x27;columns&#x27;] = [dict(col) for col in columns]
+
+            
+
+            # Get constraints if requested
+
+            if include_constraints:
+
+                constraints_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        constraint_name,
+
+                        constraint_type,
+
+                        column_name,
+
+                        foreign_table_name,
+
+                        foreign_column_name
+
+                    FROM information_schema.table_constraints tc
+
+                    LEFT JOIN information_schema.key_column_usage kcu 
+
+                        ON tc.constraint_name = kcu.constraint_name
+
+                    LEFT JOIN information_schema.referential_constraints rc
+
+                        ON tc.constraint_name = rc.constraint_name
+
+                    LEFT JOIN information_schema.key_column_usage fkcu
+
+                        ON rc.unique_constraint_name = fkcu.constraint_name
+
+                    WHERE tc.table_schema = &#x27;retail&#x27; AND tc.table_name = $1
+
+                &quot;&quot;&quot;
+
+                
+
+                constraints = await conn.fetch(constraints_query, table_name)
+
+                schema_info[&#x27;constraints&#x27;] = [dict(const) for const in constraints]
+
+            
+
+            # Get indexes if requested
+
+            if include_indexes:
+
+                indexes_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        indexname as index_name,
+
+                        indexdef as index_definition,
+
+                        tablespace
+
+                    FROM pg_indexes
+
+                    WHERE schemaname = &#x27;retail&#x27; AND tablename = $1
+
+                &quot;&quot;&quot;
+
+                
+
+                indexes = await conn.fetch(indexes_query, table_name)
+
+                schema_info[&#x27;indexes&#x27;] = [dict(idx) for idx in indexes]
+
+            
+
+            # Get table statistics if requested
+
+            if include_statistics:
+
+                stats_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        n_tup_ins as inserts,
+
+                        n_tup_upd as updates,
+
+                        n_tup_del as deletes,
+
+                        n_live_tup as live_tuples,
+
+                        n_dead_tup as dead_tuples,
+
+                        last_vacuum,
+
+                        last_autovacuum,
+
+                        last_analyze,
+
+                        last_autoanalyze
+
+                    FROM pg_stat_user_tables
+
+                    WHERE schemaname = &#x27;retail&#x27; AND relname = $1
+
+                &quot;&quot;&quot;
+
+                
+
+                stats = await conn.fetchrow(stats_query, table_name)
+
+                if stats:
+
+                    schema_info[&#x27;statistics&#x27;] = dict(stats)
+
+        
+
+        return ToolResult(
+
+            success=True,
+
+            data=schema_info,
+
+            metadata={
+
+                &#x27;table_name&#x27;: table_name,
+
+                &#x27;schema&#x27;: &#x27;retail&#x27;,
+
+                &#x27;introspection_type&#x27;: &#x27;single_table&#x27;
+
+            }
+
+        )
+
+    
+
+    async def _get_all_tables_schema(
+
+        self, 
+
+        include_constraints: bool,
+
+        include_indexes: bool
+
+    ) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Get schema information for all tables.&quot;&quot;&quot;
+
+        
+
+        async with self.get_connection() as conn:
+
+            # Get all tables in retail schema
+
+            tables_query = &quot;&quot;&quot;
+
+                SELECT 
+
+                    table_name,
+
+                    table_type
+
+                FROM information_schema.tables
+
+                WHERE table_schema = &#x27;retail&#x27;
+
+                ORDER BY table_name
+
+            &quot;&quot;&quot;
+
+            
+
+            tables = await conn.fetch(tables_query)
+
+            schema_info = {
+
+                &#x27;schema_name&#x27;: &#x27;retail&#x27;,
+
+                &#x27;tables&#x27;: []
+
+            }
+
+            
+
+            for table in tables:
+
+                table_info = {
+
+                    &#x27;table_name&#x27;: table[&#x27;table_name&#x27;],
+
+                    &#x27;table_type&#x27;: table[&#x27;table_type&#x27;],
+
+                    &#x27;columns&#x27;: []
+
+                }
+
+                
+
+                # Get columns for each table
+
+                columns_query = &quot;&quot;&quot;
+
+                    SELECT 
+
+                        column_name,
+
+                        data_type,
+
+                        is_nullable,
+
+                        column_default
+
+                    FROM information_schema.columns
+
+                    WHERE table_schema = &#x27;retail&#x27; AND table_name = $1
+
+                    ORDER BY ordinal_position
+
+                &quot;&quot;&quot;
+
+                
+
+                columns = await conn.fetch(columns_query, table[&#x27;table_name&#x27;])
+
+                table_info[&#x27;columns&#x27;] = [dict(col) for col in columns]
+
+                
+
+                schema_info[&#x27;tables&#x27;].append(table_info)
+
+        
+
+        return ToolResult(
+
+            success=True,
+
+            data=schema_info,
+
+            metadata={
+
+                &#x27;schema&#x27;: &#x27;retail&#x27;,
+
+                &#x27;table_count&#x27;: len(schema_info[&#x27;tables&#x27;]),
+
+                &#x27;introspection_type&#x27;: &#x27;all_tables&#x27;
+
+            }
+
+        )
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for schema introspection tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;table_name&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Specific table name to introspect (optional - if not provided, all tables are returned)&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z_][a-zA-Z0-9_]*$&quot;
+
+                },
+
+                &quot;include_constraints&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include constraint information&quot;,
+
+                    &quot;default&quot;: True
+
+                },
+
+                &quot;include_indexes&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include index information&quot;,
+
+                    &quot;default&quot;: True
+
+                },
+
+                &quot;include_statistics&quot;: {
+
+                    &quot;type&quot;: &quot;boolean&quot;,
+
+                    &quot;description&quot;: &quot;Include table statistics&quot;,
+
+                    &quot;default&quot;: False
+
+                }
+
+            },
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+
+
+class MultiTableSchemaTool(DatabaseTool):
+
+    &quot;&quot;&quot;Tool for getting schema information for multiple tables at once.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_multiple_table_schemas&quot;,
+
+            description=&quot;Get schema information for multiple tables efficiently&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.SCHEMA_INTROSPECTION
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute multi-table schema introspection.&quot;&quot;&quot;
+
+        
+
+        table_names = kwargs.get(&#x27;table_names&#x27;, [])
+
+        
+
+        if not table_names:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;At least one table name is required&quot;
+
+            )
+
+        
+
+        try:
+
+            schemas = {}
+
+            
+
+            async with self.get_connection() as conn:
+
+                for table_name in table_names:
+
+                    # Get table schema
+
+                    schema_query = &quot;&quot;&quot;
+
+                        SELECT 
+
+                            c.column_name,
+
+                            c.data_type,
+
+                            c.is_nullable,
+
+                            c.column_default,
+
+                            c.character_maximum_length,
+
+                            tc.constraint_type,
+
+                            kcu.constraint_name
+
+                        FROM information_schema.columns c
+
+                        LEFT JOIN information_schema.key_column_usage kcu
+
+                            ON c.table_name = kcu.table_name 
+
+                            AND c.column_name = kcu.column_name
+
+                            AND c.table_schema = kcu.table_schema
+
+                        LEFT JOIN information_schema.table_constraints tc
+
+                            ON kcu.constraint_name = tc.constraint_name
+
+                            AND kcu.table_schema = tc.table_schema
+
+                        WHERE c.table_schema = &#x27;retail&#x27; AND c.table_name = $1
+
+                        ORDER BY c.ordinal_position
+
+                    &quot;&quot;&quot;
+
+                    
+
+                    columns = await conn.fetch(schema_query, table_name)
+
+                    
+
+                    if columns:
+
+                        schemas[table_name] = {
+
+                            &#x27;table_name&#x27;: table_name,
+
+                            &#x27;columns&#x27;: [dict(col) for col in columns]
+
+                        }
+
+                    else:
+
+                        schemas[table_name] = {
+
+                            &#x27;table_name&#x27;: table_name,
+
+                            &#x27;error&#x27;: &#x27;Table not found or not accessible&#x27;
+
+                        }
+
+            
+
+            return ToolResult(
+
+                success=True,
+
+                data=schemas,
+
+                metadata={
+
+                    &#x27;requested_tables&#x27;: table_names,
+
+                    &#x27;found_tables&#x27;: [name for name, info in schemas.items() if &#x27;error&#x27; not in info],
+
+                    &#x27;missing_tables&#x27;: [name for name, info in schemas.items() if &#x27;error&#x27; in info]
+
+                }
+
+            )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Multi-table schema introspection failed: {str(e)}&quot;
+
+            )
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for multi-table schema tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;table_names&quot;: {
+
+                    &quot;type&quot;: &quot;array&quot;,
+
+                    &quot;items&quot;: {
+
+                        &quot;type&quot;: &quot;string&quot;,
+
+                        &quot;pattern&quot;: &quot;^[a-zA-Z_][a-zA-Z0-9_]*$&quot;
+
+                    },
+
+                    &quot;description&quot;: &quot;List of table names to get schema information for&quot;,
+
+                    &quot;minItems&quot;: 1,
+
+                    &quot;maxItems&quot;: 20
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;table_names&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📊 분석 및 유틸리티 도구</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">비즈니스 인텔리전스 도구</h4>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# mcp_server/tools/business_intelligence.py
+
+&quot;&quot;&quot;
+
+Advanced business intelligence and analytics tools.
+
+&quot;&quot;&quot;
+
+from typing import Dict, Any, List
+
+from datetime import datetime, timedelta
+
+from .base import DatabaseTool, ToolResult, ToolCategory
+
+
+
+class BusinessIntelligenceTool(DatabaseTool):
+
+    &quot;&quot;&quot;Advanced analytics tool for business intelligence queries.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;generate_business_insights&quot;,
+
+            description=&quot;Generate comprehensive business intelligence reports and insights&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.ANALYTICS
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute business intelligence analysis.&quot;&quot;&quot;
+
+        
+
+        analysis_type = kwargs.get(&#x27;analysis_type&#x27;, &#x27;summary&#x27;)
+
+        store_id = kwargs.get(&#x27;store_id&#x27;)
+
+        
+
+        if not store_id:
+
+            return ToolResult(
+
+                success=False,
+
+                error=&quot;store_id is required for business intelligence analysis&quot;
+
+            )
+
+        
+
+        try:
+
+            if analysis_type == &#x27;summary&#x27;:
+
+                return await self._generate_business_summary(kwargs)
+
+            elif analysis_type == &#x27;customer_segmentation&#x27;:
+
+                return await self._analyze_customer_segmentation(kwargs)
+
+            elif analysis_type == &#x27;product_performance&#x27;:
+
+                return await self._analyze_product_performance(kwargs)
+
+            elif analysis_type == &#x27;seasonal_trends&#x27;:
+
+                return await self._analyze_seasonal_trends(kwargs)
+
+            else:
+
+                return ToolResult(
+
+                    success=False,
+
+                    error=f&quot;Unknown analysis type: {analysis_type}&quot;
+
+                )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Business intelligence analysis failed: {str(e)}&quot;
+
+            )
+
+    
+
+    async def _generate_business_summary(self, kwargs: Dict[str, Any]) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Generate comprehensive business summary.&quot;&quot;&quot;
+
+        
+
+        store_id = kwargs[&#x27;store_id&#x27;]
+
+        days = kwargs.get(&#x27;days&#x27;, 30)
+
+        
+
+        summary_query = &quot;&quot;&quot;
+
+            WITH date_range AS (
+
+                SELECT CURRENT_DATE - INTERVAL &#x27;%s days&#x27; as start_date,
+
+                       CURRENT_DATE as end_date
+
+            ),
+
+            sales_summary AS (
+
+                SELECT 
+
+                    COUNT(*) as total_transactions,
+
+                    COUNT(DISTINCT customer_id) as unique_customers,
+
+                    SUM(total_amount) as total_revenue,
+
+                    AVG(total_amount) as avg_transaction_value,
+
+                    COUNT(DISTINCT DATE(transaction_date)) as active_days
+
+                FROM retail.sales_transactions st, date_range dr
+
+                WHERE st.transaction_date &gt;= dr.start_date 
+
+                  AND st.transaction_date &lt;= dr.end_date
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+            ),
+
+            product_summary AS (
+
+                SELECT 
+
+                    COUNT(DISTINCT p.product_id) as products_sold,
+
+                    SUM(sti.quantity) as total_items_sold
+
+                FROM retail.sales_transaction_items sti
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                JOIN retail.products p ON sti.product_id = p.product_id
+
+                CROSS JOIN date_range dr
+
+                WHERE st.transaction_date &gt;= dr.start_date 
+
+                  AND st.transaction_date &lt;= dr.end_date
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+            ),
+
+            top_category AS (
+
+                SELECT 
+
+                    pc.category_name,
+
+                    SUM(sti.total_price) as category_revenue
+
+                FROM retail.product_categories pc
+
+                JOIN retail.products p ON pc.category_id = p.category_id
+
+                JOIN retail.sales_transaction_items sti ON p.product_id = sti.product_id
+
+                JOIN retail.sales_transactions st ON sti.transaction_id = st.transaction_id
+
+                CROSS JOIN date_range dr
+
+                WHERE st.transaction_date &gt;= dr.start_date 
+
+                  AND st.transaction_date &lt;= dr.end_date
+
+                  AND st.transaction_type = &#x27;sale&#x27;
+
+                GROUP BY pc.category_name
+
+                ORDER BY category_revenue DESC
+
+                LIMIT 1
+
+            )
+
+            SELECT 
+
+                ss.*,
+
+                ps.products_sold,
+
+                ps.total_items_sold,
+
+                tc.category_name as top_category,
+
+                tc.category_revenue as top_category_revenue,
+
+                CASE 
+
+                    WHEN ss.active_days &gt; 0 THEN ss.total_revenue / ss.active_days
+
+                    ELSE 0
+
+                END as avg_daily_revenue
+
+            FROM sales_summary ss
+
+            CROSS JOIN product_summary ps
+
+            CROSS JOIN top_category tc
+
+        &quot;&quot;&quot; % days
+
+        
+
+        result = await self.execute_query(summary_query, None, store_id)
+
+        
+
+        if result.success and result.data:
+
+            summary = result.data[0]
+
+            
+
+            # Add derived insights
+
+            insights = {
+
+                &#x27;revenue_trend&#x27;: &#x27;stable&#x27;,  # Would calculate based on historical data
+
+                &#x27;customer_retention&#x27;: f&quot;{summary.get(&#x27;unique_customers&#x27;, 0)} active customers&quot;,
+
+                &#x27;performance_indicators&#x27;: {
+
+                    &#x27;transactions_per_day&#x27;: round(summary.get(&#x27;total_transactions&#x27;, 0) / max(summary.get(&#x27;active_days&#x27;, 1), 1), 2),
+
+                    &#x27;revenue_per_customer&#x27;: round(summary.get(&#x27;total_revenue&#x27;, 0) / max(summary.get(&#x27;unique_customers&#x27;, 1), 1), 2),
+
+                    &#x27;items_per_transaction&#x27;: round(summary.get(&#x27;total_items_sold&#x27;, 0) / max(summary.get(&#x27;total_transactions&#x27;, 1), 1), 2)
+
+                }
+
+            }
+
+            
+
+            summary[&#x27;insights&#x27;] = insights
+
+            
+
+            result.data = [summary]
+
+            result.metadata = {
+
+                &#x27;analysis_type&#x27;: &#x27;business_summary&#x27;,
+
+                &#x27;period_days&#x27;: days,
+
+                &#x27;store_id&#x27;: store_id
+
+            }
+
+        
+
+        return result
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for business intelligence tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;analysis_type&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;summary&quot;, &quot;customer_segmentation&quot;, &quot;product_performance&quot;, &quot;seasonal_trends&quot;],
+
+                    &quot;description&quot;: &quot;Type of business intelligence analysis to perform&quot;,
+
+                    &quot;default&quot;: &quot;summary&quot;
+
+                },
+
+                &quot;store_id&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;description&quot;: &quot;Store ID for analysis&quot;,
+
+                    &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-]+$&quot;
+
+                },
+
+                &quot;days&quot;: {
+
+                    &quot;type&quot;: &quot;integer&quot;,
+
+                    &quot;minimum&quot;: 1,
+
+                    &quot;maximum&quot;: 365,
+
+                    &quot;description&quot;: &quot;Number of days to analyze&quot;,
+
+                    &quot;default&quot;: 30
+
+                }
+
+            },
+
+            &quot;required&quot;: [&quot;store_id&quot;],
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+
+
+class UtilityTool(DatabaseTool):
+
+    &quot;&quot;&quot;Utility tool for common operations.&quot;&quot;&quot;
+
+    
+
+    def __init__(self, db_provider):
+
+        super().__init__(
+
+            name=&quot;get_current_utc_date&quot;,
+
+            description=&quot;Get current UTC date and time for reference&quot;,
+
+            db_provider=db_provider
+
+        )
+
+        self.category = ToolCategory.UTILITY
+
+    
+
+    async def execute(self, **kwargs) -&gt; ToolResult:
+
+        &quot;&quot;&quot;Execute utility operation.&quot;&quot;&quot;
+
+        
+
+        format_type = kwargs.get(&#x27;format&#x27;, &#x27;iso&#x27;)
+
+        
+
+        try:
+
+            async with self.get_connection() as conn:
+
+                if format_type == &#x27;iso&#x27;:
+
+                    query = &quot;SELECT CURRENT_TIMESTAMP AT TIME ZONE &#x27;UTC&#x27; as current_utc_datetime&quot;
+
+                elif format_type == &#x27;epoch&#x27;:
+
+                    query = &quot;SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP AT TIME ZONE &#x27;UTC&#x27;) as current_utc_epoch&quot;
+
+                elif format_type == &#x27;date_only&#x27;:
+
+                    query = &quot;SELECT CURRENT_DATE as current_date&quot;
+
+                else:
+
+                    return ToolResult(
+
+                        success=False,
+
+                        error=f&quot;Unknown format type: {format_type}&quot;
+
+                    )
+
+                
+
+                result = await conn.fetchrow(query)
+
+                
+
+                return ToolResult(
+
+                    success=True,
+
+                    data=dict(result),
+
+                    metadata={
+
+                        &#x27;format_type&#x27;: format_type,
+
+                        &#x27;timezone&#x27;: &#x27;UTC&#x27;
+
+                    }
+
+                )
+
+        
+
+        except Exception as e:
+
+            return ToolResult(
+
+                success=False,
+
+                error=f&quot;Utility operation failed: {str(e)}&quot;
+
+            )
+
+    
+
+    def get_input_schema(self) -&gt; Dict[str, Any]:
+
+        &quot;&quot;&quot;Get input schema for utility tool.&quot;&quot;&quot;
+
+        
+
+        return {
+
+            &quot;type&quot;: &quot;object&quot;,
+
+            &quot;properties&quot;: {
+
+                &quot;format&quot;: {
+
+                    &quot;type&quot;: &quot;string&quot;,
+
+                    &quot;enum&quot;: [&quot;iso&quot;, &quot;epoch&quot;, &quot;date_only&quot;],
+
+                    &quot;description&quot;: &quot;Format for the returned date/time&quot;,
+
+                    &quot;default&quot;: &quot;iso&quot;
+
+                }
+
+            },
+
+            &quot;additionalProperties&quot;: False
+
+        }
+
+</code></pre>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 주요 요점</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 실습을 완료한 후, 다음을 달성할 수 있습니다:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>고급 도구 아키텍처</strong>: 포괄적인 오류 처리를 갖춘 정교한 MCP 도구 구현  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>쿼리 검증</strong>: SQL 인젝션 공격을 방지하는 안전한 SQL 검증 구축  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>데이터베이스 도구</strong>: 강력한 판매 분석 및 스키마 탐색 기능 생성  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>비즈니스 인텔리전스</strong>: 포괄적인 비즈니스 통찰력을 위한 분석 도구 개발  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>성능 최적화</strong>: 캐싱, 연결 풀링, 쿼리 최적화 적용  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">✅ <strong>보안 통합</strong>: 역할 기반 접근 제어 및 감사 로깅 구현  </p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🚀 다음 단계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/07-Semantic-Search/README.md" target="_blank">실습 07: 시맨틱 검색 통합</a></strong>을 계속 진행하여:</p>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP 도구와 벡터 검색 기능 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">시맨틱 제품 검색 기능 구축</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI 기반 쿼리 이해 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">전통적 쿼리와 벡터 쿼리를 결합한 하이브리드 검색 생성</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📚 추가 자료</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">MCP 도구 개발</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/docs">Model Context Protocol Documentation</a> - 공식 MCP 사양</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/jlowin/fastmcp">FastMCP Framework</a> - Python MCP 구현</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP Tool Patterns</a> - 도구 구현 예제</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">데이터베이스 보안</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://owasp.org/www-community/attacks/SQL_Injection">SQL Injection Prevention</a> - OWASP 보안 가이드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/security.html">PostgreSQL Security</a> - 데이터베이스 보안 모범 사례</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html">Query Validation Techniques</a> - 안전한 쿼리 패턴</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">성능 최적화</h4>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/performance-tips.html">Database Query Optimization</a> - PostgreSQL 성능 가이드</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://www.postgresql.org/docs/current/runtime-config-connection.html">Connection Pooling Best Practices</a> - 연결 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><a class="text-[var(--accent)] underline" href="https://docs.python.org/3/library/asyncio.html">Async Python Patterns</a> - 비동기 프로그래밍 가이드</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>이전</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/05-MCP-Server/README.md" target="_blank">실습 05: MCP 서버 구현</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>다음</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/11-MCPServerHandsOnLabs/07-Semantic-Search/README.md" target="_blank">실습 07: 시맨틱 검색 통합</a>  </p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">---</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확성이 포함될 수 있습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원본 문서의 원어 버전이 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우, 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m11_06-05---mcp-server-implementation.html">&larr; 05 - MCP Server Implementation</a></span>
+  <span><a href="m11_08-07---semantic-search-integration.html">07 - Semantic Search Integration &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>

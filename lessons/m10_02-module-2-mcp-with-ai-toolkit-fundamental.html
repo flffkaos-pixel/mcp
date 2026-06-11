@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>🌐 Module 2: MCP with AI Toolkit Fundamentals - AI Toolkit - MCP Curriculum</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {{ --bg:#f8f9ff;--text:#0d1c2f;--muted:#404752;--accent:#005faa;--accent-hover:#004883;--border:#c2c7cf;--card:#ffffff;--code-bg:#0F172A;--radius:12px; }}
+* {{ margin:0;padding:0;box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7; }}
+.container {{ max-width:900px;margin:0 auto;padding:32px 24px; }}
+header {{ position:fixed;top:0;width:100%;z-index:50;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);height:60px; }}
+.header-inner {{ max-width:900px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;height:100%; }}
+.breadcrumb {{ font-size:0.8rem;color:var(--muted);margin-bottom:20px; }}
+.breadcrumb a {{ color:var(--accent);text-decoration:none; }}
+.breadcrumb a:hover {{ text-decoration:underline; }}
+.lesson-nav {{ display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--border); }}
+.lesson-nav a {{ color:var(--accent);text-decoration:none;font-size:0.9rem; }}
+.lesson-nav a:hover {{ text-decoration:underline; }}
+.lang-content {{ display:none; }}
+.lang-content.active {{ display:block; }}
+footer {{ border-top:1px solid var(--border);padding:24px;margin-top:48px;text-align:center;font-size:0.8rem;color:var(--muted); }}
+footer a {{ color:var(--accent);text-decoration:none; }}
+.material-symbols-outlined {{ font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="flex items-center gap-2">
+<a href="../production.html" class="flex items-center gap-1 text-[var(--accent)] text-sm font-medium no-underline">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+MCP Curriculum
+</a>
+</div>
+<div id="langToggle" class="flex items-center gap-1 cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+<span class="material-symbols-outlined text-lg">translate</span>
+<span class="text-xs font-semibold tracking-wide" id="langLabel">KO / EN</span>
+</div>
+</div>
+</header>
+<main class="pt-[76px]"><div class="container">
+<div class="breadcrumb"><a href="../production.html">Production</a> &rsaquo; <span class="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">Module 10: AI Toolkit</span> &rsaquo; 🌐 Module 2: MCP with AI Toolkit Fundamentals</div>
+<div id="content-en" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">🌐 Module 2: MCP with AI Toolkit Fundamentals</h2>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 Learning Objectives</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">By the end of this module, you will be able to:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Understand Model Context Protocol (MCP) architecture and benefits</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Explore Microsoft's MCP server ecosystem</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Integrate MCP servers with AI Toolkit Agent Builder</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Build a functional browser automation agent using Playwright MCP</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Configure and test MCP tools within your agents</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Export and deploy MCP-powered agents for production use</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 Building on Module 1</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">In Module 1, we mastered AI Toolkit basics and created our first Python Agent.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Now we'll <strong>supercharge</strong> your agents by connecting them to external tools and services through the revolutionary <strong>Model Context Protocol (MCP)</strong>.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Think of this as upgrading from a basic calculator to a full computer - your AI agents will gain the ability to:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🌐 Browse and interact with websites</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">📁 Access and manipulate files</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔧 Integrate with enterprise systems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">📊 Process real-time data from APIs</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧠 Understanding Model Context Protocol (MCP)</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔍 What is MCP?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol (MCP) is the <strong>"USB-C for AI applications"</strong> - a revolutionary open standard that connects Large Language Models (LLMs) to external tools, data sources, and services.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Just as USB-C eliminated cable chaos by providing one universal connector, MCP eliminates AI integration complexity with one standardized protocol.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 The Problem MCP Solves</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>Before MCP:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔧 Custom integrations for every tool</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔄 Vendor lock-in with proprietary solutions  </li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔒 Security vulnerabilities from ad-hoc connections</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">⏱️ Months of development for basic integrations</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>With MCP:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">⚡ Plug-and-play tool integration</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔄 Vendor-agnostic architecture</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🛡️ Built-in security best practices</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🚀 Minutes to add new capabilities</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏗️ MCP Architecture Deep Dive</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP follows a <strong>client-server architecture</strong> that creates a secure, scalable ecosystem:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TB
+
+    A[AI Application/Agent] --&gt; B[MCP Client]
+
+    B --&gt; C[MCP Server 1: Files]
+
+    B --&gt; D[MCP Server 2: Web APIs]
+
+    B --&gt; E[MCP Server 3: Database]
+
+    B --&gt; F[MCP Server N: Custom Tools]
+
+    
+
+    C --&gt; G[Local File System]
+
+    D --&gt; H[External APIs]
+
+    E --&gt; I[Database Systems]
+
+    F --&gt; J[Enterprise Systems]
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 Core Components:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| Component | Role | Examples |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Hosts</strong> | Applications that consume MCP services | Claude Desktop, VS Code, AI Toolkit |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Clients</strong> | Protocol handlers (1:1 with servers) | Built into host applications |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Servers</strong> | Expose capabilities via standard protocol | Playwright, Files, Azure, GitHub |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>Transport Layer</strong> | Communication methods | stdio, HTTP, WebSockets |</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏢 Microsoft's MCP Server Ecosystem</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Microsoft leads the MCP ecosystem with a comprehensive suite of enterprise-grade servers that address real-world business needs.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌟 Featured Microsoft MCP Servers</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. ☁️ Azure MCP Server</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 Repository</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/azure/azure-mcp">azure/azure-mcp</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Purpose</strong>: Comprehensive Azure resource management with AI integration</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ Key Features:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Declarative infrastructure provisioning</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Real-time resource monitoring</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Cost optimization recommendations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Security compliance checking</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 Use Cases:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Infrastructure-as-Code with AI assistance</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Automated resource scaling</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Cloud cost optimization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">DevOps workflow automation</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. 📊 Microsoft Dataverse MCP</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📚 Documentation</strong>: <a class="text-[var(--accent)] underline" href="https://go.microsoft.com/fwlink/?linkid=2320176">Microsoft Dataverse Integration</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Purpose</strong>: Natural language interface for business data</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ Key Features:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Natural language database queries</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Business context understanding</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Custom prompt templates</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Enterprise data governance</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 Use Cases:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Business intelligence reporting</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Customer data analysis</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Sales pipeline insights</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Compliance data queries</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. 🌐 Playwright MCP Server</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 Repository</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/playwright-mcp">microsoft/playwright-mcp</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Purpose</strong>: Browser automation and web interaction capabilities</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ Key Features:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Cross-browser automation (Chrome, Firefox, Safari)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Intelligent element detection</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Screenshot and PDF generation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Network traffic monitoring</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 Use Cases:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Automated testing workflows</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Web scraping and data extraction</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">UI/UX monitoring</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Competitive analysis automation</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4. 📁 Files MCP Server</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 Repository</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/files-mcp-server">microsoft/files-mcp-server</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Purpose</strong>: Intelligent file system operations</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ Key Features:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Declarative file management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Content synchronization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Version control integration</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Metadata extraction</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 Use Cases:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Documentation management</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Code repository organization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Content publishing workflows</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Data pipeline file handling</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">5. 📝 MarkItDown MCP Server</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 Repository</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/markitdown">microsoft/markitdown</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Purpose</strong>: Advanced Markdown processing and manipulation</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ Key Features:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Rich Markdown parsing</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Format conversion (MD ↔ HTML ↔ PDF)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Content structure analysis</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Template processing</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 Use Cases:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Technical documentation workflows</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Content management systems</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Report generation</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Knowledge base automation</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">6. 📈 Clarity MCP Server</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📦 Package</strong>: <a class="text-[var(--accent)] underline" href="https://www.npmjs.com/package/@microsoft/clarity-mcp-server">@microsoft/clarity-mcp-server</a></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Purpose</strong>: Web analytics and user behavior insights</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ Key Features:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Heatmap data analysis</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">User session recordings</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Performance metrics</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Conversion funnel analysis</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 Use Cases:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Website optimization</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">User experience research</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">A/B testing analysis</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Business intelligence dashboards</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌍 Community Ecosystem</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Beyond Microsoft's servers, the MCP ecosystem includes:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🐙 GitHub MCP</strong>: Repository management and code analysis</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🗄️ Database MCPs</strong>: PostgreSQL, MySQL, MongoDB integrations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>☁️ Cloud Provider MCPs</strong>: AWS, GCP, Digital Ocean tools</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>📧 Communication MCPs</strong>: Slack, Teams, Email integrations</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ Hands-On Lab: Building a Browser Automation Agent</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 Project Goal</strong>: Create an intelligent browser automation agent using Playwright MCP server that can navigate websites, extract information, and perform complex web interactions.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🚀 Phase 1: Agent Foundation Setup</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 1: Initialize Your Agent</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Open AI Toolkit Agent Builder</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Create New Agent</strong> with the following configuration:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Name</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">BrowserAgent</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>Model</strong>: Choose GPT-4o </p>
+
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔧 Phase 2: MCP Integration Workflow</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 3: Add MCP Server Integration</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Navigate to Tools Section</strong> in Agent Builder</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Click "Add Tool"</strong> to open the integration menu</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Select "MCP Server"</strong> from available options</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔍 Understanding Tool Types:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Built-in Tools</strong>: Pre-configured AI Toolkit functions</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP Servers</strong>: External service integrations</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Custom APIs</strong>: Your own service endpoints</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Function Calling</strong>: Direct model function access</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 4: MCP Server Selection</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Choose "MCP Server"</strong> option to proceed</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Browse MCP Catalog</strong> to explore available integrations</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎮 Phase 3: Playwright MCP Configuration</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 5: Select and Configure Playwright</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Click "Use Featured MCP Servers"</strong> to access Microsoft's verified servers</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Select "Playwright"</strong> from the featured list</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>Accept Default MCP ID</strong> or customize for your environment</p>
+
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 6: Enable Playwright Capabilities</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔑 Critical Step</strong>: Select <strong>ALL</strong> available Playwright methods for maximum functionality</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🛠️ Essential Playwright Tools:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Navigation</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">goto</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">goBack</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">goForward</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">reload</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Interaction</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">click</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">fill</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">press</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">hover</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">drag</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Extraction</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">textContent</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">innerHTML</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getAttribute</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Validation</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">isVisible</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">isEnabled</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">waitForSelector</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Capture</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">screenshot</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pdf</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">video</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Network</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">setExtraHTTPHeaders</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">route</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">waitForResponse</code></li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 7: Verify Integration Success</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ Success Indicators:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">All tools appear in Agent Builder interface</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">No error messages in the integration panel</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Playwright server status shows "Connected"</li>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 Troubleshooting Common Issues:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Connection Failed</strong>: Check internet connectivity and firewall settings</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Missing Tools</strong>: Ensure all capabilities were selected during setup</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>Permission Errors</strong>: Verify VS Code has necessary system permissions</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 Phase 4: Advanced Prompt Engineering</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 8: Design Intelligent System Prompts</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Create sophisticated prompts that leverage Playwright's full capabilities:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Web Automation Expert System Prompt
+
+
+
+## Core Identity
+
+You are an advanced web automation specialist with deep expertise in browser automation, web scraping, and user experience analysis. You have access to Playwright tools for comprehensive browser control.
+
+
+
+## Capabilities &amp; Approach
+
+### Navigation Strategy
+
+- Always start with screenshots to understand page layout
+
+- Use semantic selectors (text content, labels) when possible
+
+- Implement wait strategies for dynamic content
+
+- Handle single-page applications (SPAs) effectively
+
+
+
+### Error Handling
+
+- Retry failed operations with exponential backoff
+
+- Provide clear error descriptions and solutions
+
+- Suggest alternative approaches when primary methods fail
+
+- Always capture diagnostic screenshots on errors
+
+
+
+### Data Extraction
+
+- Extract structured data in JSON format when possible
+
+- Provide confidence scores for extracted information
+
+- Validate data completeness and accuracy
+
+- Handle pagination and infinite scroll scenarios
+
+
+
+### Reporting
+
+- Include step-by-step execution logs
+
+- Provide before/after screenshots for verification
+
+- Suggest optimizations and alternative approaches
+
+- Document any limitations or edge cases encountered
+
+
+
+## Ethical Guidelines
+
+- Respect robots.txt and rate limiting
+
+- Avoid overloading target servers
+
+- Only extract publicly available information
+
+- Follow website terms of service
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 9: Create Dynamic User Prompts</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Design prompts that demonstrate various capabilities:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🌐 Web Analysis Example:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Navigate to github.com/kinfey and provide a comprehensive analysis including:
+
+1. Repository structure and organization
+
+2. Recent activity and contribution patterns  
+
+3. Documentation quality assessment
+
+4. Technology stack identification
+
+5. Community engagement metrics
+
+6. Notable projects and their purposes
+
+
+
+Include screenshots at key steps and provide actionable insights.
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🚀 Phase 5: Execution and Testing</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 10: Execute Your First Automation</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>Click "Run"</strong> to launch the automation sequence</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>Monitor Real-time Execution</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Chrome browser launches automatically</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Agent navigates to target website</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Screenshots capture each major step</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Analysis results stream in real-time</p>
+
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 11: Analyze Results and Insights</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Review comprehensive analysis in Agent Builder's interface:</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌟 Phase 6: Advanced Capabilities and Deployment</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">Step 12: Export and Production Deployment</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Agent Builder supports multiple deployment options:</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎓 Module 2 Summary & Next Steps</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏆 Achievement Unlocked: MCP Integration Master</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ Skills Mastered:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Understanding MCP architecture and benefits</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Navigating Microsoft's MCP server ecosystem</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Integrating Playwright MCP with AI Toolkit</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Building sophisticated browser automation agents</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Advanced prompt engineering for web automation</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📚 Additional Resources</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🔗 MCP Specification</strong>: <a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">Official Protocol Documentation</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🛠️ Playwright API</strong>: <a class="text-[var(--accent)] underline" href="https://playwright.dev/docs/api/class-playwright">Complete Method Reference</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🏢 Microsoft MCP Servers</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-servers">Enterprise Integration Guide</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🌍 Community Examples</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP Server Gallery</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 Congratulations!</strong> You've successfully mastered MCP integration and can now build production-ready AI agents with external tool capabilities!</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔜 Continue to Next Module</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Ready to take your MCP skills to the next level? Proceed to <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/README.md" target="_blank">Module 3: Advanced MCP Development with AI Toolkit</a></strong> where you'll learn how to:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Create your own custom MCP servers</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Configure and use the latest MCP Python SDK</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Set up the MCP Inspector for debugging</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Master advanced MCP server development workflows</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Build a Weather MCP Server from scratch</li>
+</div>
+<div id="content-ko" class="lang-content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">🌐 모듈 2: AI Toolkit과 함께하는 MCP 기본 개념</h2>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">📋 학습 목표</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 모듈을 마치면 다음을 할 수 있습니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Model Context Protocol (MCP) 아키텍처와 장점 이해하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Microsoft의 MCP 서버 생태계 탐색하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ MCP 서버를 AI Toolkit Agent Builder와 통합하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ Playwright MCP를 활용한 브라우저 자동화 에이전트 구축하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ 에이전트 내에서 MCP 도구 구성 및 테스트하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">✅ MCP 기반 에이전트를 내보내고 프로덕션에 배포하기</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎯 모듈 1에서 이어서</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">모듈 1에서는 AI Toolkit 기본기를 익히고 첫 Python 에이전트를 만들었습니다. 이제 혁신적인 <strong>Model Context Protocol (MCP)</strong>을 통해 외부 도구와 서비스에 연결하여 에이전트를 <strong>강력하게 업그레이드</strong>할 차례입니다.</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">기본 계산기에서 완전한 컴퓨터로 업그레이드하는 것과 같다고 생각하세요 — AI 에이전트가 다음과 같은 능력을 갖추게 됩니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🌐 웹사이트 탐색 및 상호작용</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">📁 파일 접근 및 조작</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔧 기업 시스템과 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">📊 API를 통한 실시간 데이터 처리</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🧠 Model Context Protocol (MCP) 이해하기</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔍 MCP란 무엇인가?</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Model Context Protocol (MCP)은 AI 애플리케이션을 위한 <strong>"USB-C"</strong>와 같은 혁신적인 오픈 표준입니다. 대형 언어 모델(LLM)을 외부 도구, 데이터 소스, 서비스와 연결해 줍니다. USB-C가 복잡한 케이블 문제를 하나의 표준 커넥터로 해결했듯, MCP는 AI 통합의 복잡함을 하나의 표준 프로토콜로 간소화합니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 MCP가 해결하는 문제</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 이전:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔧 도구별 맞춤 통합 필요</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔄 독점 솔루션에 의한 공급업체 종속</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔒 임시 연결로 인한 보안 취약점</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">⏱️ 기본 통합에도 수개월 개발 소요</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>MCP 도입 후:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">⚡ 플러그 앤 플레이 도구 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🔄 공급업체에 구애받지 않는 아키텍처</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🛡️ 내장된 보안 모범 사례</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">🚀 새로운 기능 추가에 몇 분 소요</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏗️ MCP 아키텍처 심층 분석</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP는 <strong>클라이언트-서버 아키텍처</strong>를 따르며, 안전하고 확장 가능한 생태계를 만듭니다:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+graph TB
+
+    A[AI Application/Agent] --&gt; B[MCP Client]
+
+    B --&gt; C[MCP Server 1: Files]
+
+    B --&gt; D[MCP Server 2: Web APIs]
+
+    B --&gt; E[MCP Server 3: Database]
+
+    B --&gt; F[MCP Server N: Custom Tools]
+
+    
+
+    C --&gt; G[Local File System]
+
+    D --&gt; H[External APIs]
+
+    E --&gt; I[Database Systems]
+
+    F --&gt; J[Enterprise Systems]
+
+</code></pre>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 핵심 구성 요소:</strong></p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| 구성 요소 | 역할 | 예시 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">|-----------|------|----------|</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Hosts</strong> | MCP 서비스를 사용하는 애플리케이션 | Claude Desktop, VS Code, AI Toolkit |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Clients</strong> | 프로토콜 핸들러 (서버와 1:1 매칭) | 호스트 애플리케이션 내장 |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>MCP Servers</strong> | 표준 프로토콜로 기능 제공 | Playwright, Files, Azure, GitHub |</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">| <strong>전송 계층</strong> | 통신 방식 | stdio, HTTP, WebSockets |</p>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🏢 Microsoft의 MCP 서버 생태계</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Microsoft는 실제 비즈니스 요구를 충족하는 엔터프라이즈급 서버 제품군으로 MCP 생태계를 선도하고 있습니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌟 주요 Microsoft MCP 서버</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1. ☁️ Azure MCP 서버</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 저장소</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/azure/azure-mcp">azure/azure-mcp</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목적</strong>: AI 통합을 통한 종합 Azure 리소스 관리</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ 주요 기능:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">선언적 인프라 프로비저닝</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">실시간 리소스 모니터링</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비용 최적화 권고</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보안 규정 준수 검사</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 활용 사례:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">AI 지원 인프라 코드 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자동 리소스 스케일링</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">클라우드 비용 최적화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">DevOps 워크플로우 자동화</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">2. 📊 Microsoft Dataverse MCP</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📚 문서</strong>: <a class="text-[var(--accent)] underline" href="https://go.microsoft.com/fwlink/?linkid=2320176">Microsoft Dataverse Integration</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목적</strong>: 비즈니스 데이터를 위한 자연어 인터페이스</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ 주요 기능:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자연어 데이터베이스 쿼리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비즈니스 컨텍스트 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">맞춤형 프롬프트 템플릿</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">엔터프라이즈 데이터 거버넌스</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 활용 사례:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비즈니스 인텔리전스 보고</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">고객 데이터 분석</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">영업 파이프라인 인사이트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">규정 준수 데이터 쿼리</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3. 🌐 Playwright MCP 서버</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 저장소</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/playwright-mcp">microsoft/playwright-mcp</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목적</strong>: 브라우저 자동화 및 웹 상호작용 기능 제공</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ 주요 기능:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">크로스 브라우저 자동화 (Chrome, Firefox, Safari)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">지능형 요소 감지</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">스크린샷 및 PDF 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">네트워크 트래픽 모니터링</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 활용 사례:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자동화 테스트 워크플로우</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">웹 스크래핑 및 데이터 추출</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">UI/UX 모니터링</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">경쟁사 분석 자동화</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4. 📁 Files MCP 서버</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 저장소</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/files-mcp-server">microsoft/files-mcp-server</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목적</strong>: 지능형 파일 시스템 작업</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ 주요 기능:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">선언적 파일 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">콘텐츠 동기화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">버전 관리 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">메타데이터 추출</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 활용 사례:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">문서 관리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">코드 저장소 정리</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">콘텐츠 퍼블리싱 워크플로우</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">데이터 파이프라인 파일 처리</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">5. 📝 MarkItDown MCP 서버</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔗 저장소</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/markitdown">microsoft/markitdown</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목적</strong>: 고급 Markdown 처리 및 조작</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ 주요 기능:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">풍부한 Markdown 파싱</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">포맷 변환 (MD ↔ HTML ↔ PDF)</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">콘텐츠 구조 분석</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">템플릿 처리</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 활용 사례:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">기술 문서 워크플로우</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">콘텐츠 관리 시스템</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">보고서 생성</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">지식 베이스 자동화</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">6. 📈 Clarity MCP 서버</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>📦 패키지</strong>: <a class="text-[var(--accent)] underline" href="https://www.npmjs.com/package/@microsoft/clarity-mcp-server">@microsoft/clarity-mcp-server</a>  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 목적</strong>: 웹 분석 및 사용자 행동 인사이트 제공</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✨ 주요 기능:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">히트맵 데이터 분석</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자 세션 녹화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">성능 지표</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">전환 퍼널 분석</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🚀 활용 사례:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">웹사이트 최적화</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">사용자 경험 연구</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">A/B 테스트 분석</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">비즈니스 인텔리전스 대시보드</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌍 커뮤니티 생태계</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Microsoft 서버 외에도 MCP 생태계에는 다음이 포함됩니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🐙 GitHub MCP</strong>: 저장소 관리 및 코드 분석</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🗄️ 데이터베이스 MCP</strong>: PostgreSQL, MySQL, MongoDB 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>☁️ 클라우드 제공자 MCP</strong>: AWS, GCP, Digital Ocean 도구</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>📧 커뮤니케이션 MCP</strong>: Slack, Teams, 이메일 통합</li>
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🛠️ 실습: 브라우저 자동화 에이전트 만들기</h3>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎯 프로젝트 목표</strong>: Playwright MCP 서버를 사용해 웹사이트를 탐색하고 정보를 추출하며 복잡한 웹 상호작용을 수행하는 지능형 브라우저 자동화 에이전트를 만듭니다.</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🚀 1단계: 에이전트 기본 설정</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">1단계: 에이전트 초기화</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>AI Toolkit Agent Builder 열기</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>새 에이전트 생성</strong> 및 다음 설정 적용:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>이름</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">BrowserAgent</code></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - <strong>모델</strong>: GPT-4o 선택</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔧 2단계: MCP 통합 워크플로우</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">3단계: MCP 서버 통합 추가</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. Agent Builder에서 <strong>도구 섹션으로 이동</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>"도구 추가" 클릭</strong>하여 통합 메뉴 열기</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. <strong>"MCP 서버" 선택</strong></p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔍 도구 유형 이해하기:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>내장 도구</strong>: 사전 구성된 AI Toolkit 기능</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>MCP 서버</strong>: 외부 서비스 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>사용자 정의 API</strong>: 직접 만든 서비스 엔드포인트</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>함수 호출</strong>: 모델 함수 직접 접근</li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">4단계: MCP 서버 선택</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>"MCP 서버" 옵션 선택</strong>하여 진행</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>MCP 카탈로그 탐색</strong>하여 사용 가능한 통합 확인</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎮 3단계: Playwright MCP 구성</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">5단계: Playwright 선택 및 설정</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>"추천 MCP 서버 사용" 클릭</strong>하여 Microsoft 검증 서버 접근</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>추천 목록에서 "Playwright" 선택</strong></p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">3. 기본 MCP ID 수락 또는 환경에 맞게 수정</p>
+
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">6단계: Playwright 기능 활성화</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔑 중요 단계</strong>: 최대 기능을 위해 Playwright의 모든 메서드 선택</p>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🛠️ 필수 Playwright 도구:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>탐색</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">goto</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">goBack</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">goForward</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">reload</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>상호작용</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">click</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">fill</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">press</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">hover</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">drag</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>추출</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">textContent</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">innerHTML</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">getAttribute</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>검증</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">isVisible</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">isEnabled</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">waitForSelector</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>캡처</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">screenshot</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">pdf</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">video</code></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>네트워크</strong>: <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">setExtraHTTPHeaders</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">route</code>, <code class="px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent)] bg-[var(--border)]/30">waitForResponse</code></li>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">7단계: 통합 성공 확인</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ 성공 지표:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">모든 도구가 Agent Builder 인터페이스에 표시됨</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">통합 패널에 오류 메시지 없음</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Playwright 서버 상태가 "Connected"로 표시됨</li>
+
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🔧 일반 문제 해결:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>연결 실패</strong>: 인터넷 연결 및 방화벽 설정 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>도구 누락</strong>: 설정 시 모든 기능 선택 여부 확인</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>권한 오류</strong>: VS Code에 필요한 시스템 권한 부여 확인</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🎯 4단계: 고급 프롬프트 설계</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">8단계: 지능형 시스템 프롬프트 디자인</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Playwright의 모든 기능을 활용하는 정교한 프롬프트 작성:</p>
+
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+# Web Automation Expert System Prompt
+
+
+
+## Core Identity
+
+You are an advanced web automation specialist with deep expertise in browser automation, web scraping, and user experience analysis. You have access to Playwright tools for comprehensive browser control.
+
+
+
+## Capabilities &amp; Approach
+
+### Navigation Strategy
+
+- Always start with screenshots to understand page layout
+
+- Use semantic selectors (text content, labels) when possible
+
+- Implement wait strategies for dynamic content
+
+- Handle single-page applications (SPAs) effectively
+
+
+
+### Error Handling
+
+- Retry failed operations with exponential backoff
+
+- Provide clear error descriptions and solutions
+
+- Suggest alternative approaches when primary methods fail
+
+- Always capture diagnostic screenshots on errors
+
+
+
+### Data Extraction
+
+- Extract structured data in JSON format when possible
+
+- Provide confidence scores for extracted information
+
+- Validate data completeness and accuracy
+
+- Handle pagination and infinite scroll scenarios
+
+
+
+### Reporting
+
+- Include step-by-step execution logs
+
+- Provide before/after screenshots for verification
+
+- Suggest optimizations and alternative approaches
+
+- Document any limitations or edge cases encountered
+
+
+
+## Ethical Guidelines
+
+- Respect robots.txt and rate limiting
+
+- Avoid overloading target servers
+
+- Only extract publicly available information
+
+- Follow website terms of service
+
+</code></pre>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">9단계: 동적 사용자 프롬프트 생성</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">다양한 기능을 보여주는 프롬프트 설계:</p>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🌐 웹 분석 예시:</strong></p>
+<pre class="bg-code-bg text-white rounded-xl p-4 overflow-x-auto text-sm mb-4 leading-relaxed"><code>
+Navigate to github.com/kinfey and provide a comprehensive analysis including:
+
+1. Repository structure and organization
+
+2. Recent activity and contribution patterns  
+
+3. Documentation quality assessment
+
+4. Technology stack identification
+
+5. Community engagement metrics
+
+6. Notable projects and their purposes
+
+
+
+Include screenshots at key steps and provide actionable insights.
+
+</code></pre>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🚀 5단계: 실행 및 테스트</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">10단계: 첫 자동화 실행</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">1. <strong>"실행" 클릭</strong>하여 자동화 시퀀스 시작</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">2. <strong>실시간 실행 모니터링</strong>:</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - Chrome 브라우저 자동 실행</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 에이전트가 대상 웹사이트 탐색</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 주요 단계마다 스크린샷 캡처</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">   - 분석 결과 실시간 스트리밍</p>
+
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">11단계: 결과 및 인사이트 분석</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Agent Builder 인터페이스에서 종합 분석 검토:</p>
+
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🌟 6단계: 고급 기능 및 배포</h4>
+
+<h5 class="font-headline-sm text-headline-sm text-on-surface mt-6 mb-2">12단계: 내보내기 및 프로덕션 배포</h5>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">Agent Builder는 다양한 배포 옵션을 지원합니다:</p>
+
+
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">🎓 모듈 2 요약 및 다음 단계</h3>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🏆 달성한 목표: MCP 통합 마스터</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>✅ 습득한 기술:</strong></p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] MCP 아키텍처와 장점 이해</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Microsoft MCP 서버 생태계 탐색</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] Playwright MCP와 AI Toolkit 통합</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 정교한 브라우저 자동화 에이전트 구축</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">[ ] 웹 자동화를 위한 고급 프롬프트 엔지니어링</li>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">📚 추가 자료</h4>
+
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🔗 MCP 사양</strong>: <a class="text-[var(--accent)] underline" href="https://modelcontextprotocol.io/">공식 프로토콜 문서</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🛠️ Playwright API</strong>: <a class="text-[var(--accent)] underline" href="https://playwright.dev/docs/api/class-playwright">전체 메서드 참조</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🏢 Microsoft MCP 서버</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-servers">엔터프라이즈 통합 가이드</a></li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed"><strong>🌍 커뮤니티 예제</strong>: <a class="text-[var(--accent)] underline" href="https://github.com/modelcontextprotocol/servers">MCP 서버 갤러리</a></li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>🎉 축하합니다!</strong> MCP 통합을 성공적으로 마스터하여 외부 도구 기능을 갖춘 프로덕션 준비 AI 에이전트를 만들 수 있게 되었습니다!</p>
+
+<h4 class="font-headline-md text-headline-md text-on-surface mt-8 mb-3">🔜 다음 모듈로 진행</h4>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP 기술을 한 단계 더 발전시키고 싶다면, <strong><a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/10-StreamliningAIWorkflowsBuildingAnMCPServerWithAIToolkit/lab3/README.md" target="_blank">모듈 3: AI Toolkit과 함께하는 고급 MCP 개발</a></strong>으로 이동하세요. 여기서 다음을 배우게 됩니다:</p>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">자신만의 맞춤 MCP 서버 만들기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">최신 MCP Python SDK 구성 및 사용법</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">MCP Inspector를 통한 디버깅 설정</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">고급 MCP 서버 개발 워크플로우 마스터하기</li>
+<li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">처음부터 Weather MCP 서버 구축하기</li>
+
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><strong>면책 조항</strong>:  </p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 문서는 AI 번역 서비스 <a class="text-[var(--accent)] underline" href="https://github.com/Azure/co-op-translator">Co-op Translator</a>를 사용하여 번역되었습니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">정확성을 위해 최선을 다하고 있으나, 자동 번역에는 오류나 부정확한 부분이 있을 수 있음을 유의해 주시기 바랍니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">원문은 해당 언어의 원본 문서가 권위 있는 출처로 간주되어야 합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
+<p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">본 번역의 사용으로 인해 발생하는 오해나 잘못된 해석에 대해 당사는 책임을 지지 않습니다.</p></div>
+<div class="lesson-nav">
+  <span><a href="m10_01-module-1-ai-toolkit-fundamentals.html">&larr; 🚀 Module 1: AI Toolkit Fundamentals</a></span>
+  <span><a href="m10_03-module-3-advanced-mcp-development-with-a.html">🔧 Module 3: Advanced MCP Development with AI Toolkit &rarr;</a></span>
+</div>
+</div></main>
+<footer><p>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></p></footer>
+<script>
+(function(){{var b=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';function s(t){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(t==='en'&&e){{e.classList.add('active');l.textContent='EN / KO'}}else{{k&&k.classList.add('active');l.textContent='KO / EN'}}localStorage.setItem('mcp-lang',t)}}if(b)b.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);}})();
+</script>
+</body>
+</html>
