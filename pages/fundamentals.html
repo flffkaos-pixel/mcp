@@ -205,16 +205,18 @@ h1{{font-size:1.5rem}}
 </div>
 </div>
 <script>
+document.addEventListener('DOMContentLoaded', function(){{
 (function(){{
 var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';
 function s(v){{e.classList.remove('active');k.classList.remove('active');if(v==='ko'){{k.classList.add('active');l.textContent='EN'}}else{{e.classList.add('active');l.textContent='KO'}}localStorage.setItem('mcp-lang',v)}}
 t.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});
 s(n||'ko');
 var totalLessons=document.querySelectorAll('.lesson').length/2;
-document.getElementById('totalEn').textContent=totalLessons;
-document.getElementById('totalKo').textContent=totalLessons;
-document.getElementById('modsEn').textContent=document.querySelectorAll('.phase').length/2;
-document.getElementById('modsKo').textContent=document.querySelectorAll('.phase').length/2;
+var te=document.getElementById('totalEn'), tk=document.getElementById('totalKo'), me=document.getElementById('modsEn'), mk=document.getElementById('modsKo');
+if(te) te.textContent=totalLessons;
+if(tk) tk.textContent=totalLessons;
+if(me) me.textContent=document.querySelectorAll('.phase').length/2;
+if(mk) mk.textContent=document.querySelectorAll('.phase').length/2;
 document.querySelectorAll('.phase-header').forEach(function(h){{h.addEventListener('click',function(){{this.parentElement.classList.toggle('open')}})}});
 }})();
 function filter(q,lang){{
@@ -227,6 +229,7 @@ if(p.style.display!=='none')any=true;
 }});
 document.getElementById('no'+(lang==='ko'?'Ko':'En')).style.display=any?'none':'block';
 }}
+}});
 </script>
 </body>
 </html>
