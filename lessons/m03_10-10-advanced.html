@@ -4,63 +4,85 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>10 Advanced - Getting Started - MCP Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <style>
-:root{{--bg:#0a0f1a;--surface:#111827;--card:#1a2235;--hover:#222d42;--border:#2a3548;--text:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--green:#4ade80;--radius:12px}}
+:root{{--bg:#0d0d12;--card:#15151d;--card-hover:#1c1c26;--border:#2a2a35;--text:#e4e4e7;--muted:#888896;--accent:#5588ff;--accent-hover:#6699ff;--green:#22a67e;--amber:#e8a000;--radius:12px}}
 *{{margin:0;padding:0;box-sizing:border-box}}
-body{{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}}
-header{{position:sticky;top:0;z-index:50;background:rgba(10,15,26,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}}
-header a{{color:var(--accent);text-decoration:none;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}}
-.badge{{font-size:12px;color:var(--muted);font-weight:500}}
-.toggle-btn{{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:600;background:none;border:1px solid var(--border);padding:6px 14px;border-radius:8px;transition:all .15s}}
-.toggle-btn:hover{{color:var(--accent);border-color:var(--accent)}}
-main{{max-width:800px;margin:0 auto;padding:32px 24px 80px}}
-.breadcrumb{{font-size:13px;color:var(--muted);margin-bottom:8px}}
+body{{font-family:'Noto Sans KR','Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}}
+.container{{max-width:800px;margin:0 auto;padding:40px 24px}}
+.nav-bar{{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;margin-bottom:24px;border-bottom:1px solid var(--border)}}
+.nav-bar a{{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--accent);text-decoration:none}}
+.nav-bar a:hover{{color:var(--accent-hover)}}
+.breadcrumb{{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);margin-bottom:4px}}
 .breadcrumb a{{color:var(--accent);text-decoration:none}}
-.progress{{height:3px;background:var(--border);border-radius:2px;margin-bottom:28px;overflow:hidden}}
-.progress-fill{{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}}
+.breadcrumb a:hover{{color:var(--accent-hover)}}
+h1{{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:24px}}
+.card{{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px}}
+.meta-grid{{display:flex;flex-wrap:wrap;gap:12px}}
+.meta-item{{flex:1;min-width:120px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px}}
+.meta-item .label{{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.04em}}
+.meta-item .value{{font-size:0.95rem;margin-top:4px;font-weight:500}}
 .lang-content{{display:none}}
 .lang-content.active{{display:block}}
-.overview-body h2,.overview-body h3,.overview-body h4,.overview-body h5{{color:#fff;margin:28px 0 12px;font-weight:700}}
-.overview-body h2{{font-size:28px}}
-.overview-body h3{{font-size:22px}}
-.overview-body h4{{font-size:18px}}
-.overview-body h5{{font-size:16px}}
-.overview-body p{{color:var(--muted);margin-bottom:16px;font-size:15px}}
-.overview-body ul,.overview-body ol{{color:var(--muted);padding-left:22px;margin-bottom:16px;font-size:15px}}
-.overview-body li{{margin-bottom:6px}}
-.overview-body a{{color:var(--accent)}}
-.overview-body code{{background:var(--hover);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:13px;font-family:'JetBrains Mono',monospace}}
-.overview-body pre{{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;overflow-x:auto;margin-bottom:18px;position:relative}}
-.overview-body pre code{{background:none;color:var(--text);padding:0;font-size:13px;line-height:1.6;display:block}}
-.overview-body table{{width:100%;border-collapse:collapse;margin-bottom:18px}}
-.overview-body th,.overview-body td{{border:1px solid var(--border);padding:8px 12px;text-align:left;font-size:14px}}
-.overview-body th{{background:var(--hover);color:#fff;font-weight:600}}
-.overview-body td{{color:var(--muted)}}
-.overview-body strong{{color:#fff}}
-.overview-body hr{{border:none;border-top:1px solid var(--border);margin:28px 0}}
-.nav-row{{display:flex;gap:16px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}}
-.nav-link{{flex:1;display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:all .15s}}
-.nav-link:hover{{background:var(--hover);border-color:var(--accent)}}
-.nav-link.next{{flex-direction:row-reverse;text-align:right}}
-.nav-link .dir{{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;font-family:'JetBrains Mono',monospace}}
-.nav-link .title{{font-size:14px;font-weight:600;color:#fff}}
-footer{{border-top:1px solid var(--border);padding:32px 24px;text-align:center;color:var(--muted);font-size:14px}}
-footer a{{color:var(--accent);text-decoration:none}}
+.content h2,.content h3,.content h4{{font-family:'JetBrains Mono',monospace;color:var(--text);margin:28px 0 12px}}
+.content h2{{font-size:1.3rem;font-weight:700}}
+.content h3{{font-size:1.1rem;font-weight:600}}
+.content h4{{font-size:0.95rem;font-weight:600}}
+.content h5{{font-size:0.9rem;font-weight:600;color:var(--text);margin:20px 0 8px}}
+.content p{{color:var(--muted);margin-bottom:14px;font-size:0.95rem}}
+.content ul,.content ol{{color:var(--muted);padding-left:20px;margin-bottom:14px;font-size:0.95rem}}
+.content li{{margin-bottom:5px}}
+.content a{{color:var(--accent);text-decoration:none}}
+.content a:hover{{color:var(--accent-hover)}}
+.content code{{background:var(--bg);border:1px solid var(--border);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:0.85rem;font-family:'JetBrains Mono',monospace}}
+.content pre{{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin-bottom:16px}}
+.content pre code{{background:none;border:none;color:var(--text);padding:0;font-size:0.82rem;line-height:1.6;display:block}}
+.content table{{width:100%;border-collapse:collapse;margin-bottom:16px}}
+.content th,.content td{{border:1px solid var(--border);padding:8px 12px;text-align:left;font-size:0.88rem}}
+.content th{{background:var(--card-hover);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent)}}
+.content td{{color:var(--muted)}}
+.content strong{{color:var(--text)}}
+.content hr{{border:none;border-top:1px solid var(--border);margin:24px 0}}
+.content blockquote{{border-left:3px solid var(--accent);padding:8px 16px;margin:16px 0;color:var(--muted)}}
+.nav-links{{display:flex;gap:16px;margin-top:32px;padding-top:24px;border-top:1px solid var(--border)}}
+.nav-link{{flex:1;display:flex;flex-direction:column;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:all .15s}}
+.nav-link:hover{{background:var(--card-hover);border-color:var(--accent)}}
+.nav-link.next{{text-align:right;align-items:flex-end}}
+.nav-link .dir{{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.04em}}
+.nav-link .title{{font-size:0.92rem;font-weight:500;margin-top:4px}}
+.colophon{{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);text-align:center;font-size:0.85rem;color:var(--muted);font-family:'JetBrains Mono',monospace}}
+.colophon a{{color:var(--accent);text-decoration:none}}
+.colophon a:hover{{color:var(--accent-hover)}}
+.controls{{display:flex;align-items:center;gap:8px}}
+.btn{{border:1px solid var(--border);background:var(--card);color:var(--text);padding:6px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;cursor:pointer;transition:all .2s}}
+.btn:hover{{border-color:var(--accent);color:var(--accent)}}
+.btn-active{{background:var(--accent);color:#fff;border-color:var(--accent)}}
+@media(max-width:640px){{
+.container{{padding:24px 16px}}
+h1{{font-size:1.4rem}}
+.meta-item{{min-width:100px}}
+.nav-links{{flex-direction:column}}
+}}
 </style>
 </head>
 <body>
-<header>
-<a href="../getting-started.html">&larr; Getting-Started</a>
-<div style="display:flex;align-items:center;gap:16px">
-<span class="badge">Module 03: Getting Started</span>
-<button class="toggle-btn" id="langToggle"><span id="langLabel">KO &#8644; EN</span></button>
+<div class="container">
+<div class="nav-bar">
+<a href="../getting-started.html">&larr; Back to Getting-Started</a>
+<div class="controls">
+<button class="btn" id="langToggle"><span id="langLabel">KO</span></button>
 </div>
-</header>
-<main>
-<div class="progress"><div class="progress-fill" style="width:55%"></div></div>
-<div class="breadcrumb"><a href="../getting-started.html">Getting-Started</a> &rsaquo; Module 03: Getting Started &rsaquo; 10 Advanced</div>
-<div id="content-en" class="lang-content overview-body"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Advanced server usage</h2>
+</div>
+<div class="breadcrumb">
+<a href="../getting-started.html">Getting-Started</a> &rsaquo; Module 03: Getting Started &rsaquo; 10 Advanced
+</div>
+<h1>10 Advanced</h1>
+<div class="meta-grid">
+<div class="meta-item"><div class="label">Module</div><div class="value">Module 03: Getting Started</div></div>
+<div class="meta-item"><div class="label">Progress</div><div class="value">55%</div></div>
+</div>
+<div class="card">
+<div id="content-en" class="lang-content content active"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">Advanced server usage</h2>
 
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">There are two different types of servers exposed in the MCP SDK, your normal server and the low-level server. Normally, you would use the regular server to add features to it. For some cases though, you want to rely on the low-level server such as:</p>
 
@@ -945,7 +967,7 @@ async def handle_call_tool(
 <h3 class="font-headline-lg text-headline-lg text-on-surface mt-10 mb-4">What's Next</h3>
 
 <li class="ml-5 list-disc text-on-surface-variant mb-2 leading-relaxed">Next: <a class="text-[var(--accent)] underline" href="https://github.com/microsoft/mcp-for-beginners/tree/main/03-GettingStarted/11-simple-auth/README.md" target="_blank">Simple Authentication</a></li></div>
-<div id="content-ko" class="lang-content overview-body"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">고급 서버 사용법</h2>
+<div id="content-ko" class="lang-content content"><h2 class="font-headline-xl text-headline-xl text-on-surface mt-12 mb-6">고급 서버 사용법</h2>
 
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">MCP SDK에는 두 가지 유형의 서버가 있습니다. 일반 서버와 저수준 서버(low-level server)입니다. 보통은 일반 서버를 사용하여 기능을 추가합니다. 하지만 때때로 저수준 서버를 사용해야 할 때가 있는데, 예를 들면 다음과 같은 경우입니다:</p>
 
@@ -1830,14 +1852,18 @@ async def handle_call_tool(
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">중요한 정보의 경우 전문적인 인간 번역을 권장합니다.</p>
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed">이 번역 사용으로 인해 발생하는 오해나 오해에 대해 당사는 책임을 지지 않습니다.</p>
 <p class="text-body-md text-on-surface-variant mb-3 leading-relaxed"><!-- CO-OP TRANSLATOR DISCLAIMER END --></p></div>
-<div class="nav-row"><a href="m03_09-09-deployment.html" class="nav-link prev"><span class="dir">Previous</span><span class="title">09 Deployment</span></a><a href="m03_11-11-simple-auth.html" class="nav-link next"><span class="dir">Next</span><span class="title">11 Simple Auth</span></a></div>
-</main>
-<footer>MCP Curriculum &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a></footer>
+</div>
+<div class="nav-links"><a href="m03_09-09-deployment.html" class="nav-link prev"><span class="dir">Previous</span><span class="title">09 Deployment</span></a><a href="m03_11-11-simple-auth.html" class="nav-link next"><span class="dir">Next</span><span class="title">11 Simple Auth</span></a></div>
+<div class="colophon">
+MCP Academy &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">microsoft/mcp-for-beginners</a>
+</div>
+</div>
 <script>
 (function(){{
 var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';
-function s(v){{document.querySelectorAll('.lang-content').forEach(function(x){{x.classList.remove('active')}});if(v==='en'){{e.classList.add('active');l.textContent='EN \21C4 KO'}}else{{k.classList.add('active');l.textContent='KO \21C4 EN'}}localStorage.setItem('mcp-lang',v)}}
-t.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});s(n);
+function s(v){{e.classList.remove('active');k.classList.remove('active');if(v==='ko'){{k.classList.add('active');l.textContent='EN'}}else{{e.classList.add('active');l.textContent='KO'}}localStorage.setItem('mcp-lang',v)}}
+t.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});
+s(n||'ko');
 }})();
 </script>
 </body>

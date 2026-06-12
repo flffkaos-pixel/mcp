@@ -1,29 +1,208 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>MCP Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#0a0f1a;--surface:#111827;--card:#1a2235;--hover:#222d42;--border:#2a3548;--text:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8}
+:root{--bg:#0d0d12;--card:#15151d;--card-hover:#1c1c26;--border:#2a2a35;--text:#e4e4e7;--muted:#888896;--accent:#5588ff;--accent-hover:#6699ff;--green:#22a67e;--amber:#e8a000;--radius:12px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.links{display:flex;flex-direction:column;gap:8px;padding:48px}
-.links a{display:block;padding:16px 32px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);text-decoration:none;font-size:18px;font-weight:500;transition:all .15s}
-.links a:hover{background:var(--hover);border-color:var(--accent);color:var(--accent)}
-.links .title{font-size:28px;font-weight:800;color:var(--accent);margin-bottom:24px;text-align:center;border:none;background:none;padding:0}
-.links .title:hover{background:none;color:var(--accent)}
+body{font-family:'Noto Sans KR','Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+.container{max-width:900px;margin:0 auto;padding:40px 24px}
+h1{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;letter-spacing:-0.02em}
+h1 .ko{display:block;font-family:'Noto Sans KR','Inter',sans-serif;font-size:1.1rem;font-weight:400;color:var(--muted);margin-top:4px}
+.subtitle{color:var(--muted);font-size:1.05rem;max-width:640px;margin:12px 0 0}
+.stats-bar{display:flex;gap:24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 28px;margin:28px 0}
+.stat-item{text-align:center;flex:1}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:1.6rem;font-weight:700;color:var(--accent)}
+.stat-label{font-size:0.8rem;color:var(--muted);margin-top:2px}
+.toc-header{display:flex;justify-content:space-between;align-items:flex-end;margin:40px 0 20px}
+.toc-header h2{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em}
+.phase{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.phase-header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;cursor:pointer;user-select:none;transition:background .15s}
+.phase-header:hover{background:var(--card-hover)}
+.phase-header .caret{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:0.85rem;transition:transform .2s;flex-shrink:0;margin-left:12px}
+.phase.open .phase-header .caret{transform:rotate(90deg)}
+.phase-info{flex:1;min-width:0}
+.phase-info h3{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600}
+.phase-info .ko-sub{display:block;font-size:0.85rem;color:var(--muted);margin-top:2px}
+.phase-meta{font-size:0.78rem;color:var(--muted);font-family:'JetBrains Mono',monospace;white-space:nowrap;margin-left:12px}
+.phase-lessons{display:none;border-top:1px solid var(--border)}
+.phase.open .phase-lessons{display:block}
+.lesson{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;text-decoration:none;color:var(--text);border-bottom:1px solid var(--border);transition:background .15s;gap:16px}
+.lesson:hover{background:var(--card-hover)}
+.lesson:last-child{border-bottom:none}
+.lesson-name{font-size:0.92rem;font-weight:500;flex:1;min-width:0}
+.lesson-tags{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tag{font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:3px 10px;border-radius:4px}
+.tag.build{background:var(--accent);color:#fff}
+.tag.learn{background:var(--green);color:#fff}
+.tag.lang{color:var(--muted);font-size:0.72rem;font-family:'JetBrains Mono',monospace}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.complete{background:var(--green)}
+.status-dot.wip{background:var(--amber)}
+.search{position:relative;margin:0 0 24px}
+.search input{width:100%;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .2s}
+.search input:focus{border-color:var(--accent)}
+.no-results{display:none;text-align:center;padding:40px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.85rem}
+.colophon{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:0.85rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.colophon a{color:var(--accent);text-decoration:none}
+.colophon a:hover{color:var(--accent-hover)}
+.lang-content{display:none}
+.lang-content.active{display:block}
+.controls{display:flex;align-items:center;gap:8px}
+.btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:6px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;cursor:pointer;transition:all .2s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px}
+@media(max-width:640px){
+.container{padding:24px 16px}
+h1{font-size:1.5rem}
+.stats-bar{gap:12px;padding:16px}
+.stat-num{font-size:1.2rem}
+.lesson{flex-wrap:wrap}
+.lesson-tags{margin-left:auto}
+.phase-meta{display:none}
+.controls{margin-top:8px}
+}
 </style>
 </head>
 <body>
-<div class="links">
-<div class="title">MCP Academy</div>
-<a href="pages/fundamentals.html">Fundamentals</a>
-<a href="pages/getting-started.html">Getting Started</a>
-<a href="pages/intermediate.html">Intermediate</a>
-<a href="pages/ecosystem.html">Ecosystem</a>
-<a href="pages/production.html">Production</a>
+<div class="container">
+<div class="header-row">
+<div>
+<h1>MCP Academy<span class="ko">MCP 아카데미</span></h1>
+<p class="subtitle">A hands-on curriculum for learning the Model Context Protocol. Build MCP servers, clients, and tools across multiple languages.</p>
+<p class="subtitle" style="font-size:0.92rem;margin-top:4px">다양한 언어로 MCP 서버, 클라이언트, 도구를 구축하는 실전 커리큘럼입니다.</p>
 </div>
+<div class="controls">
+<button class="btn" id="langToggle"><span id="langLabel">KO</span></button>
+</div>
+</div>
+
+<div id="lang-en" class="lang-content">
+<div class="stats-bar">
+<div class="stat-item"><div class="stat-num">11</div><div class="stat-label">Modules</div></div>
+<div class="stat-item"><div class="stat-num" id="totalEn">0</div><div class="stat-label">Lessons</div></div>
+</div>
+<div class="toc-header"><h2>Curriculum</h2></div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Fundamentals</h3><div class="ko-sub">Fundamentals</div></div>
+<div class="phase-meta">3 modules</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/fundamentals.html" class="lesson"><span class="lesson-name">Fundamentals</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Getting Started</h3><div class="ko-sub">Getting Started</div></div>
+<div class="phase-meta">18 lessons</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/getting-started.html" class="lesson"><span class="lesson-name">Getting Started</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Intermediate</h3><div class="ko-sub">Intermediate</div></div>
+<div class="phase-meta">25 lessons</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/intermediate.html" class="lesson"><span class="lesson-name">Intermediate</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Ecosystem</h3><div class="ko-sub">Ecosystem</div></div>
+<div class="phase-meta">2 modules</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/ecosystem.html" class="lesson"><span class="lesson-name">Ecosystem</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Production</h3><div class="ko-sub">Production</div></div>
+<div class="phase-meta">19 lessons</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/production.html" class="lesson"><span class="lesson-name">Production</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+</div>
+
+<div id="lang-ko" class="lang-content">
+<div class="stats-bar">
+<div class="stat-item"><div class="stat-num">11</div><div class="stat-label">모듈</div></div>
+<div class="stat-item"><div class="stat-num" id="totalKo">0</div><div class="stat-label">레슨</div></div>
+</div>
+<div class="toc-header"><h2>커리큘럼</h2></div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Fundamentals</h3><div class="ko-sub">기초</div></div>
+<div class="phase-meta">3 모듈</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/fundamentals.html" class="lesson"><span class="lesson-name">Fundamentals</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Getting Started</h3><div class="ko-sub">시작하기</div></div>
+<div class="phase-meta">18 레슨</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/getting-started.html" class="lesson"><span class="lesson-name">Getting Started</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Intermediate</h3><div class="ko-sub">중급</div></div>
+<div class="phase-meta">25 레슨</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/intermediate.html" class="lesson"><span class="lesson-name">Intermediate</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Ecosystem</h3><div class="ko-sub">생태계</div></div>
+<div class="phase-meta">2 모듈</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/ecosystem.html" class="lesson"><span class="lesson-name">Ecosystem</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+<div class="phase">
+<div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+<div class="phase-info"><h3>Production</h3><div class="ko-sub">실전</div></div>
+<div class="phase-meta">19 레슨</div><span class="caret">▶</span>
+</div>
+<div class="phase-lessons">
+<a href="pages/production.html" class="lesson"><span class="lesson-name">Production</span><span class="tag learn">LEARN</span></a>
+</div>
+</div>
+</div>
+
+<div class="colophon">
+<span>Built with &mdash; Model Context Protocol</span>
+<div>
+<a href="https://github.com/microsoft/mcp-for-beginners" target="_blank">GitHub</a>
+<span style="margin:0 8px;color:var(--border)">|</span>
+<a href="https://github.com/microsoft/mcp-for-beginners/blob/main/LICENSE" target="_blank">License</a>
+</div>
+</div>
+</div>
+<script>
+(function(){
+var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('lang-en'),k=document.getElementById('lang-ko'),n=localStorage.getItem('mcp-lang')||'ko';
+function s(v){e.classList.remove('active');k.classList.remove('active');if(v==='ko'){k.classList.add('active');l.textContent='EN'}else{e.classList.add('active');l.textContent='KO'}localStorage.setItem('mcp-lang',v)}
+t.addEventListener('click',function(){s(n==='ko'?'en':'ko')});
+s(n||'ko');
+})();
+</script>
 </body>
 </html>
