@@ -207,9 +207,10 @@ h1{font-size:1.5rem}
 <script>
 document.addEventListener('DOMContentLoaded', function(){{
 (function(){{
-var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko'),n=localStorage.getItem('mcp-lang')||'ko';
+var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko');
 function s(v){{e.classList.remove('active');k.classList.remove('active');if(v==='ko'){{k.classList.add('active');l.textContent='EN'}}else{{e.classList.add('active');l.textContent='KO'}}localStorage.setItem('mcp-lang',v)}}
-t.addEventListener('click',function(){{s(n==='ko'?'en':'ko')}});
+t.addEventListener('click',function(){{var n=localStorage.getItem('mcp-lang')||'ko';s(n==='ko'?'en':'ko')}});
+var n=localStorage.getItem('mcp-lang')||'ko';
 s(n||'ko');
 var totalLessons=document.querySelectorAll('.lesson').length/2;
 var te=document.getElementById('totalEn'), tk=document.getElementById('totalKo'), me=document.getElementById('modsEn'), mk=document.getElementById('modsKo');
