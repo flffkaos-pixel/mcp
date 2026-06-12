@@ -492,7 +492,7 @@ def main():
                 badge = f'{title_en}'
                 badge_text = f'{title_en}'
                 badge_inline = f'{title_en}'
-                page = LESSON_TPL
+                page = LESSON_TPL.replace('{lesson_title}', lt)
                 for k, v in [('{module_title}', title_en), ('{hub_back}', f'../{hub_name}'), ('{hub_title}', hub_title), ('{module_badge}', badge), ('{module_badge_inline}', badge_inline), ('{module_badge_text}', badge_text), ('{progress_pct}', str(pct)), ('{prev_link}', prev_link), ('{next_link}', next_link), ('{en_content}', e_html), ('{ko_content}', k_html)]:
                     page = page.replace(k, v)
                 page = page.replace('href="index.html"', 'href="../index.html"')
