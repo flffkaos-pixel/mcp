@@ -301,7 +301,7 @@ LESSON_TPL = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{lesson_title} - {module_title} - MCP Academy</title>
+<title>{module_title} - MCP Academy</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <style>
 :root{{--bg:#0d0d12;--card:#15151d;--card-hover:#1c1c26;--border:#2a2a35;--text:#e4e4e7;--muted:#888896;--accent:#5588ff;--accent-hover:#6699ff;--green:#22a67e;--amber:#e8a000;--radius:12px}}
@@ -466,7 +466,7 @@ def main():
                 else:
                     kl = subs_ko[idx] if idx < len(subs_ko) else None
                     k_html = md_to_html(kl['content'], kl['folder'], True) if kl else e_html
-                    for phrase in ['_(동영상을 보려면 이미지를 클릭하세요)_', '_(클릭하여 동영상 보기)_']:
+                    for phrase in ['_(동영상을 보려면 이미지를 클릭하세요)_', '_(클릭하여 동영상 보기)_', '_(위 이미지를 클릭하면 이 강의의 영상을 볼 수 있습니다)_', '_(동영상 보기)_', 'Click the image above to view video of this lesson', 'Click the image above to view the video for this lesson']:
                         k_html = k_html.replace(phrase, '')
                 lang = s.get('lang', '')
                 lesson_pages.append((fname, s['title'], e_html, k_html, lang))
@@ -475,7 +475,12 @@ def main():
             if not subs_en:
                 safe_title = slugify(title_en)
                 fname = f'm{num}_01-{safe_title}.html'
-                lesson_pages.append((fname, title_en, main_en, main_ko, ''))
+                main_en_clean = main_en
+                main_ko_clean = main_ko
+                for phrase in ['_(Click the image above to view video of this lesson)_', '_(Click the image above to view the video for this lesson)_', '_(동영상을 보려면 이미지를 클릭하세요)_', '_(클릭하여 동영상 보기)_', '_(위 이미지를 클릭하면 이 강의의 영상을 볼 수 있습니다)_', '_(동영상 보기)_']:
+                    main_en_clean = main_en_clean.replace(phrase, '')
+                    main_ko_clean = main_ko_clean.replace(phrase, '')
+                lesson_pages.append((fname, title_en, main_en_clean, main_ko_clean, ''))
 
             for idx, (fname, lt, e_html, k_html, _) in enumerate(lesson_pages):
                 total = len(lesson_pages)
@@ -484,10 +489,10 @@ def main():
                 pct = int((idx + 1) / total * 100)
                 prev_link = f'<a href="{prev_l[0]}" class="nav-link prev"><span class="dir">Previous</span><span class="title">{prev_l[1]}</span></a>' if prev_l else '<div></div>'
                 next_link = f'<a href="{next_l[0]}" class="nav-link next"><span class="dir">Next</span><span class="title">{next_l[1]}</span></a>' if next_l else '<div></div>'
-                badge = f'<span>Module {num}: {title_en}</span>'
-                badge_text = f'Module {num}: {title_en}'
-                badge_inline = f'Module {num}: {title_en}'
-                page = LESSON_TPL.replace('{lesson_title}', lt)
+                badge = f'{title_en}'
+                badge_text = f'{title_en}'
+                badge_inline = f'{title_en}'
+                page = LESSON_TPL
                 for k, v in [('{module_title}', title_en), ('{hub_back}', f'../{hub_name}'), ('{hub_title}', hub_title), ('{module_badge}', badge), ('{module_badge_inline}', badge_inline), ('{module_badge_text}', badge_text), ('{progress_pct}', str(pct)), ('{prev_link}', prev_link), ('{next_link}', next_link), ('{en_content}', e_html), ('{ko_content}', k_html)]:
                     page = page.replace(k, v)
                 page = page.replace('href="index.html"', 'href="../index.html"')
