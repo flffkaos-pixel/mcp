@@ -133,7 +133,7 @@ HUB_TPL = """<!DOCTYPE html>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>{title} - MCP Academy</title>
 <meta name="description" content="MCP Academy - {title} 모듈. 모델 컨텍스트 프로토콜 입문을 위한 종합 학습서."/>
-<meta name="keywords" content="MCP, Model Context Protocol, AI,人工智能, 프롬프트 엔지니어링, Claude, Anthropic, LLM"/>
+<meta name="keywords" content="MCP, Model Context Protocol, AI, 인공지능, 프롬프트 엔지니어링, Claude, Anthropic, LLM"/>
 <meta name="author" content="MCP Academy"/>
 <meta name="robots" content="index, follow"/>
 <link rel="canonical" href="https://mcpbeginner.pages.dev/pages/{title}.html"/>
@@ -322,7 +322,7 @@ LESSON_TPL = """<!DOCTYPE html>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>{module_title} - MCP Academy</title>
 <meta name="description" content="MCP Academy - {module_title}. {module_badge_text} 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼."/>
-<meta name="keywords" content="MCP, Model Context Protocol, {module_badge_text}, AI,人工智能, 프롬프트 엔지니어링, Claude, Anthropic, LLM"/>
+<meta name="keywords" content="MCP, Model Context Protocol, {module_badge_text}, AI, 인공지능, 프롬프트 엔지니어링, Claude, Anthropic, LLM"/>
 <meta name="author" content="MCP Academy"/>
 <meta name="robots" content="index, follow"/>
 <link rel="canonical" href="https://mcpbeginner.pages.dev/lessons/{lesson_title}.html"/>
