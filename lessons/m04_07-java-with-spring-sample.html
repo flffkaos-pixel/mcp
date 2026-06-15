@@ -70,7 +70,7 @@ h1{font-size:1.4rem}
 <div class="nav-bar">
 <a href="../intermediate.html">&larr; Back to Intermediate</a>
 <div class="controls">
-<button class="btn" id="langToggle"><span id="langLabel">KO</span></button>
+<button class="btn" id="langToggle" type="button"><span id="langLabel">KO</span></button>
 </div>
 </div>
 <div class="breadcrumb">
@@ -324,13 +324,13 @@ MCP Academy &mdash; <a href="https://github.com/microsoft/mcp-for-beginners" tar
 </div>
 </div>
 <script>
-(function(){{
+(function(){
 var t=document.getElementById('langToggle'),l=document.getElementById('langLabel'),e=document.getElementById('content-en'),k=document.getElementById('content-ko');
-function s(v){{e.classList.remove('active');k.classList.remove('active');if(v==='ko'){{k.classList.add('active');l.textContent='EN'}}else{{e.classList.add('active');l.textContent='KO'}}localStorage.setItem('mcp-lang',v)}}
-t.addEventListener('click',function(){{var n=localStorage.getItem('mcp-lang')||'ko';s(n==='ko'?'en':'ko')}});
+function s(v){e.classList.remove('active');k.classList.remove('active');if(v==='ko'){k.classList.add('active');l.textContent='EN'}else{e.classList.add('active');l.textContent='KO'}localStorage.setItem('mcp-lang',v)}
+t.addEventListener('click',function(){var n=localStorage.getItem('mcp-lang')||'ko';s(n==='ko'?'en':'ko')});
 var n=localStorage.getItem('mcp-lang')||'ko';
 s(n||'ko');
-}});
+})();
 </script>
 </body>
 </html>
