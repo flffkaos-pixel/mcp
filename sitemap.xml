@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://mcpbeginner.pages.dev/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/index.html</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/pages/fundamentals.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/pages/getting-started.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/pages/intermediate.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/pages/ecosystem.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/pages/production.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/privacy-policy.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/terms.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/contact.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m00_01-introduction.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m01_01-core-concepts.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m02_01-security.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m03_01-01-first-server.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m03_02-02-client.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m03_03-03-llm-client.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m03_04-04-vscode.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m03_05-05-stdio-server.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m03_06-06-http-streaming.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m04_01-c.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m04_05-python.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m05_01-51-integration-with-azure.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m06_01-community-contributions.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+<url><loc>https://mcpbeginner.pages.dev/lessons/m08_01-best-practices.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>

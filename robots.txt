@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mcpbeginner.pages.dev/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+Disallow: /translations/
