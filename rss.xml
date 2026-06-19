@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>mcp</title>
+    <link>https://mcpbeginner.pages.dev</link>
+    <description>mcp updates</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 19 Jun 2026 16:11:22 GMT</lastBuildDate>
+  <item>
+    <title>Contact Us - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//contact.html</link>
+    <description>MCP Academy 문의하기. 모델 컨텍스트 프로토콜 학습 관련 질문 및 피드백.</description>
+    <guid>https://mcpbeginner.pages.dev//contact.html</guid>
+  </item>
+  <item>
+    <title>MCP Academy - 모델 컨텍스트 프로토콜 입문서</title>
+    <link>https://mcpbeginner.pages.dev//</link>
+    <description>MCP(Model Context Protocol) 입문을 위한 종합 학습서. 다중 언어로 MCP 서버, 클라이언트, 도구를 구축하는 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//</guid>
+  </item>
+  <item>
+    <title>Introduction - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m00_01-introduction.html</link>
+    <description>MCP Academy - Introduction. Introduction 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m00_01-introduction.html</guid>
+  </item>
+  <item>
+    <title>Core Concepts - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m01_01-core-concepts.html</link>
+    <description>MCP Academy - Core Concepts. Core Concepts 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m01_01-core-concepts.html</guid>
+  </item>
+  <item>
+    <title>Security - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m02_01-security.html</link>
+    <description>MCP Academy - Security. Security 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m02_01-security.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_01-01-first-server.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_01-01-first-server.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_02-02-client.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_02-02-client.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_03-03-llm-client.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_03-03-llm-client.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_04-04-vscode.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_04-04-vscode.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_05-05-stdio-server.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_05-05-stdio-server.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_06-06-http-streaming.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_06-06-http-streaming.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_07-07-aitk.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_07-07-aitk.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_08-08-testing.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_08-08-testing.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_09-09-deployment.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_09-09-deployment.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_10-10-advanced.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_10-10-advanced.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_11-11-simple-auth.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_11-11-simple-auth.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_12-12-mcp-hosts.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_12-12-mcp-hosts.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_13-13-mcp-inspector.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_13-13-mcp-inspector.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_14-14-sampling.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_14-14-sampling.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_15-15-mcp-apps.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_15-15-mcp-apps.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_16-java-calculator.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_16-java-calculator.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_17-javascript-calculator.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_17-javascript-calculator.html</guid>
+  </item>
+  <item>
+    <title>Getting Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m03_18-typescript-calculator.html</link>
+    <description>MCP Academy - Getting Started. Getting Started 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m03_18-typescript-calculator.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_01-c.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_01-c.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_02-java-with-spring.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_02-java-with-spring.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_03-typescript.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_03-typescript.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_04-javascript.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_04-javascript.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_05-python.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_05-python.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_06-pagination-and-large-result-sets.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_06-pagination-and-large-result-sets.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_07-java-with-spring-sample.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_07-java-with-spring-sample.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_08-javascript-sample.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_08-javascript-sample.html</guid>
+  </item>
+  <item>
+    <title>Practical Implementation - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m04_09-python-sample.html</link>
+    <description>MCP Academy - Practical Implementation. Practical Implementation 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m04_09-python-sample.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_01-51-integration-with-azure.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_01-51-integration-with-azure.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_02-52-multi-modal-sample.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_02-52-multi-modal-sample.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_03-54-root-contexts.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_03-54-root-contexts.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_04-55-routing.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_04-55-routing.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_05-56-sampling.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_05-56-sampling.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_06-57-scaling.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_06-57-scaling.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_07-58-security.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_07-58-security.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_08-59-web-search-sample.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_08-59-web-search-sample.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_09-510-realtime-streaming.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_09-510-realtime-streaming.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_10-511-realtime-web-search.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_10-511-realtime-web-search.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_11-512--entra-id-authentication-for-model-c.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_11-512--entra-id-authentication-for-model-c.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_12-513-azure-ai-foundry-agent-integration.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_12-513-azure-ai-foundry-agent-integration.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_13-514-context-engineering.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_13-514-context-engineering.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_14-515-mcp-custom-transport.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_14-515-mcp-custom-transport.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_15-516-protocol-features-deep-dive.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_15-516-protocol-features-deep-dive.html</guid>
+  </item>
+  <item>
+    <title>Advanced Topics - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m05_16-517-adversarial-multi-agent-reasoning.html</link>
+    <description>MCP Academy - Advanced Topics. Advanced Topics 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m05_16-517-adversarial-multi-agent-reasoning.html</guid>
+  </item>
+  <item>
+    <title>Community Contributions - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m06_01-community-contributions.html</link>
+    <description>MCP Academy - Community Contributions. Community Contributions 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m06_01-community-contributions.html</guid>
+  </item>
+  <item>
+    <title>Lessons from Early Adoption - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m07_01-lessons-from-early-adoption.html</link>
+    <description>MCP Academy - Lessons from Early Adoption. Lessons from Early Adoption 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m07_01-lessons-from-early-adoption.html</guid>
+  </item>
+  <item>
+    <title>Best Practices - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m08_01-best-practices.html</link>
+    <description>MCP Academy - Best Practices. Best Practices 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m08_01-best-practices.html</guid>
+  </item>
+  <item>
+    <title>Case Study - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m09_01-lesson.html</link>
+    <description>MCP Academy - Case Study. Case Study 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m09_01-lesson.html</guid>
+  </item>
+  <item>
+    <title>AI Toolkit - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m10_01-module-1-ai-toolkit-fundamentals.html</link>
+    <description>MCP Academy - AI Toolkit. AI Toolkit 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m10_01-module-1-ai-toolkit-fundamentals.html</guid>
+  </item>
+  <item>
+    <title>AI Toolkit - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m10_02-module-2-mcp-with-ai-toolkit-fundamental.html</link>
+    <description>MCP Academy - AI Toolkit. AI Toolkit 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m10_02-module-2-mcp-with-ai-toolkit-fundamental.html</guid>
+  </item>
+  <item>
+    <title>AI Toolkit - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m10_03-module-3-advanced-mcp-development-with-a.html</link>
+    <description>MCP Academy - AI Toolkit. AI Toolkit 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m10_03-module-3-advanced-mcp-development-with-a.html</guid>
+  </item>
+  <item>
+    <title>AI Toolkit - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m10_04-module-4-practical-mcp-development---cus.html</link>
+    <description>MCP Academy - AI Toolkit. AI Toolkit 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m10_04-module-4-practical-mcp-development---cus.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_01-00---introduction-to-mcp-database-integr.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_01-00---introduction-to-mcp-database-integr.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_02-01---core-architecture-concepts.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_02-01---core-architecture-concepts.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_03-02---security-and-multi-tenancy.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_03-02---security-and-multi-tenancy.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_04-03---environment-setup.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_04-03---environment-setup.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_05-04---database-design-and-schema.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_05-04---database-design-and-schema.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_06-05---mcp-server-implementation.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_06-05---mcp-server-implementation.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_07-06---tool-development.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_07-06---tool-development.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_08-07---semantic-search-integration.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_08-07---semantic-search-integration.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_09-08---testing-and-debugging.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_09-08---testing-and-debugging.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_10-09---vs-code-integration.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_10-09---vs-code-integration.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_11-10---deployment-strategies.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_11-10---deployment-strategies.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_12-11---monitoring-and-observability.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_12-11---monitoring-and-observability.html</guid>
+  </item>
+  <item>
+    <title>PostgreSQL - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//lessons/m11_13-12---best-practices-and-optimization.html</link>
+    <description>MCP Academy - PostgreSQL. PostgreSQL 모듈의 레슨. 모델 컨텍스트 프로토콜 입문을 위한 실전 튜토리얼.</description>
+    <guid>https://mcpbeginner.pages.dev//lessons/m11_13-12---best-practices-and-optimization.html</guid>
+  </item>
+  <item>
+    <title>Ecosystem - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//pages/ecosystem.html</link>
+    <description>MCP Academy - Ecosystem 모듈. 모델 컨텍스트 프로토콜 입문을 위한 종합 학습서.</description>
+    <guid>https://mcpbeginner.pages.dev//pages/ecosystem.html</guid>
+  </item>
+  <item>
+    <title>Fundamentals - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//pages/fundamentals.html</link>
+    <description>MCP Academy - Fundamentals 모듈. 모델 컨텍스트 프로토콜 입문을 위한 종합 학습서.</description>
+    <guid>https://mcpbeginner.pages.dev//pages/fundamentals.html</guid>
+  </item>
+  <item>
+    <title>Getting-Started - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//pages/getting-started.html</link>
+    <description>MCP Academy - Getting-Started 모듈. 모델 컨텍스트 프로토콜 입문을 위한 종합 학습서.</description>
+    <guid>https://mcpbeginner.pages.dev//pages/getting-started.html</guid>
+  </item>
+  <item>
+    <title>Intermediate - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//pages/intermediate.html</link>
+    <description>MCP Academy - Intermediate 모듈. 모델 컨텍스트 프로토콜 입문을 위한 종합 학습서.</description>
+    <guid>https://mcpbeginner.pages.dev//pages/intermediate.html</guid>
+  </item>
+  <item>
+    <title>Production - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//pages/production.html</link>
+    <description>MCP Academy - Production 모듈. 모델 컨텍스트 프로토콜 입문을 위한 종합 학습서.</description>
+    <guid>https://mcpbeginner.pages.dev//pages/production.html</guid>
+  </item>
+  <item>
+    <title>Privacy Policy - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//privacy-policy.html</link>
+    <description>MCP Academy 개인정보 처리방침. 모델 컨텍스트 프로토콜 입문 학습 플랫폼의 개인정보 보호정책.</description>
+    <guid>https://mcpbeginner.pages.dev//privacy-policy.html</guid>
+  </item>
+  <item>
+    <title>Terms of Service - MCP Academy</title>
+    <link>https://mcpbeginner.pages.dev//terms.html</link>
+    <description>MCP Academy 이용약관. 모델 컨텍스트 프로토콜 입문 학습 플랫폼의 서비스 이용약관.</description>
+    <guid>https://mcpbeginner.pages.dev//terms.html</guid>
+  </item>
+  </channel>
+</rss>
